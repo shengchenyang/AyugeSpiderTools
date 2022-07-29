@@ -1,0 +1,11 @@
+pytest
+PyExecjs
+numpy
+opencv-python
+# opencv-contrib-python
+environs
+loguru
+retrying
+oss2
+pymongo
+lgridfs

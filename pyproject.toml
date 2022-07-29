@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "AyugeSpiderTools"
+version = "0.1.5"
+description = "一些爬虫开发中简单的工具集"
+authors = ["ayuge <ayuge.s@qq.com>"]
+readme = "README.md"
+repository = ""
+homepage = ""
+
+[tool.poetry.dependencies]
+python = "^3.8"
+opencv-python = "^4.6.0"
+numpy = "^1.23.1"
+PyExecJS = "^1.5.1"
+environs = "^9.5.0"
+requests = "^2.28.1"
+loguru = "^0.6.0"
+Pillow = "^9.2.0"
+PyMySQL = "^1.0.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
