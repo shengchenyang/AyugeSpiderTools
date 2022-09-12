@@ -5,7 +5,7 @@
 ## 前言
 在 `Python` 开发时会遇到一些经常使用的模块，为了更方便地使用这些模块，我们需要将其打包并发布到 `Pypi` 上。
 
-此库的源码并非最新版（比如 scrapy 框架的扩展方法等），稍等会同步最新。其使用方法请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中查看。
+此库的源码并非最新版（比如 `scrapy` 框架的扩展方法等），稍等会同步最新。其使用方法请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中查看。
 
 ## 1. 前提条件
 
