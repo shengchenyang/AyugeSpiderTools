@@ -23,19 +23,6 @@ __ALL__ = [
 ]
 
 
-def get_true_img_url(img_url: str) -> str:
-    """
-    获取真是的图片链接，去除链接中 x-bce-process 及以后的参数
-    Args:
-        img_url: 待处理的图片链接
-
-    Returns:
-        true_img_url: 去除链接中 x-bce-process 及以后的图片链接
-    """
-    true_img_url = img_url.split('?x-bce-process')[0]
-    return true_img_url
-
-
 class AliOssBase(object):
     """
     oss 所需要的基本方法
@@ -47,7 +34,7 @@ class AliOssBase(object):
         Args:
             OssAccessKeyId: 阿里云账号 AccessKey
             OssAccessKeySecret: 阿里云账号 AccessKey 对应的秘钥
-            Endpoint: 填写 Bucket 所在地域对应的Endpoint。以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com（注意二级域名等问题）
+            Endpoint: 填写 Bucket 所在地域对应的 Endpoint。以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com（注意二级域名等问题）
             examplebucket: 填写 Bucket 名称
         """
         self.Endpoint = Endpoint
@@ -108,19 +95,3 @@ class AliOssBase(object):
         except Exception as e:
             return False, ''
         return True, input_file_name
-
-    def get_file_style(self, media_par: str) -> str:
-        """
-        判断新增图片的格式类型（此方法是为了防止图片地址格式不统一，造成图片格式提取错误）
-        Args:
-            media_par: 需要判断格式类型的文件链接
-
-        Returns:
-            1): 文件的格式信息
-        """
-        image_style = ['.svg', '.png', '.jpg', '.jpeg', '.bmp', '.wav', '.mp3']
-        for image_format in image_style:
-            if image_format in media_par:
-                return image_format[1:]
-        raise Exception("未获取到文件的格式信息，请及时查看")
-

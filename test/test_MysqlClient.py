@@ -11,27 +11,31 @@
 """
 from ayugespidertools import MysqlClient
 from ayugespidertools.config import NormalConfig
-from ayugespidertools.common import SqlFormat
+from ayugespidertools.common.SqlFormat import AboutSql
 
 
 # mysql 连接
-mysql_client = MysqlClient.MysqlOrm(NormalConfig.LOCAL_PYMYSQL_CONFIG)
+mysql_client = MysqlClient.MysqlOrm(NormalConfig.PYMYSQL_CONFIG)
 
 
 def test_select_data():
-    sql_pre, sql_after = SqlFormat.select_generate(db_table="newporj", key=["id", "title"], rule={"id|<=": 5})
+    sql_pre, sql_after = AboutSql.select_generate(db_table="zhihu_answer_info", key=["id", "q_title"], rule={"q_title|=": "我好好的跟女儿谈人际，就问了一个问题，她不说，就坐在床上有些嘲讽的笑，我说了半天也不回，有必要吗？"})
     status, res = mysql_client.search_data(sql_pre, sql_after, type="one")
     print("查询结果:", status, res)
-    assert status == 1, res == "美团终于上市了：市值超越小米和京东，仅次于 BAT"
+    assert status == 1
 
 
 def test_insert_data():
-    insert_sql, insert_value = SqlFormat.insert_generate(db_table="user", data={"name": "zhangsan", "age": 18})
+    insert_sql, insert_value = AboutSql.insert_generate(db_table="user", data={"name": "zhangsan", "age": 18})
     mysql_client.insert_data(insert_sql, insert_value)
     assert True
 
 
 def test_update_data():
-    update_sql, update_value = SqlFormat.update_generate(db_table="user", data={"score": 4}, rule={"name": "zhangsan"})
+    update_sql, update_value = AboutSql.update_generate(db_table="user", data={"score": 4}, rule={"name": "zhangsan"})
     mysql_client.update_data(update_sql, update_value)
     assert True
+
+
+sql_pre, sql_after = AboutSql.select_generate(db_table="zhihu_answer_info", key=["id", "q_title"], rule={"q_title|=": "我好好的跟女儿谈人际，就问了一个问题，她不说，就坐在床上有些嘲讽的笑，我说了半天也不回，有必要吗？"})
+status, res = mysql_client.search_data(sql_pre, sql_after, type="one")

@@ -14,6 +14,11 @@ import os
 import subprocess
 
 
+__all__ = [
+    "AboutPyppeteer",
+]
+
+
 class AboutPyppeteer(object):
     """
     关于 Pyppeteer 的相关管理，目前只有在 Pyppeteer 卡住的时候及时释放的功能
@@ -70,38 +75,8 @@ class AboutPyppeteer(object):
             block_times = cls.get_crawl_debug(content=log_res)
             # 当连续输出 scrapy 的统计信息 3 次时，则卡住
             if block_times >= 3:
-                print("quit progess tmall")
+                # logger.info("quit process success")
                 cls.quit_process("自行替换 sudo root 的密码")
-
-                # TODO: 添加其它后置处理，目前不需要要
-                # MONGODB_SETTINGS = {
-                #     'host': '*****',
-                #     'port': *****,
-                #     'database': '*****',
-                #     'user': '*****',
-                #     'pwd': '*****',
-                # }
-                # mongodb = Database(**MONGODB_SETTINGS)
-                # machine_id = 6
-                # skip_num = 139 * (machine_id - 1)
-                # limit_num = 139
-                # search_res = list(mongodb.find(
-                #     "tmall_goods_key",
-                #     {'_id': {'$exists': True}}, {'original_key': 1, 'handle_key': 1, 'status': 1, '_id': 0}
-                # ).limit(limit_num).skip(skip_num))
-                # if search_res:
-                #     for one_key_dict in search_res:
-                #         if not one_key_dict['status']:
-                #             search_res_deal = [one_key_dict]
-                #
-                #             original_key = search_res_deal[0]['original_key']
-                #             handle_key = search_res_deal[0]['handle_key']
-                #             mongodb.update_super(
-                #                 collection="tmall_goods_key",
-                #                 select_dict={"original_key": original_key, "handle_key": handle_key},
-                #                 set_dict={"status": 1})
-                #             break
-                # del mongodb
 
             # 当最新四行日志中未出现 scrapy 统计，则为正常状态，并清空日志
             elif block_times == 0:

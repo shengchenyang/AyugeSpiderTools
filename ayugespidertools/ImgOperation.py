@@ -59,7 +59,7 @@ class Picture(object):
         # captcha = Image.new('RGB', (50, 120))  # 新建空白图片
         img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')  # 实例化原始图片Image对象
 
-        # todo: 切割滑块验证码图片，将背景图和滑块图分开
+        # 切割滑块验证码图片，将背景图和滑块图分开
         captcha = img.crop((260, 0, 325, 120 - 4))  # (left, upper, right, lower)
         # captcha = img.crop((274, 46, 300, 120 - 20))  # (left, upper, right, lower)
         captcha = captcha.convert('RGBA')
@@ -121,7 +121,7 @@ class Picture(object):
         captcha = Image.new('RGB', (13 * 20, 60 * 2 - 4))  # 新建空白图片
         img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')  # 实例化原始图片Image对象
 
-        # todo: 切割滑块验证码图片，将背景图和滑块图分开
+        # 切割滑块验证码图片，将背景图和滑块图分开
         captcha_de = img.crop((0, 0, 260, 120 - 4))  # (left, upper, right, lower)
         captcha_de = captcha_de.convert('RGBA')
         captcha_de.save(f'{NormalConfig.DOC_DIR}/captcha.png')

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import pymysql
+from typing import Optional
 
 
 __all__ = [
@@ -20,7 +21,7 @@ class MysqlOrm(object):
         self.cursor.execute(sql_pre, sql_after)
         self.connection.commit()
 
-    def search_data(self, sql_pre: str, sql_after: tuple, type=None) -> (bool, tuple):
+    def search_data(self, sql_pre: str, sql_after: tuple, type: Optional[str] = None) -> (bool, tuple):
         if not type:
             type = "one"
 
@@ -42,6 +43,10 @@ class MysqlOrm(object):
         self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
         self.connection.commit()
+
+    def close(self):
+        self.cursor.close()
+        self.connection.close()
 
     def __del__(self):
         self.cursor.close()

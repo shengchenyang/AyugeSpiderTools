@@ -1,3 +1,7 @@
+/.git/
+/.idea/
 /ayugespidertools/logs/
 /ayugespidertools/logs/error.log
 /ayugespidertools/logs/runtime.log
+/dist/
+/test/.pytest_cache/

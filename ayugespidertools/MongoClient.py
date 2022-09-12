@@ -9,11 +9,10 @@
 @License :  (c)Copyright 2022-2023
 @Desc    :  None
 """
-import pymongo
 from gridfs import *
+from typing import Optional
 from typing import List, Dict
 from pymongo import MongoClient
-from urllib.parse import quote_plus
 
 
 __ALL__ = [
@@ -25,36 +24,40 @@ class MongoDbBase(object):
     """
     mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）
     """
-    def __init__(self, user: str, pwd: str, host: str, port: int, database: str = None, connect_style: str = None):
+    def __init__(self, user: str, password: str, host: str, port: int, authsource: str = "admin", database: str = None, connect_style: str = None):
         """
         初始化 mongo 连接句柄
         Args:
             user: 用户名
-            pwd: 用户对应的密码
+            password: 用户对应的密码
             host: mongoDB 链接需要的 host
             port: mongoDB 链接需要的端口
+            authsource: mongoDB 身份验证需要的数据库名称，默认为 admin
             database: mongoDB 链接需要的数据库
             connect_style: mongoDB 的链接方式，参数选择有：
                             1). uri: uri 方式；
                             2). key: 关键字变量方式；
                             3). auth: authenticate 或 admin 认证方式;
-                            默认为 uri 方式
+                            默认为 uri 方式，但其实对外使用还是只传 user, password ... connect_style 的形式
         """
-        # uri 方式
+        # uri 方式，默认使用此方式连接
         if any([not connect_style, connect_style in ["uri", "U"]]):
-            uri = "mongodb://%s:%s@%s:%s" % (quote_plus(user), quote_plus(pwd), host, port)
-            self.connect = MongoClient(uri)
+            uri = "mongodb://%s:%s@%s:%s/?authSource=%s&authMechanism=SCRAM-SHA-1" % (user, password, host, port, authsource)
+            self.conn = MongoClient(uri)
 
         # 关键字变量方式
         elif connect_style in ["key", "K"]:
-            self.connect = pymongo.MongoClient(host=host, port=port, username=user, password=pwd)
+            self.conn = MongoClient(host=host, port=port, username=user, password=password, authSource=authsource, authMechanism='SCRAM-SHA-1')
 
-        # authenticate 或 admin 认证方式
+        # authenticate 或 admin 认证方式(pymongo 3.9 及以下版本使用)，不推荐此方法
         elif connect_style in ["auth", "A"]:
-            self.connect = MongoClient(host, port)
+            self.conn = MongoClient(host, port)
             # 连接 admin 数据库，账号密码认证(其实这里也可以使用 uri 的 auth 认证方式)
-            db = self.connect.admin
-            db.authenticate(user, pwd)
+            db = self.conn.admin
+            db.authenticate(user, password)
+
+        else:
+            raise Exception("你指定错误了 connect_style 的 mongo 链接类型，请正确输入！")
 
         if database:
             self.db = self.init_db(database)
@@ -65,7 +68,7 @@ class MongoDbBase(object):
         Returns:
             1). bool: 链接是否正常
         """
-        return all([self.connect is not None, self.db is not None])
+        return all([self.conn is not None, self.db is not None])
 
     def init_db(self, database: str):
         """
@@ -76,7 +79,7 @@ class MongoDbBase(object):
         Returns:
             1). connect: 数据库链接
         """
-        return self.connect[database]
+        return self.conn[database]
 
     def insert_one(self, collection: str, data: dict) -> str:
         """
@@ -113,13 +116,11 @@ class MongoDbBase(object):
         更新
         Args:
             collection: 集合名称
-            data: 更新的数据
+            data: 更新的数据，{key:[old_data,new_data]}
 
         Returns:
             modified_count: 更新影响的个数
         """
-        # data format:
-        # {key:[old_data,new_data]}
         data_filter = {}
         data_revised = {}
         for key in data.keys():
@@ -129,7 +130,7 @@ class MongoDbBase(object):
             return self.db[collection].update_many(data_filter, {"$set": data_revised}).modified_count
         return 0
 
-    def find(self, collection, condition, column=None):
+    def find(self, collection, condition, column: Optional[dict] = None):
         """
         查询
         Args:
@@ -178,14 +179,14 @@ class MongoDbBase(object):
         return 0
 
     # 上传数据
-    def upLoadFile(self, file_name, collection, contentType, file_data, metadata):
+    def upload_file(self, file_name, collection, content_type, file_data, metadata):
         gridfs_col = GridFS(self.db, collection)
         # with open(file_name, 'rb') as file_r:
         #     file_data = file_r.read()
-        #     file_ = gridfs_col.put(data=file_data, content_type=contentType, filename=file_name, metadata=metadata)
+        #     file_ = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
         #     # return file_
 
-        file_ = gridfs_col.put(data=file_data, content_type=contentType, filename=file_name, metadata=metadata)
+        file_ = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
         return file_
 
     def getFileMd5(self, _id, collection):
@@ -195,18 +196,42 @@ class MongoDbBase(object):
         _id = gf._id
         return {'_id': _id, 'md5': md5}
 
-    def Upload(self, file_name, _id, contentType, collection, file_data):
+    def upload(self, file_name, _id, content_type, collection, file_data):
+        """
+        上传文件
+        Args:
+            file_name: 上传至 mongoDB 的 GridFS 存储桶里的文件名
+            _id: 唯一 id，雪花 id，用来标识此上传任务和图片的唯一
+            content_type: 上传文件的类型，示例：image/jpeg
+            collection: 存储至 GridFS 存储桶名称
+            file_data: 文件的 bytes 内容
+
+        Returns:
+            gridfs_id: 上传至 GridFS 上的文件 ID 标识
+            image_id: 上传至 GridFS 上的文件 MD5 标识
+        """
         metadata = {
-            "_contentType": contentType,
-            "isThumb": 'true', "targetId": _id,
+            "_contentType": content_type,
+            "isThumb": 'true',
+            "targetId": _id,
             "_class": "com.ccr.dc.admin.mongo.MongoFsMetaData"
         }
 
         gridfs_col = GridFS(self.db, collection)
-        id = gridfs_col.put(data=file_data, content_type=contentType, filename=file_name, metadata=metadata)
-        md5 = self.getFileMd5(id, 'fs')['md5']
-        imageId = "/file/find/{}/{}".format(str(id), md5)
-        return id, imageId
+        # 当存储桶中不存在此文件，才需要上传
+        if not gridfs_col.exists(filename=file_name):
+            gridfs_id = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
+            md5 = self.getFileMd5(gridfs_id, 'fs')['md5']
+            image_id = f"/file/find/{str(gridfs_id)}/{md5}"
+            return gridfs_id, image_id
+
+        # 否则，只需返回文件的 id 等标识即可
+        res = gridfs_col.find_one({"filename": file_name})
+        return res._id, f"/file/find/{str(res._id)}/{res.md5}"
+
+    def close_mongodb(self):
+        """手动关闭连接"""
+        self.conn.close()
 
     def __del__(self):
-        self.connect.close()
+        self.conn.close()

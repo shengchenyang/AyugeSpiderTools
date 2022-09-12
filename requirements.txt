@@ -1,11 +1,20 @@
 pytest
-PyExecjs
-numpy
 opencv-python
-# opencv-contrib-python
+numpy
+PyExecJS
 environs
+requests
 loguru
+Pillow
+PyMySQL
+Scrapy
+pandas
+WorkWeixinRobot
+crawlab-sdk
 retrying
-oss2
-pymongo
-lgridfs
+pymongo==3.11.0
+SQLAlchemy
+DBUtils
+itemadapter
+aiohttp
+html2text
