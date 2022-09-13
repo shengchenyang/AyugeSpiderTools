@@ -1,0 +1,12 @@
+以下为即将添加的功能（不只是 python 库相关）：
+
+1. clean_process 进程管理相关 √
+2. crawlab 的爬虫记录、管理等支持
+3. Mysql sql 拼接方法： data_format.py 中查看（可优化）√
+4. MongoDB 语句拼接方法：优化为 pymilk 库中的方法 √
+5. ali oss 操作 √
+6. mq 相关操作
+7. rpa 相关 quit_pyppeteer √
+8. scrapy 框架扩展（可优化和增加新功能） √
+9. ~ nacos 获取远程配置 ~ 改为 consul 的方式获取配置 √
+10. ...
