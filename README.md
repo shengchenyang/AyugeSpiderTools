@@ -67,25 +67,24 @@ aiohttp = "^3.8.1"
 具体使用方法请在 [DemoSpider 之 AyugeSpiderTools 工具应用示例](https://github.com/shengchenyang/DemoSpider) 项目中查看，目前已适配以下场景：
 
 ```diff
-# 采集数据存入 `Mysql` 的场景：
+# 一）采集数据存入 `Mysql` 的场景：
 - 1).demo_one: 配置根据本地 `settings` 的 `LOCAL_MYSQL_CONFIG` 中取值
 + 3).demo_three: 配置根据 `consul` 的应用管理中心中取值
 + 5).demo_five: 异步存入 `Mysql` 的场景
 
-# 采集数据存入 `MongoDB` 的场景：
-- 2).demo_two: 采集数据存入 `MongoDB` 的场景（配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值）
-+ 4).demo_four: 采集数据存入 `MongoDB` 的场景（配置根据 `consul` 的应用管理中心中取值）
+# 二）采集数据存入 `MongoDB` 的场景：
+- 2).demo_two: 配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值
++ 4).demo_four: 配置根据 `consul` 的应用管理中心中取值
 + 6).demo_six: 异步存入 `MongoDB` 的场景
 
-# 将 `Scrapy` 的 `Request`，`FormRequest` 替换为其它工具实现的场景
+# 三）将 `Scrapy` 的 `Request`，`FormRequest` 替换为其它工具实现的场景
 - 以上为使用 scrapy Request 的场景
 + 7).demo_seven: scrapy Request 替换为 requests 请求的场景(一般情况下不推荐使用，同步库会拖慢 scrapy 速度，可用于测试场景)
-
-+ 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
-
-- 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
++ 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
 + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
+# 四）其它场景
++ 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
 + 11.demo_proxy_one: 快代理动态隧道代理示例
 + 12).demo_proxy_two: 测试快代理独享代理
 ```
@@ -179,9 +178,9 @@ assert gap_distance in list(range(205, 218))
 
 # 参数为图片 bytes 的情况
 with open("doc/image/1.png", "rb") as f:
-target_bytes = f.read()
+    target_bytes = f.read()
 with open("doc/image/2.jpg", "rb") as f:
-template_bytes = f.read()
+    template_bytes = f.read()
 gap_distance = Picture.identify_gap(template_bytes, target_bytes, "doc/image/33.png")
 print("滑块验证码的缺口距离2为：", gap_distance)
 ```
