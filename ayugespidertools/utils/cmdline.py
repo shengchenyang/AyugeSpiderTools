@@ -15,6 +15,7 @@ import argparse
 import cProfile
 import inspect
 import pkg_resources
+import ayugespidertools
 from scrapy.crawler import CrawlerProcess
 from scrapy.commands import ScrapyCommand, ScrapyHelpFormatter
 from scrapy.exceptions import UsageError
@@ -85,8 +86,7 @@ def _pop_command_name(argv):
 
 
 def _print_header(settings, inproject):
-    # version = ayugespidertools.__version__
-    version = "1.0.0"
+    version = ayugespidertools.__version__
     if inproject:
         print(f"AyugeSpiderTools {version} - project: {settings['BOT_NAME']}\n")
     else:
@@ -96,7 +96,7 @@ def _print_header(settings, inproject):
 def _print_commands(settings, inproject):
     _print_header(settings, inproject)
     print("Usage:")
-    print("  scrapy <command> [options] [args]\n")
+    print("  ayugespidertools <command> [options] [args]\n")
     print("Available commands:")
     cmds = _get_commands_dict(settings, inproject)
     for cmdname, cmdclass in sorted(cmds.items()):
@@ -105,13 +105,13 @@ def _print_commands(settings, inproject):
         print()
         print("  [ more ]      More commands available when run from project directory")
     print()
-    print('Use "scrapy <command> -h" to see more info about a command')
+    print('Use "ayugespidertools <command> -h" to see more info about a command')
 
 
 def _print_unknown_command(settings, cmdname, inproject):
     _print_header(settings, inproject)
     print(f"Unknown command: {cmdname}\n")
-    print('Use "scrapy" to see available commands')
+    print('Use "ayugespidertools" to see available commands')
 
 
 def _run_print_help(parser, func, *a, **kw):
@@ -174,7 +174,7 @@ def _run_command(cmd, args, opts):
 
 def _run_command_profiled(cmd, args, opts):
     if opts.profile:
-        sys.stderr.write(f"scrapy: writing cProfile stats to {opts.profile!r}\n")
+        sys.stderr.write(f"ayugespidertools: writing cProfile stats to {opts.profile!r}\n")
     loc = locals()
     p = cProfile.Profile()
     p.runctx('cmd.run(args, opts)', globals(), loc)
