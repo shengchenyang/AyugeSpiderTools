@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "1.0.1rc1"
+version = "1.0.2"
 description = "一些爬虫开发中简单的工具集"
 authors = ["ayuge <ayuge.s@qq.com>"]
 readme = "README.md"
