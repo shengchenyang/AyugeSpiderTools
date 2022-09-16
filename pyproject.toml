@@ -1,12 +1,16 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "1.0.2"
-description = "一些爬虫开发中简单的工具集"
+version = "1.0.3rc1"
+description = "scarpy 扩展库：在爬虫和其它开发中遇到的一些工具库集合"
 authors = ["ayuge <ayuge.s@qq.com>"]
+maintainers = ["ayuge <ayuge.s@qq.com>"]
 readme = "README.md"
 packages = [{include = "ayugespidertools"}]
 repository = "https://github.com/shengchenyang"
+documentation = "https://github.com/shengchenyang/DemoSpider"
+keywords = ["scrapy", "aiohttp", "asyncio"]
 homepage = "http://175.178.210.193:8090/mkdocs-material/"
+include = ["pyproject.toml"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -21,14 +25,13 @@ PyMySQL = "^1.0.2"
 Scrapy = "^2.6.2"
 pandas = "^1.4.3"
 WorkWeixinRobot = "^1.0.1"
-crawlab-sdk = "^0.6.0"
 retrying = "^1.3.3"
-pymongo = "3.11.0"
 SQLAlchemy = "^1.4.39"
 DBUtils = "^3.0.2"
 itemadapter = "^0.7.0"
 aiohttp = "^3.8.1"
 html2text = "^2020.1.16"
+pymongo = "^3.12.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"

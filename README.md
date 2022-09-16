@@ -28,33 +28,12 @@
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-> 或者自行安装以下依赖：
+> 或者自行安装相关依赖：
 
-```ini
-python = "^3.8"
-opencv-python = "^4.6.0"
-numpy = "^1.23.1"
-PyExecJS = "^1.5.1"
-environs = "^9.5.0"
-requests = "^2.28.1"
-loguru = "^0.6.0"
-Pillow = "^9.2.0"
-PyMySQL = "^1.0.2"
-Scrapy = "^2.6.2"
-pandas = "^1.4.3"
-WorkWeixinRobot = "^1.0.1"
-crawlab-sdk = “^0.6.0”
-# pymongo 版本要在 3.11.0 及以下
-pymongo = "3.11.0"
-pytest == “6.2.5”
-retrying = “^1.3.3”
-SQLAlchemy = "^1.4.39"
-DBUtils = "^3.0.2"
-itemadapter = "^0.7.0"
-aiohttp = "^3.8.1"
-```
+依赖信息在根目录下的 `requirements.txt` 文件中
 
-注：`pymongo` 版本要在 `3.11.0` 及以下的要求是因为我的 `mongoDB` 的版本为 `3.4`；若依赖库中的库有版本冲突，请去除版本限制即可。
+注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！；
+建议在独立的虚拟环境中使用，以免与您的其它项目依赖互相干扰。
 
 ### 1.1. 使用方法
 
@@ -67,25 +46,26 @@ aiohttp = "^3.8.1"
 具体使用方法请在 [DemoSpider 之 AyugeSpiderTools 工具应用示例](https://github.com/shengchenyang/DemoSpider) 项目中查看，目前已适配以下场景：
 
 ```diff
-# 一）采集数据存入 `Mysql` 的场景：
+# 采集数据存入 `Mysql` 的场景：
 - 1).demo_one: 配置根据本地 `settings` 的 `LOCAL_MYSQL_CONFIG` 中取值
 + 3).demo_three: 配置根据 `consul` 的应用管理中心中取值
 + 5).demo_five: 异步存入 `Mysql` 的场景
 
-# 二）采集数据存入 `MongoDB` 的场景：
-- 2).demo_two: 配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值
-+ 4).demo_four: 配置根据 `consul` 的应用管理中心中取值
+# 采集数据存入 `MongoDB` 的场景：
+- 2).demo_two: 采集数据存入 `MongoDB` 的场景（配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值）
++ 4).demo_four: 采集数据存入 `MongoDB` 的场景（配置根据 `consul` 的应用管理中心中取值）
 + 6).demo_six: 异步存入 `MongoDB` 的场景
 
-# 三）将 `Scrapy` 的 `Request`，`FormRequest` 替换为其它工具实现的场景
+# 将 `Scrapy` 的 `Request`，`FormRequest` 替换为其它工具实现的场景
 - 以上为使用 scrapy Request 的场景
 + 7).demo_seven: scrapy Request 替换为 requests 请求的场景(一般情况下不推荐使用，同步库会拖慢 scrapy 速度，可用于测试场景)
-+ 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
+
++ 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
+
+- 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
 + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
-# 四）其它场景
-+ 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
-+ 11.demo_proxy_one: 快代理动态隧道代理示例
++ 11).demo_proxy_one: 快代理动态隧道代理示例
 + 12).demo_proxy_two: 测试快代理独享代理
 ```
 
@@ -213,19 +193,35 @@ tracks = VerificationCode.get_normal_track(space=120)
 
 ```python
 # mysql 连接
+from ayugespidertools import MysqlClient
+from ayugespidertools.common.SqlFormat import AboutSql
+
+
 mysql_client = MysqlClient.MysqlOrm(NormalConfig.PYMYSQL_CONFIG)
 
 # test_select_data
-sql_pre, sql_after = SqlFormat.select_generate(db_table="newporj", key=["id", "title"], rule={"id|<=": 5}, order_by="id")
-status, res = mysql_client.search_data(sql_pre, sql_after, type="one")
+select_sql, select_value = AboutSql.select_generate(db_table="zhihu_answer_info", key=["id", "q_title"], rule={"q_id|=": "34987206"}, limit=1)
+print(f"select_sql: {select_sql}, select_value: {select_value}")
+mysql_client.search_data(select_sql, select_value, type="one")
 
 # test_insert_data
-insert_sql, insert_value = SqlFormat.insert_generate(db_table="user", data={"name": "zhangsan", "age": 18})
+insert_sql, insert_value = AboutSql.insert_generate(db_table="user", data={"name": "zhangsan", "age": 18})
+print(f"insert_sql: {insert_sql}, insert_value: {insert_value}")
 mysql_client.insert_data(insert_sql, insert_value)
 
 # test_update_data
-update_sql, update_value = SqlFormat.update_generate(db_table="user", data={"score": 4}, rule={"name": "zhangsan"})
+update_sql, update_value = AboutSql.update_generate(db_table="user", data={"score": 4}, rule={"name": "zhangsan"})
+print(f"update_sql: {update_sql}, update_value: {update_value}")
 mysql_client.update_data(update_sql, update_value)
+```
+
+结果为：
+```
+select_sql: select `id`, `q_title` from `zhihu_answer_info` where `q_id`=%s limit 1, select_value: ('34987206',)
+
+insert_sql: insert into `user` (`name`, `age`) values (%s, %s), insert_value: ('zhangsan', 18)
+
+update_sql: update `user` set `score`=%s where `name`=%s, update_value: (4, 'zhangsan')
 ```
 
 ### 2.4. 自动化相关
@@ -281,7 +277,7 @@ assert js_res
   - [x] `mongoDB` 语句拼接
   - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
   - [ ] 字体反爬还原方法
-  - [x] `html` 格式转 `markdown` 格式
+  - [ ] `html` 格式转 `markdown` 格式
   - [ ] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等等等
   - [x] 添加常用的图片验证码中的处理方法
     - [x] 滑块缺口距离的识别方法（多种实现方式）

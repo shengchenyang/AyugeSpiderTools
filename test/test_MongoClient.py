@@ -24,6 +24,8 @@ def test_uri_connect():
     print("MONGODB_CONFIG:", MONGODB_CONFIG)
     print("mongodb.connect:", mongodb.conn)
     print("mongodb.db:", mongodb.db)
+    select_res = mongodb.find('book_info_list', {'book_name': '武帝独尊'})
+    print("select_res:", list(select_res))
     assert mongodb is not None
 
 
@@ -31,7 +33,8 @@ def test_key_connect():
     """测试 mongoDB 的 key 关键字链接方式"""
     MONGODB_CONFIG['connect_style'] = "K"
     mongodb = MongoDbBase(**MONGODB_CONFIG)
-    print(mongodb)
+    select_res = mongodb.find('title', {'name': '标题名称3'}).count()
+    print("select_res:", select_res)
     assert mongodb is not None
 
 
@@ -40,7 +43,8 @@ def test_auth_connect():
     MONGODB_CONFIG['connect_style'] = "A"
     print(MONGODB_CONFIG)
     mongodb = MongoDbBase(**MONGODB_CONFIG)
-    print(mongodb)
+    select_res = mongodb.find('title', {'name': '标题名称3'}).count()
+    print("select_res:", select_res)
     assert mongodb is not None
 
 

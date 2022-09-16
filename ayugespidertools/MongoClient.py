@@ -24,7 +24,16 @@ class MongoDbBase(object):
     """
     mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）
     """
-    def __init__(self, user: str, password: str, host: str, port: int, authsource: str = "admin", database: str = None, connect_style: str = None):
+    def __init__(
+        self,
+        user: str,
+        password: str,
+        host: str,
+        port: int,
+        authsource: str = "admin",
+        database: str = None,
+        connect_style: str = None
+    ) -> None:
         """
         初始化 mongo 连接句柄
         Args:
