@@ -10,7 +10,7 @@
 @Desc    :  sql 相关处理: sql 语句的管理方法，
     这里的 sql 拼接只能做到最简单的逻辑，若想做到适配性更高，请参考 directsql, python-sql, pypika 或 pymilk 等第三方类似功能库的实现方法，以后会再优化此场景
 """
-from typing import Optional
+from typing import Optional, Union
 
 
 __all__ = [
@@ -24,7 +24,14 @@ class AboutSql(object):
     """
 
     @staticmethod
-    def select_generate(db_table: str, key: list, rule: dict, base: Optional[str] = None, order_by: Optional[str] = None, limit: int = 0) -> (str, tuple):
+    def select_generate(
+        db_table: str,
+        key: list,
+        rule: dict,
+        base: Optional[str] = None,
+        order_by: Optional[str] = None,
+        limit: Optional[Union[bool, int]] = False
+    ) -> (str, tuple):
         """
         根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句（适用于简单情况）
         Args:
@@ -33,7 +40,7 @@ class AboutSql(object):
             rule: 查询需要的规则
             base: 在有多个查询规则时，选择 "and" 或 "or"，默认 "and"
             order_by: 排序的 key 值
-            limit: limit 限制
+            limit: limit 限制，默认无限制（查询所有）；如果需要则指定 int 值即可
 
         Returns:
             select_sql: 生成的 sql 语句
