@@ -34,7 +34,8 @@ class AliOssBase(object):
         Args:
             OssAccessKeyId: 阿里云账号 AccessKey
             OssAccessKeySecret: 阿里云账号 AccessKey 对应的秘钥
-            Endpoint: 填写 Bucket 所在地域对应的 Endpoint。以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com（注意二级域名等问题）
+            Endpoint: 填写 Bucket 所在地域对应的 Endpoint。
+                以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com（注意二级域名等问题）
             examplebucket: 填写 Bucket 名称
         """
         self.Endpoint = Endpoint
@@ -54,7 +55,10 @@ class AliOssBase(object):
             None
         """
         try:
-            self.bucket.delete_object('{}/{}'.format(self.operateDoc, del_logo_url.replace('{}/{}/'.format(self.Endpoint, self.operateDoc), '')))
+            self.bucket.delete_object('{}/{}'.format(
+                self.operateDoc,
+                del_logo_url.replace('{}/{}/'.format(self.Endpoint, self.operateDoc), ''))
+            )
         except oss2.exceptions.NoSuchKey as e:
             raise Exception('delete_oss error: status={0}, request_id={1}'.format(e.status, e.request_id))
 

@@ -51,12 +51,20 @@ class MongoDbBase(object):
         """
         # uri 方式，默认使用此方式连接
         if any([not connect_style, connect_style in ["uri", "U"]]):
-            uri = "mongodb://%s:%s@%s:%s/?authSource=%s&authMechanism=SCRAM-SHA-1" % (user, password, host, port, authsource)
+            uri = "mongodb://%s:%s@%s:%s/?authSource=%s&authMechanism=SCRAM-SHA-1" % (
+                user, password, host, port, authsource)
             self.conn = MongoClient(uri)
 
         # 关键字变量方式
         elif connect_style in ["key", "K"]:
-            self.conn = MongoClient(host=host, port=port, username=user, password=password, authSource=authsource, authMechanism='SCRAM-SHA-1')
+            self.conn = MongoClient(
+                host=host,
+                port=port,
+                username=user,
+                password=password,
+                authSource=authsource,
+                authMechanism='SCRAM-SHA-1'
+            )
 
         # authenticate 或 admin 认证方式(pymongo 3.9 及以下版本使用)，不推荐此方法
         elif connect_style in ["auth", "A"]:

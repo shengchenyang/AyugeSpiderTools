@@ -81,7 +81,12 @@ class DataHandle(object):
         return False
 
     @staticmethod
-    def _get_format_t(date_style: str = "", date_is_full: bool = False, specific_date_conn: str = " ", hms_conn: str = ":") -> str:
+    def _get_format_t(
+        date_style: str = "",
+        date_is_full: bool = False,
+        specific_date_conn: str = " ",
+        hms_conn: str = ":"
+    ) -> str:
         """
         将需要格式化的数据用 date_style 标识来拼接起来，如果 date_is_full 为 True 时，则需要补齐"时分秒"位
         Args:
@@ -124,7 +129,14 @@ class DataHandle(object):
         return ""
 
     @classmethod
-    def normal_to_stamp(cls, normal_time: str, _format_t: str = None, date_is_full: bool = True, specific_date_conn: str = " ", hms_conn: str = ":") -> int:
+    def normal_to_stamp(
+        cls,
+        normal_time: str,
+        _format_t: str = None,
+        date_is_full: bool = True,
+        specific_date_conn: str = " ",
+        hms_conn: str = ":"
+    ) -> int:
         """
         将网页正常时间转为时间戳
         Args:

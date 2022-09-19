@@ -225,7 +225,7 @@ class AyuMysqlPipeline:
         note_dic = item_o.get("notes_dic")
         keys = "`" + "`, `".join(new_item.keys()) + "`"
         values = ", ".join(["%s"] * len(new_item))
-        sql = """INSERT INTO {table} ({keys}) values ({values}) ON DUPLICATE KEY UPDATE """.format(table=table, keys=keys, values=values)
+        sql = """INSERT INTO {table} ({keys}) values ({values}) ON DUPLICATE KEY UPDATE """.format(table=table,keys=keys, values=values)
         update = ",".join([" `{key}` = %s".format(key=key) for key in new_item])
         sql += update
 
@@ -246,7 +246,6 @@ class AyuMysqlPipeline:
 
                 if colum == "url":
                     sql = "ALTER TABLE `%s` ADD COLUMN `%s` TEXT(500) NULL COMMENT '%s';" % (table, colum, notes)
-
                 elif colum in ["create_time", "crawl_time"]:
                     sql = "ALTER TABLE `%s` ADD COLUMN `%s` DATE NULL DEFAULT NULL COMMENT '%s';" % (table, colum, notes)
                 else:
@@ -328,7 +327,8 @@ class AyuMysqlPipeline:
                     if "text" == column_type:
                         change_colum_type = "LONGTEXT"
 
-                    sql = """ALTER TABLE `%s` CHANGE COLUMN `%s` `%s` %s NULL DEFAULT NULL COMMENT "%s" ;""" % (table, colum, colum, change_colum_type, notes)
+                    sql = """ALTER TABLE `%s` CHANGE COLUMN `%s` `%s` %s NULL DEFAULT NULL COMMENT "%s" ;""" % (
+                        table, colum, colum, change_colum_type, notes)
                     try:
                         self.conn.ping(reconnect=True)
                         if self.cursor.execute(sql):
