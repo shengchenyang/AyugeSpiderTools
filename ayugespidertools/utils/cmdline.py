@@ -17,6 +17,7 @@ import inspect
 import pkg_resources
 import ayugespidertools
 from scrapy.crawler import CrawlerProcess
+from ayugespidertools.commands.version import AyuCommand
 from scrapy.commands import ScrapyCommand, ScrapyHelpFormatter
 from scrapy.exceptions import UsageError
 from scrapy.utils.misc import walk_modules
@@ -86,7 +87,7 @@ def _pop_command_name(argv):
 
 
 def _print_header(settings, inproject):
-    version = ayugespidertools.__version__
+    version = AyuCommand().run(args=None, opts=None)
     if inproject:
         print(f"AyugeSpiderTools {version} - project: {settings['BOT_NAME']}\n")
     else:
