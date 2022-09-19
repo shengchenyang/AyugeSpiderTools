@@ -222,7 +222,10 @@ class ReuseOperation(object):
             None
         """
         # 判断 pymysql_dict_config 是否满足最少的 key 值
-        judge_pymysql_dict_config = cls.if_dict_meet_min_limit(dict_config=pymysql_dict_config, key_list=["host", "port", "user", "password", "charset"])
+        judge_pymysql_dict_config = cls.if_dict_meet_min_limit(
+            dict_config=pymysql_dict_config,
+            key_list=["host", "port", "user", "password", "charset"]
+        )
         if not judge_pymysql_dict_config:
             raise Exception("创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！")
 
@@ -281,7 +284,10 @@ class ReuseOperation(object):
         consul_conf_dict = settings.get('CONSUL_CONFIG')
         consul_conf_dict_lowered = cls.dict_keys_to_lower(consul_conf_dict)
         # 取最少需要配置的值，consul 一般情况下最少需要 host, port 和 token 共三个值
-        consul_conf_dict_min = cls.get_items_by_keys(dict_config=consul_conf_dict_lowered,  key_list=["host", "port", "token"])
+        consul_conf_dict_min = cls.get_items_by_keys(
+            dict_config=consul_conf_dict_lowered,
+            key_list=["host", "port", "token"]
+        )
         if not consul_conf_dict_min:
             raise Exception(f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！")
 

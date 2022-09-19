@@ -165,7 +165,10 @@ class AyuSpider(AyuMixin, CrawlSpider):
             return None
 
         # 1). 从本地 local_mysql_config 的参数中取值
-        if ReuseOperation.if_dict_meet_min_limit(dict_config=local_mysql_config, key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"]):
+        if ReuseOperation.if_dict_meet_min_limit(
+            dict_config=local_mysql_config,
+            key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"]
+        ):
             mysql_conf_temp = {
                 "host": local_mysql_config.get("HOST"),
                 "port": local_mysql_config.get("PORT"),
@@ -200,7 +203,10 @@ class AyuSpider(AyuMixin, CrawlSpider):
             return None
 
         # 1). 从本地 local_mongo_conf 的参数中取值
-        if ReuseOperation.if_dict_meet_min_limit(dict_config=local_mongodb_conf, key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"]):
+        if ReuseOperation.if_dict_meet_min_limit(
+            dict_config=local_mongodb_conf,
+            key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"]
+        ):
             mongodb_conf_temp = {
                 "host": local_mongodb_conf.get("HOST"),
                 "port": local_mongodb_conf.get("PORT"),
@@ -229,7 +235,11 @@ class AyuSpider(AyuMixin, CrawlSpider):
             # 如果打开了 mysql_engine_off 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_off:
                 mysql_url = "mysql+pymysql://{}:{}@{}:{}/{}?charset={}".format(
-                    mysql_conf.get("user"), mysql_conf.get("password"), mysql_conf.get("host"), mysql_conf.get("port"), mysql_conf.get("database"),
+                    mysql_conf.get("user"),
+                    mysql_conf.get("password"),
+                    mysql_conf.get("host"),
+                    mysql_conf.get("port"),
+                    mysql_conf.get("database"),
                     mysql_conf.get("charset")
                 )
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine

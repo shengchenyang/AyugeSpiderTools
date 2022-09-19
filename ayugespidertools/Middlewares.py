@@ -81,7 +81,10 @@ class DynamicProxyDownloaderMiddleware(object):
         """
         dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(dict_config=dynamic_proxy_config, key_list=["PROXY_URL", "USERNAME", "PASSWORD"])
+        is_match = ReuseOperation.if_dict_meet_min_limit(
+            dict_config=dynamic_proxy_config,
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
+        )
         if not is_match:
             raise Exception(f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}")
 
@@ -128,7 +131,10 @@ class ExclusiveProxyDownloaderMiddleware(object):
         """
         self.proxy = None
         # 查看独享代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(dict_config=exclusive_proxy_config, key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"])
+        is_match = ReuseOperation.if_dict_meet_min_limit(
+            dict_config=exclusive_proxy_config,
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"]
+        )
         if not is_match:
             raise Exception(f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_config_example}")
 
@@ -394,7 +400,10 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         """
         dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(dict_config=dynamic_proxy_config, key_list=["PROXY_URL", "USERNAME", "PASSWORD"])
+        is_match = ReuseOperation.if_dict_meet_min_limit(
+            dict_config=dynamic_proxy_config,
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
+        )
         if not is_match:
             raise Exception(f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}")
 

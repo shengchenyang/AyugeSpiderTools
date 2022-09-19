@@ -61,7 +61,17 @@ class AiohttpRequest(Request):
         aiohttp_meta = meta.setdefault("aiohttp_args", {})
         aiohttp_meta["proxy"] = self.proxy
         aiohttp_meta["timeout"] = self.timeout
-        super(AiohttpRequest, self).__init__(url, callback, method=method, headers=headers, body=body, cookies=cookies, meta=meta, *args, **kwargs)
+        super(AiohttpRequest, self).__init__(
+            url,
+            callback,
+            method=method,
+            headers=headers,
+            body=body,
+            cookies=cookies,
+            meta=meta,
+            *args,
+            **kwargs
+        )
 
 
 class AioFormRequestBackup(AiohttpRequest, FormRequest):
@@ -109,7 +119,18 @@ class AioFormRequestBackup(AiohttpRequest, FormRequest):
             formcss: Optional[str] = None,
             **kwargs,
     ) -> FormRequestTypeVar:
-        return super().from_response(response, formname, formid, formnumber, formdata, clickdata, dont_click, formxpath, formcss, **kwargs)
+        return super().from_response(
+            response,
+            formname,
+            formid,
+            formnumber,
+            formdata,
+            clickdata,
+            dont_click,
+            formxpath,
+            formcss,
+            **kwargs
+        )
 
 
 class AioFormRequest(AiohttpRequest):

@@ -46,7 +46,11 @@ class ToolsForAyu(object):
         """
         curr_consul_headers = copy.deepcopy(Param.consul_headers)
         curr_consul_headers["X-Consul-Token"] = token
-        r = requests.get(f'http://{host}:{port}/v1/kv/?keys&dc=dc1&separator=%2F', headers=curr_consul_headers, verify=False)
+        r = requests.get(
+            url=f'http://{host}:{port}/v1/kv/?keys&dc=dc1&separator=%2F',
+            headers=curr_consul_headers,
+            verify=False
+        )
         return r.json()
 
     @classmethod

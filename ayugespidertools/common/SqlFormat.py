@@ -8,7 +8,8 @@
 @Contact :  ayuge.s@qq.com
 @License :  (c)Copyright 2022-2023
 @Desc    :  sql 相关处理: sql 语句的管理方法，
-    这里的 sql 拼接只能做到最简单的逻辑，若想做到适配性更高，请参考 directsql, python-sql, pypika 或 pymilk 等第三方类似功能库的实现方法，以后会再优化此场景
+            这里的 sql 拼接只能做到最简单的逻辑，若想做到适配性更高，请参考 directsql, python-sql, pypika
+            或 pymilk 等第三方类似功能库的实现方法，以后会再优化此场景
 """
 from typing import Optional, Union
 
