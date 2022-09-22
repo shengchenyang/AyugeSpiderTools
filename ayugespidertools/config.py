@@ -35,7 +35,7 @@ class NormalConfig(object):
     CONFIG_DIR = dirname(abspath(__file__))
     ROOT_DIR = os.path.dirname(CONFIG_DIR)
     LOG_DIR = join(CONFIG_DIR, "logs")
-    DOC_DIR = join(CONFIG_DIR, "doc")
+    DOC_DIR = join(CONFIG_DIR, "docs")
     COMMON_DIR = join(CONFIG_DIR, "common")
     VIT_DIR = join(CONFIG_DIR, "VIT")
 
