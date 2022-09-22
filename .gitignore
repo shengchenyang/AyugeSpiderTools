@@ -5,3 +5,4 @@
 /ayugespidertools/logs/runtime.log
 /dist/
 /test/.pytest_cache/
+/tests/.pytest_cache/

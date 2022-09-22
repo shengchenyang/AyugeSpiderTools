@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "1.0.3"
+version = "1.0.4rc1"
 description = "scarpy 扩展库：在爬虫和其它开发中遇到的一些工具库集合"
 authors = ["ayuge <ayuge.s@qq.com>"]
 maintainers = ["ayuge <ayuge.s@qq.com>"]
@@ -35,9 +35,6 @@ pymongo = "^3.12.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
-
-[tool.poetry.plugins."poetry.application.plugin"]
-demo = "ayugespidertools.cmdline:MyApplicationPlugin"
 
 [tool.poetry.scripts]
 ayugespidertools = 'ayugespidertools.utils.cmdline:execute'

@@ -344,3 +344,31 @@ class ReuseOperation(object):
             1). 转化 dict 格式后的 body
         """
         return {x.split("=", 1)[0]: x.split("=", 1)[1] for x in req_body_data_str.split("&")}
+
+    @staticmethod
+    def get_array_dimension(array: list) -> int:
+        """
+        获取 array 的维度
+        Args:
+            array: 数组
+
+        Returns:
+            1).层级数
+        """
+        return len(np.array(array).shape)
+
+    @classmethod
+    def get_array_depth(cls, array: list) -> int:
+        """
+        获取 array 的最大层级，深度
+        Args:
+            array: 数组
+
+        Returns:
+            1).最大层级，深度
+        """
+
+        """1 + max(map(depthCount,x)) if x and isinstance(x,list) else 0"""
+        # 先判断是否为数组类型的元素
+        judge_array = isinstance(array, (frozenset, list, set, tuple,))
+        return int(judge_array) and len(array) and 1 + max(map(cls.get_array_depth, array))
