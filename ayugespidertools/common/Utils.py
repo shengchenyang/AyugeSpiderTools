@@ -13,6 +13,7 @@ import copy
 import json
 import requests
 import dataclasses
+import numpy as np
 import ayugespidertools.Items
 from itemadapter import ItemAdapter
 from ayugespidertools.config import logger
@@ -172,7 +173,9 @@ class ToolsForAyu(object):
         """
         # 如果输入的提取规则参数的格式为字符；或者参数格式是个列表，但是只含有一个元素的情况时
         if any([isinstance(query, str), all([isinstance(query, list), len(query) == 1])]):
-            return json_data.get(query, "")
+            if isinstance(query, str):
+                return json_data.get(query, "")
+            return json_data.get(query[0], "")
 
         # 循环取值时的处理
         for curr_q in query:
@@ -180,6 +183,30 @@ class ToolsForAyu(object):
             if not json_data:
                 return json_data
         return json_data
+
+    @classmethod
+    def extract_with_json_rules(cls, json_data: dict, query_rules: list):
+        """
+        当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
+        Args:
+            json_data: scrapy response 响应内容中的 json 格式数据
+            query_rules: json 提取的规则列表
+
+        Returns:
+            1).提取的内容
+        """
+        # 先判断层级是否为两层
+        depth_num = ReuseOperation.get_array_depth(query_rules)
+        if depth_num >= 2:
+            raise Exception("query_rules 参数错误，请输入深度最多为 2 的参数！")
+
+        for query in query_rules:
+            json_data = cls.extract_with_json(json_data=json_data, query=query)
+
+            # 只要有任意字段存在数据的情况就返回
+            if json_data:
+                return json_data
+        return ""
 
     @staticmethod
     def get_collate_by_charset(mysql_config: dict) -> str:

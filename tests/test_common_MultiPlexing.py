@@ -28,8 +28,10 @@ def test_get_items_except_keys():
             'article_detail_url': {
                 'key_value': 'https://blog.csdn.net/weixin_52986315/article/details/126512431',
                 'notes': '文章详情链接'},
-            'article_title': {'key_value': '如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件', 'notes': '文章标题'},
-            'comment_count': {'key_value': '69', 'notes': '文章评论数量'}, 'favor_count': {'key_value': '41', 'notes': '文章赞成数量'},
+            'article_title': {'key_value': '如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件',
+                              'notes': '文章标题'},
+            'comment_count': {'key_value': '69', 'notes': '文章评论数量'},
+            'favor_count': {'key_value': '41', 'notes': '文章赞成数量'},
             'nick_name': {'key_value': 'Binaire-沐辰', 'notes': '文章作者昵称'}
         },
         'table': 'article_info_list',
@@ -52,9 +54,35 @@ def test_get_req_dict_from_scrapy():
     scrapy_body_str = "post_key1=post_value1&post_key2=post_value2"
 
     res = ReuseOperation.get_req_dict_from_scrapy(req_body_data_str=scrapy_body_str)
-    print("req body dict:", res)
+    print("req bo dy di ct:", res)
     assert res is not None
 
 
 def test_extract_content():
+    assert True
+
+
+def test_get_array_dimension():
+    array = ["a", "b"]
+    array_two = ["a", ["b", "c"]]
+    len1 = ReuseOperation.get_array_dimension(array=array)
+    len2 = ReuseOperation.get_array_dimension(array=array_two)
+    print("res len1:", len1)
+    print("res len2:", len2)
+    assert True
+
+
+def test_get_array_depth():
+    array = ["a", "b"]
+    array_two = ["a", [1, [2, [3, 4]]], ["b", "c"]]
+    array_three = ["a", (1, [2, [3, 4]]), ["b", "c"]]
+    len1 = ReuseOperation.get_array_depth(array=array)
+    print("len1:", len1)
+    len2 = ReuseOperation.get_array_depth(array=array_two)
+    print("len2:", len2)
+    len3 = ReuseOperation.get_array_depth(array=array_three)
+    print("len3:", len3)
+
+    res = not isinstance(array, (frozenset, list, set, tuple,))
+    print("res", res)
     assert True
