@@ -13,8 +13,8 @@ import copy
 import json
 import requests
 import dataclasses
-import numpy as np
 import ayugespidertools.Items
+from typing import Union, List
 from itemadapter import ItemAdapter
 from ayugespidertools.config import logger
 from ayugespidertools.FormatData import DataHandle
@@ -161,7 +161,7 @@ class ToolsForAyu(object):
 
     @classmethod
     @DataHandle.simple_deal_for_extract
-    def extract_with_json(cls, json_data: dict, query: str or list):
+    def extract_with_json(cls, json_data: dict, query: Union[str, List[str]]):
         """
         scrapy 中提取 json 数据遇到的情况
         Args:
@@ -179,13 +179,15 @@ class ToolsForAyu(object):
 
         # 循环取值时的处理
         for curr_q in query:
+
+            # 这里循环时不对 json_data 的类型做判断，如果此时 json_data 类型无 get 方法，不处理
             json_data = json_data.get(curr_q, "")
             if not json_data:
                 return json_data
         return json_data
 
     @classmethod
-    def extract_with_json_rules(cls, json_data: dict, query_rules: list):
+    def extract_with_json_rules(cls, json_data: dict, query_rules: List[Param.Str_Lstr]):
         """
         当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
         Args:
@@ -197,15 +199,15 @@ class ToolsForAyu(object):
         """
         # 先判断层级是否为两层
         depth_num = ReuseOperation.get_array_depth(query_rules)
-        if depth_num >= 2:
+        if depth_num > 2:
             raise Exception("query_rules 参数错误，请输入深度最多为 2 的参数！")
 
         for query in query_rules:
-            json_data = cls.extract_with_json(json_data=json_data, query=query)
+            extract_res = cls.extract_with_json(json_data=json_data, query=query)
 
             # 只要有任意字段存在数据的情况就返回
-            if json_data:
-                return json_data
+            if extract_res:
+                return extract_res
         return ""
 
     @staticmethod
