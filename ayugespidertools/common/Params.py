@@ -11,6 +11,7 @@
 """
 import random
 import platform
+from typing import Union, TypeVar, List
 
 
 __all__ = [
@@ -22,6 +23,11 @@ class Param:
     """
     用于存储项目中需要的参数变量设置
     """
+
+    # 用于参数的约束
+    I_Str = TypeVar("I_Str", int, str)
+    I_Str_N = TypeVar("I_Str_N", int, str, None)
+    Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
     # 基本的请求头
     base_headers = {

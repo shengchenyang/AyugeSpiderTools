@@ -11,6 +11,7 @@
 """
 import time
 import threading
+from typing import Union
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
 from scrapy.spiders import CrawlSpider
@@ -147,7 +148,7 @@ class AyuSpider(AyuMixin, CrawlSpider):
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
     @classmethod
-    def get_mysql_config(cls, settings) -> dict or None:
+    def get_mysql_config(cls, settings) -> Union[dict, None]:
         """
         根据环境获取相应的 Mysql 数据库配置，获取其他自定义配置
         Args:
@@ -185,7 +186,7 @@ class AyuSpider(AyuMixin, CrawlSpider):
             return ToolsForAyu.get_mysql_conf_by_consul(**consul_conf_dict_min)
 
     @classmethod
-    def get_mongodb_config(cls, settings) -> dict or None:
+    def get_mongodb_config(cls, settings) -> Union[dict, None]:
         """
         根据环境获取相应的 mongoDB 数据库配置，获取其他自定义配置
         Args:

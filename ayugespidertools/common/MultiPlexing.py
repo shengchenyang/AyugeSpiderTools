@@ -17,7 +17,7 @@ import cv2
 import random
 import pymysql
 import numpy as np
-from typing import Optional
+from typing import Optional, Union
 from ayugespidertools.config import logger
 
 
@@ -175,7 +175,7 @@ class ReuseOperation(object):
         return True
 
     @classmethod
-    def get_items_by_keys(cls, dict_config: dict, key_list: list) -> dict or bool:
+    def get_items_by_keys(cls, dict_config: dict, key_list: list) -> Union[dict, bool]:
         """
         获取 dict_config 中的含有 key_list 的 key 的字段
         Args:
