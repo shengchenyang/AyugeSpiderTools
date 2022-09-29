@@ -13,7 +13,7 @@ import base64
 import hashlib
 
 
-__ALL__ = [
+__all__ = [
     'EncryptOperation',
 ]
 

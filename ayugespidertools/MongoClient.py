@@ -15,7 +15,7 @@ from typing import List, Dict
 from pymongo import MongoClient
 
 
-__ALL__ = [
+__all__ = [
     'MongoDbBase',
 ]
 

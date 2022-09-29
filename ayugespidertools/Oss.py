@@ -18,7 +18,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-__ALL__ = [
+__all__ = [
     'AliOssBase',
 ]
 
