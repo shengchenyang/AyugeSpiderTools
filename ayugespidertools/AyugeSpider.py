@@ -122,7 +122,7 @@ class AyuSpider(AyuMixin, CrawlSpider):
     # 自定义数据库表枚举
     custom_table_enum = None
     # 数据库引擎开关
-    mysql_engine_off = False
+    mysql_engine_enabled = False
 
     def __init__(self, *args, **kwargs):
         super(AyuSpider, self).__init__(*args, **kwargs)
@@ -233,8 +233,8 @@ class AyuSpider(AyuMixin, CrawlSpider):
             spider.mysql_config = mysql_conf
             spider.stats = crawler.stats
 
-            # 如果打开了 mysql_engine_off 参数(用于 spiders 中数据入库前去重查询)
-            if cls.mysql_engine_off:
+            # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
+            if cls.mysql_engine_enabled:
                 mysql_url = "mysql+pymysql://{}:{}@{}:{}/{}?charset={}".format(
                     mysql_conf.get("user"),
                     mysql_conf.get("password"),
