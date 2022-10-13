@@ -168,18 +168,14 @@ class AyuMysqlPipeline:
         Returns:
             1). 整合后的 item
         """
-        new_item = {"crawl_time": self.crawl_time}
-        notes_dic = {"crawl_time": "采集时间"}
+        new_item = dict()
+        notes_dic = dict()
         # 如果是 ayugespidertools.Items 中的各个自封装类型时
         if item.get("alldata"):
             # 如果是 Item 对象转化而来，则需要转换下，以便兼容写法
             for key, value in item["alldata"].items():
                 if type(value) == dict:
-                    key_value = ""
-                    if value["key_value"] is not None:
-                        key_value = value["key_value"]
-
-                    new_item[key] = key_value
+                    new_item[key] = value.get("key_value", "")
                     notes_dic[key] = value["notes"]
                 else:
                     new_item[key] = value
