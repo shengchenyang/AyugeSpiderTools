@@ -9,8 +9,11 @@
 @License :  (c)Copyright 2022-2023
 @Desc    :  None
 """
+import mmh3
 import base64
 import hashlib
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
 
 
 __all__ = [
@@ -68,3 +71,36 @@ class EncryptOperation(object):
         if url_safe:
             return str(base64.urlsafe_b64decode(decode_data), encoding="utf-8")
         return str(base64.b64decode(decode_data), encoding="utf-8")
+
+    @staticmethod
+    def rsa_encrypt(rsa_public_key: str, encode_data: str) -> str:
+        """
+        rsa encode example
+        Args:
+            rsa_public_key: rsa publickey
+            encode_data: rsa encode data
+
+        Returns:
+            1). rsa encrypted result
+        """
+        public_key = """-----BEGIN PUBLIC KEY-----
+        {key}
+        -----END PUBLIC KEY-----""".format(key=rsa_public_key)
+        a = bytes(encode_data, encoding="utf8")
+        rsa_key = RSA.importKey(public_key)
+        cipher = Cipher_pkcsl_v1_5.new(rsa_key)
+        return str(base64.b64encode(cipher.encrypt(a)), encoding="utf-8")
+
+    @staticmethod
+    def mm3_hash128_encode(encode_data: str) -> str:
+        """
+        MurmurHash3 非加密哈希之 hash128
+        Args:
+            encode_data: 需要 mmh3 hash128 的参数
+
+        Returns:
+            1). mmh3 hash128 后的结果
+        """
+        o = mmh3.hash128(encode_data)
+        hash128_encoded = hex(((o & 0xffffffffffffffff) << 64) + (o >> 64))
+        return hash128_encoded[2:]

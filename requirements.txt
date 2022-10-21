@@ -17,3 +17,5 @@ DBUtils
 itemadapter
 aiohttp
 html2text
+mmh3
+pycryptodome

@@ -11,11 +11,12 @@
 """
 import copy
 import json
+import pandas
 import requests
 import dataclasses
 import ayugespidertools.Items
-from typing import Union, List
 from itemadapter import ItemAdapter
+from typing import Union, List, Optional
 from ayugespidertools.config import logger
 from ayugespidertools.FormatData import DataHandle
 from ayugespidertools.common.Params import Param
@@ -284,3 +285,33 @@ class ToolsForAyu(object):
         for b_key, b_value_list in dict(scrapy_headers).items():
             req_headers[str(b_key, encoding="utf-8")] = str(b_value_list[0], encoding="utf-8")
         return req_headers
+
+    @staticmethod
+    def filter_data_before_yield(
+            sql: str,
+            mysql_engine,
+            item: Param.ScrapyItems,
+    ) -> Param.ScrapyItems:
+        """
+        数据入库前查询是否已存在，已存在则跳过
+        Args:
+            sql: 判断的 sql
+            mysql_engine: sqlalchemy 的 create_engine 句柄
+            item: 当前 scrapy item
+
+        Returns:
+            item: 当前 scrapy item
+        """
+        # 数据入库逻辑
+        try:
+            df = pandas.read_sql(sql, mysql_engine)
+            # 如果为空，说明此数据不存在于数据库，则新增
+            if df.empty:
+                return item
+
+        except Exception as e:
+            # 若数据库或数据表不存在时，直接返回 item 即可，会自动创建所依赖的数据库数据表及字段注释（前提是用户有对应权限，否则还是会报错）
+            if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
+                return item
+            else:
+                raise Exception(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}")

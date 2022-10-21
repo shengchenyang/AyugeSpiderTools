@@ -14,7 +14,6 @@ import aiohttp
 import urllib.parse
 from loguru import logger
 from scrapy.http import HtmlResponse
-from scrapy.utils.defer import deferred_to_future
 from twisted.internet.defer import Deferred
 from ayugespidertools.common.Params import Param
 from ayugespidertools.common.Utils import ToolsForAyu
@@ -167,7 +166,10 @@ class AiohttpMiddleware(object):
                 headers_cookie_str = str(request.headers.get("Cookie"), encoding="utf-8")
                 aiohttp_cookie_dict = ReuseOperation.get_ck_dict_from_headers(headers_ck_str=headers_cookie_str)
                 # logger.debug(f"使用 headers 中 ck 的值: {aiohttp_cookie_dict}, {type(aiohttp_cookie_dict)}")
-            html_content = await self._request_by_aiohttp(aio_request_args=aiohttp_args_dict, aio_request_cookies=aiohttp_cookie_dict)
+
+            html_content = await self._request_by_aiohttp(
+                aio_request_args=aiohttp_args_dict,
+                aio_request_cookies=aiohttp_cookie_dict)
 
         except TimeoutError:
             logger.exception(f'使用 aiohttp 错误响应 url: {request.url}')
