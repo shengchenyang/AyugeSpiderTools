@@ -15,7 +15,6 @@ import argparse
 import cProfile
 import inspect
 import pkg_resources
-import ayugespidertools
 from scrapy.crawler import CrawlerProcess
 from ayugespidertools.commands.version import AyuCommand
 from scrapy.commands import ScrapyCommand, ScrapyHelpFormatter
@@ -27,7 +26,7 @@ from scrapy.utils.python import garbage_collect
 
 class ScrapyArgumentParser(argparse.ArgumentParser):
     def _parse_optional(self, arg_string):
-        # if starts with -: it means that is a parameter not a argument
+        # if starts with -: it means that is a parameter not an argument
         if arg_string[:2] == '-:':
             return None
 

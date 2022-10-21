@@ -3,6 +3,7 @@
 import pandas
 from loguru import logger
 from scrapy.http import Request
+from scrapy.http.response import Response
 from $project_name.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
 from ayugespidertools.common.Utils import ToolsForAyu
@@ -58,12 +59,15 @@ class $classname(AyuSpider):
             callback=self.parse_first,
             headers={
                 'referer': 'https://blog.csdn.net/rank/list',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
             },
+            cb_kwargs=dict(
+                curr_site="csdn",
+            ),
             dont_filter=True
         )
 
-    def parse_first(self, response):
+    def parse_first(self, response: Response, curr_site: str):
+        logger.info(f"当前采集站点为: {curr_site}")
         data_list = ToolsForAyu.extract_with_json(json_data=response.json(), query="data")
         for curr_data in data_list:
             article_detail_url = ToolsForAyu.extract_with_json(json_data=curr_data, query="articleDetailUrl")
@@ -81,11 +85,19 @@ class $classname(AyuSpider):
                 "nick_name": {'key_value': nick_name, 'notes': '文章作者昵称'}
             }
 
+            # 存储到 mysql 的示例
             AritleInfoMysqlItem = MysqlDataItem(
                 alldata=article_info,
                 table=TableEnum.aritle_list_table.value['value'],
             )
 
+            # 数据入库逻辑 -> 测试 mysql_engine 的去重功能
+            sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
+                self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.aritle_list_table.value['value'],
+                article_detail_url)
+            yield ToolsForAyu.filter_data_before_yield(sql=sql, mysql_engine=self.mysql_engine, item=AritleInfoMysqlItem)
+
+            # 存储到 mongoDB 的示例
             AritleInfoMongoItem = MongoDataItem(
                 # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
                 alldata=article_info,
@@ -95,23 +107,3 @@ class $classname(AyuSpider):
                 mongo_update_rule={"article_detail_url": article_detail_url},
             )
             yield AritleInfoMongoItem
-
-            # 数据入库逻辑
-            try:
-                # 测试 mysql_engine 的去重功能
-                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.aritle_list_table.value['value'], article_detail_url)
-                df = pandas.read_sql(sql, self.mysql_engine)
-
-                # 如果为空，说明此数据不存在于数据库，则新增
-                if df.empty:
-                    yield AritleInfoMysqlItem
-
-                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-                else:
-                    logger.debug(f"标题为 ”{article_title}“ 的数据已存在")
-
-            except Exception as e:
-                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                    yield AritleInfoMysqlItem
-                else:
-                    logger.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
