@@ -15,8 +15,8 @@ import pandas
 import requests
 import dataclasses
 import ayugespidertools.Items
-from typing import Union, List
 from itemadapter import ItemAdapter
+from typing import Union, List, Optional
 from ayugespidertools.config import logger
 from ayugespidertools.FormatData import DataHandle
 from ayugespidertools.common.Params import Param
@@ -290,7 +290,7 @@ class ToolsForAyu(object):
     def filter_data_before_yield(
             sql: str,
             mysql_engine,
-            item: Param.ScrapyItems
+            item: Param.ScrapyItems,
     ) -> Param.ScrapyItems:
         """
         数据入库前查询是否已存在，已存在则跳过
@@ -305,18 +305,13 @@ class ToolsForAyu(object):
         # 数据入库逻辑
         try:
             df = pandas.read_sql(sql, mysql_engine)
-
             # 如果为空，说明此数据不存在于数据库，则新增
             if df.empty:
                 return item
-
-            # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-            else:
-                logger.debug(f"此数据已存在")
 
         except Exception as e:
             # 若数据库或数据表不存在时，直接返回 item 即可，会自动创建所依赖的数据库数据表及字段注释（前提是用户有对应权限，否则还是会报错）
             if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
                 return item
             else:
-                logger.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
+                raise Exception(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}")
