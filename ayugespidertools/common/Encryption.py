@@ -12,6 +12,7 @@
 import mmh3
 import base64
 import hashlib
+from typing import Union
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
 
@@ -41,7 +42,7 @@ class EncryptOperation(object):
         return hl.hexdigest()
 
     @classmethod
-    def base64_encode(cls, encode_data: str, url_safe: bool = False) -> str:
+    def base64_encode(cls, encode_data: Union[bytes, str], url_safe: bool = False) -> str:
         """
         base64 编码
         Args:

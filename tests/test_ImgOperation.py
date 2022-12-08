@@ -10,6 +10,7 @@
 @Desc    :  None
 """
 from ayugespidertools.ImgOperation import Picture
+from ayugespidertools.common.MultiPlexing import ReuseOperation
 
 
 def test_identify_gap():
@@ -27,3 +28,17 @@ def test_identify_gap():
     print("滑块验证码的缺口距离2为：", gap_distance)
     assert gap_distance in list(range(205, 218))
 
+
+def test_get_data_urls_by_img():
+    """
+    根据图片参数生成 Data URLs 格式数据
+    """
+    # 参数为图片全路径时
+    data_urls1 = Picture.get_data_urls_by_img(mediatype="png", data="docs/image/1.png")
+    print("data_urls1:", data_urls1)
+
+    # 参数为图片 bytes
+    img_bytes = ReuseOperation.get_bytes_by_file(file_path="docs/image/1.png")
+    data_urls2 = Picture.get_data_urls_by_img(mediatype="png", data=img_bytes)
+    print("data_urls2:", data_urls2)
+    assert data_urls1 is not None, data_urls2 is not None

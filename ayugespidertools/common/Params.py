@@ -27,6 +27,7 @@ class Param:
 
     # 用于参数的描述
     I_Str = TypeVar("I_Str", int, str)
+    B_Str = TypeVar("B_Str", bytes, str)
     I_Str_N = TypeVar("I_Str_N", int, str, None)
     Str_Lstr = TypeVar("Str_Lstr", str, List[str])
     # 此框架中 Item 的类型种类

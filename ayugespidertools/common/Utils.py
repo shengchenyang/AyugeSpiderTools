@@ -198,10 +198,9 @@ class ToolsForAyu(object):
         Returns:
             1).提取的内容
         """
-        # 先判断层级是否为两层
+        # 先判断层级，最多为 2 层
         depth_num = ReuseOperation.get_array_depth(query_rules)
-        if depth_num > 2:
-            raise Exception("query_rules 参数错误，请输入深度最多为 2 的参数！")
+        assert depth_num <= 2, "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
         for query in query_rules:
             extract_res = cls.extract_with_json(json_data=json_data, query=query)

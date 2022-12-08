@@ -1048,8 +1048,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
         Args:
             mongodb_config: mongDB 的连接配置
         """
-        if all([not mongodb_config, not app_conf_manage]):
-            raise Exception("未配置 MongoDB 连接配置！")
+        assert all([mongodb_config, app_conf_manage]), "未配置 MongoDB 连接配置！"
 
         self.mongodb_config = None
         # 优先从本地中取配置
