@@ -1,3 +1,6 @@
+![image-20221208100604577](ayugespidertools/docs/images/ayugespidertools_logo.png)
+
+
 # AyugeSpiderTools 工具说明
 
 > 本文章用于说明在爬虫开发中遇到的各种通用方法，还有 `scrapy` 扩展库开发，将其打包成 `Pypi` 包以方便安装和使用，此工具会长久维护。
@@ -9,9 +12,7 @@
 
 > 目前项目正处于**积极开发和维护**中
 
-项目创建初期，且包含各阶段时期的代码，会出现代码风格不统一，代码杂乱，文档滞后和测试文件不全的问题，近期会优化此情况。
-
-项目目前暂定主要包含**两大部分**（*可能其中一些功能会考虑拆分到其它新建库中，以防止此库过于杂糅*）：
+项目目前暂定主要包含**两大部分**：
 
 - 开发场景中的工具库
   - 比如 `MongoDB`，`Mysql sql` 语句的生成，图像处理，数据处理相关 ... ...
@@ -28,12 +29,7 @@
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-> 或者自行安装相关依赖：
-
-依赖信息在根目录下的 `requirements.txt` 文件中
-
-注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！；
-建议在独立的虚拟环境中使用，以免与您的其它项目依赖互相干扰。
+注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！
 
 ### 1.1. 使用方法
 
@@ -86,7 +82,10 @@ pip install ayugespidertools -i https://pypi.org/simple
 根据域名 `domain_name` 拼接 `deal_url` 来获得完整链接，示例如下：
 
 ```python
-full_url = FormatData.get_full_url(domain_name="https://static.geetest.com", deal_url="/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd478aa31e0dca37601cd4.jpg")
+full_url = FormatData.get_full_url(
+    domain_name="https://static.geetest.com",
+    deal_url="/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd478aa31e0dca37601cd4.jpg")
+print(full_url)
 ```
 
 输出为：
@@ -129,7 +128,9 @@ normal_stamp = FormatData.normal_to_stamp("2022/06/21", date_is_full=False)
 print("normal_stamp4_2:", normal_stamp)
 
 # 当是英文的其他格式，或者混合格式时，需要自己自定时间格式化符
-normal_stamp = FormatData.normal_to_stamp(normal_time="2022/Dec/21 16:40:00", _format_t="%Y/%b/%d %H:%M:%S")
+normal_stamp = FormatData.normal_to_stamp(
+    normal_time="2022/Dec/21 16:40:00",
+    _format_t="%Y/%b/%d %H:%M:%S")
 print("normal_stamp5:", normal_stamp)
 ```
 
@@ -167,9 +168,10 @@ print("滑块验证码的缺口距离2为：", gap_distance)
 
 结果为：
 
-<img src="http://175.178.210.193:9000/drawingbed/image/image-20220802110652131.png" alt="image-20220802110652131" style="zoom: 25%;" />
-
-<img src="http://175.178.210.193:9000/drawingbed/image/image-20220802110842737.png" alt="image-20220802110842737" style="zoom:33%;" />
+| 识别结果展示                                                 | 备注                                                   |
+| :----------------------------------------------------------- | ------------------------------------------------------ |
+| <img src="ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 无                                                     |
+| <img src="ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
 
 #### 2.2.2. 滑块验证轨迹生成
 
@@ -200,17 +202,26 @@ from ayugespidertools.common.SqlFormat import AboutSql
 mysql_client = MysqlClient.MysqlOrm(NormalConfig.PYMYSQL_CONFIG)
 
 # test_select_data
-select_sql, select_value = AboutSql.select_generate(db_table="zhihu_answer_info", key=["id", "q_title"], rule={"q_id|=": "34987206"}, limit=1)
+select_sql, select_value = AboutSql.select_generate(
+    db_table="zhihu_answer_info",
+    key=["id", "q_title"],
+    rule={"q_id|=": "34987206"},
+    limit=1)
 print(f"select_sql: {select_sql}, select_value: {select_value}")
 mysql_client.search_data(select_sql, select_value, type="one")
 
 # test_insert_data
-insert_sql, insert_value = AboutSql.insert_generate(db_table="user", data={"name": "zhangsan", "age": 18})
+insert_sql, insert_value = AboutSql.insert_generate(
+    db_table="user",
+    data={"name": "zhangsan", "age": 18})
 print(f"insert_sql: {insert_sql}, insert_value: {insert_value}")
 mysql_client.insert_data(insert_sql, insert_value)
 
 # test_update_data
-update_sql, update_value = AboutSql.update_generate(db_table="user", data={"score": 4}, rule={"name": "zhangsan"})
+update_sql, update_value = AboutSql.update_generate(
+    db_table="user",
+    data={"score": 4},
+    rule={"name": "zhangsan"})
 print(f"update_sql: {update_sql}, update_value: {update_value}")
 mysql_client.update_data(update_sql, update_value)
 ```
@@ -218,9 +229,7 @@ mysql_client.update_data(update_sql, update_value)
 结果为：
 ```
 select_sql: select `id`, `q_title` from `zhihu_answer_info` where `q_id`=%s limit 1, select_value: ('34987206',)
-
 insert_sql: insert into `user` (`name`, `age`) values (%s, %s), insert_value: ('zhangsan', 18)
-
 update_sql: update `user` set `score`=%s where `name`=%s, update_value: (4, 'zhangsan')
 ```
 
@@ -230,7 +239,7 @@ update_sql: update `user` set `score`=%s where `name`=%s, update_value: (4, 'zha
 
 ### 2.5. 执行 js 相关
 
-鸡肋封装，以后会优化和添加多个常用功能
+鸡肋封装，以后会优化和添加多个常用功能。**推荐  [`PyMiniRacer`](https://github.com/sqreen/PyMiniRacer) 或 `D8` 运行 `js`，会少很多坑！**
 
 ```python
 # 测试运行 js 文件中的方法
@@ -277,8 +286,8 @@ assert js_res
   - [x] `mongoDB` 语句拼接
   - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
   - [ ] 字体反爬还原方法
-  - [ ] `html` 格式转 `markdown` 格式
-  - [ ] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等等等
+  - [x] `html` 格式转 `markdown` 格式
+  - [x] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等等等
   - [x] 添加常用的图片验证码中的处理方法
     - [x] 滑块缺口距离的识别方法（多种实现方式）
     - [x] 根据滑块距离生成轨迹数组的方法

@@ -49,9 +49,9 @@ class NormalConfig(object):
         config_parse = configparser.ConfigParser()
         config_parse.read(f"{VIT_DIR}/.conf", encoding="utf-8")
         # 测试环境中各种配置信息，已脱敏，请自行配置 VIT 的 .conf 文件后测试
-        mysql_config = config_parse["DEV_MYSQL"]
-        mongodb_config = config_parse["DEV_MONGODB"]
-        oss_config = config_parse["DEV_ALI_OSS"]
+        mysql_config = config_parse["MYSQL"]
+        mongodb_config = config_parse["MONGODB"]
+        oss_config = config_parse["ALI_OSS"]
         # 企业微信机器人 key
         WWXRobot_key = config_parse["WWXRobot"]["key"]
 
@@ -78,7 +78,7 @@ class NormalConfig(object):
         }
 
         # 测试 MongoDB 数据库配置
-        MONGODB_CONN_URI = config_parse["DEV_MONGODB_URI"]["CONN_URI"]
+        MONGODB_CONN_URI = config_parse["MONGODB_URI"]["CONN_URI"]
 
         # 读取 Oss 配置信息，已脱敏，请自行配置后测试
         OSS_CONFIG = {

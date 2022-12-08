@@ -8,3 +8,4 @@
 /tests/.pytest_cache/
 /tests/test_common/.pytest_cache/
 /tests/test_commands/.pytest_cache/
+/tests/__pycache__

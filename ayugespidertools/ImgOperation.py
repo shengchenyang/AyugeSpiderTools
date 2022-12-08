@@ -12,7 +12,9 @@
 import cv2
 import requests
 from PIL import Image
+from typing import Optional, Union
 from ayugespidertools.config import NormalConfig
+from ayugespidertools.common.Encryption import EncryptOperation
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 
 
@@ -56,12 +58,14 @@ class Picture(object):
         with open(f'{NormalConfig.DOC_DIR}/captcha.png', 'wb') as f:
             f.write(text)
 
-        # captcha = Image.new('RGB', (50, 120))  # 新建空白图片
-        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')  # 实例化原始图片Image对象
+        # 新建空白图片
+        # captcha = Image.new('RGB', (50, 120))
+        # 实例化原始图片 Image 对象
+        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')
 
         # 切割滑块验证码图片，将背景图和滑块图分开
-        captcha = img.crop((260, 0, 325, 120 - 4))  # (left, upper, right, lower)
-        # captcha = img.crop((274, 46, 300, 120 - 20))  # (left, upper, right, lower)
+        # (left, upper, right, lower)
+        captcha = img.crop((260, 0, 325, 120 - 4))
         captcha = captcha.convert('RGBA')
         captcha.save(f'{NormalConfig.DOC_DIR}/captcha_slide.png')
 
@@ -118,19 +122,26 @@ class Picture(object):
         Returns:
             None
         """
-        captcha = Image.new('RGB', (13 * 20, 60 * 2 - 4))  # 新建空白图片
-        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')  # 实例化原始图片Image对象
+        # 新建空白图片
+        captcha = Image.new('RGB', (13 * 20, 60 * 2 - 4))
+        # 实例化原始图片Image对象
+        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')
 
         # 切割滑块验证码图片，将背景图和滑块图分开
-        captcha_de = img.crop((0, 0, 260, 120 - 4))  # (left, upper, right, lower)
+        # (left, upper, right, lower)
+        captcha_de = img.crop((0, 0, 260, 120 - 4))
         captcha_de = captcha_de.convert('RGBA')
         captcha_de.save(f'{NormalConfig.DOC_DIR}/captcha.png')
 
         for i, off in enumerate(offset_list):
-            box = Picture.convert_css_to_offset(off)  # 根据css backgound-position获取每张小图的坐标
-            regoin = img.crop(box)  # 抠图
-            offset = Picture.convert_index_to_offset(i)  # 获取当前小图在空白图片的坐标
-            captcha.paste(regoin, offset)  # 根据当前坐标将小图粘贴到空白图片
+            # 根据css backgound-position获取每张小图的坐标
+            box = Picture.convert_css_to_offset(off)
+            # 抠图
+            regoin = img.crop(box)
+            # 获取当前小图在空白图片的坐标
+            offset = Picture.convert_index_to_offset(i)
+            # 根据当前坐标将小图粘贴到空白图片
+            captcha.paste(regoin, offset)
         captcha.save(f'{NormalConfig.DOC_DIR}/regoin.jpg')
 
     @classmethod
@@ -182,13 +193,13 @@ class Picture(object):
         return value[2:][0][0], value[2:][1][0]
 
     @classmethod
-    def identify_gap(cls, bg, tp, out: str = None) -> int:
+    def identify_gap(cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None) -> int:
         """
         通过背景图片和缺口图片识别出滑块距离
         Args:
             bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
             tp: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
-            out: 输出图片路径，示例：doc/test.jpg
+            out: 输出图片路径，示例：doc/test.jpg；此参数如果为空，则不输出标记后的图片
 
         Returns:
             tl[0]: 滑块缺口距离
@@ -206,16 +217,50 @@ class Picture(object):
 
         # 缺口匹配
         res = cv2.matchTemplate(bg_pic, tp_pic, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)  # 寻找最优匹配
-        tl = max_loc  # 左上角点的坐标
+        # 寻找最优匹配
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        # 左上角点的坐标
+        tl = max_loc
 
         # 是否要输出绘制图像
         if out:
             # 绘制方框
             th, tw = tp_pic.shape[:2]
-            br = (tl[0] + tw, tl[1] + th)  # 右下角点的坐标
-            cv2.rectangle(bg_cv, tl, br, (0, 0, 255), 2)  # 绘制矩形
-            cv2.imwrite(out, bg_cv)  # 保存在本地
+            # 右下角点的坐标
+            br = (tl[0] + tw, tl[1] + th)
+            # 绘制矩形
+            cv2.rectangle(bg_cv, tl, br, (0, 0, 255), 2)
+            # 保存在本地
+            cv2.imwrite(out, bg_cv)
 
         # 返回缺口的X坐标
         return tl[0]
+
+    @classmethod
+    def get_data_urls_by_img(cls, mediatype: str, data: Union[bytes, str]) -> str:
+        """
+        根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
+        Data URLs 格式示例:
+            data:image/png;base64,iVB...
+            data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E
+
+        关于 Data URLs 更多的描述，其参考文档: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
+
+        Args:
+            mediatype: MIME 类型字符串，例如 'image/jpeg' JPEG 图像文件。
+                如果省略，则默认为 text/plain;charset=US-ASCII
+            data: 用于获取其 base64 编码的二进制数据
+                参数格式可以为全路径图片，或 bytes 内容
+
+        Returns:
+            1). Data URLs 格式数据
+        """
+        assert type(data) in [str, bytes], "图片转 Data URLs 的参数 data 需要是全路径 str 或 bytes 数据"
+
+        if isinstance(data, str):
+            data_bytes = ReuseOperation.get_bytes_by_file(file_path=data)
+            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data_bytes)
+
+        else:
+            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data)
+        return f"data:image/{mediatype};base64,{data_base64_encoded}"

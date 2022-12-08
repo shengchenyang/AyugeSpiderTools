@@ -25,9 +25,11 @@ class Param:
     用于存储项目中需要的参数变量设置
     """
 
+    NoneType = type(None)
     # 用于参数的描述
     I_Str = TypeVar("I_Str", int, str)
-    I_Str_N = TypeVar("I_Str_N", int, str, None)
+    B_Str = TypeVar("B_Str", bytes, str)
+    I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
     Str_Lstr = TypeVar("Str_Lstr", str, List[str])
     # 此框架中 Item 的类型种类
     ScrapyItems = TypeVar("ScrapyItems", MysqlDataItem, MongoDataItem, ScrapyClassicItem)

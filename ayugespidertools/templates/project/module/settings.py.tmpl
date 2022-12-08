@@ -29,31 +29,33 @@ config_parse = configparser.ConfigParser()
 config_parse.read(f"{VIT_DIR}/.conf", encoding="utf-8")
 
 # 这是需要链接的数据库配置，请自行设置
+mysql_ini = config_parse["MYSQL"]
 LOCAL_MYSQL_CONFIG = {
     # 数据库IP
-    'HOST': config_parse["DEV_MYSQL"]["HOST"],
+    'HOST': mysql_ini["HOST"],
     # 数据库端口
-    'PORT': int(config_parse["DEV_MYSQL"]["PORT"]),
+    'PORT': int(mysql_ini["PORT"]),
     # 数据库用户名
-    'USER': config_parse["DEV_MYSQL"]["USER"],
+    'USER': mysql_ini["USER"],
     # 数据库密码
-    'PASSWORD': config_parse["DEV_MYSQL"]["PASSWORD"],
+    'PASSWORD': mysql_ini["PASSWORD"],
     # 数据库编码
-    'CHARSET': config_parse["DEV_MYSQL"]["CHARSET"],
+    'CHARSET': mysql_ini["CHARSET"],
     # 数据库 engin 采用的驱动，可不填此参数
     'DRIVER': 'mysqlconnector',
     # 数据库
-    'DATABASE': config_parse["DEV_MYSQL"]["DATABASE"]
+    'DATABASE': mysql_ini["DATABASE"]
 }
 
 # 测试 MongoDB 数据库配置
+mongodb_ini = config_parse["MONGODB"]
 LOCAL_MONGODB_CONFIG = {
-    "HOST": config_parse["DEV_MONGODB"]["HOST"],
-    "PORT": int(config_parse["DEV_MONGODB"]["PORT"]),
-    "AUTHSOURCE": config_parse["DEV_MONGODB"]["AUTHSOURCE"],
-    "USER": config_parse["DEV_MONGODB"]["USER"],
-    "PASSWORD": config_parse["DEV_MONGODB"]["PASSWORD"],
-    "DATABASE": config_parse["DEV_MONGODB"]["DATABASE"],
+    "HOST": mongodb_ini["HOST"],
+    "PORT": int(mongodb_ini["PORT"]),
+    "AUTHSOURCE": mongodb_ini["AUTHSOURCE"],
+    "USER": mongodb_ini["USER"],
+    "PASSWORD": mongodb_ini["PASSWORD"],
+    "DATABASE": mongodb_ini["DATABASE"],
 }
 
 # scrapy Request 替换为 aiohttp 的配置
@@ -65,30 +67,43 @@ LOCAL_AIOHTTP_CONFIG = {
 }
 
 # consul 应用管理的连接配置
+consul_ini = config_parse["CONSUL"]
 CONSUL_CONFIG = {
-    "HOST": config_parse["DEV_CONSUL"]["HOST"],
-    "PORT": config_parse["DEV_CONSUL"]["PORT"],
+    "HOST": consul_ini["HOST"],
+    "PORT": consul_ini["PORT"],
     # 此 token 值只需要只读权限即可，只用于取配置值
-    "TOKEN": config_parse["DEV_CONSUL"]["TOKEN"],
+    "TOKEN": consul_ini["TOKEN"],
     # 这个是应用管理中心最终的 key 值，如果不设置此值会默认设置值为中程序中的 ENV 值
-    "KEY_VALUES": config_parse["DEV_CONSUL"]["KEY_VALUES"],
+    "KEY_VALUES": consul_ini["KEY_VALUES"],
     # 这个是此配置在应用管理中心所属的 group，默认为空(按需配置，如果不需要直接不配置此值或配置为空皆可)
-    "GROUP": config_parse["DEV_CONSUL"]["GROUP"],
+    "GROUP": consul_ini["GROUP"],
 }
 
 # 动态隧道代理（快代理版本）
+kdl_dynamic_proxy_ini = config_parse["KDL_DYNAMIC_PROXY"]
 DYNAMIC_PROXY_CONFIG = {
-    "PROXY_URL": config_parse["DEV_KDL_DYNAMIC_PROXY"]["PROXY_URL"],
-    "USERNAME": config_parse["DEV_KDL_DYNAMIC_PROXY"]["USERNAME"],
-    "PASSWORD": config_parse["DEV_KDL_DYNAMIC_PROXY"]["PASSWORD"],
+    "PROXY_URL": kdl_dynamic_proxy_ini["PROXY_URL"],
+    "USERNAME": kdl_dynamic_proxy_ini["USERNAME"],
+    "PASSWORD": kdl_dynamic_proxy_ini["PASSWORD"],
 }
 
 # 独享代理（快代理版本）
+kdl_exclusive_proxy_ini = config_parse["KDL_EXCLUSIVE_PROXY"]
 EXCLUSIVE_PROXY_CONFIG = {
-    "PROXY_URL": config_parse["DEV_KDL_EXCLUSIVE_PROXY"]["PROXY_URL"],
-    "USERNAME": config_parse["DEV_KDL_EXCLUSIVE_PROXY"]["USERNAME"],
-    "PASSWORD": config_parse["DEV_KDL_EXCLUSIVE_PROXY"]["PASSWORD"],
-    "PROXY_INDEX": config_parse["DEV_KDL_EXCLUSIVE_PROXY"]["PROXY_INDEX"],
+    "PROXY_URL": kdl_exclusive_proxy_ini["PROXY_URL"],
+    "USERNAME": kdl_exclusive_proxy_ini["USERNAME"],
+    "PASSWORD": kdl_exclusive_proxy_ini["PASSWORD"],
+    "PROXY_INDEX": kdl_exclusive_proxy_ini["PROXY_INDEX"],
+}
+
+# ali oss 对象存储
+ali_oss_ini = config_parse["ALI_OSS"]
+OSS_CONFIG = {
+    "OssAccessKeyId": ali_oss_ini["OssAccessKeyId"],
+    "OssAccessKeySecret": ali_oss_ini["OssAccessKeySecret"],
+    "Endpoint": ali_oss_ini["Endpoint"],
+    "examplebucket": ali_oss_ini["Examplebucket"],
+    "operateDoc": ali_oss_ini["OperateDoc"],
 }
 
 # 日志管理

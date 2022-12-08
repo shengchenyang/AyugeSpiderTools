@@ -3,7 +3,7 @@
 import pandas
 from loguru import logger
 from scrapy.http import Request
-from scrapy.http.response import Response
+from scrapy.http.response.text import TextResponse
 from $project_name.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
 from ayugespidertools.common.Utils import ToolsForAyu
@@ -66,7 +66,7 @@ class $classname(AyuSpider):
             dont_filter=True
         )
 
-    def parse_first(self, response: Response, curr_site: str):
+    def parse_first(self, response: TextResponse, curr_site: str):
         logger.info(f"当前采集站点为: {curr_site}")
         data_list = ToolsForAyu.extract_with_json(json_data=response.json(), query="data")
         for curr_data in data_list:

@@ -85,8 +85,7 @@ class DynamicProxyDownloaderMiddleware(object):
             dict_config=dynamic_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
         )
-        if not is_match:
-            raise Exception(f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}")
+        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
 
         self.proxy_url = dynamic_proxy_config["PROXY_URL"]
         self.username = dynamic_proxy_config["USERNAME"]
@@ -135,8 +134,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
             dict_config=exclusive_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"]
         )
-        if not is_match:
-            raise Exception(f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_config_example}")
+        assert is_match, f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_config_example}"
 
         self.proxy_url = exclusive_proxy_config["PROXY_URL"]
         self.username = exclusive_proxy_config["USERNAME"]
@@ -404,8 +402,7 @@ class AbuDynamicProxyDownloaderMiddleware(object):
             dict_config=dynamic_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
         )
-        if not is_match:
-            raise Exception(f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}")
+        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
 
         self.proxy_url = dynamic_proxy_config["PROXY_URL"]
         self.username = dynamic_proxy_config["USERNAME"]

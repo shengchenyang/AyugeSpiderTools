@@ -109,17 +109,31 @@ class ReuseOperation(object):
         return file_bytes
 
     @staticmethod
-    def read_image_data(bg, tp):
-        if any([type(bg) != str, type(bg) == bytes]):
+    def read_image_data(bg: Union[bytes, str], tp: Union[bytes, str]):
+        """
+        用 opencv 读取图片数据
+        Args:
+            bg: 背景图片信息
+            tp: 滑块图
+
+        Returns:
+            bg_cv: opencv 读取背景图片的数据
+            tp_cv: opencv 读取滑块图片的数据
+        """
+        assert type(bg) in [str, bytes], "带缺口的背景图参数需要是全路径图片或 bytes 数据"
+        assert type(tp) in [str, bytes], "滑块图参数需要是全路径图片或 bytes 数据"
+
+        if isinstance(bg, bytes):
             bg_buf = np.frombuffer(bg, np.uint8)
-            tp_buf = np.frombuffer(tp, np.uint8)
-
             bg_cv = cv2.imdecode(bg_buf, cv2.IMREAD_ANYCOLOR)
-            tp_cv = cv2.imdecode(tp_buf, cv2.IMREAD_ANYCOLOR)
-
         else:
             # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
             bg_cv = cv2.imread(bg)
+
+        if isinstance(tp, bytes):
+            tp_buf = np.frombuffer(tp, np.uint8)
+            tp_cv = cv2.imdecode(tp_buf, cv2.IMREAD_ANYCOLOR)
+        else:
             # 0 表示采用黑白的方式读取图片
             tp_cv = cv2.imread(tp, 0)
 
@@ -226,8 +240,7 @@ class ReuseOperation(object):
             dict_config=pymysql_dict_config,
             key_list=["host", "port", "user", "password", "charset"]
         )
-        if not judge_pymysql_dict_config:
-            raise Exception("创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！")
+        assert judge_pymysql_dict_config, "创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！"
 
         pymysql_dict_config_tmp = copy.deepcopy(pymysql_dict_config)
         if "database" in pymysql_dict_config_tmp.keys():
@@ -288,8 +301,7 @@ class ReuseOperation(object):
             dict_config=consul_conf_dict_lowered,
             key_list=["host", "port", "token"]
         )
-        if not consul_conf_dict_min:
-            raise Exception(f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！")
+        assert consul_conf_dict_min, f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！"
 
         # 添加 key_values 的值，如果没有设置，则默认取全局配置中的 ENV 值
         if not consul_conf_dict_lowered.get("key_values", None):

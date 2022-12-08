@@ -102,8 +102,7 @@ class AiohttpMiddleware(object):
         使用 aiohttp 来 process spider
         """
         aiohttp_meta = request.meta.get('aiohttp_args', {})
-        if not isinstance(aiohttp_meta, dict):
-            raise Exception("aiohttp_args 参数的格式不是 dict，请查看！")
+        assert isinstance(aiohttp_meta, dict), "aiohttp_args 参数的格式不是 dict，请查看！"
 
         # set proxy
 

@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+source ${project_startup_dir}/${project_name}_venv/bin/activate
+cd ${project_startup_dir}/${project_name} && nohup python ./run.py &
+deactivate
