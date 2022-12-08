@@ -1,4 +1,5 @@
-<img src="ayugespidertools/docs/images/ayugespidertools_logo.png" alt="image-20220802110842737" style="zoom: 67%;" align="left"/>
+![image-20221208100604577](ayugespidertools/docs/images/ayugespidertools_logo.png)
+
 
 # AyugeSpiderTools 工具说明
 
@@ -167,9 +168,10 @@ print("滑块验证码的缺口距离2为：", gap_distance)
 
 结果为：
 
-<img src="ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20220802110652131" style="zoom: 25%;" align="left" />
-
-<img src="ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20220802110842737" style="zoom:33%;" align="left" />
+| 识别结果展示                                                 | 备注                                                   |
+| :----------------------------------------------------------- | ------------------------------------------------------ |
+| <img src="ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 无                                                     |
+| <img src="ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
 
 #### 2.2.2. 滑块验证轨迹生成
 
