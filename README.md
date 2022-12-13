@@ -1,4 +1,4 @@
-![image-20221208100604577](ayugespidertools/docs/images/ayugespidertools_logo.png)
+![image-20221213151510988](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools_logo.png)
 
 
 # AyugeSpiderTools 工具说明
@@ -16,7 +16,7 @@
 
 - 开发场景中的工具库
   - 比如 `MongoDB`，`Mysql sql` 语句的生成，图像处理，数据处理相关 ... ...
-- `Scrapy` 扩展功能
+- `Scrapy` 扩展功能（主推功能）
   - 使爬虫开发无须在意数据库和数据表结构，不用去管常规 `item, pipelines` 和 `middlewares` 的文件的编写
 
 注：具体内容请查看本文中的 [TodoList](# TodoList) 内容
@@ -38,6 +38,32 @@ pip install ayugespidertools -i https://pypi.org/simple
 > 此扩展使 `Scrapy` 爬虫开发不用考虑其 `item` 编写，内置通用的 `middlewares` 中间件方法（随机请求头，动态/独享代理等），和常用的 `pipelines` 方法（`Mysql`，`MongoDB` 存储，`Kafka`，`RabbitMQ` 推送队列等）。
 >
 > 开发人员只需根据命令生成示例模板，再配置并激活相关设置即可，可以专注于爬虫 `spider` 的开发。
+
+使用方法示例 `GIF` 如下： 
+
+![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools.gif)
+
+对以上 `GIF` 中的步骤进行解释：
+
+```shell
+查看库版本
+ayugespidertools version
+
+创建项目
+ayugespidertools startproject <project_name>
+
+进入项目根目录
+cd <project_name>
+
+生成爬虫脚本
+ayugespidertools genspider <spider_name> <example.com>
+
+替换(覆盖)为真实的配置 .conf 文件；这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上相关配置即可
+cp /root/mytemp/.conf DemoSpider/VIT/.conf
+
+运行脚本
+scrapy crawl <spider_name>
+```
 
 具体使用方法请在 [DemoSpider 之 AyugeSpiderTools 工具应用示例](https://github.com/shengchenyang/DemoSpider) 项目中查看，目前已适配以下场景：
 
