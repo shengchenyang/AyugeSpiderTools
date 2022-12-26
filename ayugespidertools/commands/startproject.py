@@ -146,6 +146,8 @@ class AyuCommand(Command):
         print("You can start your first spider with:")
         print(f"    cd {project_dir}")
         print("    scrapy genspider example example.com")
+        print("Or you can start your first spider with ayugespidertools:")
+        print("    ayugespidertools genspider example example.com")
 
     @property
     def templates_dir(self):

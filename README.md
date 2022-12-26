@@ -39,6 +39,32 @@ pip install ayugespidertools -i https://pypi.org/simple
 >
 > 开发人员只需根据命令生成示例模板，再配置并激活相关设置即可，可以专注于爬虫 `spider` 的开发。
 
+使用方法示例 `GIF` 如下： 
+
+![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools.gif)
+
+对以上 `GIF` 中的步骤进行解释：
+
+```shell
+查看库版本
+ayugespidertools version
+
+创建项目
+ayugespidertools startproject <project_name>
+
+进入项目根目录
+cd <project_name>
+
+生成爬虫脚本
+ayugespidertools genspider <spider_name> <example.com>
+
+替换(覆盖)为真实的配置 .conf 文件；这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上相关配置即可
+cp /root/mytemp/.conf DemoSpider/VIT/.conf
+
+运行脚本
+scrapy crawl <spider_name>
+```
+
 具体使用方法请在 [DemoSpider 之 AyugeSpiderTools 工具应用示例](https://github.com/shengchenyang/DemoSpider) 项目中查看，目前已适配以下场景：
 
 ```diff
