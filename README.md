@@ -16,7 +16,7 @@
 
 - 开发场景中的工具库
   - 比如 `MongoDB`，`Mysql sql` 语句的生成，图像处理，数据处理相关 ... ...
-- `Scrapy` 扩展功能
+- `Scrapy` 扩展功能（主推功能）
   - 使爬虫开发无须在意数据库和数据表结构，不用去管常规 `item, pipelines` 和 `middlewares` 的文件的编写
 
 注：具体内容请查看本文中的 [TodoList](# TodoList) 内容
