@@ -12,6 +12,9 @@ NEWSPIDER_MODULE = '$project_name.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+# Set settings whose default value is deprecated to a future-proof value
+REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
+
 env = Env()
 env.read_env()
 

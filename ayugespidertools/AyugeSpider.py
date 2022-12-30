@@ -9,12 +9,13 @@
 @License :  (c)Copyright 2022-2023
 @Desc    :  None
 """
+import sys
 import time
 import threading
 from typing import Union
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
-from scrapy.spiders import CrawlSpider
+from ayugespidertools.config import logger
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 
@@ -22,18 +23,6 @@ from ayugespidertools.common.MultiPlexing import ReuseOperation
 __all__ = [
     "AyuSpider",
 ]
-
-
-class AyuMixin(Spider):
-    """
-    防止 AyuSpider 类的 Spider 和 CrawlSpider 出现重复继承的问题
-    """
-
-    def parse(self, response, **kwargs):
-        super(AyuMixin, self).parse(response, **kwargs)
-
-    def __init__(self, *args, **kwargs):
-        super(AyuMixin, self).__init__(*args, **kwargs)
 
 
 class MySqlEngineClass:
@@ -54,7 +43,7 @@ class MySqlEngineClass:
         return MySqlEngineClass._instance
 
 
-class AyuSpider(AyuMixin, CrawlSpider):
+class AyuSpider(Spider):
     """
     用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等
     """
@@ -62,12 +51,9 @@ class AyuSpider(AyuMixin, CrawlSpider):
     custom_common_settings = {
         "ROBOTSTXT_OBEY": False,
         "TELNETCONSOLE_ENABLED": False,
-        "RETRY_TIMES": 10,
+        "RETRY_TIMES": 3,
         "DEPTH_PRIORITY": -1,
-        "USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36",
-        "ITEM_PIPELINES": {
-            "ayugespidertools.Pipelines.AyuMysqlPipeline": 300,
-        },
+        "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
         "ENV": "dev",
     }
 
@@ -77,9 +63,9 @@ class AyuSpider(AyuMixin, CrawlSpider):
         "LOG_LEVEL": "DEBUG",
         "ROBOTSTXT_OBEY": False,
         # 超时
-        "DOWNLOAD_TIMEOUT": 30,
+        "DOWNLOAD_TIMEOUT": 20,
         # 重试次数
-        "RETRY_TIMES": 50,
+        "RETRY_TIMES": 3,
         # 禁用所有重定向
         "REDIRECT_ENABLED": False,
         # 后进先出，深度优先
@@ -98,9 +84,9 @@ class AyuSpider(AyuMixin, CrawlSpider):
         "LOG_LEVEL": "ERROR",
         "ROBOTSTXT_OBEY": False,
         # 超时
-        "DOWNLOAD_TIMEOUT": 30,
+        "DOWNLOAD_TIMEOUT": 20,
         # 重试次数
-        "RETRY_TIMES": 50,
+        "RETRY_TIMES": 3,
         # 禁用所有重定向
         "REDIRECT_ENABLED": False,
         # 后进先出，深度优先
@@ -124,26 +110,56 @@ class AyuSpider(AyuMixin, CrawlSpider):
     # 数据库引擎开关
     mysql_engine_enabled = False
 
+    def parse(self, response, **kwargs):
+        """
+        实现所继承类的 abstract 方法 parse
+        """
+        super(AyuSpider, self).parse(response, **kwargs)
+
     def __init__(self, *args, **kwargs):
         super(AyuSpider, self).__init__(*args, **kwargs)
         self.mysql_engine = None
 
     @classmethod
+    def slog_init(cls, level: Union[str, list]) -> None:
+        """
+        日志全局配置
+
+        can use it directly (e.g. Spider.slog.info('msg'))
+        Almost the same as (spider.logger.info('msg'))
+        loguru 文档中相关介绍:
+            https://loguru.readthedocs.io/en/stable/resources/recipes.html#changing-the-level-of-an-existing-handler
+
+        Args:
+            level: loguru 等级配置参数
+                1. 当参数为 str 时：设置日志等级只输出 level 之上
+                2. 当参数为 list 时：设置日志输出列表中的级别
+
+        Returns:
+            None
+        """
+        assert type(level) in [str, list], "level 参数需要为 str 或 list 格式！"
+
+        # 先删除其它所有的 handle，以防使用本库的其它项目中 loguru 日志配置相互影响
+        logger.remove()
+        if isinstance(level, str):
+            logger.add(sys.stderr, level=level)
+        else:
+            logger.add(sys.stderr, filter=lambda record: record["level"].name in level)
+
+    @classmethod
     def update_settings(cls, settings):
         custom_table_enum = getattr(cls, "custom_table_enum", None)
+        # 设置类型，用于快速设置某些场景下的通用配置。比如测试 test 和生产 prod 下的通用配置；可不设置，默认为 common
         settings_type = getattr(cls, "settings_type", "common")
-        inner_settings = {}
-        if settings_type == "common":
-            inner_settings = getattr(cls, "custom_common_settings", {})
-        elif settings_type == "debug":
-            inner_settings = getattr(cls, "custom_debug_settings", {})
-        elif settings_type == "product":
-            inner_settings = getattr(cls, "custom_product_settings", {})
+        # 根据 settings_type 参数取出对应的 inner_settings 配置
+        inner_settings = getattr(cls, f"custom_{settings_type}_settings", {})
 
         if custom_table_enum:
             inner_settings["DATA_ENUM"] = custom_table_enum
 
-        # 内置配置 inner_settings 优先级介于 project 和 spider 之间, 即优先级顺序：settings.py < inner_settings < custom_settings
+        # 内置配置 inner_settings 优先级介于 project 和 spider 之间
+        # 即优先级顺序：settings.py < inner_settings < custom_settings
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
@@ -225,11 +241,21 @@ class AyuSpider(AyuMixin, CrawlSpider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
+
+        # 取出日志等级，同样配置给 loguru
+        normal_logger_level = crawler.settings.get("LOG_LEVEL", "DEBUG")
+        cls.slog_init(level=normal_logger_level)
+        # 将 spider.slog 的日志功能替代为 spider.logger，具有同样功能
+        spider.slog = logger
+        # 先输出下相关日志，用于调试时查看
+        spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
+        spider.slog.debug(f"scrapy 当前配置为: {dict(crawler.settings)}")
+
         # 1).先配置 Mysql 的相关信息，如果存在 Mysql 配置，则把 mysql_conf 添加到 spider 上
         mysql_conf = cls.get_mysql_config(crawler.settings)
         # 如果配置了 Mysql 信息
         if mysql_conf:
-            spider.logger.info("项目中配置了 mysql_config 信息")
+            spider.slog.info("项目中配置了 mysql_config 信息")
             spider.mysql_config = mysql_conf
             spider.stats = crawler.stats
 
@@ -249,6 +275,7 @@ class AyuSpider(AyuMixin, CrawlSpider):
         mongodb_conf = cls.get_mongodb_config(crawler.settings)
         # 如果配置了 MongoDB 信息
         if mongodb_conf:
-            spider.logger.info("项目中配置了 mongodb_config 信息")
+            spider.slog.info("项目中配置了 mongodb_config 信息")
             spider.mongodb_conf = mongodb_conf
+
         return spider

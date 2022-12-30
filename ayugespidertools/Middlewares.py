@@ -13,9 +13,9 @@ from retrying import retry
 from scrapy import signals
 from typing import Optional
 from threading import Thread
+from .config import NormalConfig
 from scrapy.http import HtmlResponse
 from scrapy.settings import Settings
-from .config import NormalConfig, logger
 from .common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Params import Param
 from ayugespidertools.common.Utils import ToolsForAyu
@@ -61,14 +61,13 @@ class RandomRequestUaMiddleware(object):
         return s
 
     def spider_opened(self, spider):
-        logger.info(f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: %s" % spider.name)
-        # spider.logger.info("RandomRequestUaMiddleware opened: %s" % spider.name)
+        spider.slog.info(f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: %s" % spider.name)
 
     def process_request(self, request, spider):
         curr_ua = self.get_random_ua_by_weight()
         if curr_ua:
             request.headers.setdefault(b"User-Agent", curr_ua)
-            spider.logger.info("RandomRequestUaMiddleware 当前使用的 ua 为: %s" % curr_ua)
+            spider.slog.debug("RandomRequestUaMiddleware 当前使用的 ua 为: %s" % curr_ua)
 
 
 class DynamicProxyDownloaderMiddleware(object):
@@ -106,7 +105,7 @@ class DynamicProxyDownloaderMiddleware(object):
         elif request.url.startswith("http://"):
             request.meta['proxy'] = f"http://{self.username}:{self.password}@{self.proxy_url}/"
         else:
-            spider.logger.info(f"request url: {request.url} error when use proxy middlewares!")
+            spider.slog.info(f"request url: {request.url} error when use proxy middlewares!")
 
         # 避免因连接复用导致隧道不能切换 IP
         request.headers["Connection"] = "close"
@@ -114,7 +113,7 @@ class DynamicProxyDownloaderMiddleware(object):
         request.headers["Accept-Encoding"] = "gzip"
 
     def spider_opened(self, spider):
-        logger.info(f"动态隧道代理中间件: DynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
+        spider.slog.info(f"动态隧道代理中间件: DynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
 
 
 class ExclusiveProxyDownloaderMiddleware(object):
@@ -170,7 +169,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
         elif request.url.startswith("http://"):
             request.meta["proxy"] = "http://{}".format(self.proxy)
         else:
-            spider.logger.info(f"request url error: {request.url}")
+            spider.slog.info(f"request url error: {request.url}")
 
         proxy_user_pass = self.username + ":" + self.password
         encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
@@ -178,7 +177,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         self.get_proxy_ip()
-        logger.info(f"独享代理中间件: ExclusiveProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}，当前独享代理为: {self.proxy}")
+        spider.slog.info(f"独享代理中间件: ExclusiveProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}，当前独享代理为: {self.proxy}")
 
 
 class SiMiProxyDownloaderMiddleware(RetryMiddleware):
@@ -253,14 +252,14 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
         # 统计请求速率
         self.reqnum_count[current_ip_index] += 1.0
         self.v_sum()
-        # logger.debugger(f"目前的平均请求速度为：{np.average(self.v_count)}")
+        # spider.slog.debugger(f"目前的平均请求速度为：{np.average(self.v_count)}")
 
         if request.url.startswith("https://"):
             request.meta["proxy"] = "https://{}".format(current_ip)
         elif request.url.startswith("http://"):
             request.meta["proxy"] = "http://{}".format(current_ip)
         else:
-            spider.logger.info(f"request url error: {request.url}")
+            spider.slog.info(f"request url error: {request.url}")
 
         # request.meta["proxy"] = "http://{}".format(current_ip)
         request.meta["dont_retry"] = True
@@ -284,7 +283,7 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
             elif request.url.startswith("http://"):
                 request.meta["proxy"] = "http://{}".format(current_ip)
             else:
-                spider.logger.info(f"request url error: {request.url}")
+                spider.slog.error(f"request url error: {request.url}")
             # request.meta["proxy"] = "http://{}".format(current_ip)
             reason = response_status_message(response.status)
             return self._retry(request, reason, spider) or response
@@ -299,7 +298,7 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
             is_exists = requests.get(url).json()
             if not is_exists["data"][current_ip]:
                 if current_ip in self.proxy_list:
-                    spider.logger.info("更新ip")
+                    spider.slog.info("更新ip")
                     # 找到相应索引，并删除相应时间统计数组、ip列表以及请求次数统计数组相应索引上的值
                     current_ip_index = self.proxy_list.index(current_ip)
                     self.proxy_list.pop(current_ip_index)
@@ -326,7 +325,7 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
                         current_ip = self.proxy_list[current_ip_index]
                         self.reqnum_count[current_ip_index] += 1
 
-                    spider.logger.info(f"目前 ip 池存量 ip 数量为：{len(self.proxy_list)}")
+                    spider.slog.info(f"目前 ip 池存量 ip 数量为：{len(self.proxy_list)}")
                     self.v_sum()
                 else:
                     current_ip_index = np.argmin(self.v_count)
@@ -339,7 +338,7 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
             elif request.url.startswith("http://"):
                 request.meta["proxy"] = "http://{}".format(current_ip)
             else:
-                spider.logger.info(f"request url error: {request.url}")
+                spider.slog.info(f"request url error: {request.url}")
             # request.meta["proxy"] = "http://{}".format(current_ip)
             return self._retry(request, exception, spider)
 
@@ -376,13 +375,13 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
         self.t = Thread(target=self.clock, args=(spider,), daemon=True)
         self.t.start()
         self.get_proxy_ip(self.proxypool_size, True)
-        spider.logger.info(f"初始化 ip 字典，ip 数量为：{len(self.proxy_list)}")
-        spider.logger.info("SiMiProxyDownloaderMiddleware opened: %s" % spider.name)
+        spider.slog.info(f"初始化 ip 字典，ip 数量为：{len(self.proxy_list)}")
+        spider.slog.info("SiMiProxyDownloaderMiddleware opened: %s" % spider.name)
 
     def spider_closed(self, spider):
         self.end_time = True
         self.t.join()
-        spider.logger.info("SiMiProxyDownloaderMiddleware closed: %s" % spider.name)
+        spider.slog.info("SiMiProxyDownloaderMiddleware closed: %s" % spider.name)
 
 
 class AbuDynamicProxyDownloaderMiddleware(object):
@@ -416,7 +415,7 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         return s
 
     def spider_opened(self, spider):
-        logger.info(f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
+        spider.slog.info(f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
 
     def process_request(self, request, spider):
         if request.url.startswith("https://"):
@@ -424,7 +423,7 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         elif request.url.startswith("http://"):
             request.meta["proxy"] = "http://{}".format(self.proxy_url)
         else:
-            spider.logger.info(f"request url error: {request.url}")
+            spider.slog.info(f"request url error: {request.url}")
 
         proxy_user_pass = self.username + ":" + self.password
         encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
