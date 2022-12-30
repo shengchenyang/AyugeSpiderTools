@@ -349,73 +349,74 @@ class AyuMysqlPipeline:
                 logger.info(f"重新连接 db: =>{table}, =>{new_item} ")
 
     def close_spider(self, spider):
-        mysql_config = spider.mysql_config
-        text = {}
-        stats = spider.stats.get_stats()
-        error_reason = ""
-        for k, v in stats.items():
-            if isinstance(v, datetime.datetime):
-                text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                if "response_status_count" in k and k != "downloader/response_status_count/200":
-                    status_code = k.split("/")[-1] if len(k.split("/")) > 0 else ""
-                    if status_code.startswith("4"):
-                        if status_code == "429":
-                            error_reason += "%s错误：代理超过使用频率限制 " % status_code
-                        else:
-                            error_reason += "%s错误：网页失效/无此网页/网站拒绝访问 " % status_code
-                    elif status_code.startswith("5"):
-                        error_reason += "%s错误：网站服务器处理出错 " % status_code
-                    elif status_code != "":
-                        error_reason += "%s:待人工排查原因" % status_code
-                elif "exception_type_count" in k:
-                    error_name = k.split("/")[-1]
-                    if "Timeout" in error_name:
-                        error_reason += "%s:网站响应超时错误 " % error_name
-                    elif "ConnectionDone" in error_name:
-                        error_reason += "%s:网站与脚本连接断开 " % error_name
-                    elif "ResponseNeverReceived" or "ResponseFailed" in error_name:
-                        error_reason += "%s:网站无响应 " % error_name
-                    else:
-                        error_reason += "%s:待人工排查原因" % error_name
-
-                text[k.replace("/", "_")] = v
-        log_info = {
-            "database": mysql_config["database"],
-            # 脚本名称
-            "spider_name": spider.name,
-            # uid
-            "uid": mysql_config["database"] + "|" + spider.name,
-            # 请求次数统计
-            "request_counts": text.get("downloader_request_count", 0),
-            # 接收次数统计
-            "received_count": text.get("response_received_count", 0),
-            # 采集数据量
-            "item_counts": text.get("item_scraped_count", 0),
-            # info 数据统计
-            "info_count": text.get("log_count_INFO", 0),
-            # 警告数据统计
-            "warning_count": text.get("log_count_WARNING", 0),
-            # 错误数据统计
-            "error_count": text.get("log_count_ERROR", 0),
-            # 开始时间
-            "start_time": text.get("start_time"),
-            # 结束时间
-            "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            # 花费时间
-            "spend_minutes": round((datetime.datetime.now() - stats.get("start_time") - datetime.timedelta(hours=8)).seconds / 60, 2),
-            "crawl_time": self.crawl_time
-        }
-
-        # 错误原因
-        if text.get("log_count_ERROR", 0):
-            log_info["log_count_ERROR"] = error_reason if error_reason else "请人工排查错误原因！"
-
-        else:
-            log_info["log_count_ERROR"] = ""
-
-        # 是否记录程序采集的基本信息到 Mysql 中
+        # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
         if self.record_log_to_mysql:
+            mysql_config = spider.mysql_config
+            text = {}
+            stats = spider.stats.get_stats()
+            error_reason = ""
+            for k, v in stats.items():
+                if isinstance(v, datetime.datetime):
+                    text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    if "response_status_count" in k and k != "downloader/response_status_count/200":
+                        status_code = k.split("/")[-1] if len(k.split("/")) > 0 else ""
+                        if status_code.startswith("4"):
+                            if status_code == "429":
+                                error_reason += "%s错误：代理超过使用频率限制 " % status_code
+                            else:
+                                error_reason += "%s错误：网页失效/无此网页/网站拒绝访问 " % status_code
+                        elif status_code.startswith("5"):
+                            error_reason += "%s错误：网站服务器处理出错 " % status_code
+                        elif status_code != "":
+                            error_reason += "%s:待人工排查原因" % status_code
+                    elif "exception_type_count" in k:
+                        error_name = k.split("/")[-1]
+                        if "Timeout" in error_name:
+                            error_reason += "%s:网站响应超时错误 " % error_name
+                        elif "ConnectionDone" in error_name:
+                            error_reason += "%s:网站与脚本连接断开 " % error_name
+                        elif "ResponseNeverReceived" or "ResponseFailed" in error_name:
+                            error_reason += "%s:网站无响应 " % error_name
+                        else:
+                            error_reason += "%s:待人工排查原因" % error_name
+
+                    text[k.replace("/", "_")] = v
+            log_info = {
+                "database": mysql_config["database"],
+                # 脚本名称
+                "spider_name": spider.name,
+                # uid
+                "uid": mysql_config["database"] + "|" + spider.name,
+                # 请求次数统计
+                "request_counts": text.get("downloader_request_count", 0),
+                # 接收次数统计
+                "received_count": text.get("response_received_count", 0),
+                # 采集数据量
+                "item_counts": text.get("item_scraped_count", 0),
+                # info 数据统计
+                "info_count": text.get("log_count_INFO", 0),
+                # 警告数据统计
+                "warning_count": text.get("log_count_WARNING", 0),
+                # 错误数据统计
+                "error_count": text.get("log_count_ERROR", 0),
+                # 开始时间
+                "start_time": text.get("start_time"),
+                # 结束时间
+                "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                # 花费时间
+                "spend_minutes": round(
+                    (datetime.datetime.now() - stats.get("start_time") - datetime.timedelta(hours=8)).seconds / 60, 2),
+                "crawl_time": self.crawl_time
+            }
+
+            # 错误原因
+            if text.get("log_count_ERROR", 0):
+                log_info["log_count_ERROR"] = error_reason if error_reason else "请人工排查错误原因！"
+
+            else:
+                log_info["log_count_ERROR"] = ""
+
             # 运行脚本统计信息
             self.insert_script_statistics(log_info)
             self.table_collection_statistics(spider_name=spider.name, database=mysql_config["database"], crawl_time=self.crawl_time)

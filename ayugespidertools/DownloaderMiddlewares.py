@@ -12,8 +12,8 @@
 import asyncio
 import aiohttp
 import urllib.parse
-from loguru import logger
 from scrapy.http import HtmlResponse
+from ayugespidertools.config import logger
 from twisted.internet.defer import Deferred
 from ayugespidertools.common.Params import Param
 from ayugespidertools.common.Utils import ToolsForAyu
