@@ -10,12 +10,11 @@ import datetime
 import dataclasses
 from scrapy import Request
 from retrying import retry
-from typing import Optional
 from pymysql import cursors
+from typing import Optional
 from urllib.parse import urlparse
 from twisted.enterprise import adbapi
 from dbutils.pooled_db import PooledDB
-from ayugespidertools.config import logger
 from twisted.internet import defer, reactor
 from scrapy.pipelines.files import FilesPipeline
 from ayugespidertools.common.Params import Param
@@ -43,7 +42,13 @@ class AyuMysqlPipeline:
     Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例
     """
 
-    def __init__(self, table_prefix, table_enum, env, record_log_to_mysql):
+    def __init__(
+        self,
+        table_prefix: str,
+        table_enum,
+        env: str,
+        record_log_to_mysql: bool
+    ) -> None:
         """
         初始化 Mysql 链接所需要的信息
         Args:
@@ -60,6 +65,7 @@ class AyuMysqlPipeline:
         self.collate = None
         self.mysql_config = None
         self.conn = None
+        self.slog = None
         self.cursor = None
         self.crawl_time = datetime.date.today()
 
@@ -76,7 +82,7 @@ class AyuMysqlPipeline:
             record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
         )
 
-    def get_column_type(self, database, table, column) -> str:
+    def get_column_type(self, database: str, table: str, column: str) -> str:
         """
         获取数据字段存储类型
         Args:
@@ -98,10 +104,15 @@ class AyuMysqlPipeline:
                 lines = self.cursor.fetchall()
                 column_type = lines[0][0] if len(lines) == 1 else ""
         except Exception as e:
-            logger.error(f"{e}")
+            self.slog.error(f"{e}")
         return column_type
 
-    def create_table(self, table_name: str, tabel_notes: str = "", demand_code: str = ""):
+    def create_table(
+        self,
+        table_name: str,
+        tabel_notes: Optional[str] = "",
+        demand_code: Optional[str] = ""
+    ) -> None:
         """
         创建数据库表
         Args:
@@ -123,17 +134,17 @@ class AyuMysqlPipeline:
             # 执行 sql 查询，获取数据
             data = self.cursor.execute(sql)
             if any([data == 0, not data]):
-                logger.info(f"创建数据表 {tabel_notes}: {table_name} 成功！")
+                self.slog.info(f"创建数据表 {tabel_notes}: {table_name} 成功！")
 
         except Exception as e:
-            logger.error(f"创建表失败，tabel_notes：{tabel_notes}，table_name：{table_name}，error：{e}")
+            self.slog.error(f"创建表失败，tabel_notes：{tabel_notes}，table_name：{table_name}，error：{e}")
 
     @retry(stop_max_attempt_number=Param.retry_num, wait_random_min=Param.retry_time_min, wait_random_max=Param.retry_time_max)
     def _connect(self, pymysql_dict_config):
         try:
             self.conn = pymysql.connect(**pymysql_dict_config)
         except Exception as e:
-            logger.warning(f"目标数据库：{pymysql_dict_config['database']} 不存在，尝试创建中...")
+            self.slog.warning(f"目标数据库：{pymysql_dict_config['database']} 不存在，尝试创建中...")
             if "1049" in str(e):
                 # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
                 ReuseOperation.create_database(pymysql_dict_config)
@@ -144,6 +155,7 @@ class AyuMysqlPipeline:
         return pymysql.connect(**pymysql_dict_config)
 
     def open_spider(self, spider):
+        self.slog = spider.slog
         self.mysql_config = spider.mysql_config
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
         self.conn = self._connect(self.mysql_config)
@@ -172,9 +184,12 @@ class AyuMysqlPipeline:
         new_item = dict()
         notes_dic = dict()
         # 如果是 ayugespidertools.Items 中的各个自封装类型时
-        if item.get("alldata"):
+        # alldata 可以认为是关键字，需要判断其是否存在，且是否为 dict。
+        # 若其存在且为 dict，则默认其为 Items 中的 alldata 数据类型而非单一字段值
+        insert_data = item.get("alldata")
+        if all([insert_data, isinstance(insert_data, dict)]):
             # 如果是 Item 对象转化而来，则需要转换下，以便兼容写法
-            for key, value in item["alldata"].items():
+            for key, value in insert_data.items():
                 if type(value) == dict:
                     new_item[key] = value.get("key_value", "")
                     notes_dic[key] = value["notes"]
@@ -188,7 +203,6 @@ class AyuMysqlPipeline:
             save_data_item = ReuseOperation.get_items_except_keys(dict_config=item, key_list=["table", "item_mode"])
             for k, v in save_data_item.items():
                 key = k.strip()
-                # 将存入表的无关字段给去掉
                 if isinstance(v, str):
                     new_item[key] = v.strip()
                     notes_dic[key] = key
@@ -232,12 +246,12 @@ class AyuMysqlPipeline:
                 self.conn.commit()
 
         except Exception as e:
-            logger.warning(f":{e}")
-            logger.warning(f"Item:{new_item}  Table: {table}")
+            self.slog.warning(f":{e}")
+            self.slog.warning(f"Item:{new_item}  Table: {table}")
             self.conn.rollback()
-            patern_colum = re.compile(r"Unknown column '(.*?)' in 'field list'")
+            colum_pattern = re.compile(r"Unknown column '(.*?)' in 'field list'")
             if "1054" in str(e):
-                text = re.findall(patern_colum, str(e))
+                text = re.findall(colum_pattern, str(e))
                 colum = text[0]
                 notes = note_dic[colum]
 
@@ -254,9 +268,9 @@ class AyuMysqlPipeline:
                         self.conn.commit()
                 except Exception as e:
                     if "1060" in str(e):
-                        logger.info(f"添加字段 {colum} 已存在")
+                        self.slog.info(f"添加字段 {colum} 已存在")
                     else:
-                        logger.info(f"{e}")
+                        self.slog.info(f"{e}")
                 return self.insert_item(item_o, table)
 
             elif "1146" in str(e):
@@ -284,15 +298,15 @@ class AyuMysqlPipeline:
                     self.insert_item(item_o, table)
                 else:
                     # 未定义 Tabel_Enum 则建表
-                    logger.info("未定义数据库表枚举，进行创表操作")
+                    self.slog.info("未定义数据库表枚举，进行创表操作")
                     table_name = table
                     self.create_table(table_name)
                     self.insert_item(item_o, table)
 
             elif "1406" in str(e):
                 if "Data too long for" in str(e):
-                    patern_colum = re.compile(r"Data too long for column '(.*?)' at")
-                    text = re.findall(patern_colum, str(e))
+                    colum_pattern = re.compile(r"Data too long for column '(.*?)' at")
+                    text = re.findall(colum_pattern, str(e))
                     colum = text[0]
                     notes = note_dic[colum]
                     column_type = self.get_column_type(database=self.mysql_config["database"], table=table, column=colum)
@@ -308,15 +322,15 @@ class AyuMysqlPipeline:
                         if self.cursor.execute(sql):
                             self.conn.commit()
                     except Exception as e:
-                        logger.info(f"更新字段类型失败 {e}")
+                        self.slog.info(f"更新字段类型失败 {e}")
                     return self.insert_item(item_o, table)
                 else:
-                    logger.info("1406 错误其他类型")
+                    self.slog.info("1406 错误其他类型")
 
             elif "1265" in str(e):
                 if "Data truncated for column" in str(e):
-                    patern_colum = re.compile(r"Data truncated for column '(.*?)' at")
-                    text = re.findall(patern_colum, str(e))
+                    colum_pattern = re.compile(r"Data truncated for column '(.*?)' at")
+                    text = re.findall(colum_pattern, str(e))
                     colum = text[0]
                     notes = note_dic[colum]
                     column_type = self.get_column_type(database=self.mysql_config["database"], table=table, column=colum)
@@ -331,14 +345,14 @@ class AyuMysqlPipeline:
                         if self.cursor.execute(sql):
                             self.conn.commit()
                     except Exception as e:
-                        logger.info(f"更新字段类型失败 {e}")
+                        self.slog.info(f"更新字段类型失败 {e}")
                     return self.insert_item(item_o, table)
                 else:
-                    logger.info("1265 错误其他类型")
+                    self.slog.info("1265 错误其他类型")
 
             else:
                 # 碰到其他的异常才打印错误日志，已处理的异常不打印
-                logger.error(f"ERROR:{e}")
+                self.slog.error(f"ERROR:{e}")
 
             try:
                 self.conn.ping(reconnect=True)
@@ -346,7 +360,7 @@ class AyuMysqlPipeline:
                 self.conn = self._connect(self.mysql_config)
                 self.cursor = self.conn.cursor()
                 self.cursor.execute(sql, tuple(new_item.values()) * 2)
-                logger.info(f"重新连接 db: =>{table}, =>{new_item} ")
+                self.slog.info(f"重新连接 db: =>{table}, =>{new_item} ")
 
     def close_spider(self, spider):
         # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
@@ -504,7 +518,7 @@ class AyuMysqlPipeline:
                 self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logger.warning(f":{e}")
+            self.slog.warning(f":{e}")
 
     @retry(stop_max_attempt_number=Param.retry_num, wait_random_min=Param.retry_time_min, wait_random_max=Param.retry_time_max)
     def insert_script_statistics(self, data_item):
@@ -550,7 +564,7 @@ class AyuMysqlPipeline:
                 self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logger.warning(f":{e}")
+            self.slog.warning(f":{e}")
 
 
 class AyuStatsMysqlPipeline(AyuMysqlPipeline):
@@ -600,23 +614,11 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     def __init__(self, pool_db_config, *args, **kwargs):
         super(AyuTurboMysqlPipeline, self).__init__(*args, **kwargs)
         self.pool_db_config = pool_db_config
+        self.slog = None
 
     @classmethod
     def from_crawler(cls, crawler):
         pool_db_config = crawler.settings.get('POOL_DB_CONFIG', None)
-        if not pool_db_config:
-            logger.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
-            pool_db_config = {
-                # 连接池允许的最大连接数
-                'maxconnections': 5,
-                # 连接池中空闲连接的最大数量。默认0，即无最大数量限制
-                'maxcached': 0,
-                # 连接的最大使用次数。默认0，即无使用次数限制
-                'maxusage': 0,
-                # 连接数达到最大时，新连接是否可阻塞。默认False，即达到最大连接数时，再取新连接将会报错
-                'blocking': True,
-            }
-
         return cls(
             # 数据库表前缀
             table_prefix=crawler.settings.get("MYSQL_TABLE_PREFIX", ""),
@@ -632,6 +634,19 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         )
 
     def open_spider(self, spider):
+        self.slog = spider.slog
+        if not self.pool_db_config:
+            spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
+            self.pool_db_config = {
+                # 连接池允许的最大连接数
+                'maxconnections': 5,
+                # 连接池中空闲连接的最大数量。默认0，即无最大数量限制
+                'maxcached': 0,
+                # 连接的最大使用次数。默认0，即无使用次数限制
+                'maxusage': 0,
+                # 连接数达到最大时，新连接是否可阻塞。默认False，即达到最大连接数时，再取新连接将会报错
+                'blocking': True,
+            }
         self.mysql_config = spider.mysql_config
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
 
@@ -691,7 +706,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         pass
 
     def db_create_err(self, failure):
-        logger.error('创建数据表失败: {}'.format(failure))
+        self.slog.error('创建数据表失败: {}'.format(failure))
 
     def get_column_type_by_myself(self, cursor, database, table, column) -> str:
         """
@@ -715,7 +730,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                 lines = cursor.fetchall()
                 column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
         except Exception as e:
-            logger.error(f"{e}")
+            self.slog.error(f"{e}")
         return column_type
 
     def process_item(self, item, spider):
@@ -743,12 +758,12 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
             cursor.execute(sql, tuple(new_item.values()) * 2)
 
         except Exception as e:
-            logger.warning(f":{e}")
-            logger.warning(f"Item:{new_item}  Table: {table}")
+            self.slog.warning(f":{e}")
+            self.slog.warning(f"Item:{new_item}  Table: {table}")
             # self.conn.rollback()
-            patern_colum = re.compile(r"Unknown column '(.*?)' in 'field list'")
+            colum_pattern = re.compile(r"Unknown column '(.*?)' in 'field list'")
             if "1054" in str(e):
-                text = re.findall(patern_colum, str(e))
+                text = re.findall(colum_pattern, str(e))
                 colum = text[0]
                 notes = note_dic[colum]
 
@@ -763,9 +778,9 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     cursor.execute(sql)
                 except Exception as e:
                     if "1060" in str(e):
-                        logger.info(f"添加字段 {colum} 已存在")
+                        self.slog.info(f"添加字段 {colum} 已存在")
                     else:
-                        logger.info(f"{e}")
+                        self.slog.info(f"{e}")
                 return self.db_insert(cursor, item)
 
             elif "1146" in str(e):
@@ -793,15 +808,15 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     self.db_insert(cursor, item)
                 else:
                     # 未定义 Tabel_Enum 则建表
-                    logger.info("未定义数据库表枚举，进行创表操作")
+                    self.slog.info("未定义数据库表枚举，进行创表操作")
                     table_name = table
                     super(AyuTwistedMysqlPipeline, self).create_table(table_name)
                     self.db_insert(cursor, item)
 
             elif "1406" in str(e):
                 if "Data too long for" in str(e):
-                    patern_colum = re.compile(r"Data too long for column '(.*?)' at")
-                    text = re.findall(patern_colum, str(e))
+                    colum_pattern = re.compile(r"Data too long for column '(.*?)' at")
+                    text = re.findall(colum_pattern, str(e))
                     colum = text[0]
                     notes = note_dic[colum]
                     column_type = self.get_column_type_by_myself(cursor=cursor, database=self.mysql_config["database"], table=table, column=colum)
@@ -814,15 +829,15 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     try:
                         cursor.execute(sql)
                     except Exception as e:
-                        logger.info(f"更新字段类型失败 {e}")
+                        self.slog.info(f"更新字段类型失败 {e}")
                     return self.db_insert(cursor, item)
                 else:
-                    logger.info("1406 错误其他类型")
+                    self.slog.info("1406 错误其他类型")
 
             elif "1265" in str(e):
                 if "Data truncated for column" in str(e):
-                    patern_colum = re.compile(r"Data truncated for column '(.*?)' at")
-                    text = re.findall(patern_colum, str(e))
+                    colum_pattern = re.compile(r"Data truncated for column '(.*?)' at")
+                    text = re.findall(colum_pattern, str(e))
                     colum = text[0]
                     notes = note_dic[colum]
                     column_type = self.get_column_type_by_myself(cursor=cursor, database=self.mysql_config["database"], table=table, column=colum)
@@ -834,19 +849,19 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     try:
                         cursor.execute(sql)
                     except Exception as e:
-                        logger.info(f"更新字段类型失败 {e}")
+                        self.slog.info(f"更新字段类型失败 {e}")
                     return self.db_insert(cursor, item)
                 else:
-                    logger.info("1265 错误其他类型")
+                    self.slog.info("1265 错误其他类型")
 
             else:
                 # 碰到其他的异常才打印错误日志，已处理的异常不打印
-                logger.error(f"ERROR:{e}")
+                self.slog.error(f"ERROR:{e}")
 
         return item
 
     def handle_error(self, failure, item):
-        logger.error('插入数据失败:{}, item: {}'.format(failure, item))
+        self.slog.error('插入数据失败:{}, item: {}'.format(failure, item))
 
     def close_spider(self, spider):
         # 不删除 cursorclass 其实也不影响
@@ -866,7 +881,7 @@ class FilesDownloadPipeline(FilesPipeline):
         file_url = item.get("file_url")
         if file_url:
             return Request(file_url)
-        logger.info("No file_url")
+        print("No file_url")
 
     def item_completed(self, results, item, info):
         file_paths = [x["path"] for ok, x in results if ok]
@@ -887,7 +902,7 @@ class ImagesDownloadPipeline(ImagesPipeline):
         image_url = item.get("image_url")
         if image_url:
             return Request(image_url)
-        logger.info("No image_url")
+        print("No image_url")
 
     def item_completed(self, results, item, info):
         image_paths = [x["path"] for ok, x in results if ok]
@@ -906,6 +921,7 @@ class AyuStatisticsMysqlPipeline:
 
     def __init__(self, env):
         self.env = env
+        self.slog = None
         self.conn = None
         self.cursor = None
         self.collate = None
@@ -923,7 +939,7 @@ class AyuStatisticsMysqlPipeline:
         try:
             self.conn = pymysql.connect(**pymysql_dict_config)
         except Exception as e:
-            logger.warning(f"目标数据库：{pymysql_dict_config['database']} 不存在，尝试创建中...")
+            self.slog.warning(f"目标数据库：{pymysql_dict_config['database']} 不存在，尝试创建中...")
             if "1049" in str(e):
                 ReuseOperation.create_database(pymysql_dict_config)
         else:
@@ -933,6 +949,7 @@ class AyuStatisticsMysqlPipeline:
         return pymysql.connect(**pymysql_dict_config)
 
     def open_spider(self, spider):
+        self.slog = spider.slog
         self.mysql_config = spider.mysql_config
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
 
@@ -961,7 +978,7 @@ class AyuStatisticsMysqlPipeline:
             if self.cursor.execute(sql, tuple(data.values()) * 2):
                 self.conn.commit()
         except Exception as e:
-            logger.warning(f":{e}")
+            self.slog.warning(f":{e}")
 
     def close_spider(self, spider):
         mysql_config = spider.mysql_config
@@ -1083,7 +1100,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
 
         # 用于输出日志
         if all([self.conn, self.db]):
-            logger.info(f"已连接至 host: {self.mongodb_config['host']}, database: {self.mongodb_config['database']} 的 MongoDB 目标数据库")
+            spider.slog.info(f"已连接至 host: {self.mongodb_config['host']}, database: {self.mongodb_config['database']} 的 MongoDB 目标数据库")
 
     def close_spider(self, spider):
         self.conn.close()
@@ -1104,7 +1121,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
         if item_dict["item_mode"] == "MongoDB":
             insert_data = item_dict.get("alldata")
             # 如果有 alldata 字段，则其为推荐格式
-            if insert_data:
+            if all([insert_data, isinstance(insert_data, dict)]):
                 # 判断数据中中的 alldata 的格式：
                 #     1.推荐：是嵌套 dict，就像 AyuMysqlPipeline 一样 -- 这是为了通用写法风格；
                 #     2. 是单层的 dict
@@ -1152,7 +1169,7 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
         if item_dict["item_mode"] == "MongoDB":
             insert_data = item_dict.get("alldata")
             # 如果有 alldata 字段，则其为推荐格式
-            if insert_data:
+            if all([insert_data, isinstance(insert_data, dict)]):
                 if any([isinstance(v, dict) for v in insert_data.values()]):
                     insert_data = {v: insert_data[v]["key_value"] for v in insert_data.keys()}
 
