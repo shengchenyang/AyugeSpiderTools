@@ -9,7 +9,6 @@
 @License :  (c)Copyright 2022-2023
 @Desc    :  None
 """
-import sys
 import time
 import threading
 from typing import Union
@@ -121,33 +120,6 @@ class AyuSpider(Spider):
         self.mysql_engine = None
 
     @classmethod
-    def slog_init(cls, level: Union[str, list]) -> None:
-        """
-        日志全局配置
-
-        can use it directly (e.g. Spider.slog.info('msg'))
-        Almost the same as (spider.logger.info('msg'))
-        loguru 文档中相关介绍:
-            https://loguru.readthedocs.io/en/stable/resources/recipes.html#changing-the-level-of-an-existing-handler
-
-        Args:
-            level: loguru 等级配置参数
-                1. 当参数为 str 时：设置日志等级只输出 level 之上
-                2. 当参数为 list 时：设置日志输出列表中的级别
-
-        Returns:
-            None
-        """
-        assert type(level) in [str, list], "level 参数需要为 str 或 list 格式！"
-
-        # 先删除其它所有的 handle，以防使用本库的其它项目中 loguru 日志配置相互影响
-        logger.remove()
-        if isinstance(level, str):
-            logger.add(sys.stderr, level=level)
-        else:
-            logger.add(sys.stderr, filter=lambda record: record["level"].name in level)
-
-    @classmethod
     def update_settings(cls, settings):
         custom_table_enum = getattr(cls, "custom_table_enum", None)
         # 设置类型，用于快速设置某些场景下的通用配置。比如测试 test 和生产 prod 下的通用配置；可不设置，默认为 common
@@ -242,11 +214,15 @@ class AyuSpider(Spider):
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
 
-        # 取出日志等级，同样配置给 loguru
-        normal_logger_level = crawler.settings.get("LOG_LEVEL", "DEBUG")
-        cls.slog_init(level=normal_logger_level)
-        # 将 spider.slog 的日志功能替代为 spider.logger，具有同样功能
-        spider.slog = logger
+        # 若有 loguru 的日志配置，先取出其配置
+        loguru_config_tmp = crawler.settings.get("LOGURU_CONFIG")
+        # 添加 spider.slog 的日志功能，与 spider.logger 具有同样功能
+        if not loguru_config_tmp:
+            # 其实直接赋值为 loguru 的 logger 即可
+            spider.slog = logger
+        else:
+            spider.slog = loguru_config_tmp
+
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
         spider.slog.debug(f"scrapy 当前配置为: {dict(crawler.settings)}")

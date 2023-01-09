@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import pandas
-from loguru import logger
 from scrapy.http import Request
+from $project_name.settings import logger
 from scrapy.http.response.text import TextResponse
 from $project_name.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
@@ -30,11 +30,17 @@ class $classname(AyuSpider):
     custom_table_enum = TableEnum
     # 初始化配置的类型
     settings_type = 'debug'
-    custom_settings = { 
-        # 是否开启记录项目相关运行统计信息
+    custom_settings = {
+        # scrapy 日志等级配置
+        'LOG_LEVEL': 'DEBUG',
+        # 是否开启记录项目相关运行统计信息。不配置默认为 False
         'RECORD_LOG_TO_MYSQL': False,
-        # 数据表的前缀名称，用于标记属于哪个项目，也可以不用添加或配置
-        'MYSQL_TABLE_PREFIX': "",
+        # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
+        'LOGURU_CONFIG': logger,
+        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
+        'MYSQL_TABLE_PREFIX': "demo_basic_",
+        # MongoDB 集合的前缀名称，用于标记属于哪个项目，也可以不用配置
+        'MONGODB_COLLECTION_PREFIX': "demo_basic_",
         'ITEM_PIPELINES': {
             # 激活此项则数据会存储至 Mysql
             'ayugespidertools.Pipelines.AyuFtyMysqlPipeline': 300,
@@ -67,16 +73,35 @@ class $classname(AyuSpider):
         )
 
     def parse_first(self, response: TextResponse, curr_site: str):
-        logger.info(f"当前采集站点为: {curr_site}")
+        # 日志使用: scrapy 的 self.logger 或本库的 self.slog 或直接使用全局的 logger handle 也行（根据场景自行选择）
+        self.slog.info(f"当前采集的站点为: {curr_site}")
+
+        # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
         data_list = ToolsForAyu.extract_with_json(json_data=response.json(), query="data")
         for curr_data in data_list:
-            article_detail_url = ToolsForAyu.extract_with_json(json_data=curr_data, query="articleDetailUrl")
-            article_title = ToolsForAyu.extract_with_json(json_data=curr_data, query="articleTitle")
-            comment_count = ToolsForAyu.extract_with_json(json_data=curr_data, query="commentCount")
-            favor_count = ToolsForAyu.extract_with_json(json_data=curr_data, query="favorCount")
-            nick_name = ToolsForAyu.extract_with_json(json_data=curr_data, query="nickName")
-            logger.info(f"article data: {article_detail_url, article_title, comment_count, favor_count, nick_name}")
+            article_detail_url = ToolsForAyu.extract_with_json(
+                json_data=curr_data,
+                query="articleDetailUrl")
 
+            article_title = ToolsForAyu.extract_with_json(
+                json_data=curr_data,
+                query="articleTitle")
+
+            comment_count = ToolsForAyu.extract_with_json(
+                json_data=curr_data,
+                query="commentCount")
+
+            favor_count = ToolsForAyu.extract_with_json(
+                json_data=curr_data,
+                query="favorCount")
+
+            nick_name = ToolsForAyu.extract_with_json(
+                json_data=curr_data,
+                query="nickName")
+
+            self.slog.info(f"article data: {article_detail_url, article_title, comment_count, favor_count, nick_name}")
+
+            # 这是需要存储的字段信息
             article_info = {
                 "article_detail_url": {'key_value': article_detail_url, 'notes': '文章详情链接'},
                 "article_title": {'key_value': article_title, 'notes': '文章标题'},
@@ -85,24 +110,38 @@ class $classname(AyuSpider):
                 "nick_name": {'key_value': nick_name, 'notes': '文章作者昵称'}
             }
 
-            # 存储到 mysql 的示例
-            AritleInfoMysqlItem = MysqlDataItem(
+            ArticleInfoMysqlItem = MysqlDataItem(
                 alldata=article_info,
-                table=TableEnum.aritle_list_table.value['value'],
+                table=TableEnum.article_list_table.value['value'],
             )
 
-            # 数据入库逻辑 -> 测试 mysql_engine 的去重功能
-            sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
-                self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.aritle_list_table.value['value'],
-                article_detail_url)
-            yield ToolsForAyu.filter_data_before_yield(sql=sql, mysql_engine=self.mysql_engine, item=AritleInfoMysqlItem)
+            # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
+            try:
+                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
+                    self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.article_list_table.value['value'],
+                    article_detail_url)
+                df = pandas.read_sql(sql, self.mysql_engine)
 
-            # 存储到 mongoDB 的示例
+                # 如果为空，说明此数据不存在于数据库，则新增
+                if df.empty:
+                    yield ArticleInfoMysqlItem
+
+                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
+                else:
+                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
+
+            except Exception as e:
+                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
+                    yield ArticleInfoMysqlItem
+                else:
+                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
+
+            # 这是 MongoDB 存储场景的示例
             AritleInfoMongoItem = MongoDataItem(
                 # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
                 alldata=article_info,
                 # table 为 mongo 的存储 Collection 集合的名称
-                table=TableEnum.aritle_list_table.value['value'],
+                table=TableEnum.article_list_table.value['value'],
                 # mongo_update_rule 为查询数据是否存在的规则
                 mongo_update_rule={"article_detail_url": article_detail_url},
             )
