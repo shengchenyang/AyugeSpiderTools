@@ -214,14 +214,20 @@ class AyuSpider(Spider):
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
 
-        # 若有 loguru 的日志配置，先取出其配置
+        # 设置 loguru 日志配置
         loguru_config_tmp = crawler.settings.get("LOGURU_CONFIG")
-        # 添加 spider.slog 的日志功能，与 spider.logger 具有同样功能
-        if not loguru_config_tmp:
-            # 其实直接赋值为 loguru 的 logger 即可
-            spider.slog = logger
+        # 是否开启 loguru 日志记录
+        loguru_enabled = crawler.settings.get("LOGURU_ENABLED", True)
+        assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
+
+        # 如果开启推荐的 loguru 日志管理功能
+        if loguru_enabled:
+            # 则使用 LOGURU_CONFIG 下的配置，或直接使用统一管理的 logger
+            spider.slog = loguru_config_tmp or logger
+
+        # 如果关闭推荐的日志管理，则替换为 scrapy 的日志管理
         else:
-            spider.slog = loguru_config_tmp
+            spider.slog = spider.logger
 
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
