@@ -119,6 +119,27 @@ class AyuSpider(Spider):
         super(AyuSpider, self).__init__(*args, **kwargs)
         self.mysql_engine = None
 
+    @property
+    def slog(self):
+        """
+        本库的日志管理模块，使用 loguru 来管理日志；
+        本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
+        """
+        # 设置 loguru 日志配置
+        loguru_config_tmp = self.crawler.settings.get("LOGURU_CONFIG")
+        # 是否开启 loguru 日志记录
+        loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
+        assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
+
+        # 如果开启推荐的 loguru 日志管理功能
+        if loguru_enabled:
+            # 则使用 LOGURU_CONFIG 下的配置，或直接使用统一管理的 logger
+            return loguru_config_tmp or logger
+
+        # 如果关闭推荐的日志管理，则替换为 scrapy 的日志管理
+        else:
+            return super(AyuSpider, self).logger
+
     @classmethod
     def update_settings(cls, settings):
         custom_table_enum = getattr(cls, "custom_table_enum", None)
@@ -213,21 +234,6 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
-
-        # 设置 loguru 日志配置
-        loguru_config_tmp = crawler.settings.get("LOGURU_CONFIG")
-        # 是否开启 loguru 日志记录
-        loguru_enabled = crawler.settings.get("LOGURU_ENABLED", True)
-        assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
-
-        # 如果开启推荐的 loguru 日志管理功能
-        if loguru_enabled:
-            # 则使用 LOGURU_CONFIG 下的配置，或直接使用统一管理的 logger
-            spider.slog = loguru_config_tmp or logger
-
-        # 如果关闭推荐的日志管理，则替换为 scrapy 的日志管理
-        else:
-            spider.slog = spider.logger
 
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
