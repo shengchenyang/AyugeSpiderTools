@@ -614,7 +614,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     def __init__(self, pool_db_config, *args, **kwargs):
         super(AyuTurboMysqlPipeline, self).__init__(*args, **kwargs)
         self.pool_db_config = pool_db_config
-        self.slog = None
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -671,10 +670,6 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
     def __init__(self, *args, **kwargs):
         super(AyuTwistedMysqlPipeline, self).__init__(*args, **kwargs)
         self.dbpool = None
-        # 用于建表时使用
-        self.collate = None
-        self.conn = None
-        self.cursor = None
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -690,6 +685,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         )
 
     def open_spider(self, spider):
+        self.slog = spider.slog
         self.mysql_config = spider.mysql_config
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
 
