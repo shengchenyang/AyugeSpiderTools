@@ -27,7 +27,7 @@ __all__ = [
 
 def as_deferred(f):
     """
-    transform a Twisted Deffered to an Asyncio Future
+    transform a Twisted Deferred to an Asyncio Future
     Args:
         f: async function
 

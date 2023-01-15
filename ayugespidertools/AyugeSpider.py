@@ -179,16 +179,14 @@ class AyuSpider(Spider):
             dict_config=local_mysql_config,
             key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"]
         ):
-            mysql_conf_temp = {
+            return {
                 "host": local_mysql_config.get("HOST"),
                 "port": local_mysql_config.get("PORT"),
                 "user": local_mysql_config.get("USER"),
                 "password": local_mysql_config.get("PASSWORD"),
                 "database": local_mysql_config.get("DATABASE"),
-                "charset": local_mysql_config.get("CHARSET") or "utf8mb4"
+                "charset": local_mysql_config.get("CHARSET") or "utf8mb4",
             }
-            return mysql_conf_temp
-
         # 2). 本地没有配置，再从 consul 中获取应用配置
         if app_conf_manage:
             consul_conf_dict_min = ReuseOperation.get_consul_conf(settings=settings)
@@ -217,15 +215,13 @@ class AyuSpider(Spider):
             dict_config=local_mongodb_conf,
             key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"]
         ):
-            mongodb_conf_temp = {
+            return {
                 "host": local_mongodb_conf.get("HOST"),
                 "port": local_mongodb_conf.get("PORT"),
                 "user": local_mongodb_conf.get("USER"),
                 "password": local_mongodb_conf.get("PASSWORD"),
                 "database": local_mongodb_conf.get("DATABASE"),
             }
-            return mongodb_conf_temp
-
         # 2). 本地没有配置，再从 consul 中获取应用配置
         if app_conf_manage:
             consul_conf_dict_min = ReuseOperation.get_consul_conf(settings=settings)
@@ -240,29 +236,18 @@ class AyuSpider(Spider):
         spider.slog.debug(f"scrapy 当前配置为: {dict(crawler.settings)}")
 
         # 1).先配置 Mysql 的相关信息，如果存在 Mysql 配置，则把 mysql_conf 添加到 spider 上
-        mysql_conf = cls.get_mysql_config(crawler.settings)
-        # 如果配置了 Mysql 信息
-        if mysql_conf:
+        if mysql_conf := cls.get_mysql_config(crawler.settings):
             spider.slog.info("项目中配置了 mysql_config 信息")
             spider.mysql_config = mysql_conf
             spider.stats = crawler.stats
 
             # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_enabled:
-                mysql_url = "mysql+pymysql://{}:{}@{}:{}/{}?charset={}".format(
-                    mysql_conf.get("user"),
-                    mysql_conf.get("password"),
-                    mysql_conf.get("host"),
-                    mysql_conf.get("port"),
-                    mysql_conf.get("database"),
-                    mysql_conf.get("charset")
-                )
+                mysql_url = f'mysql+pymysql://{mysql_conf.get("user")}:{mysql_conf.get("password")}@{mysql_conf.get("host")}:{mysql_conf.get("port")}/{mysql_conf.get("database")}?charset={mysql_conf.get("charset")}'
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
         # 2).配置 MongoDB 的相关信息，如果存在 MongoDB 配置，则把 mongodb_conf 添加到 spider 上
-        mongodb_conf = cls.get_mongodb_config(crawler.settings)
-        # 如果配置了 MongoDB 信息
-        if mongodb_conf:
+        if mongodb_conf := cls.get_mongodb_config(crawler.settings):
             spider.slog.info("项目中配置了 mongodb_config 信息")
             spider.mongodb_conf = mongodb_conf
 

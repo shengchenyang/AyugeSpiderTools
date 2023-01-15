@@ -50,13 +50,11 @@ class MongoDbBase(object):
                             默认为 uri 方式，但其实对外使用还是只传 user, password ... connect_style 的形式
         """
         # uri 方式，默认使用此方式连接
-        if any([not connect_style, connect_style in ["uri", "U"]]):
-            uri = "mongodb://%s:%s@%s:%s/?authSource=%s&authMechanism=SCRAM-SHA-1" % (
-                user, password, host, port, authsource)
+        if any([not connect_style, connect_style in {"uri", "U"}]):
+            uri = f"mongodb://{user}:{password}@{host}:{port}/?authSource={authsource}&authMechanism=SCRAM-SHA-1"
             self.conn = MongoClient(uri)
 
-        # 关键字变量方式
-        elif connect_style in ["key", "K"]:
+        elif connect_style in {"key", "K"}:
             self.conn = MongoClient(
                 host=host,
                 port=port,
@@ -66,8 +64,7 @@ class MongoDbBase(object):
                 authMechanism='SCRAM-SHA-1'
             )
 
-        # authenticate 或 admin 认证方式(pymongo 3.9 及以下版本使用)，不推荐此方法
-        elif connect_style in ["auth", "A"]:
+        elif connect_style in {"auth", "A"}:
             self.conn = MongoClient(host, port)
             # 连接 admin 数据库，账号密码认证(其实这里也可以使用 uri 的 auth 认证方式)
             db = self.conn.admin
@@ -198,13 +195,12 @@ class MongoDbBase(object):
     # 上传数据
     def upload_file(self, file_name, collection, content_type, file_data, metadata):
         gridfs_col = GridFS(self.db, collection)
-        # with open(file_name, 'rb') as file_r:
-        #     file_data = file_r.read()
-        #     file_ = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
-        #     # return file_
-
-        file_ = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
-        return file_
+        return gridfs_col.put(
+            data=file_data,
+            content_type=content_type,
+            filename=file_name,
+            metadata=metadata,
+        )
 
     def getFileMd5(self, _id, collection):
         gridfs_col = GridFS(self.db, collection)

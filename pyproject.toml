@@ -1,15 +1,15 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "1.0.16"
+version = "1.0.17"
 description = "scarpy 扩展库：在爬虫和其它开发中遇到的一些工具库集合"
 authors = ["ayuge <ayuge.s@qq.com>"]
 maintainers = ["ayuge <ayuge.s@qq.com>"]
 readme = "README.md"
 packages = [{include = "ayugespidertools"}]
 repository = "https://github.com/shengchenyang"
-documentation = "https://github.com/shengchenyang/DemoSpider"
+documentation = "https://github.com/shengchenyang/AyugeSpiderTools"
 keywords = ["scrapy", "aiohttp", "asyncio"]
-homepage = "http://175.178.210.193:8090/mkdocs-material/"
+homepage = "https://www.ayuge.top/mkdocs-material/"
 include = ["pyproject.toml"]
 
 [tool.poetry.dependencies]

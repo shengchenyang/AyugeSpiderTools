@@ -52,13 +52,13 @@ class Param:
     # requests 连接超时，响应时间超时，随机休眠间隔等设置
     requests_req_timeout = 1
     requests_res_timeout = 1
-    requests_time_sleep_list = [x / 10 for x in range(5, 19, 1)]
+    requests_time_sleep_list = [x / 10 for x in range(5, 19)]
     requests_time_sleep_random = random.choice(requests_time_sleep_list)
 
     # aiohttp 连接超时，响应时间超时，随机休眠间隔等设置
     aiohttp_req_timeout = 1
     aiohttp_res_timeout = 1
-    aiohttp_time_sleep_list = [x / 10 for x in range(5, 19, 1)]
+    aiohttp_time_sleep_list = [x / 10 for x in range(5, 19)]
     aiohttp_time_sleep_random = random.choice(aiohttp_time_sleep_list)
     aiohttp_timeout_default = 5
     aiohttp_sleep_default = 1

@@ -92,12 +92,11 @@ class ToolsForAyu(object):
             group: key_values 所属的 group，如果没有的话不设置此值即可
 
         Returns:
-            mysql_conf_lowered: consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
+            1). consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
         """
         conf_value = cls.get_kvs_detail_by_consul(host, port, token, key_values, group)
         mysql_conf = conf_value["MYSQL"] or conf_value["mysql"]
-        mysql_conf_lowered = ReuseOperation.dict_keys_to_lower(mysql_conf)
-        return mysql_conf_lowered
+        return ReuseOperation.dict_keys_to_lower(mysql_conf)
 
     @classmethod
     def get_mongodb_conf_by_consul(cls, host: str, port: int, token: str, key_values: str, group: str = None):
@@ -111,12 +110,11 @@ class ToolsForAyu(object):
             group: key_values 所属的 group，如果没有的话不设置此值即可
 
         Returns:
-            mysql_conf_lowered: consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
+            1). consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
         """
         conf_value = cls.get_kvs_detail_by_consul(host, port, token, key_values, group)
         mysql_conf = conf_value["MONGODB"] or conf_value["mongodb"]
-        mysql_conf_lowered = ReuseOperation.dict_keys_to_lower(mysql_conf)
-        return mysql_conf_lowered
+        return ReuseOperation.dict_keys_to_lower(mysql_conf)
 
     @classmethod
     @DataHandle.simple_deal_for_extract
@@ -203,15 +201,16 @@ class ToolsForAyu(object):
         assert depth_num <= 2, "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
         for query in query_rules:
-            extract_res = cls.extract_with_json(json_data=json_data, query=query)
-
-            # 只要有任意字段存在数据的情况就返回
-            if extract_res:
+            if extract_res := cls.extract_with_json(
+                json_data=json_data, query=query
+            ):
                 return extract_res
         return ""
 
     @staticmethod
     def get_collate_by_charset(mysql_config: dict) -> str:
+        # sourcery skip: raise-specific-error
+        # TODO:
         """
         根据 mysql 的 charset 获取对应 collate
         Args:
@@ -280,10 +279,10 @@ class ToolsForAyu(object):
         Returns:
             req_headers: 转化 dict 后的 headers 内容
         """
-        req_headers = dict()
-        for b_key, b_value_list in dict(scrapy_headers).items():
-            req_headers[str(b_key, encoding="utf-8")] = str(b_value_list[0], encoding="utf-8")
-        return req_headers
+        return {
+            str(b_key, encoding="utf-8"): str(b_value_list[0], encoding="utf-8")
+            for b_key, b_value_list in dict(scrapy_headers).items()
+        }
 
     @staticmethod
     def filter_data_before_yield(
@@ -313,4 +312,4 @@ class ToolsForAyu(object):
             if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
                 return item
             else:
-                raise Exception(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}")
+                raise Exception(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e

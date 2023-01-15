@@ -43,7 +43,7 @@ class ReuseOperation(object):
         Returns:
             1): 文件的格式信息
         """
-        if any([str(media_file_or_url).startswith("http"), strict]):
+        if any([media_file_or_url.startswith("http"), strict]):
             image_style = ['.svg', '.png', '.jpg', '.jpeg', '.bmp', '.wav', '.mp3', '.ogg', '.flv']
             for image_format in image_style:
                 if image_format in media_file_or_url:
@@ -63,8 +63,7 @@ class ReuseOperation(object):
             1). 文件名称
         """
         pattern = re.compile(r""".*/(.*?)\..*?""")
-        file_name_list = pattern.findall(file_url)
-        if file_name_list:
+        if file_name_list := pattern.findall(file_url):
             return file_name_list[0]
         return ""
 
@@ -81,18 +80,7 @@ class ReuseOperation(object):
         """
         # 得到文件夹下的所有文件名称
         files = os.listdir(path)
-        file_list = []
-        # 遍历该文件夹
-        for file in files:
-            # 是子文件夹
-            if os.path.isdir(path + "\\" + file):
-                # get_voice_files(path + "\\" + file)
-                continue
-
-            # 是文件
-            else:
-                file_list.append(file)
-        return file_list
+        return [file for file in files if not os.path.isdir(path + "\\" + file)]
 
     @staticmethod
     def get_bytes_by_file(file_path: str) -> bytes:
@@ -149,16 +137,12 @@ class ReuseOperation(object):
         Returns:
             ret: 返回当前权重的账号信息 account_arr 中的一个账号信息
         """
-        total = 0
-        for item in weight_data:
-            # 权重求和
-            total += item['weight']
-
+        total = sum(item['weight'] for item in weight_data)
         # 在 0 与权重和之间获取一个随机数
         ra = random.uniform(0, total)
         curr_sum = 0
         ret = None
-        for key, data in enumerate(weight_data):
+        for data in weight_data:
             # 在遍历中，累加当前权重值
             curr_sum += data['weight']
             # 当随机数 <= 当前权重和时，返回权重 key
@@ -184,9 +168,7 @@ class ReuseOperation(object):
         # 理想中的 dict_config 参数为 dict，且其 key 要有且只有 len(key_list) 个
         ideal_keys_list = [x for x in list(dict_config.keys()) if x in key_list]
         # 如果未配置 dict_config 为 dict，且其 key 不是 key_list 中的这几个值时返回 False
-        if len(ideal_keys_list) != len(key_list):
-            return False
-        return True
+        return len(ideal_keys_list) == len(key_list)
 
     @classmethod
     def get_items_by_keys(cls, dict_config: dict, key_list: list) -> Union[dict, bool]:
@@ -199,11 +181,14 @@ class ReuseOperation(object):
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
-        # 先要满足最先限定，先要满足这个条件
-        if not cls.if_dict_meet_min_limit(dict_config=dict_config, key_list=key_list):
-            return False
-
-        return {k: dict_config[k] for k in key_list}
+        # 参数先要满足最小限定，然后再取出限定的参数值；否则直接返回 False
+        return (
+            {k: dict_config[k] for k in key_list}
+            if cls.if_dict_meet_min_limit(
+                dict_config=dict_config, key_list=key_list
+            )
+            else False
+        )
 
     @classmethod
     def get_items_except_keys(cls, dict_config, key_list: list) -> dict:
@@ -229,6 +214,7 @@ class ReuseOperation(object):
     def create_database(cls, pymysql_dict_config: dict):
         """
         创建数据库
+        由于这是在连接数据库，报数据库不存在错误时的场景，则需要新建(不指定数据库)连接创建好所需数据库即可
         Args:
             pymysql_dict_config: pymysql 的数据库连接配置 dict
 
@@ -243,7 +229,7 @@ class ReuseOperation(object):
         assert judge_pymysql_dict_config, "创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！"
 
         pymysql_dict_config_tmp = copy.deepcopy(pymysql_dict_config)
-        if "database" in pymysql_dict_config_tmp.keys():
+        if "database" in pymysql_dict_config_tmp:
             del pymysql_dict_config_tmp["database"]
         conn = pymysql.connect(**pymysql_dict_config_tmp)
         cursor = conn.cursor()
@@ -263,6 +249,7 @@ class ReuseOperation(object):
         """
         str_key_to_lower_dict = {k.lower(): v for k, v in deal_dict.items() if isinstance(k, str)}
         not_str_key_dict = {k: v for k, v in deal_dict.items() if not isinstance(k, str)}
+        # python 3.9+ 可优化为：str_key_to_lower_dict |= not_str_key_dict
         str_key_to_lower_dict.update(not_str_key_dict)
         return str_key_to_lower_dict
 
@@ -302,12 +289,12 @@ class ReuseOperation(object):
             key_list=["host", "port", "token"]
         )
         assert consul_conf_dict_min, f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！"
-
         # 添加 key_values 的值，如果没有设置，则默认取全局配置中的 ENV 值
-        if not consul_conf_dict_lowered.get("key_values", None):
-            consul_conf_dict_min["key_values"] = settings.get("ENV")
-        else:
-            consul_conf_dict_min["key_values"] = consul_conf_dict_lowered["key_values"]
+        consul_conf_dict_min["key_values"] = (
+            consul_conf_dict_lowered["key_values"]
+            if consul_conf_dict_lowered.get("key_values")
+            else settings.get("ENV")
+        )
         consul_conf_dict_min["group"] = consul_conf_dict_lowered["group"]
         return consul_conf_dict_min
 

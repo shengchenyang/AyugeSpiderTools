@@ -179,14 +179,13 @@ class DataHandle(object):
             timestamp_data: 需要处理的时间格式
 
         Returns:
-            ori_handled_time: 转换后的时间结果
+            1). 转换后的时间结果
         """
         if len(str(timestamp_data)) > 10:
             timestamp_data = int(str(timestamp_data[:-3]))
 
-        time_array = time.localtime(int(timestamp_data))
-        ori_handled_time = time.strftime("%Y-%m-%d %H:%M:%S", time_array)
-        return ori_handled_time
+        time_array = time.localtime(timestamp_data)
+        return time.strftime("%Y-%m-%d %H:%M:%S", time_array)
 
     @staticmethod
     def remove_all_tags(func):
@@ -242,8 +241,7 @@ class DataHandle(object):
         h_obj.body_width = 0
         h_obj.ignore_links = True
         h_obj.bypass_tables = False
-        content = h_obj.handle(html_txt)
-        return content
+        return h_obj.handle(html_txt)
 
     @classmethod
     def extract_html_to_md(cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None) -> str:
@@ -271,8 +269,7 @@ class DataHandle(object):
 
         # 先处理表格 <table> 标签中格式
         table_pattern = re.compile(r"(<table.*?</table>)", flags=re.S)
-        table_res_list = table_pattern.findall(content)
-        if table_res_list:
+        if table_res_list := table_pattern.findall(content):
             for table_res in table_res_list:
                 table_deal = cls._extract_table_rule(html_txt=table_res, h_obj=h_obj)
                 # 将 table 转换时去除多余的换行和空白字符等内容
