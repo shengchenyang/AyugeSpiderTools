@@ -56,7 +56,7 @@ class AliOssBase(object):
         self.operateDoc = operateDoc
         self.examplebucket = examplebucket
         self.auth = oss2.Auth(OssAccessKeyId, OssAccessKeySecret)
-        self.bucket = oss2.Bucket(self.auth, '{}/'.format(self.Endpoint), self.examplebucket)
+        self.bucket = oss2.Bucket(self.auth, f'{self.Endpoint}/', self.examplebucket)
         self.headers = {'Connection': 'close'}
 
     def delete_oss(self, del_logo_url: str):
@@ -69,11 +69,15 @@ class AliOssBase(object):
             None
         """
         try:
-            self.bucket.delete_object('{}/{}'.format(
-                self.operateDoc,
-                del_logo_url.replace('{}/{}/'.format(self.Endpoint, self.operateDoc), '')))
+            self.bucket.delete_object(
+                f"{self.operateDoc}/{del_logo_url.replace(f'{self.Endpoint}/{self.operateDoc}/', '')}"
+            )
         except oss2.exceptions.NoSuchKey as e:
-            raise Exception('delete_oss error: status={0}, request_id={1}'.format(e.status, e.request_id))
+            raise ValueError(
+                'delete_oss error: status={0}, request_id={1}'.format(
+                    e.status, e.request_id
+                )
+            ) from e
 
     @retry(stop_max_attempt_number=Param.retry_num, retry_on_result=lambda x: x[0] is False)
     def put_oss(
@@ -102,7 +106,10 @@ class AliOssBase(object):
             put_bytes_or_url = requests.get(url=put_bytes_or_url, headers=self.headers, verify=False).content
 
         try:
-            self.bucket.put_object('{}/{}.{}'.format(self.operateDoc, input_file_name, file_format), put_bytes_or_url)
+            self.bucket.put_object(
+                f'{self.operateDoc}/{input_file_name}.{file_format}',
+                put_bytes_or_url,
+            )
         except Exception as e:
             return False, ''
         return True, input_file_name

@@ -28,16 +28,14 @@ class MysqlOrm(object):
         self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
         global select_res
-        if type == "one":
-            select_res = self.cursor.fetchone()
-
-        elif type == "all":
+        if type == "all":
             select_res = self.cursor.fetchall()
 
+        elif type == "one":
+            select_res = self.cursor.fetchone()
+
         # 判断查询结果
-        if select_res:
-            return True, select_res
-        return False, ""
+        return (True, select_res) if select_res else (False, "")
 
     def update_data(self, sql_pre: str, sql_after: tuple):
         self.connection.ping(reconnect=True)

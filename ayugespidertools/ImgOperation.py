@@ -163,13 +163,9 @@ class Picture(object):
         for curr_data in slide_data:
             curr_position_list = []
             if curr_data < l:
-                curr_position_list.append(int(c / l * curr_data))
-                curr_position_list.append(0)
-
+                curr_position_list.extend((int(c / l * curr_data), 0))
             else:
-                curr_position_list.append(int(c / l * (curr_data % l)))
-                curr_position_list.append(60)
-
+                curr_position_list.extend((int(c / l * (curr_data % l)), 60))
             true_pic_list.append(curr_position_list)
         return true_pic_list
 

@@ -111,6 +111,6 @@ OSS_CONFIG = {
 
 # 日志管理
 LOG_FILE = f'{LOG_DIR}/$project_name.log'
-# logger.add(env.str("LOG_RUNTIME_FILE", f"{LOG_DIR}/runtime.log"), level="DEBUG", rotation="1 week", retention="7 days")
-# logger.add(env.str("LOG_RUNTIME_FILE", f"{LOG_DIR}/warning.log"), level="WARNING", rotation="1 week", retention="7 days")
-logger.add(env.str("LOG_ERROR_FILE", f"{LOG_DIR}/error.log"), level="ERROR", rotation="1 week", retention="7 days")
+# logger.add(env.str("LOG_RUNTIME_FILE", f"{LOG_DIR}/runtime.log"), level="DEBUG", rotation="1 week", retention="7 days", enqueue=True)
+# logger.add(env.str("LOG_RUNTIME_FILE", f"{LOG_DIR}/warning.log"), level="WARNING", rotation="1 week", retention="7 days", enqueue=True)
+logger.add(env.str("LOG_ERROR_FILE", f"{LOG_DIR}/error.log"), level="ERROR", rotation="1 week", retention="7 days", enqueue=True)

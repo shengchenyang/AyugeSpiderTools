@@ -12,7 +12,7 @@
 
 至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 的应用示例，你可以很快上手。
 
-**在使用过程中若遇到各种问题，或有任何优化建议欢迎提 Issues**
+**在使用过程中若遇到各种问题，或有任何优化建议欢迎提 Issues !**
 
 ## 项目状态
 
@@ -122,7 +122,7 @@ print(full_url)
 
 输出为：
 
-```
+```python
 https://static.geetest.com/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd478aa31e0dca37601cd4.jpg
 ```
 
@@ -130,13 +130,13 @@ https://static.geetest.com/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd47
 
 将小数 `decimal` 保留小数点后 `decimal_places` 位，结果四舍五入，示例如下：
 
-```
+```python
 res = FormatData.click_point_deal(13.32596516, 3)
 ```
 
 输出为：
 
-```
+```python
 13.326
 ```
 
@@ -168,7 +168,7 @@ print("normal_stamp5:", normal_stamp)
 
 输出为：
 
-```
+```python
 normal_stamp1: 1658425386
 normal_stamp2: 1658483984
 normal_stamp3: 1655800800
@@ -202,8 +202,8 @@ print("滑块验证码的缺口距离2为：", gap_distance)
 
 | 识别结果展示                                                 | 备注                                                   |
 | :----------------------------------------------------------- | ------------------------------------------------------ |
-| <img src="ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 无                                                     |
-| <img src="ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20221208100846241" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
+| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20220802110652131" style="zoom: 25%;" /> | 无                                                     |
+| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20220802110842737" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
 
 #### 2.2.2. 滑块验证轨迹生成
 
@@ -215,7 +215,7 @@ tracks = VerificationCode.get_normal_track(space=120)
 
 结果为：
 
-```
+```python
 生成的轨迹为： [[2, 2, 401], [4, 4, 501], [8, 6, 603], [13, 7, 701], [19, 7, 801], [25, 7, 901], [32, 10, 1001], [40, 12, 1101], [48, 14, 1201], [56, 15, 1301], [65, 18, 1401], [74, 19, 1501], [82, 21, 1601], [90, 21, 1701], [98, 22, 1801], [105, 23, 1901], [111, 25, 2001], [117, 26, 2101], [122, 28, 2201], [126, 30, 2301], [128, 27, 2401], [130, 27, 2502], [131, 30, 2601], [131, 28, 2701], [120, 30, 2802]]
 ```
 
@@ -259,7 +259,7 @@ mysql_client.update_data(update_sql, update_value)
 ```
 
 结果为：
-```
+```python
 select_sql: select `id`, `q_title` from `zhihu_answer_info` where `q_id`=%s limit 1, select_value: ('34987206',)
 insert_sql: insert into `user` (`name`, `age`) values (%s, %s), insert_value: ('zhangsan', 18)
 update_sql: update `user` set `score`=%s where `name`=%s, update_value: (4, 'zhangsan')
@@ -291,7 +291,7 @@ assert js_res
 
 ## 3. 总结
 
-项目目前是疯狂开发阶段，会慢慢丰富 `python` 开发中的遇到的通用方法。
+此项目会慢慢丰富 `python` 开发中的遇到的通用方法。
 
 ## TodoList
 

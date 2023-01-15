@@ -47,7 +47,7 @@ class AboutSql(object):
             select_sql: 生成的 sql 语句
             tuple(rule.values()): 查询字段的参数名称
         """
-        select_key = ", ".join('`{}`'.format(k) for k in key)
+        select_key = ", ".join(f'`{k}`' for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
         # select_key = select_key.replace("""`count(1)`""", "count(1)")
 
@@ -56,8 +56,10 @@ class AboutSql(object):
             "or": " or ",
         }
 
-        base_where = " and " if not base else base_list[base]
-        select_where = base_where.join('`{}`{}%s'.format(k.split('|')[0], k.split('|')[1]) for k in rule.keys())
+        base_where = base_list[base] if base else " and "
+        select_where = base_where.join(
+            f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
+        )
         if not order_by:
             if limit:
                 select_sql = """select %s from `%s` where %s limit %s""" % (select_key, db_table, select_where, limit)
@@ -81,9 +83,9 @@ class AboutSql(object):
             select_sql: 生成的 sql 语句
             tuple(rule.values()): 新增字段的参数名称
         """
-        keys = ", ".join('`{}`'.format(k) for k in data.keys())
+        keys = ", ".join(f'`{k}`' for k in data)
         values = ', '.join(['%s'] * len(data))
-        sql = '''insert into `%s` (%s) values (%s)''' % (db_table, keys, values)
+        sql = f'''insert into `{db_table}` ({keys}) values ({values})'''
         return sql, tuple(data.values())
 
     @staticmethod
@@ -100,13 +102,13 @@ class AboutSql(object):
             select_sql: 生成的 sql 语句
             tuple(rule.values()): 更新字段的参数名称
         """
-        update_set = ", ".join('`{}`=%s'.format(k) for k in data.keys())
+        update_set = ", ".join(f'`{k}`=%s' for k in data)
         base_list = {
             "and": " and ",
             "or": " or ",
         }
 
-        base_where = " and " if not base else base_list[base]
-        update_where = base_where.join('`{}`=%s'.format(k) for k in rule.keys())
-        sql = """update `%s` set %s where %s""" % (db_table, update_set, update_where)
+        base_where = base_list[base] if base else " and "
+        update_where = base_where.join(f'`{k}`=%s' for k in rule)
+        sql = f"""update `{db_table}` set {update_set} where {update_where}"""
         return sql, tuple(data.values()) + tuple(rule.values())

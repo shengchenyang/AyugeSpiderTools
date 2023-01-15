@@ -10,6 +10,7 @@
 @Desc    :  None
 """
 import cv2
+import itertools
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 
 
@@ -31,29 +32,27 @@ class YiDunGetGap(object):
             img: 待处理的图片
 
         Returns:
-            img1: 清楚图片空白区域的图片
+            1). 清楚图片空白区域的图片
         """
         rows, cols, channel = img.shape
         min_x = 255
         min_y = 255
         max_x = 0
         max_y = 0
-        for x in range(1, rows):
-            for y in range(1, cols):
-                t = set(img[x, y])
-                if len(t) >= 2:
-                    if x <= min_x:
-                        min_x = x
-                    elif x >= max_x:
-                        max_x = x
+        for x, y in itertools.product(range(1, rows), range(1, cols)):
+            t = set(img[x, y])
+            if len(t) >= 2:
+                if x <= min_x:
+                    min_x = x
+                elif x >= max_x:
+                    max_x = x
 
-                    if y <= min_y:
-                        min_y = y
-                    elif y >= max_y:
-                        max_y = y
+                if y <= min_y:
+                    min_y = y
+                elif y >= max_y:
+                    max_y = y
 
-        img1 = img[min_x:max_x, min_y: max_y]
-        return img1
+        return img[min_x:max_x, min_y: max_y]
 
     @classmethod
     def template_match(cls, tpl, target, out: str = None) -> int:
@@ -94,10 +93,9 @@ class YiDunGetGap(object):
             img: 需要处理的图片，用于边缘检测使用
 
         Returns:
-            处理后的图片
+            1). 处理后的图片
         """
-        edges = cv2.Canny(img, 100, 200)
-        return edges
+        return cv2.Canny(img, 100, 200)
 
     @classmethod
     def discern(cls, slide, bg, out: str = None):
@@ -124,5 +122,4 @@ class YiDunGetGap(object):
         slide_pic = cv2.cvtColor(slide, cv2.COLOR_GRAY2RGB)
         back_pic = cv2.cvtColor(back, cv2.COLOR_GRAY2RGB)
         # 输出横坐标, 即滑块在图片上的位置
-        x = cls.template_match(slide_pic, back_pic, out)
-        return x
+        return cls.template_match(slide_pic, back_pic, out)

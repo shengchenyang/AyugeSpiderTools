@@ -126,7 +126,7 @@ def get_yidun_tracks(distance):
     """
     t_list = [random.randint(50, 160)]
     x_list = [random.randint(5, 11)]
-    y_list = list()
+    y_list = []
     # 生成x坐标轨迹, 生成t坐标轨迹
     for j in range(1, distance):
         x_list.append(x_list[j - 1] + random.randint(2, 4))
@@ -171,10 +171,9 @@ def get_yidun_gap(slide_img_path, bg_img_path, out_img_path: str = False) -> int
         out_img_path: 输出图片
 
     Returns:
-        gap_distance: 易盾滑块缺口距离
+        1). 易盾滑块缺口距离
     """
-    gap_distance = YiDunGetGap.discern(slide_img_path, bg_img_path, out_img_path)
-    return gap_distance
+    return YiDunGetGap.discern(slide_img_path, bg_img_path, out_img_path)
 
 
 def get_normal_track(space):

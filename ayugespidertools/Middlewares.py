@@ -376,12 +376,12 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
         self.t.start()
         self.get_proxy_ip(self.proxypool_size, True)
         spider.slog.info(f"初始化 ip 字典，ip 数量为：{len(self.proxy_list)}")
-        spider.slog.info("SiMiProxyDownloaderMiddleware opened: %s" % spider.name)
+        spider.slog.info(f"SiMiProxyDownloaderMiddleware opened: {spider.name}")
 
     def spider_closed(self, spider):
         self.end_time = True
         self.t.join()
-        spider.slog.info("SiMiProxyDownloaderMiddleware closed: %s" % spider.name)
+        spider.slog.info(f"SiMiProxyDownloaderMiddleware closed: {spider.name}")
 
 
 class AbuDynamicProxyDownloaderMiddleware(object):
@@ -419,13 +419,13 @@ class AbuDynamicProxyDownloaderMiddleware(object):
 
     def process_request(self, request, spider):
         if request.url.startswith("https://"):
-            request.meta["proxy"] = "https://{}".format(self.proxy_url)
+            request.meta["proxy"] = f"https://{self.proxy_url}"
         elif request.url.startswith("http://"):
-            request.meta["proxy"] = "http://{}".format(self.proxy_url)
+            request.meta["proxy"] = f"http://{self.proxy_url}"
         else:
             spider.slog.info(f"request url error: {request.url}")
 
-        proxy_user_pass = self.username + ":" + self.password
+        proxy_user_pass = f"{self.username}:{self.password}"
         encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
@@ -491,7 +491,7 @@ class RequestByRequestsMiddleware(object):
                         timeout=(Param.requests_req_timeout, Param.requests_res_timeout)
                     )
             else:
-                raise Exception("出现未知请求方式，请及时查看！")
+                raise ValueError("出现未知请求方式，请及时查看！")
             return HtmlResponse(url=request.url, status=r_response.status_code, body=r_response.text, request=request, encoding="utf-8")
 
         except Exception as e:
