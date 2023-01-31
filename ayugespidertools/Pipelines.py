@@ -254,7 +254,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
 
     def table_collection_statistics(self, spider_name: str, database: str, crawl_time: datetime.date):
         """
-        统计数据库入库数据
+        统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
         Args:
             spider_name: 爬虫脚本名称
             database: 数据库，保存程序采集记录保存的数据库
@@ -263,35 +263,35 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             None
         """
-        sql = '''
+        sql = f'''
         select concat(
             'select "',
-            TABLE_name,
+            TABLE_NAME,
             '", count(id) as num , crawl_time from ',
             TABLE_SCHEMA,
             '.',
-            TABLE_name,
-                ' where crawl_time = "%s"'
+            TABLE_NAME,
+                ' where crawl_time = "{crawl_time}"'
         ) from information_schema.tables
-        where TABLE_SCHEMA='%s';
-        ''' % (crawl_time, database)
+        where TABLE_SCHEMA='{database}' and TABLE_NAME in (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
+        '''
         self.conn.ping(reconnect=True)
         self.cursor.execute(sql)
-        # 获取所有记录列表
         results = self.cursor.fetchall()
-        sql_list = [row[0] for row in results]
-        sql_all = " union all ".join(sql_list)
-        self.cursor.execute(sql_all)
-        results = self.cursor.fetchall()
-        for row in results:
-            table_statistics = {
-                "spider_name": spider_name,
-                "database": database,
-                "table_name": row[0],
-                "number": row[1],
-                "crawl_time": str((row[2] or crawl_time)),
-            }
-            self.insert_table_statistics(table_statistics)
+        if sql_list := [row[0] for row in results]:
+            sql_all = " union all ".join(sql_list)
+            self.cursor.execute(sql_all)
+            results = self.cursor.fetchall()
+
+            for row in results:
+                table_statistics = {
+                    "spider_name": spider_name,
+                    "database": database,
+                    "table_name": row[0],
+                    "number": row[1],
+                    "crawl_time": str((row[2] or crawl_time)),
+                }
+                self.insert_table_statistics(table_statistics)
 
     def insert_table_statistics(self, data: dict, table: Optional[str] = "table_collection_statistics"):
         """
@@ -476,19 +476,6 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
     def __init__(self, *args, **kwargs):
         super(AyuTwistedMysqlPipeline, self).__init__(*args, **kwargs)
         self.dbpool = None
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            # 数据库表前缀
-            table_prefix=crawler.settings.get("MYSQL_TABLE_PREFIX", ""),
-            # 数据库表枚举是否开启
-            table_enum=crawler.settings.get("DATA_ENUM"),
-            # 获取部署的环境
-            env=crawler.settings.get("ENV"),
-            # 当 record_log_to_mysql 为 True 时，会记录运行情况
-            record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
-        )
 
     def open_spider(self, spider):
         self.slog = spider.slog

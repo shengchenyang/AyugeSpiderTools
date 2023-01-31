@@ -71,7 +71,7 @@ class MongoDbBase(object):
             db.authenticate(user, password)
 
         else:
-            raise Exception("你指定错误了 connect_style 的 mongo 链接类型，请正确输入！")
+            raise ValueError("你指定错误了 connect_style 的 mongo 链接类型，请正确输入！")
 
         if database:
             self.db = self.init_db(database)

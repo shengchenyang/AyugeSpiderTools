@@ -16,40 +16,40 @@ from ayugespidertools.Items import MysqlDataItem, MongoDataItem
 # collection_content: 采集内容介绍
 # create_time: xxxx-xx-xx
 # explain:
-# demand_code_prefix = ''
+# demand_code_prefix = ""
 ####################################################################################################
 """
 
 
 class $classname(AyuSpider):
-    name = '$name'
-    allowed_domains = ['$domain']
-    start_urls = ['http://$domain/']
+    name = "$name"
+    allowed_domains = ["$domain"]
+    start_urls = ["http://$domain/"]
 
     # 数据库表的枚举信息
     custom_table_enum = TableEnum
     # 初始化配置的类型
-    settings_type = 'debug'
+    settings_type = "debug"
     custom_settings = {
         # scrapy 日志等级配置
-        'LOG_LEVEL': 'DEBUG',
+        "LOG_LEVEL": "DEBUG",
         # 是否开启记录项目相关运行统计信息。不配置默认为 False
-        'RECORD_LOG_TO_MYSQL': False,
-        # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
-        'LOGURU_CONFIG': logger,
-        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
-        'MYSQL_TABLE_PREFIX': "demo_basic_",
-        # MongoDB 集合的前缀名称，用于标记属于哪个项目，也可以不用配置
-        'MONGODB_COLLECTION_PREFIX': "demo_basic_",
-        'ITEM_PIPELINES': {
+        "RECORD_LOG_TO_MYSQL": False,
+        # 以 loguru 来管理日志，本库会在 settings 中生成规则示例，可自行修改。也可不配置
+        "LOGURU_CONFIG": logger,
+        # Mysql 数据表的前缀名称，用于标记属于哪个项目，可不配置
+        "MYSQL_TABLE_PREFIX": "demo_basic_",
+        # MongoDB 集合的前缀名称，用于标记属于哪个项目，可不配置
+        "MONGODB_COLLECTION_PREFIX": "demo_basic_",
+        "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
-            'ayugespidertools.Pipelines.AyuFtyMysqlPipeline': 300,
+            "ayugespidertools.Pipelines.AyuFtyMysqlPipeline": 300,
             # 激活此项则数据会存储至 MongoDB
-            'ayugespidertools.Pipelines.AyuFtyMongoPipeline': 301,
+            "ayugespidertools.Pipelines.AyuFtyMongoPipeline": 301,
         },
-        'DOWNLOADER_MIDDLEWARES': {
+        "DOWNLOADER_MIDDLEWARES": {
             # 随机请求头
-            'ayugespidertools.Middlewares.RandomRequestUaMiddleware': 400,
+            "ayugespidertools.Middlewares.RandomRequestUaMiddleware": 400,
         },
     }
 
@@ -64,11 +64,11 @@ class $classname(AyuSpider):
             url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
             callback=self.parse_first,
             headers={
-                'referer': 'https://blog.csdn.net/rank/list',
+                "referer": "https://blog.csdn.net/rank/list",
             },
-            cb_kwargs=dict(
-                curr_site="csdn",
-            ),
+            cb_kwargs={
+                "curr_site": "csdn",
+            },
             dont_filter=True
         )
 
@@ -101,25 +101,23 @@ class $classname(AyuSpider):
 
             # 这是需要存储的字段信息
             article_info = {
-                "article_detail_url": {'key_value': article_detail_url, 'notes': '文章详情链接'},
-                "article_title": {'key_value': article_title, 'notes': '文章标题'},
-                "comment_count": {'key_value': comment_count, 'notes': '文章评论数量'},
-                "favor_count": {'key_value': favor_count, 'notes': '文章赞成数量'},
-                "nick_name": {'key_value': nick_name, 'notes': '文章作者昵称'}
+                "article_detail_url": {"key_value": article_detail_url, "notes": "文章详情链接"},
+                "article_title": {"key_value": article_title, "notes": "文章标题"},
+                "comment_count": {"key_value": comment_count, "notes": "文章评论数量"},
+                "favor_count": {"key_value": favor_count, "notes": "文章赞成数量"},
+                "nick_name": {"key_value": nick_name, "notes": "文章作者昵称"}
             }
 
             ArticleInfoMysqlItem = MysqlDataItem(
                 alldata=article_info,
-                table=TableEnum.article_list_table.value['value'],
+                table=TableEnum.article_list_table.value["value"],
             )
-
             self.slog.info(f"ArticleInfoMysqlItem: {ArticleInfoMysqlItem}")
 
             # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
             try:
-                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
-                    self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.article_list_table.value['value'],
-                    article_detail_url)
+                save_table = f"{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}"
+                sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
                 df = pandas.read_sql(sql, self.mysql_engine)
 
                 # 如果为空，说明此数据不存在于数据库，则新增
@@ -141,7 +139,7 @@ class $classname(AyuSpider):
                 # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
                 alldata=article_info,
                 # table 为 mongo 的存储 Collection 集合的名称
-                table=TableEnum.article_list_table.value['value'],
+                table=TableEnum.article_list_table.value["value"],
                 # mongo_update_rule 为查询数据是否存在的规则
                 mongo_update_rule={"article_detail_url": article_detail_url},
             )

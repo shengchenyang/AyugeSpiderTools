@@ -209,22 +209,28 @@ class ToolsForAyu(object):
 
     @staticmethod
     def get_collate_by_charset(mysql_config: dict) -> str:
-        # sourcery skip: raise-specific-error
-        # TODO:
         """
-        根据 mysql 的 charset 获取对应 collate
+        根据 mysql 的 charset 获取对应默认的 collate
         Args:
             mysql_config: mysql 连接配置
 
         Returns:
             collate: 排序规则
         """
-        if mysql_config["charset"] == "utf8mb4":
-            collate = "utf8mb4_general_ci"
-        elif mysql_config["charset"] == "utf8":
-            collate = "utf8_general_ci"
-        else:
-            raise Exception(f"数据库连接时出现未知 charset：{mysql_config['charset']}，若抛错请查看！")
+        charset_collate_map = {
+            # utf8mb4_unicode_ci 也是经常使用的
+            "utf8mb4": "utf8mb4_general_ci",
+            "utf8": "utf8_general_ci",
+            "gbk": "gbk_chinese_ci",
+            "latin1": "latin1_swedish_ci",
+            "utf16": "utf16_general_ci",
+            "utf16le": "utf16le_general_ci",
+            "cp1251": "cp1251_general_ci",
+            "euckr": "euckr_korean_ci",
+            "greek": "greek_general_ci"
+        }
+        collate = charset_collate_map.get(mysql_config["charset"])
+        assert collate is not None, f"数据库配置出现未知 charset：{mysql_config['charset']}，若抛错请查看或手动创建所需数据表！"
         return collate
 
     @staticmethod

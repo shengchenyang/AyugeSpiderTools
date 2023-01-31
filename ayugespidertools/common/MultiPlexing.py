@@ -235,7 +235,7 @@ class ReuseOperation(object):
         cursor = conn.cursor()
         cursor.execute(f'''CREATE DATABASE `{pymysql_dict_config["database"]}` character set {pymysql_dict_config["charset"]};''')
         conn.close()
-        logger.info(f'''创建数据库 {pymysql_dict_config["database"]} 成功，类型是：{pymysql_dict_config["charset"]}!''')
+        logger.info(f'''创建数据库 {pymysql_dict_config["database"]} 成功，其 charset 类型是：{pymysql_dict_config["charset"]}!''')
 
     @classmethod
     def dict_keys_to_lower(cls, deal_dict: dict) -> dict:

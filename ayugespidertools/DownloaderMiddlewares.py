@@ -55,10 +55,8 @@ class AiohttpMiddleware(object):
         """
         settings = crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
-        local_aiohttp_conf = settings.get("LOCAL_AIOHTTP_CONFIG", {})
-
-        # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
-        if local_aiohttp_conf:
+        if local_aiohttp_conf := settings.get("LOCAL_AIOHTTP_CONFIG", {}):
+            # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
             aiohttp_conf_temp = {
                 "TIMEOUT": local_aiohttp_conf.get("TIMEOUT"),
                 "SLEEP": local_aiohttp_conf.get("SLEEP"),
@@ -87,8 +85,7 @@ class AiohttpMiddleware(object):
             async with session.request(**aio_request_args) as response:
                 # (f"Status: {response.status}")
                 # (f"Content-type: {response.headers['content-type']}")
-                html = await response.text()
-                return html
+                return await response.text()
 
     async def _process_request(self, request, spider):
         """
@@ -131,13 +128,11 @@ class AiohttpMiddleware(object):
                 }
 
             else:
-                spider.slog.warning(f"出现未知请求方式，请及时查看，默认 GET")
+                spider.slog.warning("出现未知请求方式，请及时查看，默认 GET")
                 aiohttp_args_dict = default_aiohttp_args_dict
 
             # 设置请求 body 参数，GET 情况下和 POST 情况下的请求参数处理
-            request_body_str = str(request.body, encoding="utf-8")
-
-            if request_body_str:
+            if request_body_str := str(request.body, encoding="utf-8"):
                 # 如果是 json 字典格式的数据时，则是 scrapy body 传来的 json dumps 参数
                 if ReuseOperation.judge_str_is_json(judge_str=request_body_str):
                     aiohttp_args_dict["data"] = request_body_str
@@ -177,15 +172,14 @@ class AiohttpMiddleware(object):
         if not html_content:
             spider.slog.error(f'url: {request.url} 返回内容为空')
 
-        response = HtmlResponse(
+        return HtmlResponse(
             request.url,
             status=200,
             # headers={"response_header_example": "tmp"},
             body=body,
             encoding='utf-8',
-            request=request
+            request=request,
         )
-        return response
 
     def process_request(self, request, spider):
         """

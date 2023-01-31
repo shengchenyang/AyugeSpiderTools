@@ -1,19 +1,30 @@
+# Scrapy settings for $project_name project
+#
+# For simplicity, this file contains only settings considered important or
+# commonly used. You can find more settings consulting the documentation:
+#
+#     https://docs.scrapy.org/en/latest/topics/settings.html
+#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+
 import configparser
 from environs import Env
 from loguru import logger
 from os.path import dirname, abspath, join
 
 
-BOT_NAME = '$project_name'
+BOT_NAME = "$project_name"
 
-SPIDER_MODULES = ['$project_name.spiders']
-NEWSPIDER_MODULE = '$project_name.spiders'
+SPIDER_MODULES = ["$project_name.spiders"]
+NEWSPIDER_MODULE = "$project_name.spiders"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Set settings whose default value is deprecated to a future-proof value
-REQUEST_FINGERPRINTER_IMPLEMENTATION = '2.7'
+REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+FEED_EXPORT_ENCODING = "utf-8"
 
 env = Env()
 env.read_env()

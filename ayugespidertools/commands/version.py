@@ -1,9 +1,10 @@
 import configparser
-from scrapy.commands.genspider import Command
+from scrapy.commands.version import Command
 from ayugespidertools.config import NormalConfig
 
 
 class AyuCommand(Command):
+    default_settings = {"LOG_ENABLED": False, "SPIDER_LOADER_WARN_ONLY": True}
 
     def short_desc(self):
         return "Print AyugeSpiderTools version"
