@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
 import pandas
 from scrapy.http import Request
 from $project_name.settings import logger
@@ -8,7 +6,6 @@ from $project_name.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.Items import MysqlDataItem, MongoDataItem
-
 
 """
 ####################################################################################################
@@ -116,7 +113,7 @@ class $classname(AyuSpider):
 
             # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
             try:
-                save_table = f"{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}"
+                save_table = f'{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}'
                 sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
                 df = pandas.read_sql(sql, self.mysql_engine)
 

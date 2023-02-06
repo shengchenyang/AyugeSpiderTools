@@ -1,23 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  format_data.py
-@Time    :  2022/7/8 10:33
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  用于数据处理相关方法
-"""
+import datetime
 import re
 import time
-import datetime
-import html2text
 from typing import Optional
 from urllib.parse import urljoin
-from w3lib.html import remove_tags
-from w3lib.html import replace_entities
 
+import html2text
+from w3lib.html import remove_tags, replace_entities
 
 __all__ = [
     "DataHandle",
@@ -85,7 +73,7 @@ class DataHandle(object):
         date_style: str = "",
         date_is_full: bool = False,
         specific_date_conn: str = " ",
-        hms_conn: str = ":"
+        hms_conn: str = ":",
     ) -> str:
         """
         将需要格式化的数据用 date_style 标识来拼接起来，如果 date_is_full 为 True 时，则需要补齐"时分秒"位
@@ -122,7 +110,7 @@ class DataHandle(object):
         Returns:
             1): 时间格式的标识，比如：-
         """
-        format_style_list = ['-', '.', '/', '年']
+        format_style_list = ["-", ".", "/", "年"]
         for format_style in format_style_list:
             if format_style in date_str:
                 return format_style
@@ -135,7 +123,7 @@ class DataHandle(object):
         _format_t: str = None,
         date_is_full: bool = True,
         specific_date_conn: str = " ",
-        hms_conn: str = ":"
+        hms_conn: str = ":",
     ) -> int:
         """
         将网页正常时间转为时间戳
@@ -161,13 +149,17 @@ class DataHandle(object):
                 else:
                     _format_t = "%a %b %d %H:%M:%S %Y"
             standard_time = datetime.datetime.strptime(normal_time, _format_t)
-            stamp = time.mktime(time.strptime(str(standard_time), cls._get_format_t('-', True)))
+            stamp = time.mktime(
+                time.strptime(str(standard_time), cls._get_format_t("-", True))
+            )
 
         else:
             # 先判断正常时间的格式
             date_style = cls._time_format(normal_time)
             # standard_time_format = _get_format_t(date_style, date_is_full).replace('%m', '%b').replace('-', '/')
-            standard_time_format = cls._get_format_t(date_style, date_is_full, specific_date_conn, hms_conn)
+            standard_time_format = cls._get_format_t(
+                date_style, date_is_full, specific_date_conn, hms_conn
+            )
             stamp = time.mktime(time.strptime(normal_time, standard_time_format))
         return int(stamp)
 
@@ -192,10 +184,12 @@ class DataHandle(object):
         """
         去除所有标签
         """
+
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
             func_res = remove_tags(func_res)
             return func_res
+
         return inner
 
     @staticmethod
@@ -203,10 +197,12 @@ class DataHandle(object):
         """
         去除掉网页的注释(将网页中的特殊字符的源码改成正常显示)
         """
+
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
             func_res = replace_entities(func_res)
             return func_res
+
         return inner
 
     @staticmethod
@@ -214,6 +210,7 @@ class DataHandle(object):
         """
         将 xpath, css 或 json 提取的数据做简单处理；提取的数据若非数组数据，则统一返回字符类型
         """
+
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
             if type(func_res) in [str, int, float, bool]:
@@ -221,10 +218,13 @@ class DataHandle(object):
                 return str(func_res).strip()
             else:
                 return func_res
+
         return inner
 
     @classmethod
-    def _extract_table_rule(cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None):
+    def _extract_table_rule(
+        cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
+    ):
         """
         根据 html2text 来处理 html 中的 table 表格内容
         Args:
@@ -244,7 +244,9 @@ class DataHandle(object):
         return h_obj.handle(html_txt)
 
     @classmethod
-    def extract_html_to_md(cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None) -> str:
+    def extract_html_to_md(
+        cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
+    ) -> str:
         """
         将 html 内容转化为 markdown 内容
 
@@ -279,7 +281,9 @@ class DataHandle(object):
                 table_deal = re.sub(r"\r\n", "\n", table_deal, flags=re.S)
                 table_deal = re.sub(r"[\n]{1,}", "\n", table_deal, flags=re.S)
 
-                content = re.sub(r"(<table.*?</table>)", table_deal + '\n', content, 1, re.S)
+                content = re.sub(
+                    r"(<table.*?</table>)", table_deal + "\n", content, 1, re.S
+                )
 
         # TODO: 可以添加上通用处理的装饰器
         # 将三个以上换行改为两个换行

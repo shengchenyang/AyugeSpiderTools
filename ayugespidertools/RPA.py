@@ -1,18 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  RPA.py
-@Time    :  2022/7/15 9:55
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import re
 import os
+import re
 import subprocess
-
 
 __all__ = [
     "AboutPyppeteer",
@@ -50,10 +38,10 @@ class AboutPyppeteer(object):
             None
         """
         command = "ps aux | grep run_tmall | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
-        os.system('echo %s|sudo -S %s' % (sudo_pwd, command))
+        os.system(f"echo {sudo_pwd}|sudo -S {command}")
 
         command = "ps aux | grep tmall_by_goods | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
-        os.system('echo %s|sudo -S %s' % (sudo_pwd, command))
+        os.system(f"echo {sudo_pwd}|sudo -S {command}")
 
     @classmethod
     def deal_pyppeteer_suspend(cls, fn: str, line: int):
@@ -66,11 +54,11 @@ class AboutPyppeteer(object):
         Returns:
             None
         """
-        read_log = subprocess.getstatusoutput('tail -n %d %s' % (line, fn))
+        read_log = subprocess.getstatusoutput("tail -n %d %s" % (line, fn))
 
         # 当运行成功时
         if not read_log[0]:
-            log_res = ''.join(read_log[1])
+            log_res = "".join(read_log[1])
 
             block_times = cls.get_crawl_debug(content=log_res)
             # 当连续输出 scrapy 的统计信息 3 次时，则卡住
@@ -80,4 +68,4 @@ class AboutPyppeteer(object):
 
             # 当最新四行日志中未出现 scrapy 统计，则为正常状态，并清空日志
             elif block_times == 0:
-                clean_log = subprocess.getstatusoutput('> %s' % (fn,))
+                clean_log = subprocess.getstatusoutput("> %s" % (fn,))

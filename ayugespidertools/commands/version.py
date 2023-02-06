@@ -1,5 +1,7 @@
 import configparser
+
 from scrapy.commands.version import Command
+
 from ayugespidertools.config import NormalConfig
 
 
@@ -10,7 +12,7 @@ class AyuCommand(Command):
         return "Print AyugeSpiderTools version"
 
     def run(self, args, opts):
-        config_parse = configparser.ConfigParser()
-        config_parse.read(f"{NormalConfig.ROOT_DIR}/pyproject.toml", encoding="utf-8")
-        version = config_parse["tool.poetry"]["version"]
+        config_parser = configparser.ConfigParser()
+        config_parser.read(f"{NormalConfig.ROOT_DIR}/pyproject.toml", encoding="utf-8")
+        version = config_parser["tool.poetry"]["version"]
         print(f"AyugeSpiderTools {version}")

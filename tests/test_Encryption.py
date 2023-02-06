@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  test_Encryption.py
-@Time    :  2022/7/22 14:50
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
 from ayugespidertools.common.Encryption import EncryptOperation
 
 
@@ -23,8 +12,7 @@ def test_base64_encode():
     print("base64_encode_res1:", base64_encode_str_res)
 
     base64_encode_url_res = EncryptOperation.base64_encode(
-        encode_data="https://www.demo.com/",
-        url_safe=True
+        encode_data="https://www.demo.com/", url_safe=True
     )
     print("base64_encode_res2:", base64_encode_url_res)
     assert base64_encode_str_res == "MTIzNDU2", base64_encode_url_res is not None
@@ -37,8 +25,7 @@ def test_base64_decode():
     print("base64_decode_res1:", base64_decode_res)
 
     base64_decode_url_res = EncryptOperation.base64_decode(
-        decode_data="aHR0cHM6Ly93d3cuZGVtby5jb20v",
-        url_safe=True
+        decode_data="aHR0cHM6Ly93d3cuZGVtby5jb20v", url_safe=True
     )
 
     print("base64_decode_res2:", base64_decode_url_res)
@@ -53,6 +40,8 @@ def test_mmh3_hash128_encode():
 
 def test_rsa_encrypt():
     rsa_key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCuR3+MuPOVYuAKOS6O+J/ds+JAesgyFforFupDiDBBMTItdXyMrG6gUPFxj/pT/9uQSq8Zxl7BrdiKdi0G2ppEn4Nym+VRLTv2+lNa3kvlrj25Lop7wDZkVRecK5oDvdaQHrm4KKiF7jZNbHEreWGsINLpGvzBMRNztRtOJ6+XEQIDAQAB"
-    rsa_encrypted = EncryptOperation.rsa_encrypt(rsa_public_key=rsa_key, encode_data="123456")
+    rsa_encrypted = EncryptOperation.rsa_encrypt(
+        rsa_public_key=rsa_key, encode_data="123456"
+    )
     print(rsa_encrypted)
     assert rsa_encrypted is not None

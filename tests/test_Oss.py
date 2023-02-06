@@ -1,16 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  test_Oss.py
-@Time    :  2022/12/9 14:45
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
 from ayugespidertools.Oss import AliOssBase
-
 
 OSS_CONFIG = {
     "OssAccessKeyId": "",
@@ -19,7 +7,6 @@ OSS_CONFIG = {
     "examplebucket": "",
     "operateDoc": "",
 }
-
 
 ali_oss = AliOssBase(**OSS_CONFIG)
 
@@ -30,9 +17,8 @@ def test_put_oss():
         file_bytes = f.read()
 
     put_status, file_name = ali_oss.put_oss(
-        put_bytes_or_url=file_bytes,
-        file_name="1",
-        file_format="png")
+        put_bytes_or_url=file_bytes, file_name="1", file_format="png"
+    )
 
     print(put_status)
     assert put_status is True

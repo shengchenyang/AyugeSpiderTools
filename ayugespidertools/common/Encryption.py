@@ -1,24 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  Encryption.py
-@Time    :  2022/7/22 14:42
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import mmh3
 import base64
 import hashlib
 from typing import Union
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
 
+import mmh3
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
+from Crypto.PublicKey import RSA
 
 __all__ = [
-    'EncryptOperation',
+    "EncryptOperation",
 ]
 
 
@@ -38,11 +27,13 @@ class EncryptOperation(object):
             1): md5 处理后的参数
         """
         hl = hashlib.md5()
-        hl.update(encrypt_data.encode(encoding='utf-8'))
+        hl.update(encrypt_data.encode(encoding="utf-8"))
         return hl.hexdigest()
 
     @classmethod
-    def base64_encode(cls, encode_data: Union[bytes, str], url_safe: bool = False) -> str:
+    def base64_encode(
+        cls, encode_data: Union[bytes, str], url_safe: bool = False
+    ) -> str:
         """
         base64 编码
         Args:
@@ -86,7 +77,9 @@ class EncryptOperation(object):
         """
         public_key = """-----BEGIN PUBLIC KEY-----
         {key}
-        -----END PUBLIC KEY-----""".format(key=rsa_public_key)
+        -----END PUBLIC KEY-----""".format(
+            key=rsa_public_key
+        )
         a = bytes(encode_data, encoding="utf8")
         rsa_key = RSA.importKey(public_key)
         cipher = Cipher_pkcsl_v1_5.new(rsa_key)
@@ -103,5 +96,5 @@ class EncryptOperation(object):
             1). mmh3 hash128 后的结果
         """
         o = mmh3.hash128(encode_data)
-        hash128_encoded = hex(((o & 0xffffffffffffffff) << 64) + (o >> 64))
+        hash128_encoded = hex(((o & 0xFFFFFFFFFFFFFFFF) << 64) + (o >> 64))
         return hash128_encoded[2:]
