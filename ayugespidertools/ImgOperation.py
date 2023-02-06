@@ -1,25 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  ImgOperation.py
-@Time    :  2022/7/12 15:14
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
+from typing import Optional, Union
+
 import cv2
 import requests
 from PIL import Image
-from typing import Optional, Union
-from ayugespidertools.config import NormalConfig
+
 from ayugespidertools.common.Encryption import EncryptOperation
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-
+from ayugespidertools.config import NormalConfig
 
 __all__ = [
-    'Picture',
+    "Picture",
 ]
 
 
@@ -40,34 +30,34 @@ class Picture(object):
         """
         session = requests.Session()
         session.headers = {
-            'authority': 'captchas-1251008858.file.myqcloud.com',
-            'pragma': 'no-cache',
-            'cache-control': 'no-cache',
-            'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
-            'sec-ch-ua-mobile': '?0',
-            'upgrade-insecure-requests': '1',
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'sec-fetch-site': 'none',
-            'sec-fetch-mode': 'navigate',
-            'sec-fetch-user': '?1',
-            'sec-fetch-dest': 'document',
-            'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            "authority": "captchas-1251008858.file.myqcloud.com",
+            "pragma": "no-cache",
+            "cache-control": "no-cache",
+            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
+            "sec-ch-ua-mobile": "?0",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "sec-fetch-site": "none",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "sec-fetch-dest": "document",
+            "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
         text = session.get(url).content
-        with open(f'{NormalConfig.DOC_DIR}/captcha.png', 'wb') as f:
+        with open(f"{NormalConfig.DOC_DIR}/captcha.png", "wb") as f:
             f.write(text)
 
         # 新建空白图片
         # captcha = Image.new('RGB', (50, 120))
         # 实例化原始图片 Image 对象
-        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')
+        img = Image.open(f"{NormalConfig.DOC_DIR}/captcha.png")
 
         # 切割滑块验证码图片，将背景图和滑块图分开
         # (left, upper, right, lower)
         captcha = img.crop((260, 0, 325, 120 - 4))
-        captcha = captcha.convert('RGBA')
-        captcha.save(f'{NormalConfig.DOC_DIR}/captcha_slide.png')
+        captcha = captcha.convert("RGBA")
+        captcha.save(f"{NormalConfig.DOC_DIR}/captcha_slide.png")
 
     @classmethod
     def convert_index_to_offset(cls, index):
@@ -81,14 +71,14 @@ class Picture(object):
         """
 
         # 代码注释
-        '''
+        """
         # 图片大小为：334 159， 22 为 334 / 15 得到，58 是 159 /
         if index < 15:  # 完整的验证码图片是由30个小图片组合而成，共2行15列
             return (index * 22, 0)
         else:
             i = index - 15
             return (i * 22, 58)  # 每张小图的大小为22*58
-        '''
+        """
         # 完整的验证码图片是由 40 个小图片组合而成，共 2 行 15 列
         if index < 20:
             return index * 13, 0
@@ -123,15 +113,15 @@ class Picture(object):
             None
         """
         # 新建空白图片
-        captcha = Image.new('RGB', (13 * 20, 60 * 2 - 4))
+        captcha = Image.new("RGB", (13 * 20, 60 * 2 - 4))
         # 实例化原始图片Image对象
-        img = Image.open(f'{NormalConfig.DOC_DIR}/captcha.png')
+        img = Image.open(f"{NormalConfig.DOC_DIR}/captcha.png")
 
         # 切割滑块验证码图片，将背景图和滑块图分开
         # (left, upper, right, lower)
         captcha_de = img.crop((0, 0, 260, 120 - 4))
-        captcha_de = captcha_de.convert('RGBA')
-        captcha_de.save(f'{NormalConfig.DOC_DIR}/captcha.png')
+        captcha_de = captcha_de.convert("RGBA")
+        captcha_de.save(f"{NormalConfig.DOC_DIR}/captcha.png")
 
         for i, off in enumerate(offset_list):
             # 根据css backgound-position获取每张小图的坐标
@@ -142,7 +132,7 @@ class Picture(object):
             offset = Picture.convert_index_to_offset(i)
             # 根据当前坐标将小图粘贴到空白图片
             captcha.paste(regoin, offset)
-        captcha.save(f'{NormalConfig.DOC_DIR}/regoin.jpg')
+        captcha.save(f"{NormalConfig.DOC_DIR}/regoin.jpg")
 
     @classmethod
     def reset_pic(cls, slide_data):
@@ -189,7 +179,9 @@ class Picture(object):
         return value[2:][0][0], value[2:][1][0]
 
     @classmethod
-    def identify_gap(cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None) -> int:
+    def identify_gap(
+        cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None
+    ) -> int:
         """
         通过背景图片和缺口图片识别出滑块距离
         Args:
@@ -251,7 +243,10 @@ class Picture(object):
         Returns:
             1). Data URLs 格式数据
         """
-        assert type(data) in [str, bytes], "图片转 Data URLs 的参数 data 需要是全路径 str 或 bytes 数据"
+        assert type(data) in [
+            str,
+            bytes,
+        ], "图片转 Data URLs 的参数 data 需要是全路径 str 或 bytes 数据"
 
         if isinstance(data, str):
             data_bytes = ReuseOperation.get_bytes_by_file(file_path=data)

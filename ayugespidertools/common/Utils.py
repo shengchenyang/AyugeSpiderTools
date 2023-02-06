@@ -1,28 +1,18 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  Utils.py
-@Time    :  2022/8/5 16:15
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  用于 AyugeSpiderTools 的一些通用方法，主要是用于 scrapy 扩展的一些通用方法
-"""
 import copy
+import dataclasses
 import json
+from typing import List, Optional, Union
+
 import pandas
 import requests
-import dataclasses
-import ayugespidertools.Items
 from itemadapter import ItemAdapter
-from typing import Union, List, Optional
-from ayugespidertools.config import logger
-from ayugespidertools.FormatData import DataHandle
-from ayugespidertools.common.Params import Param
+
+import ayugespidertools.Items
 from ayugespidertools.common.Encryption import EncryptOperation
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-
+from ayugespidertools.common.Params import Param
+from ayugespidertools.config import logger
+from ayugespidertools.FormatData import DataHandle
 
 __all__ = [
     "ToolsForAyu",
@@ -49,14 +39,16 @@ class ToolsForAyu(object):
         curr_consul_headers = copy.deepcopy(Param.consul_headers)
         curr_consul_headers["X-Consul-Token"] = token
         r = requests.get(
-            url=f'http://{host}:{port}/v1/kv/?keys&dc=dc1&separator=%2F',
+            url=f"http://{host}:{port}/v1/kv/?keys&dc=dc1&separator=%2F",
             headers=curr_consul_headers,
-            verify=False
+            verify=False,
         )
         return r.json()
 
     @classmethod
-    def get_kvs_detail_by_consul(cls, host: str, port: int, token: str, key_values: str, group: str = None) -> dict:
+    def get_kvs_detail_by_consul(
+        cls, host: str, port: int, token: str, key_values: str, group: str = None
+    ) -> dict:
         """
         获取 consul 的 key_values 的详细信息
         Args:
@@ -81,7 +73,9 @@ class ToolsForAyu(object):
         return json.loads(conf_value)
 
     @classmethod
-    def get_mysql_conf_by_consul(cls, host: str, port: int, token: str, key_values: str, group: str = None):
+    def get_mysql_conf_by_consul(
+        cls, host: str, port: int, token: str, key_values: str, group: str = None
+    ):
         """
         获取 consul 中的 mysql 配置信息
         Args:
@@ -99,7 +93,9 @@ class ToolsForAyu(object):
         return ReuseOperation.dict_keys_to_lower(mysql_conf)
 
     @classmethod
-    def get_mongodb_conf_by_consul(cls, host: str, port: int, token: str, key_values: str, group: str = None):
+    def get_mongodb_conf_by_consul(
+        cls, host: str, port: int, token: str, key_values: str, group: str = None
+    ):
         """
         获取 consul 中的 mysql 配置信息
         Args:
@@ -118,7 +114,9 @@ class ToolsForAyu(object):
 
     @classmethod
     @DataHandle.simple_deal_for_extract
-    def extract_with_css(cls, response, query: str, get_all: bool = False, return_selector: bool = False):
+    def extract_with_css(
+        cls, response, query: str, get_all: bool = False, return_selector: bool = False
+    ):
         """
         使用 scrapy 的 css 提取信息
         Args:
@@ -139,7 +137,9 @@ class ToolsForAyu(object):
 
     @classmethod
     @DataHandle.simple_deal_for_extract
-    def extract_with_xpath(cls, response, query: str, get_all: bool = False, return_selector: bool = False):
+    def extract_with_xpath(
+        cls, response, query: str, get_all: bool = False, return_selector: bool = False
+    ):
         """
         使用 scrapy 的 xpath 提取信息
         Args:
@@ -171,14 +171,15 @@ class ToolsForAyu(object):
             1).提取的内容
         """
         # 如果输入的提取规则参数的格式为字符；或者参数格式是个列表，但是只含有一个元素的情况时
-        if any([isinstance(query, str), all([isinstance(query, list), len(query) == 1])]):
+        if any(
+            [isinstance(query, str), all([isinstance(query, list), len(query) == 1])]
+        ):
             if isinstance(query, str):
                 return json_data.get(query, "")
             return json_data.get(query[0], "")
 
         # 循环取值时的处理
         for curr_q in query:
-
             # 这里循环时不对 json_data 的类型做判断，如果此时 json_data 类型无 get 方法，不处理
             json_data = json_data.get(curr_q, "")
             if not json_data:
@@ -186,7 +187,9 @@ class ToolsForAyu(object):
         return json_data
 
     @classmethod
-    def extract_with_json_rules(cls, json_data: dict, query_rules: List[Param.Str_Lstr]):
+    def extract_with_json_rules(
+        cls, json_data: dict, query_rules: List[Param.Str_Lstr]
+    ):
         """
         当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
         Args:
@@ -201,9 +204,7 @@ class ToolsForAyu(object):
         assert depth_num <= 2, "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
         for query in query_rules:
-            if extract_res := cls.extract_with_json(
-                json_data=json_data, query=query
-            ):
+            if extract_res := cls.extract_with_json(json_data=json_data, query=query):
                 return extract_res
         return ""
 
@@ -227,10 +228,12 @@ class ToolsForAyu(object):
             "utf16le": "utf16le_general_ci",
             "cp1251": "cp1251_general_ci",
             "euckr": "euckr_korean_ci",
-            "greek": "greek_general_ci"
+            "greek": "greek_general_ci",
         }
         collate = charset_collate_map.get(mysql_config["charset"])
-        assert collate is not None, f"数据库配置出现未知 charset：{mysql_config['charset']}，若抛错请查看或手动创建所需数据表！"
+        assert (
+            collate is not None
+        ), f"数据库配置出现未知 charset：{mysql_config['charset']}，若抛错请查看或手动创建所需数据表！"
         return collate
 
     @staticmethod
@@ -292,9 +295,9 @@ class ToolsForAyu(object):
 
     @staticmethod
     def filter_data_before_yield(
-            sql: str,
-            mysql_engine,
-            item: Param.ScrapyItems,
+        sql: str,
+        mysql_engine,
+        item: Param.ScrapyItems,
     ) -> Param.ScrapyItems:
         """
         数据入库前查询是否已存在，已存在则跳过

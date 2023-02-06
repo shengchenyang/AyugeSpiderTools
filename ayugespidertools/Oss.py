@@ -1,45 +1,36 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  Oss.py
-@Time    :  2022/7/22 13:44
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  阿里云 Oss 对象存储 python sdk 示例
-    其 GitHub 官方文档地址：
-        https://github.com/aliyun/aliyun-oss-python-sdk?spm=5176.8465980.tools.dpython-github.572b1450ON6Z9R
-    阿里云官方 oss sdk 文档地址：
-        https://www.alibabacloud.com/help/zh/object-storage-service/latest/python-quick-start
-"""
+import warnings
+from typing import Union
+
 import oss2
 import requests
-from typing import Union
 from retrying import retry
-from ayugespidertools.common.Params import Param
-from ayugespidertools.common.Encryption import EncryptOperation
-# 去除 requests 的警告信息
-import warnings
-warnings.filterwarnings('ignore')
 
+from ayugespidertools.common.Encryption import EncryptOperation
+from ayugespidertools.common.Params import Param
+
+warnings.filterwarnings("ignore")
 
 __all__ = [
-    'AliOssBase',
+    "AliOssBase",
 ]
 
 
 class AliOssBase(object):
     """
-    ali oss 所需要的基本方法
+    阿里云 Oss 对象存储 python sdk 示例
+    其 GitHub 官方文档地址：
+        https://github.com/aliyun/aliyun-oss-python-sdk?spm=5176.8465980.tools.dpython-github.572b1450ON6Z9R
+    阿里云官方 oss sdk 文档地址：
+        https://www.alibabacloud.com/help/zh/object-storage-service/latest/python-quick-start
     """
+
     def __init__(
         self,
         OssAccessKeyId: str,
         OssAccessKeySecret: str,
         Endpoint: str,
         examplebucket: str,
-        operateDoc: str
+        operateDoc: str,
     ) -> None:
         """
         初始化 auth，bucket 等信息
@@ -56,8 +47,8 @@ class AliOssBase(object):
         self.operateDoc = operateDoc
         self.examplebucket = examplebucket
         self.auth = oss2.Auth(OssAccessKeyId, OssAccessKeySecret)
-        self.bucket = oss2.Bucket(self.auth, f'{self.Endpoint}/', self.examplebucket)
-        self.headers = {'Connection': 'close'}
+        self.bucket = oss2.Bucket(self.auth, f"{self.Endpoint}/", self.examplebucket)
+        self.headers = {"Connection": "close"}
 
     def delete_oss(self, del_logo_url: str):
         """
@@ -74,18 +65,20 @@ class AliOssBase(object):
             )
         except oss2.exceptions.NoSuchKey as e:
             raise ValueError(
-                'delete_oss error: status={0}, request_id={1}'.format(
+                "delete_oss error: status={0}, request_id={1}".format(
                     e.status, e.request_id
                 )
             ) from e
 
-    @retry(stop_max_attempt_number=Param.retry_num, retry_on_result=lambda x: x[0] is False)
+    @retry(
+        stop_max_attempt_number=Param.retry_num, retry_on_result=lambda x: x[0] is False
+    )
     def put_oss(
         self,
         put_bytes_or_url: Union[str, bytes],
         file_name: str,
         file_format: str,
-        file_name_md5: bool = False
+        file_name_md5: bool = False,
     ) -> (bool, str):
         """
         上传单个文件的 bytes 内容
@@ -101,23 +94,25 @@ class AliOssBase(object):
         """
         assert type(put_bytes_or_url) in [str, bytes], "参数：上传的文件需要是 str 或 bytes 格式"
 
-        input_file_name = EncryptOperation.md5(file_name) if file_name_md5 else file_name
+        input_file_name = (
+            EncryptOperation.md5(file_name) if file_name_md5 else file_name
+        )
         if isinstance(put_bytes_or_url, str):
-            put_bytes_or_url = requests.get(url=put_bytes_or_url, headers=self.headers, verify=False).content
+            put_bytes_or_url = requests.get(
+                url=put_bytes_or_url, headers=self.headers, verify=False
+            ).content
 
         try:
             self.bucket.put_object(
-                f'{self.operateDoc}/{input_file_name}.{file_format}',
+                f"{self.operateDoc}/{input_file_name}.{file_format}",
                 put_bytes_or_url,
             )
         except Exception as e:
-            return False, ''
+            return False, ""
         return True, input_file_name
 
     def enumer_file_by_pre(
-        self,
-        prefix: str,
-        count_by_type: Union[Param.Str_Lstr, Param.NoneType] = None
+        self, prefix: str, count_by_type: Union[Param.Str_Lstr, Param.NoneType] = None
     ) -> list:
         """
         列举 prefix 文件夹下的所有的 count_by_type 类型的文件元素
@@ -131,7 +126,11 @@ class AliOssBase(object):
         Returns:
             1). prefix 目录下的符合规则的文件列表
         """
-        assert type(count_by_type) in [str, list, Param.NoneType], "计数依据的参数类型需要是 str 或 list"
+        assert type(count_by_type) in [
+            str,
+            list,
+            Param.NoneType,
+        ], "计数依据的参数类型需要是 str 或 list"
 
         # 如果依据为空，则统计目标目录下的所有文件
         obj_list = list(oss2.ObjectIterator(self.bucket, prefix=prefix))

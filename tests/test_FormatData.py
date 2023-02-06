@@ -1,19 +1,11 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  test_mytools.py
-@Time    :  2022/7/11 9:20
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
 from ayugespidertools.FormatData import DataHandle
 
 
 def test_get_full_url():
-    full_url = DataHandle.get_full_url(domain_name="https://static.geetest.com", deal_url="/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd478aa31e0dca37601cd4.jpg")
+    full_url = DataHandle.get_full_url(
+        domain_name="https://static.geetest.com",
+        deal_url="/captcha_v3/batch/v3/2021-04-27T15/word/4406ba6e71cd478aa31e0dca37601cd4.jpg",
+    )
     print(f"完整的链接 get_full_url 为: {full_url}")
     assert full_url
 
@@ -36,7 +28,9 @@ def test_normal_to_stamp():
     normal_stamp = DataHandle.normal_to_stamp("2022-06-21 16:40:00")
     print("normal_stamp3:", normal_stamp)
 
-    normal_stamp = DataHandle.normal_to_stamp(normal_time="20220815192255", _format_t="", specific_date_conn="", hms_conn="")
+    normal_stamp = DataHandle.normal_to_stamp(
+        normal_time="20220815192255", _format_t="", specific_date_conn="", hms_conn=""
+    )
     print("normal_stamp3.1:", normal_stamp)
 
     res = DataHandle.timestamp_to_normal(normal_stamp)
@@ -49,17 +43,18 @@ def test_normal_to_stamp():
     print("normal_stamp4_2:", normal_stamp)
 
     # 当是英文的其他格式，或者混合格式时，需要自己自定时间格式化符
-    normal_stamp = DataHandle.normal_to_stamp(normal_time="2022/Dec/21 16:40:00", _format_t="%Y/%b/%d %H:%M:%S")
+    normal_stamp = DataHandle.normal_to_stamp(
+        normal_time="2022/Dec/21 16:40:00", _format_t="%Y/%b/%d %H:%M:%S"
+    )
     print("normal_stamp5:", normal_stamp)
 
 
 def test_remove_tags():
-
     @DataHandle.remove_all_tags
     def true_test_remove_tags(html_content):
         return html_content + "<p>无事发生</p>"
 
-    res = true_test_remove_tags('''<a href="https://www.baidu.com">跳转到百度1</a>''')
+    res = true_test_remove_tags("""<a href="https://www.baidu.com">跳转到百度1</a>""")
     print(res)
     assert res is not None
 

@@ -1,26 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  Params.py
-@Time    :  2023/1/20 16:32
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import re
-import pymysql
 import datetime
-from retrying import retry
+import re
 from typing import Optional
-from ayugespidertools.config import logger
-from ayugespidertools.common.Params import Param
-from ayugespidertools.common.MultiPlexing import ReuseOperation
 
+import pymysql
+from retrying import retry
+
+from ayugespidertools.common.MultiPlexing import ReuseOperation
+from ayugespidertools.common.Params import Param
+from ayugespidertools.config import logger
 
 __all__ = [
-    'MysqlErrorHandlingMixin',
+    "MysqlErrorHandlingMixin",
 ]
 
 
@@ -30,12 +20,7 @@ class MysqlErrorHandlingMixin(object):
     """
 
     def get_column_type(
-        self,
-        conn,
-        cursor,
-        database: str,
-        table: str,
-        column: str
+        self, conn, cursor, database: str, table: str, column: str
     ) -> str:
         """
         获取数据字段存储类型
@@ -49,8 +34,8 @@ class MysqlErrorHandlingMixin(object):
         Returns:
             column_type: 字段存储类型
         """
-        sql = f'''select COLUMN_TYPE from information_schema.columns where table_schema = '{database}' and 
-            table_name = '{table}' and COLUMN_NAME= '{column}';'''
+        sql = f"""select COLUMN_TYPE from information_schema.columns where table_schema = '{database}' and 
+            table_name = '{table}' and COLUMN_NAME= '{column}';"""
         column_type = None
         try:
             if conn:
@@ -76,7 +61,7 @@ class MysqlErrorHandlingMixin(object):
         charset: str,
         collate: str,
         tabel_notes: Optional[str] = "",
-        demand_code: Optional[str] = ""
+        demand_code: Optional[str] = "",
     ) -> None:
         """
         创建数据库表
@@ -95,9 +80,9 @@ class MysqlErrorHandlingMixin(object):
         if demand_code != "":
             tabel_notes = f"{demand_code}_{tabel_notes}"
 
-        sql = f'''CREATE TABLE `{table_name}` (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
+        sql = f"""CREATE TABLE `{table_name}` (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
             PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET={charset} 
-            COLLATE={collate} COMMENT='{tabel_notes}'; '''
+            COLLATE={collate} COMMENT='{tabel_notes}'; """
         try:
             # 执行 sql 查询，获取数据
             data = cursor.execute(sql)
@@ -105,10 +90,15 @@ class MysqlErrorHandlingMixin(object):
                 logger.info(f"创建数据表 {tabel_notes}: {table_name} 成功！")
 
         except Exception as e:
-            logger.error(f"创建表失败，tabel_notes：{tabel_notes}，table_name：{table_name}，error：{e}")
+            logger.error(
+                f"创建表失败，tabel_notes：{tabel_notes}，table_name：{table_name}，error：{e}"
+            )
 
-    @retry(stop_max_attempt_number=Param.retry_num, wait_random_min=Param.retry_time_min,
-           wait_random_max=Param.retry_time_max)
+    @retry(
+        stop_max_attempt_number=Param.retry_num,
+        wait_random_min=Param.retry_time_min,
+        wait_random_max=Param.retry_time_max,
+    )
     def _connect(self, pymysql_dict_config):
         try:
             conn = pymysql.connect(**pymysql_dict_config)
@@ -161,7 +151,9 @@ class MysqlErrorHandlingMixin(object):
             else:
                 logger.info(f"{e}")
 
-    def deal_1146_error(self, err_msg: str, table_prefix, cursor, charset, collate, table_enum):
+    def deal_1146_error(
+        self, err_msg: str, table_prefix, cursor, charset, collate, table_enum
+    ):
         table_pattern = re.compile(r"Table '(.*?)' doesn't exist")
         text = re.findall(table_pattern, err_msg)
         table = text[0].split(".")[1]
@@ -181,7 +173,7 @@ class MysqlErrorHandlingMixin(object):
                         charset=charset,
                         collate=collate,
                         tabel_notes=table_notes,
-                        demand_code=demand_code
+                        demand_code=demand_code,
                     )
                     break
             if have_create_flag is False:
@@ -191,7 +183,7 @@ class MysqlErrorHandlingMixin(object):
                     charset=charset,
                     collate=collate,
                     tabel_notes="",
-                    demand_code=""
+                    demand_code="",
                 )
 
         else:
@@ -203,16 +195,20 @@ class MysqlErrorHandlingMixin(object):
                 charset=charset,
                 collate=collate,
                 tabel_notes="",
-                demand_code=""
+                demand_code="",
             )
 
-    def deal_1406_error(self, err_msg: str, conn, cursor, database: str, table: str, note_dic: dict):
+    def deal_1406_error(
+        self, err_msg: str, conn, cursor, database: str, table: str, note_dic: dict
+    ):
         if "Data too long for" in err_msg:
             colum_pattern = re.compile(r"Data too long for column '(.*?)' at")
             text = re.findall(colum_pattern, err_msg)
             colum = text[0]
             notes = note_dic[colum]
-            column_type = self.get_column_type(conn=conn, cursor=cursor, database=database, table=table, column=colum)
+            column_type = self.get_column_type(
+                conn=conn, cursor=cursor, database=database, table=table, column=colum
+            )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
 
@@ -229,13 +225,17 @@ class MysqlErrorHandlingMixin(object):
             logger.error(f"1406 的其它错误类型: {err_msg}")
             raise Exception(f"1406 的其它错误类型: {err_msg}")
 
-    def deal_1265_error(self, err_msg: str, conn, cursor, database: str, table: str, note_dic: dict):
+    def deal_1265_error(
+        self, err_msg: str, conn, cursor, database: str, table: str, note_dic: dict
+    ):
         if "Data truncated for column" in err_msg:
             colum_pattern = re.compile(r"Data truncated for column '(.*?)' at")
             text = re.findall(colum_pattern, err_msg)
             colum = text[0]
             notes = note_dic[colum]
-            column_type = self.get_column_type(conn=conn, cursor=cursor, database=database, table=table, column=colum)
+            column_type = self.get_column_type(
+                conn=conn, cursor=cursor, database=database, table=table, column=colum
+            )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
             try:
@@ -258,9 +258,16 @@ class MysqlErrorHandlingMixin(object):
         error_reason = ""
         for k, v in stats.items():
             if isinstance(v, datetime.datetime):
-                text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+                text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
             else:
-                if all(["response_status_count" in k, k != "downloader/response_status_count/200"]):
+                if all(
+                    [
+                        "response_status_count" in k,
+                        k != "downloader/response_status_count/200",
+                    ]
+                ):
                     status_code = k.split("/")[-1] if len(k.split("/")) > 0 else ""
                     if status_code.startswith("4"):
                         if status_code == "429":
@@ -306,8 +313,15 @@ class MysqlErrorHandlingMixin(object):
             "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             # 花费时间
             "spend_minutes": round(
-                (datetime.datetime.now() - stats.get("start_time") - datetime.timedelta(hours=8)).seconds / 60, 2),
-            "crawl_time": crawl_time
+                (
+                    datetime.datetime.now()
+                    - stats.get("start_time")
+                    - datetime.timedelta(hours=8)
+                ).seconds
+                / 60,
+                2,
+            ),
+            "crawl_time": crawl_time,
         }
 
         # 错误原因

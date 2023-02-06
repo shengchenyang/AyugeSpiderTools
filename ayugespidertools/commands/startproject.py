@@ -1,18 +1,20 @@
-import os
 import string
+from os.path import abspath, exists, join
 from pathlib import Path
-from os.path import join, exists, abspath
 from shutil import copy2, copystat, ignore_patterns, move
-from stat import S_IWUSR as OWNER_WRITE_PERMISSION
 
+from scrapy.commands.startproject import Command
 from scrapy.exceptions import UsageError
 from scrapy.utils.template import render_templatefile, string_camelcase
 
 import ayugespidertools
-from scrapy.commands.startproject import Command
 
-
+# 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
+    (".gitignore",),
+    ("pyproject.toml",),
+    ("README.md",),
+    ("requirements.txt",),
     ("scrapy.cfg",),
     ("${project_name}", "settings.py.tmpl"),
     ("${project_name}", "items.py.tmpl"),
@@ -25,13 +27,7 @@ TEMPLATES_TO_RENDER = (
 IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
 
 
-def _make_writable(path):
-    current_permissions = os.stat(path).st_mode
-    os.chmod(path, current_permissions | OWNER_WRITE_PERMISSION)
-
-
 class AyuCommand(Command):
-
     requires_project = False
     default_settings = {"LOG_ENABLED": False, "SPIDER_LOADER_WARN_ONLY": True}
 
@@ -77,7 +73,7 @@ class AyuCommand(Command):
             project_startup_dir=abspath(project_dir),
             ProjectStartupDir=string_camelcase(abspath(project_dir)),
             project_name=project_name,
-            ProjectName=string_camelcase(project_name)
+            ProjectName=string_camelcase(project_name),
         )
         print(
             f"New Scrapy project '{project_name}', using template directory "

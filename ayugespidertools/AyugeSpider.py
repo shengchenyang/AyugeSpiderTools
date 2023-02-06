@@ -1,23 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  AyugeSpider.py
-@Time    :  2022/7/29 17:33
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import time
 import threading
+import time
 from typing import Union
+
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
-from ayugespidertools.config import logger
-from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.common.MultiPlexing import ReuseOperation
 
+from ayugespidertools.common.MultiPlexing import ReuseOperation
+from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.config import logger
 
 __all__ = [
     "AyuSpider",
@@ -28,10 +18,13 @@ class MySqlEngineClass:
     """
     mysql 链接句柄单例模式
     """
+
     _instance_lock = threading.Lock()
 
     def __init__(self, engine_url):
-        self.engine = create_engine(engine_url, pool_pre_ping=True, pool_recycle=3600 * 7)
+        self.engine = create_engine(
+            engine_url, pool_pre_ping=True, pool_recycle=3600 * 7
+        )
 
     def __new__(cls, *args, **kwargs):
         if not hasattr(MySqlEngineClass, "_instance"):
@@ -46,6 +39,7 @@ class AyuSpider(Spider):
     """
     用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等
     """
+
     # 自定义 common 设置
     custom_common_settings = {
         "ROBOTSTXT_OBEY": False,
@@ -177,7 +171,7 @@ class AyuSpider(Spider):
         # 1). 从本地 local_mysql_config 的参数中取值
         if ReuseOperation.if_dict_meet_min_limit(
             dict_config=local_mysql_config,
-            key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"]
+            key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"],
         ):
             return {
                 "host": local_mysql_config.get("HOST"),
@@ -213,7 +207,7 @@ class AyuSpider(Spider):
         # 1). 从本地 local_mongo_conf 的参数中取值
         if ReuseOperation.if_dict_meet_min_limit(
             dict_config=local_mongodb_conf,
-            key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"]
+            key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"],
         ):
             return {
                 "host": local_mongodb_conf.get("HOST"),

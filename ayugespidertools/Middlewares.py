@@ -2,28 +2,29 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-import json
-import time
 import base64
+import json
 import random
-import requests
+import time
 import traceback
+from threading import Thread
+from typing import Optional
+
 import numpy as np
+import requests
 from retrying import retry
 from scrapy import signals
-from typing import Optional
-from threading import Thread
-from .config import NormalConfig
+from scrapy.downloadermiddlewares.retry import RetryMiddleware
 from scrapy.http import HtmlResponse
 from scrapy.settings import Settings
-from .common.MultiPlexing import ReuseOperation
+from scrapy.utils.project import get_project_settings
+from scrapy.utils.response import response_status_message
+from WorkWeixinRobot.work_weixin_robot import WWXRobot
+
+from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Params import Param
 from ayugespidertools.common.Utils import ToolsForAyu
-from scrapy.utils.project import get_project_settings
-from WorkWeixinRobot.work_weixin_robot import WWXRobot
-from scrapy.utils.response import response_status_message
-from scrapy.downloadermiddlewares.retry import RetryMiddleware
-
+from ayugespidertools.config import NormalConfig
 
 __all__ = [
     "RandomRequestUaMiddleware",
@@ -38,6 +39,7 @@ class RandomRequestUaMiddleware(object):
     """
     随机请求头中间件
     """
+
     def get_random_ua_by_weight(self) -> str:
         """根据权重来获取随机请求头 ua 信息"""
         # 带权重的 ua 列表，将比较常用的 ua 标识的权重设置高一点。这里是根据 fake_useragent 库中的打印信息来规划权重的。
@@ -50,8 +52,7 @@ class RandomRequestUaMiddleware(object):
         ]
         curr_ua_type = ReuseOperation.random_weight(weight_data=ua_arr)
         curr_ua_list = Param.fake_useragent_dict[curr_ua_type["explorer_type"]]
-        curr_ua = random.choice(curr_ua_list)
-        return curr_ua
+        return random.choice(curr_ua_list)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -61,19 +62,19 @@ class RandomRequestUaMiddleware(object):
         return s
 
     def spider_opened(self, spider):
-        spider.slog.info(f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: %s" % spider.name)
+        spider.slog.info(f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}")
 
     def process_request(self, request, spider):
-        curr_ua = self.get_random_ua_by_weight()
-        if curr_ua:
+        if curr_ua := self.get_random_ua_by_weight():
             request.headers.setdefault(b"User-Agent", curr_ua)
-            spider.slog.debug("RandomRequestUaMiddleware 当前使用的 ua 为: %s" % curr_ua)
+            spider.slog.debug(f"RandomRequestUaMiddleware 当前使用的 ua 为: {curr_ua}")
 
 
 class DynamicProxyDownloaderMiddleware(object):
     """
     动态隧道代理中间件
     """
+
     def __init__(self, settings):
         """
         从 scrapy 配置中取出动态隧道代理的信息
@@ -82,7 +83,7 @@ class DynamicProxyDownloaderMiddleware(object):
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.if_dict_meet_min_limit(
             dict_config=dynamic_proxy_config,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )
         assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
 
@@ -101,11 +102,17 @@ class DynamicProxyDownloaderMiddleware(object):
         # TODO: 根据权重来随机获取一个账号 DYNAMIC_PROXY_CONFIG
         # account = ReuseOperation.random_weight(self.account_arr)
         if request.url.startswith("https://"):
-            request.meta['proxy'] = f"https://{self.username}:{self.password}@{self.proxy_url}/"
+            request.meta[
+                "proxy"
+            ] = f"https://{self.username}:{self.password}@{self.proxy_url}/"
         elif request.url.startswith("http://"):
-            request.meta['proxy'] = f"http://{self.username}:{self.password}@{self.proxy_url}/"
+            request.meta[
+                "proxy"
+            ] = f"http://{self.username}:{self.password}@{self.proxy_url}/"
         else:
-            spider.slog.info(f"request url: {request.url} error when use proxy middlewares!")
+            spider.slog.info(
+                f"request url: {request.url} error when use proxy middlewares!"
+            )
 
         # 避免因连接复用导致隧道不能切换 IP
         request.headers["Connection"] = "close"
@@ -113,7 +120,9 @@ class DynamicProxyDownloaderMiddleware(object):
         request.headers["Accept-Encoding"] = "gzip"
 
     def spider_opened(self, spider):
-        spider.slog.info(f"动态隧道代理中间件: DynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
+        spider.slog.info(
+            f"动态隧道代理中间件: DynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
+        )
 
 
 class ExclusiveProxyDownloaderMiddleware(object):
@@ -131,7 +140,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
         # 查看独享代理配置是否符合要求
         is_match = ReuseOperation.if_dict_meet_min_limit(
             dict_config=exclusive_proxy_config,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"]
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"],
         )
         assert is_match, f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_config_example}"
 
@@ -165,19 +174,23 @@ class ExclusiveProxyDownloaderMiddleware(object):
 
     def process_request(self, request, spider):
         if request.url.startswith("https://"):
-            request.meta["proxy"] = "https://{}".format(self.proxy)
+            request.meta["proxy"] = f"https://{self.proxy}"
         elif request.url.startswith("http://"):
-            request.meta["proxy"] = "http://{}".format(self.proxy)
+            request.meta["proxy"] = f"http://{self.proxy}"
         else:
             spider.slog.info(f"request url error: {request.url}")
 
-        proxy_user_pass = self.username + ":" + self.password
-        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
+        proxy_user_pass = f"{self.username}:{self.password}"
+        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(
+            bytes(proxy_user_pass, "ascii")
+        ).decode("utf8")
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
     def spider_opened(self, spider):
         self.get_proxy_ip()
-        spider.slog.info(f"独享代理中间件: ExclusiveProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}，当前独享代理为: {self.proxy}")
+        spider.slog.info(
+            f"独享代理中间件: ExclusiveProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}，当前独享代理为: {self.proxy}"
+        )
 
 
 class SiMiProxyDownloaderMiddleware(RetryMiddleware):
@@ -220,9 +233,13 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
                     if (now_ipnum < 100) and (now_ipnum >= 50):
                         self.WWX.send_text("私密代理三级警报：相关部门请注意，ip 数量已经少于 100 个！请及时充值！")
                     elif (now_ipnum < 50) and (now_ipnum >= 10):
-                        self.WWX.send_text("私密代理二级警报：相关部门请注意，相关部门请注意, ip 数量已经少 50 个！请及时充值！")
+                        self.WWX.send_text(
+                            "私密代理二级警报：相关部门请注意，相关部门请注意, ip 数量已经少 50 个！请及时充值！"
+                        )
                     elif now_ipnum < 10:
-                        self.WWX.send_text("私密代理一级警报：相关部门请注意，，相关部门请注意，相关部门请注意, ip 数量已经少于 10 个！请及时充值！")
+                        self.WWX.send_text(
+                            "私密代理一级警报：相关部门请注意，，相关部门请注意，相关部门请注意, ip 数量已经少于 10 个！请及时充值！"
+                        )
 
                     if isdict:
                         self.proxy_list = iplist
@@ -255,17 +272,19 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
         # spider.slog.debugger(f"目前的平均请求速度为：{np.average(self.v_count)}")
 
         if request.url.startswith("https://"):
-            request.meta["proxy"] = "https://{}".format(current_ip)
+            request.meta["proxy"] = f"https://{current_ip}"
         elif request.url.startswith("http://"):
-            request.meta["proxy"] = "http://{}".format(current_ip)
+            request.meta["proxy"] = f"http://{current_ip}"
         else:
             spider.slog.info(f"request url error: {request.url}")
 
         # request.meta["proxy"] = "http://{}".format(current_ip)
         request.meta["dont_retry"] = True
         # request.meta["ja3"] = True
-        proxy_user_pass = self.username + ":" + self.password
-        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
+        proxy_user_pass = f"{self.username}:{self.password}"
+        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(
+            bytes(proxy_user_pass, "ascii")
+        ).decode("utf8")
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
     def process_response(self, request, response, spider):
@@ -291,10 +310,12 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
 
     def process_exception(self, request, exception, spider):
         if isinstance(exception, self.EXCEPTIONS_TO_RETRY):
-            current_ip = request.meta["proxy"].split(""//"")[-1]
+            current_ip = request.meta["proxy"].split("" // "")[-1]
             url = "https://dps.kdlapi.com/api/checkdpsvalid?orderid={}&signature={}&proxy={}".format(
-                self.simidaili_config["orderid"], self.simidaili_config["signature"],
-                current_ip)
+                self.simidaili_config["orderid"],
+                self.simidaili_config["signature"],
+                current_ip,
+            )
             is_exists = requests.get(url).json()
             if not is_exists["data"][current_ip]:
                 if current_ip in self.proxy_list:
@@ -302,8 +323,12 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
                     # 找到相应索引，并删除相应时间统计数组、ip列表以及请求次数统计数组相应索引上的值
                     current_ip_index = self.proxy_list.index(current_ip)
                     self.proxy_list.pop(current_ip_index)
-                    self.time_count = np.delete(self.time_count, current_ip_index, axis=0)
-                    self.reqnum_count = np.delete(self.reqnum_count, current_ip_index, axis=0)
+                    self.time_count = np.delete(
+                        self.time_count, current_ip_index, axis=0
+                    )
+                    self.reqnum_count = np.delete(
+                        self.reqnum_count, current_ip_index, axis=0
+                    )
 
                     # 如果平均速度大于每个 ip 4 次每秒，或者 ip 池子小于 1 时，则增加两个 ip，否则不予增加。
                     if (np.average(self.v_count) >= 4.5) and (len(self.proxy_list) < 7):
@@ -361,7 +386,9 @@ class SiMiProxyDownloaderMiddleware(RetryMiddleware):
 
         if settings.get("SMPPSIZE"):
             if settings.get("SMPPSIZE") < 1:
-                raise ValueError("您输入的 ip 池子大小不能小于 1！请重新修改 settings 中的 SMPPSIZE 的值为大于等于 1")
+                raise ValueError(
+                    "您输入的 ip 池子大小不能小于 1！请重新修改 settings 中的 SMPPSIZE 的值为大于等于 1"
+                )
             elif settings.get("SMPPSIZE") > 7:
                 raise ValueError("你礼貌吗，ip 池最大数量不可以超过 7 个！请重新设置！")
 
@@ -399,7 +426,7 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.if_dict_meet_min_limit(
             dict_config=dynamic_proxy_config,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD"]
+            key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )
         assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
 
@@ -415,7 +442,9 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         return s
 
     def spider_opened(self, spider):
-        spider.slog.info(f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}")
+        spider.slog.info(
+            f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
+        )
 
     def process_request(self, request, spider):
         if request.url.startswith("https://"):
@@ -426,7 +455,9 @@ class AbuDynamicProxyDownloaderMiddleware(object):
             spider.slog.info(f"request url error: {request.url}")
 
         proxy_user_pass = f"{self.username}:{self.password}"
-        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(bytes(proxy_user_pass, "ascii")).decode("utf8")
+        encoded_user_pass = "Basic " + base64.urlsafe_b64encode(
+            bytes(proxy_user_pass, "ascii")
+        ).decode("utf8")
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
 
@@ -438,7 +469,9 @@ class RequestByRequestsMiddleware(object):
     def process_request(self, request, spider):
         try:
             # 将 scrapy 的 request headers 的值，原封不动地转移到 requests 中
-            r_headers = ToolsForAyu.get_dict_form_scrapy_req_headers(scrapy_headers=request.headers)
+            r_headers = ToolsForAyu.get_dict_form_scrapy_req_headers(
+                scrapy_headers=request.headers
+            )
 
             request_body_str = str(request.body, encoding="utf-8")
             scrapy_request_method = str(request.method).upper()
@@ -451,7 +484,10 @@ class RequestByRequestsMiddleware(object):
                         headers=r_headers,
                         cookies=request.cookies,
                         verify=False,
-                        timeout=(Param.requests_req_timeout, Param.requests_res_timeout)
+                        timeout=(
+                            Param.requests_req_timeout,
+                            Param.requests_res_timeout,
+                        ),
                     )
 
                 # 携带 body 参数的 GET 请求
@@ -463,7 +499,10 @@ class RequestByRequestsMiddleware(object):
                         cookies=request.cookies,
                         data=request_body_str,
                         verify=False,
-                        timeout=(Param.requests_req_timeout, Param.requests_res_timeout)
+                        timeout=(
+                            Param.requests_req_timeout,
+                            Param.requests_res_timeout,
+                        ),
                     )
 
             elif scrapy_request_method == "POST":
@@ -476,11 +515,17 @@ class RequestByRequestsMiddleware(object):
                         data=request_body_str,
                         cookies=request.cookies,
                         verify=False,
-                        timeout=(Param.requests_req_timeout, Param.requests_res_timeout)
+                        timeout=(
+                            Param.requests_req_timeout,
+                            Param.requests_res_timeout,
+                        ),
                     )
 
                 else:
-                    post_data_dict = {x.split("=")[0]: x.split("=")[1] for x in request_body_str.split("&")}
+                    post_data_dict = {
+                        x.split("=")[0]: x.split("=")[1]
+                        for x in request_body_str.split("&")
+                    }
                     r_response = requests.request(
                         method=scrapy_request_method,
                         url=request.url,
@@ -488,12 +533,27 @@ class RequestByRequestsMiddleware(object):
                         data=post_data_dict,
                         cookies=request.cookies,
                         verify=False,
-                        timeout=(Param.requests_req_timeout, Param.requests_res_timeout)
+                        timeout=(
+                            Param.requests_req_timeout,
+                            Param.requests_res_timeout,
+                        ),
                     )
             else:
                 raise ValueError("出现未知请求方式，请及时查看！")
-            return HtmlResponse(url=request.url, status=r_response.status_code, body=r_response.text, request=request, encoding="utf-8")
+            return HtmlResponse(
+                url=request.url,
+                status=r_response.status_code,
+                body=r_response.text,
+                request=request,
+                encoding="utf-8",
+            )
 
         except Exception as e:
             """这里比较重要，还是推荐捕获所有错误；不建议只抛错 requests.exceptions.ConnectTimeout:"""
-            return HtmlResponse(url=request.url, status=202, body=f"requests 请求出现错误：{e}", request=request, encoding="utf-8")
+            return HtmlResponse(
+                url=request.url,
+                status=202,
+                body=f"requests 请求出现错误：{e}",
+                request=request,
+                encoding="utf-8",
+            )

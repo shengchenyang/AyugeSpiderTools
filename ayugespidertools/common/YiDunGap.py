@@ -1,18 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  YiDunGap.py
-@Time    :  2022/7/12 10:36
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import cv2
 import itertools
-from ayugespidertools.common.MultiPlexing import ReuseOperation
 
+import cv2
+
+from ayugespidertools.common.MultiPlexing import ReuseOperation
 
 __all__ = [
     "YiDunGetGap",
@@ -52,7 +42,7 @@ class YiDunGetGap(object):
                 elif y >= max_y:
                     max_y = y
 
-        return img[min_x:max_x, min_y: max_y]
+        return img[min_x:max_x, min_y:max_y]
 
     @classmethod
     def template_match(cls, tpl, target, out: str = None) -> int:

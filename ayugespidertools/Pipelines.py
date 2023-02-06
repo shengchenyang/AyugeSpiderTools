@@ -2,32 +2,34 @@
 #
 # Don"t forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import os
-import pymysql
-import warnings
-import datetime
 import dataclasses
-from scrapy import Request
-from retrying import retry
-from pymysql import cursors
+import datetime
+import os
+import warnings
 from enum import Enum, unique
-from urllib.parse import urlparse
-from twisted.enterprise import adbapi
-from dbutils.pooled_db import PooledDB
 from typing import Optional, Type, TypeVar
-from twisted.internet import defer, reactor
-from scrapy.pipelines.files import FilesPipeline
-from ayugespidertools.common.Params import Param
-from scrapy.pipelines.images import ImagesPipeline
-from ayugespidertools.MongoClient import MongoDbBase
-from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
+from urllib.parse import urlparse
 
+import pymysql
+from dbutils.pooled_db import PooledDB
+from pymysql import cursors
+from retrying import retry
+from scrapy import Request
+from scrapy.pipelines.files import FilesPipeline
+from scrapy.pipelines.images import ImagesPipeline
+from twisted.enterprise import adbapi
+from twisted.internet import defer, reactor
+
+from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
+from ayugespidertools.common.MultiPlexing import ReuseOperation
+from ayugespidertools.common.Params import Param
+from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.MongoClient import MongoDbBase
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
-warnings.filterwarnings("error", category=pymysql.Warning, message=".*Data truncated for column.*")
-
+warnings.filterwarnings(
+    "error", category=pymysql.Warning, message=".*Data truncated for column.*"
+)
 
 __all__ = [
     "AyuFtyMysqlPipeline",
@@ -36,7 +38,6 @@ __all__ = [
     "AyuTurboMysqlPipeline",
     "AyuTwistedMongoPipeline",
 ]
-
 
 TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
 
@@ -51,7 +52,7 @@ class TableEnum(Enum):
     demo_detail_table = {
         "value": "表名(eg: demo_detail)",
         "notes": "表注释信息(eg: 详情表信息)",
-        "demand_code": "需求表对应数据(eg: Demo_detail_table_demand_code，此示例没有意义，需要自定义)"
+        "demand_code": "需求表对应数据(eg: Demo_detail_table_demand_code，此示例没有意义，需要自定义)",
     }
 
 
@@ -65,7 +66,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         table_prefix: str,
         table_enum: Type[TableEnumTypeVar],
         env: str,
-        record_log_to_mysql: Optional[bool] = False
+        record_log_to_mysql: Optional[bool] = False,
     ) -> None:
         """
         初始化 Mysql 链接所需要的信息
@@ -101,9 +102,13 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         )
 
     def open_spider(self, spider):
+        assert hasattr(spider, "mysql_config"), "未配置 Mysql 连接信息！"
+
         self.slog = spider.slog
         self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
+        self.collate = ToolsForAyu.get_collate_by_charset(
+            mysql_config=self.mysql_config
+        )
         self.conn = self._connect(self.mysql_config)
         self.cursor = self.conn.cursor()
 
@@ -119,7 +124,9 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         full_table_name = f"{self.table_prefix}{table}"
 
         # 最终的数据表名不能含有空格
-        assert " " not in full_table_name, "数据表名不能含空格，请检查 MYSQL_TABLE_PREFIX 参数和 item 中的 table 参数"
+        assert (
+            " " not in full_table_name
+        ), "数据表名不能含空格，请检查 MYSQL_TABLE_PREFIX 参数和 item 中的 table 参数"
         return full_table_name
 
     def get_new_item(self, item):
@@ -150,21 +157,22 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         # 兼容旧写法，直接 dict 格式的 item 即可
         else:
             # 将存入表的无关字段给去掉
-            save_data_item = ReuseOperation.get_items_except_keys(dict_config=item, key_list=["table", "item_mode"])
+            save_data_item = ReuseOperation.get_items_except_keys(
+                dict_config=item, key_list=["table", "item_mode"]
+            )
             for key, value in save_data_item.items():
                 new_item[key] = value
                 notes_dic[key] = key
 
-        return {
-            "new_item": new_item,
-            "notes_dic": notes_dic
-        }
+        return {"new_item": new_item, "notes_dic": notes_dic}
 
     def process_item(self, item, spider):
         item_dict = ToolsForAyu.convert_items_to_dict(item)
         # 先查看存储场景是否匹配
         if item_dict["item_mode"] == "Mysql":
-            self.insert_item(self.get_new_item(item_dict), self.get_table_name(item_dict["table"]))
+            self.insert_item(
+                self.get_new_item(item_dict), self.get_table_name(item_dict["table"])
+            )
         return item
 
     def insert_item(self, item_o, table):
@@ -195,7 +203,13 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             self.conn.rollback()
             err_msg = str(e)
             if "1054" in err_msg:
-                self.deal_1054_error(err_msg=err_msg, conn=self.conn, cursor=self.cursor, table=table, note_dic=note_dic)
+                self.deal_1054_error(
+                    err_msg=err_msg,
+                    conn=self.conn,
+                    cursor=self.cursor,
+                    table=table,
+                    note_dic=note_dic,
+                )
                 return self.insert_item(item_o, table)
 
             elif "1146" in err_msg:
@@ -205,7 +219,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     cursor=self.cursor,
                     charset=self.mysql_config["charset"],
                     collate=self.collate,
-                    table_enum=self.table_enum
+                    table_enum=self.table_enum,
                 )
                 self.insert_item(item_o, table)
             elif "1406" in err_msg:
@@ -215,7 +229,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     cursor=self.cursor,
                     database=self.mysql_config["database"],
                     table=table,
-                    note_dic=note_dic
+                    note_dic=note_dic,
                 )
 
             elif "1265" in err_msg:
@@ -225,7 +239,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     cursor=self.cursor,
                     database=self.mysql_config["database"],
                     table=table,
-                    note_dic=note_dic
+                    note_dic=note_dic,
                 )
 
             else:
@@ -243,16 +257,24 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
     def close_spider(self, spider):
         # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
         if self.record_log_to_mysql:
-            log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
+            log_info = self._get_log_by_spider(
+                spider=spider, crawl_time=self.crawl_time
+            )
 
             # 运行脚本统计信息
             self.insert_script_statistics(log_info)
-            self.table_collection_statistics(spider_name=spider.name, database=spider.mysql_config["database"], crawl_time=self.crawl_time)
+            self.table_collection_statistics(
+                spider_name=spider.name,
+                database=spider.mysql_config["database"],
+                crawl_time=self.crawl_time,
+            )
 
         if self.conn:
             self.conn.close()
 
-    def table_collection_statistics(self, spider_name: str, database: str, crawl_time: datetime.date):
+    def table_collection_statistics(
+        self, spider_name: str, database: str, crawl_time: datetime.date
+    ):
         """
         统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
         Args:
@@ -263,7 +285,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             None
         """
-        sql = f'''
+        sql = f"""
         select concat(
             'select "',
             TABLE_NAME,
@@ -274,7 +296,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                 ' where crawl_time = "{crawl_time}"'
         ) from information_schema.tables
         where TABLE_SCHEMA='{database}' and TABLE_NAME in (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
-        '''
+        """
         self.conn.ping(reconnect=True)
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
@@ -293,7 +315,9 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                 }
                 self.insert_table_statistics(table_statistics)
 
-    def insert_table_statistics(self, data: dict, table: Optional[str] = "table_collection_statistics"):
+    def insert_table_statistics(
+        self, data: dict, table: Optional[str] = "table_collection_statistics"
+    ):
         """
         插入统计数据到表中
         Args:
@@ -304,7 +328,8 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             None
         """
         self.conn.ping(reconnect=True)
-        self.cursor.execute(f"""
+        self.cursor.execute(
+            f"""
             CREATE TABLE IF NOT EXISTS `{table}` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
@@ -314,7 +339,8 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             `number` varchar(255) NOT NULL COMMENT '当前表的当前 crawl_time 的采集个数',            
             PRIMARY KEY (`id`) USING BTREE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目对应库中各表采集统计表';
-        """)
+            """
+        )
 
         keys = f"""`{"`, `".join(data.keys())}`"""
         values = ", ".join(["%s"] * len(data))
@@ -328,8 +354,14 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             self.conn.rollback()
             self.slog.warning(f":{e}")
 
-    @retry(stop_max_attempt_number=Param.retry_num, wait_random_min=Param.retry_time_min, wait_random_max=Param.retry_time_max)
-    def insert_script_statistics(self, data: dict, table: Optional[str] = "script_collection_statistics"):
+    @retry(
+        stop_max_attempt_number=Param.retry_num,
+        wait_random_min=Param.retry_time_min,
+        wait_random_max=Param.retry_time_max,
+    )
+    def insert_script_statistics(
+        self, data: dict, table: Optional[str] = "script_collection_statistics"
+    ):
         """
         存储运行脚本的统计信息
         Args:
@@ -339,7 +371,8 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             None
         """
-        self.cursor.execute(f"""
+        self.cursor.execute(
+            f"""
             CREATE TABLE IF NOT EXISTS `{table}` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
@@ -358,7 +391,8 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             `log_count_ERROR` varchar(255) DEFAULT NULL COMMENT '错误原因',
             PRIMARY KEY (`id`) USING BTREE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目运行脚本统计信息表';
-        """)
+            """
+        )
 
         keys = f"""`{"`, `".join(data.keys())}`"""
         values = ", ".join(["%s"] * len(data))
@@ -377,6 +411,7 @@ class AyuStatsMysqlPipeline(AyuMysqlPipeline):
     """
     记录运行脚本统计信息的简单示例，不在生成中使用
     """
+
     def __init__(self, *args, **kwargs):
         super(AyuStatsMysqlPipeline, self).__init__(*args, **kwargs)
 
@@ -400,16 +435,24 @@ class AyuStatsMysqlPipeline(AyuMysqlPipeline):
             "error_count": text.get("log_count_ERROR"),
             "start_time": text.get("start_time"),
             "finish_time": datetime.datetime.now(),
-            "spend_minutes": (datetime.datetime.now() - spider.stats.get_stats().get("start_time") - datetime.timedelta(hours=8)).seconds / 60,
-            "table": "logs"
+            "spend_minutes": (
+                datetime.datetime.now()
+                - spider.stats.get_stats().get("start_time")
+                - datetime.timedelta(hours=8)
+            ).seconds
+            / 60,
+            "table": "logs",
         }
-        self.insert_item(self.get_new_item(log_info), self.get_table_name(log_info.get("table")))
+        self.insert_item(
+            self.get_new_item(log_info), self.get_table_name(log_info.get("table"))
+        )
 
 
 class AyuFtyMysqlPipeline(AyuMysqlPipeline):
     """
     Mysql 存储场景的 scrapy pipeline 扩展
     """
+
     def __init__(self, *args, **kwargs):
         super(AyuFtyMysqlPipeline, self).__init__(*args, **kwargs)
 
@@ -425,7 +468,7 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
 
     @classmethod
     def from_crawler(cls, crawler):
-        pool_db_config = crawler.settings.get('POOL_DB_CONFIG', None)
+        pool_db_config = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
             # 数据库表前缀
             table_prefix=crawler.settings.get("MYSQL_TABLE_PREFIX", ""),
@@ -435,7 +478,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
             env=crawler.settings.get("ENV"),
             # 当 record_log_to_mysql 为 True 时，会记录运行情况
             record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
-
             # 数据库连接池配置
             pool_db_config=pool_db_config,
         )
@@ -446,16 +488,18 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
             self.pool_db_config = {
                 # 连接池允许的最大连接数
-                'maxconnections': 5,
+                "maxconnections": 5,
                 # 连接池中空闲连接的最大数量。默认0，即无最大数量限制
-                'maxcached': 0,
+                "maxcached": 0,
                 # 连接的最大使用次数。默认0，即无使用次数限制
-                'maxusage': 0,
+                "maxusage": 0,
                 # 连接数达到最大时，新连接是否可阻塞。默认False，即达到最大连接数时，再取新连接将会报错
-                'blocking': True,
+                "blocking": True,
             }
         self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
+        self.collate = ToolsForAyu.get_collate_by_charset(
+            mysql_config=self.mysql_config
+        )
 
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。这个并不需要此连接对象，直接关闭即可
         self._connect(pymysql_dict_config=self.mysql_config).close()
@@ -480,7 +524,9 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
     def open_spider(self, spider):
         self.slog = spider.slog
         self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
+        self.collate = ToolsForAyu.get_collate_by_charset(
+            mysql_config=self.mysql_config
+        )
 
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         # 记录日志时需要此连接对象，否则直接关闭
@@ -490,8 +536,10 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         else:
             self._connect(pymysql_dict_config=self.mysql_config).close()
 
-        self.mysql_config['cursorclass'] = cursors.DictCursor
-        self.dbpool = adbapi.ConnectionPool("pymysql", cp_reconnect=True, **self.mysql_config)
+        self.mysql_config["cursorclass"] = cursors.DictCursor
+        self.dbpool = adbapi.ConnectionPool(
+            "pymysql", cp_reconnect=True, **self.mysql_config
+        )
         query = self.dbpool.runInteraction(self.db_create)
         query.addErrback(self.db_create_err)
 
@@ -499,7 +547,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         pass
 
     def db_create_err(self, failure):
-        self.slog.error(f'创建数据表失败: {failure}')
+        self.slog.error(f"创建数据表失败: {failure}")
 
     def process_item(self, item, spider):
         item_dict = ToolsForAyu.convert_items_to_dict(item)
@@ -529,7 +577,13 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
             self.slog.warning(f"Item:{new_item}  Table: {table}")
             err_msg = str(e)
             if "1054" in err_msg:
-                self.deal_1054_error(err_msg=err_msg, conn=None, cursor=cursor, table=table, note_dic=note_dic)
+                self.deal_1054_error(
+                    err_msg=err_msg,
+                    conn=None,
+                    cursor=cursor,
+                    table=table,
+                    note_dic=note_dic,
+                )
                 return self.db_insert(cursor, item)
 
             elif "1146" in err_msg:
@@ -539,7 +593,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     cursor=cursor,
                     charset=self.mysql_config["charset"],
                     collate=self.collate,
-                    table_enum=self.table_enum
+                    table_enum=self.table_enum,
                 )
                 return self.db_insert(cursor, item)
 
@@ -550,7 +604,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     cursor=cursor,
                     database=self.mysql_config["database"],
                     table=table,
-                    note_dic=note_dic
+                    note_dic=note_dic,
                 )
                 return self.db_insert(cursor, item)
 
@@ -561,7 +615,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     cursor=cursor,
                     database=self.mysql_config["database"],
                     table=table,
-                    note_dic=note_dic
+                    note_dic=note_dic,
                 )
                 return self.db_insert(cursor, item)
 
@@ -572,7 +626,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         return item
 
     def handle_error(self, failure, item):
-        self.slog.error(f'插入数据失败:{failure}, item: {item}')
+        self.slog.error(f"插入数据失败:{failure}, item: {item}")
 
     def close_spider(self, spider):
         # 不删除 cursorclass 其实也不影响
@@ -637,14 +691,14 @@ class AyuStatisticsMysqlPipeline(MysqlErrorHandlingMixin):
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(
-            env=crawler.settings.get("ENV", "")
-        )
+        return cls(env=crawler.settings.get("ENV", ""))
 
     def open_spider(self, spider):
         self.slog = spider.slog
         self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_config=self.mysql_config)
+        self.collate = ToolsForAyu.get_collate_by_charset(
+            mysql_config=self.mysql_config
+        )
 
         self.conn = self._connect(self.mysql_config)
         self.cursor = self.conn.cursor()
@@ -691,7 +745,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
         self,
         mongodb_config: dict,
         app_conf_manage: bool,
-        collection_prefix: Optional[str] = ""
+        collection_prefix: Optional[str] = "",
     ) -> None:
         """
         初始化 mongoDB 连接，正常的话会返回 mongoDB 的连接对象 `connect` 和 `db` 对象
@@ -701,7 +755,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
                 只有当 app_conf_manage 开启且不存在本地配置 LOCAL_MONGODB_CONFIG 时，才会从 consul 中取值！
             collection_prefix: mongDB 存储集合的前缀，默认为空字符
         """
-        assert any([mongodb_config, app_conf_manage]), "未配置 MongoDB 连接配置！"
+        assert any([mongodb_config, app_conf_manage]), "未配置 MongoDB 连接信息！"
         assert isinstance(collection_prefix, str), "mongoDB 所要存储的集合前缀名称需要是 str 格式！"
 
         self.collection_prefix = collection_prefix or ""
@@ -714,9 +768,9 @@ class AyuFtyMongoPipeline(MongoDbBase):
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            mongodb_config=crawler.settings.get('LOCAL_MONGODB_CONFIG'),
-            app_conf_manage=crawler.settings.get('APP_CONF_MANAGE'),
-            collection_prefix=crawler.settings.get('MONGODB_COLLECTION_PREFIX', ''),
+            mongodb_config=crawler.settings.get("LOCAL_MONGODB_CONFIG"),
+            app_conf_manage=crawler.settings.get("APP_CONF_MANAGE"),
+            collection_prefix=crawler.settings.get("MONGODB_COLLECTION_PREFIX", ""),
         )
 
     def open_spider(self, spider):
@@ -726,7 +780,9 @@ class AyuFtyMongoPipeline(MongoDbBase):
 
         # 用于输出日志
         if all([self.conn, self.db]):
-            spider.slog.info(f"已连接至 host: {self.mongodb_config['host']}, database: {self.mongodb_config['database']} 的 MongoDB 目标数据库")
+            spider.slog.info(
+                f"已连接至 host: {self.mongodb_config['host']}, database: {self.mongodb_config['database']} 的 MongoDB 目标数据库"
+            )
 
     def close_spider(self, spider):
         if self.conn:
@@ -754,21 +810,26 @@ class AyuFtyMongoPipeline(MongoDbBase):
                 #     2. 是单层的 dict
                 # 如果是嵌套格式的话，需要再转化为正常格式，因为此场景不需要像 Mysql 一样依赖备注来生成字段注释
                 if any(isinstance(v, dict) for v in insert_data.values()):
-                    insert_data = {v: insert_data[v]["key_value"] for v in insert_data.keys()}
+                    insert_data = {
+                        v: insert_data[v]["key_value"] for v in insert_data.keys()
+                    }
 
             # 否则为旧格式
             else:
                 insert_data = ReuseOperation.get_items_except_keys(
                     dict_config=item_dict,
-                    key_list=["table", "item_mode", "mongo_update_rule"])
+                    key_list=["table", "item_mode", "mongo_update_rule"],
+                )
 
             # 真实的集合名称为：集合前缀名 + 集合名称
-            collection_name = f'''{self.collection_prefix}{item_dict["table"]}'''
+            collection_name = f"""{self.collection_prefix}{item_dict["table"]}"""
             # 如果没有查重字段时，就直接插入数据（不去重）
             if not item_dict.get("mongo_update_rule"):
                 self.db[collection_name].insert(insert_data)
             else:
-                self.db[collection_name].update(item_dict["mongo_update_rule"], {'$set': insert_data}, True)
+                self.db[collection_name].update(
+                    item_dict["mongo_update_rule"], {"$set": insert_data}, True
+                )
         return item
 
 
@@ -799,15 +860,20 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
             # 如果有 alldata 字段，则其为推荐格式
             if all([insert_data, isinstance(insert_data, dict)]):
                 if any(isinstance(v, dict) for v in insert_data.values()):
-                    insert_data = {v: insert_data[v]["key_value"] for v in insert_data.keys()}
+                    insert_data = {
+                        v: insert_data[v]["key_value"] for v in insert_data.keys()
+                    }
 
             # 否则为旧格式
             else:
                 insert_data = ReuseOperation.get_items_except_keys(
                     dict_config=item_dict,
-                    key_list=["table", "item_mode", "mongo_update_rule"])
+                    key_list=["table", "item_mode", "mongo_update_rule"],
+                )
 
             # 真实的集合名称为：集合前缀名 + 集合名称
-            collection_name = f'''{self.collection_prefix}{item_dict["table"]}'''
-            self.db[collection_name].update(item_dict["mongo_update_rule"], {'$set': insert_data}, True)
+            collection_name = f"""{self.collection_prefix}{item_dict["table"]}"""
+            self.db[collection_name].update(
+                item_dict["mongo_update_rule"], {"$set": insert_data}, True
+            )
             reactor.callFromThread(out.callback, item_dict)
