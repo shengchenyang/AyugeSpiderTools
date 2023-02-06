@@ -1,5 +1,12 @@
 ![image-20221213151510988](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools_logo.png)
 
+[![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
+![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
+![python](https://img.shields.io/badge/python-3.8%2B-blue)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/shengchenyang/AyugeSpiderTools)
+![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ayugespidertools?label=pypi%20downloads)
+
 
 # AyugeSpiderTools 工具说明
 
@@ -22,7 +29,7 @@
 
 - 开发场景中的工具库
   - 比如 `MongoDB`，`Mysql sql` 语句的生成，图像处理，数据处理相关 ... ...
-- `Scrapy` 扩展功能（主推功能）
+- `Scrapy` 扩展功能（**主推功能 — 解放双手**）
   - 使爬虫开发无须在意数据库和数据表结构，不用去管常规 `item, pipelines` 和 `middlewares` 的文件的编写
 
 注：具体内容请查看本文中的 [TodoList](# TodoList) 内容
@@ -289,9 +296,13 @@ print("test_exec_js_by_file:", js_res)
 assert js_res
 ```
 
-## 3. 总结
+## 3. 总结及补充
 
-此项目会慢慢丰富 `python` 开发中的遇到的通用方法。
+> 此项目会慢慢丰富 `python` 开发中的遇到的通用方法。
+
+若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，可以 `clone` 源码修改后自行 `build`。
+
+具体的文档请在 [AyugeSpiderTools 说明文档](http://www.ayuge.top/mkdocs-material/ayuge/) 中查看。
 
 ## TodoList
 
@@ -311,6 +322,9 @@ assert js_res
   - [x] `Mysql` 存储的场景下适配
     - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
   - [x] `MongoDB` 存储的场景下适配，编写风格与 `Mysql` 存储等场景下一致
+  - [ ] `asyncio` 语法支持与 `async` 第三方库支持示例
+    - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
+    - [ ] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
   - [ ] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
   - [ ] ... ...
 - [x] 常用开发场景

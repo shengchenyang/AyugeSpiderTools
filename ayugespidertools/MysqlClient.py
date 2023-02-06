@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
-import pymysql
 from typing import Optional
 
+import pymysql
 
 __all__ = [
-    'MysqlOrm',
+    "MysqlOrm",
 ]
 
 
@@ -21,7 +19,9 @@ class MysqlOrm(object):
         self.cursor.execute(sql_pre, sql_after)
         self.connection.commit()
 
-    def search_data(self, sql_pre: str, sql_after: tuple, type: Optional[str] = None) -> (bool, tuple):
+    def search_data(
+        self, sql_pre: str, sql_after: tuple, type: Optional[str] = None
+    ) -> (bool, tuple):
         if not type:
             type = "one"
 

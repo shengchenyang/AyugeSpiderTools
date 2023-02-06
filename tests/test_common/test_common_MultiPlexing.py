@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  test_common_MultiPlexing.py
-@Time    :  2022/8/19 13:33
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 
 
@@ -16,7 +5,7 @@ def test_judge_str_is_json():
     data = '{"post_key1": "post_value1"}'
     res = ReuseOperation.judge_str_is_json(judge_str=data)
     print(res)
-    data = 'post_key1=post_value1'
+    data = "post_key1=post_value1"
     res = ReuseOperation.judge_str_is_json(judge_str=data)
     print(res)
     assert res is not None
@@ -24,20 +13,25 @@ def test_judge_str_is_json():
 
 def test_get_items_except_keys():
     dict_config = {
-        'alldata': {
-            'article_detail_url': {
-                'key_value': 'https://blog.csdn.net/weixin_52986315/article/details/126512431',
-                'notes': '文章详情链接'},
-            'article_title': {'key_value': '如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件',
-                              'notes': '文章标题'},
-            'comment_count': {'key_value': '69', 'notes': '文章评论数量'},
-            'favor_count': {'key_value': '41', 'notes': '文章赞成数量'},
-            'nick_name': {'key_value': 'Binaire-沐辰', 'notes': '文章作者昵称'}
+        "alldata": {
+            "article_detail_url": {
+                "key_value": "https://blog.csdn.net/weixin_52986315/article/details/126512431",
+                "notes": "文章详情链接",
+            },
+            "article_title": {
+                "key_value": "如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件",
+                "notes": "文章标题",
+            },
+            "comment_count": {"key_value": "69", "notes": "文章评论数量"},
+            "favor_count": {"key_value": "41", "notes": "文章赞成数量"},
+            "nick_name": {"key_value": "Binaire-沐辰", "notes": "文章作者昵称"},
         },
-        'table': 'article_info_list',
-        'item_mode': 'Mysql'
+        "table": "article_info_list",
+        "item_mode": "Mysql",
     }
-    res = ReuseOperation.get_items_except_keys(dict_config=dict_config, key_list=["table", "item_mode"])
+    res = ReuseOperation.get_items_except_keys(
+        dict_config=dict_config, key_list=["table", "item_mode"]
+    )
     print("res:", res)
     assert res is not None
 
@@ -83,6 +77,14 @@ def test_get_array_depth():
     len3 = ReuseOperation.get_array_depth(array=array_three)
     print("len3:", len3)
 
-    res = not isinstance(array, (frozenset, list, set, tuple,))
+    res = not isinstance(
+        array,
+        (
+            frozenset,
+            list,
+            set,
+            tuple,
+        ),
+    )
     print("res", res)
     assert True

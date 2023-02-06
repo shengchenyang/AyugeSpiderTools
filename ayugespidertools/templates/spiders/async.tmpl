@@ -1,30 +1,27 @@
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
 import aiohttp
 from scrapy.http import Request
 from $project_name.settings import logger
 from scrapy.http.response.text import TextResponse
 from ayugespidertools.AyugeSpider import AyuSpider
 
-
 """
-####################################################################################################
+########################################################################################################################
 # collection_website: $domain - 采集的目标站点介绍
 # collection_content: 采集内容介绍
 # create_time: xxxx-xx-xx
 # explain: async 协程在 spider 中的写法示例
-# demand_code_prefix = ''
-####################################################################################################
+# demand_code_prefix = ""
+########################################################################################################################
 """
 
 
 class $classname(AyuSpider):
-    name = '$name'
-    allowed_domains = ['$domain']
-    start_urls = ['http://$domain/']
+    name = "$name"
+    allowed_domains = ["$domain"]
+    start_urls = ["http://$domain/"]
 
     # 初始化配置的类型
-    settings_type = 'debug'
+    settings_type = "debug"
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }
@@ -32,13 +29,13 @@ class $classname(AyuSpider):
     async def parse(self, response):
         self.slog.info("starting ...")
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://myip.ipip.net') as additional_response:
+            async with session.get("https://myip.ipip.net") as additional_response:
                 additional_data = await additional_response.text()
                 self.slog.debug(f"parse 响应内容: {additional_data}")
                 yield Request(
                     url="https://myip.ipip.net",
                     callback=self.parse_first,
-                    dont_filter=True
+                    dont_filter=True,
                 )
 
     async def parse_first(self, response: TextResponse):

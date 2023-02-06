@@ -1,23 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  DownloaderMiddlewares.py
-@Time    :  2022/8/30 16:36
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
 import asyncio
-import aiohttp
 import urllib.parse
+
+import aiohttp
 from scrapy.http import HtmlResponse
 from twisted.internet.defer import Deferred
+
+from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Params import Param
 from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-
 
 __all__ = [
     "AiohttpMiddleware",
@@ -80,7 +70,9 @@ class AiohttpMiddleware(object):
 
         return cls()
 
-    async def _request_by_aiohttp(self, aio_request_args: dict, aio_request_cookies: dict) -> str:
+    async def _request_by_aiohttp(
+        self, aio_request_args: dict, aio_request_cookies: dict
+    ) -> str:
         async with aiohttp.ClientSession(cookies=aio_request_cookies) as session:
             async with session.request(**aio_request_args) as response:
                 # (f"Status: {response.status}")
@@ -91,7 +83,7 @@ class AiohttpMiddleware(object):
         """
         使用 aiohttp 来 process spider
         """
-        aiohttp_meta = request.meta.get('aiohttp_args', {})
+        aiohttp_meta = request.meta.get("aiohttp_args", {})
         assert isinstance(aiohttp_meta, dict), "aiohttp_args 参数的格式不是 dict，请查看！"
 
         # set proxy
@@ -104,11 +96,13 @@ class AiohttpMiddleware(object):
         # if aiohttp_meta.get('timeout') is not None:
         #     _timeout = aiohttp_meta.get('timeout')
 
-        spider.slog.debug(f'crawling {request.url}')
+        spider.slog.debug(f"crawling {request.url}")
         html_content = None
         try:
             # 获取请求头信息
-            aiohttp_headers = ToolsForAyu.get_dict_form_scrapy_req_headers(scrapy_headers=request.headers)
+            aiohttp_headers = ToolsForAyu.get_dict_form_scrapy_req_headers(
+                scrapy_headers=request.headers
+            )
             aiohttp_headers_args = {"headers": aiohttp_headers}
 
             # 确定请求方式
@@ -139,7 +133,9 @@ class AiohttpMiddleware(object):
 
                 # 否则就是传来的字典格式
                 else:
-                    req_body_dict = ReuseOperation.get_req_dict_from_scrapy(req_body_data_str=request_body_str)
+                    req_body_dict = ReuseOperation.get_req_dict_from_scrapy(
+                        req_body_data_str=request_body_str
+                    )
                     aiohttp_args_dict["data"] = req_body_dict
 
             # 如果存在请求头，则设置此请求头
@@ -150,34 +146,47 @@ class AiohttpMiddleware(object):
             aiohttp_cookie_dict = request.cookies
             # spider.slog.info(f"使用 cookies 参数中 ck 的值: {aiohttp_cookie_dict}")
             if all([not aiohttp_cookie_dict, request.headers.get("Cookie", None)]):
-                headers_cookie_str = str(request.headers.get("Cookie"), encoding="utf-8")
-                aiohttp_cookie_dict = ReuseOperation.get_ck_dict_from_headers(headers_ck_str=headers_cookie_str)
+                headers_cookie_str = str(
+                    request.headers.get("Cookie"), encoding="utf-8"
+                )
+                aiohttp_cookie_dict = ReuseOperation.get_ck_dict_from_headers(
+                    headers_ck_str=headers_cookie_str
+                )
                 # spider.slog.info(f"使用 headers 中 ck 的值: {aiohttp_cookie_dict}, {type(aiohttp_cookie_dict)}")
 
             html_content = await self._request_by_aiohttp(
                 aio_request_args=aiohttp_args_dict,
-                aio_request_cookies=aiohttp_cookie_dict)
+                aio_request_cookies=aiohttp_cookie_dict,
+            )
 
         except TimeoutError:
-            spider.slog.error(f'使用 aiohttp 错误响应 url: {request.url}')
+            spider.slog.error(f"使用 aiohttp 错误响应 url: {request.url}")
             # return self._retry(request, 504, spider)
 
         # 休眠或延迟设置(优先级顺序：scrapy meta 中的参数值 > settings 中的参数值 > default 自定义的参数值)
-        self.timeout = aiohttp_meta.get("timeout") or self.timeout or Param.aiohttp_timeout_default
-        self.sleep = aiohttp_meta.get("sleep") or self.sleep or Param.aiohttp_sleep_default
-        self.retry_times = aiohttp_meta.get("retry_times") or self.retry_times or Param.aiohttp_retry_times_default
+        self.timeout = (
+            aiohttp_meta.get("timeout") or self.timeout or Param.aiohttp_timeout_default
+        )
+        self.sleep = (
+            aiohttp_meta.get("sleep") or self.sleep or Param.aiohttp_sleep_default
+        )
+        self.retry_times = (
+            aiohttp_meta.get("retry_times")
+            or self.retry_times
+            or Param.aiohttp_retry_times_default
+        )
         await asyncio.sleep(self.sleep)
 
         body = str.encode(html_content)
         if not html_content:
-            spider.slog.error(f'url: {request.url} 返回内容为空')
+            spider.slog.error(f"url: {request.url} 返回内容为空")
 
         return HtmlResponse(
             request.url,
             status=200,
             # headers={"response_header_example": "tmp"},
             body=body,
-            encoding='utf-8',
+            encoding="utf-8",
             request=request,
         )
 

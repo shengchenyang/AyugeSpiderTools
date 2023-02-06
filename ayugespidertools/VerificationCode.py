@@ -1,27 +1,17 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  VerificationCode.py
-@Time    :  2022/7/11 14:01
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-import cv2
 import math
 import random
+
+import cv2
 import numpy as np
+
 from ayugespidertools.common.YiDunGap import YiDunGetGap
 
-
 __all__ = [
-    'match_img_get_distance',
-    'get_selenium_tracks',
-    'get_yidun_tracks',
-    'get_yidun_gap',
-    'get_normal_track',
+    "match_img_get_distance",
+    "get_selenium_tracks",
+    "get_yidun_tracks",
+    "get_yidun_gap",
+    "get_normal_track",
 ]
 
 
@@ -106,13 +96,13 @@ def get_selenium_tracks(distance):
             a = 2
         else:
             a = -3
-        s = v * t + 0.5 * a * (t ** 2)
+        s = v * t + 0.5 * a * (t**2)
         v = v + a * t
         current += s
         forward_tracks.append(round(s))
 
     back_tracks = [-3, -3, -2, -2, -2, -2, -2, -1, -1, -1]
-    return {'forward_tracks': forward_tracks, 'back_tracks': back_tracks}
+    return {"forward_tracks": forward_tracks, "back_tracks": back_tracks}
 
 
 def get_yidun_tracks(distance):
@@ -203,11 +193,17 @@ def get_normal_track(space):
         if y[-1] < 30:
             y.append(y[-1] + random.choice([0, 0, 1, 1, 2, 2, 1, 2, 0, 0, 3, 3]))
         else:
-            y.append(y[-1] + random.choice([0, 0, -1, -1, -2, -2, -1, -2, 0, 0, -3, -3]))
+            y.append(
+                y[-1] + random.choice([0, 0, -1, -1, -2, -2, -1, -2, 0, 0, -3, -3])
+            )
     # z
     for i in range(len(x) - 1):
         # z.append((z[-1] // 100 * 100) + 100 + random.choice([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2]))
-        z.append((z[-1] // 100 * 100) + 100 + random.choice([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3]))
+        z.append(
+            (z[-1] // 100 * 100)
+            + 100
+            + random.choice([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3])
+        )
 
     tracks_list = list(map(list, zip(x, y, z)))
     tracks_list = [x for x in tracks_list if x[0] > 0]

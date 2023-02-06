@@ -1,19 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-@File    :  MongoClient.py
-@Time    :  2022/7/22 15:43
-@Author  :  Ayuge
-@Version :  1.0
-@Contact :  ayuge.s@qq.com
-@License :  (c)Copyright 2022-2023
-@Desc    :  None
-"""
-from gridfs import *
-from typing import Optional
-from typing import List, Dict
-from pymongo import MongoClient
+from typing import Dict, List, Optional
 
+from gridfs import *
+from pymongo import MongoClient
 
 __all__ = [
     "MongoDbBase",
@@ -24,6 +12,7 @@ class MongoDbBase(object):
     """
     mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）
     """
+
     def __init__(
         self,
         user: str,
@@ -32,7 +21,7 @@ class MongoDbBase(object):
         port: int,
         authsource: str = "admin",
         database: str = None,
-        connect_style: str = None
+        connect_style: str = None,
     ) -> None:
         """
         初始化 mongo 连接句柄
@@ -61,7 +50,7 @@ class MongoDbBase(object):
                 username=user,
                 password=password,
                 authSource=authsource,
-                authMechanism='SCRAM-SHA-1'
+                authMechanism="SCRAM-SHA-1",
             )
 
         elif connect_style in {"auth", "A"}:
@@ -141,7 +130,11 @@ class MongoDbBase(object):
             data_filter[key] = data[key][0]
             data_revised[key] = data[key][1]
         if self.get_state():
-            return self.db[collection].update_many(data_filter, {"$set": data_revised}).modified_count
+            return (
+                self.db[collection]
+                .update_many(data_filter, {"$set": data_revised})
+                .modified_count
+            )
         return 0
 
     def find(self, collection, condition, column: Optional[dict] = None):
@@ -168,10 +161,18 @@ class MongoDbBase(object):
 
     def t_update(self, collection, s_key, s_value, update_data):
         # self.db.get_collection(collection).update_one({s_key: s_value}, {"$set": update_data})
-        return self.db[collection].update_one({s_key: s_value}, {"$set": {"groupProps": update_data}}).modified_count
+        return (
+            self.db[collection]
+            .update_one({s_key: s_value}, {"$set": {"groupProps": update_data}})
+            .modified_count
+        )
 
     def update_normal(self, collection, s_key, s_value, data_style, update_data):
-        return self.db[collection].update_one({s_key: s_value}, {"$set": {data_style: update_data}}).modified_count
+        return (
+            self.db[collection]
+            .update_one({s_key: s_value}, {"$set": {data_style: update_data}})
+            .modified_count
+        )
 
     def update_super(self, collection: str, select_dict: dict, set_dict: dict):
         """
@@ -184,7 +185,11 @@ class MongoDbBase(object):
         Returns:
             1). modified_count: int: 更新影响的数量
         """
-        return self.db[collection].update_one(select_dict, {"$set": set_dict}).modified_count
+        return (
+            self.db[collection]
+            .update_one(select_dict, {"$set": set_dict})
+            .modified_count
+        )
 
     # 删除
     def delete(self, collection, condition):
@@ -207,7 +212,7 @@ class MongoDbBase(object):
         gf = gridfs_col.get(_id)
         md5 = gf.md5
         _id = gf._id
-        return {'_id': _id, 'md5': md5}
+        return {"_id": _id, "md5": md5}
 
     def upload(self, file_name, _id, content_type, collection, file_data):
         """
@@ -225,16 +230,21 @@ class MongoDbBase(object):
         """
         metadata = {
             "_contentType": content_type,
-            "isThumb": 'true',
+            "isThumb": "true",
             "targetId": _id,
-            "_class": "com.ccr.dc.admin.mongo.MongoFsMetaData"
+            "_class": "com.ccr.dc.admin.mongo.MongoFsMetaData",
         }
 
         gridfs_col = GridFS(self.db, collection)
         # 当存储桶中不存在此文件，才需要上传
         if not gridfs_col.exists(filename=file_name):
-            gridfs_id = gridfs_col.put(data=file_data, content_type=content_type, filename=file_name, metadata=metadata)
-            md5 = self.getFileMd5(gridfs_id, 'fs')['md5']
+            gridfs_id = gridfs_col.put(
+                data=file_data,
+                content_type=content_type,
+                filename=file_name,
+                metadata=metadata,
+            )
+            md5 = self.getFileMd5(gridfs_id, "fs")["md5"]
             image_id = f"/file/find/{str(gridfs_id)}/{md5}"
             return gridfs_id, image_id
 
