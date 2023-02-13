@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json
 import os
@@ -8,6 +9,7 @@ from typing import Optional, Union
 import cv2
 import numpy as np
 import pymysql
+from twisted.internet.defer import Deferred
 
 from ayugespidertools.config import logger
 
@@ -20,6 +22,18 @@ class ReuseOperation(object):
     """
     用于存放经常复用的一些操作
     """
+
+    @staticmethod
+    def as_deferred(f):
+        """
+        transform a Twisted Deferred to an Asyncio Future
+        Args:
+            f: async function
+
+        Returns:
+            1).Deferred
+        """
+        return Deferred.fromFuture(asyncio.ensure_future(f))
 
     @staticmethod
     def judge_file_style(
@@ -134,10 +148,11 @@ class ReuseOperation(object):
         """
         带权重的随机取值，即在带权重的列表数据中根据权重随机取一个值
         Args:
-            weight_data: 带权重的列表信息，示例：[{'username': 'xxxx', 'password': '******', 'weight': 8}, ...]
+            weight_data: 带权重的列表信息，示例：
+                [{'username': 'xxxx', 'password': '******', 'weight': 8}, ...]
 
         Returns:
-            ret: 返回当前权重的账号信息 account_arr 中的一个账号信息
+            ret: 返回当前权重列表 account_arr 中的一个值
         """
         total = sum(item["weight"] for item in weight_data)
         # 在 0 与权重和之间获取一个随机数

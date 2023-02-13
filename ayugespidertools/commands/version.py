@@ -11,8 +11,11 @@ class AyuCommand(Command):
     def short_desc(self):
         return "Print AyugeSpiderTools version"
 
-    def run(self, args, opts):
+    @staticmethod
+    def version():
         config_parser = configparser.ConfigParser()
         config_parser.read(f"{NormalConfig.ROOT_DIR}/pyproject.toml", encoding="utf-8")
-        version = config_parser["tool.poetry"]["version"]
-        print(f"AyugeSpiderTools {version}")
+        return config_parser["tool.poetry"]["version"][1:-1]
+
+    def run(self, args, opts):
+        print(f"AyugeSpiderTools {AyuCommand.version()}")

@@ -19,11 +19,12 @@ class Picture(object):
     """
 
     @classmethod
-    def get_captcha(cls, url: str):
+    def get_captcha(cls, url: str, img_path: str) -> None:
         """
         下载完美滑块的图片，并将缺口图和滑块在一起的图片切割
         Args:
             url: 完美滑块的滑块图片链接
+            img_path: 图片保存路径
 
         Returns:
             None
@@ -45,19 +46,19 @@ class Picture(object):
             "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
         }
         text = session.get(url).content
-        with open(f"{NormalConfig.DOC_DIR}/captcha.png", "wb") as f:
+        with open(f"{img_path}/captcha.png", "wb") as f:
             f.write(text)
 
         # 新建空白图片
         # captcha = Image.new('RGB', (50, 120))
         # 实例化原始图片 Image 对象
-        img = Image.open(f"{NormalConfig.DOC_DIR}/captcha.png")
+        img = Image.open(f"{img_path}/captcha.png")
 
         # 切割滑块验证码图片，将背景图和滑块图分开
         # (left, upper, right, lower)
         captcha = img.crop((260, 0, 325, 120 - 4))
         captcha = captcha.convert("RGBA")
-        captcha.save(f"{NormalConfig.DOC_DIR}/captcha_slide.png")
+        captcha.save(f"{img_path}/captcha_slide.png")
 
     @classmethod
     def convert_index_to_offset(cls, index):
@@ -103,11 +104,12 @@ class Picture(object):
         return int(off[0]), int(off[1]), int(off[0]) + 22, int(off[1]) + 58
 
     @classmethod
-    def recombine_captcha(cls, offset_list):
+    def recombine_captcha(cls, offset_list: list, img_path: str):
         """
         图片重组: 完美世界网站的图片重组方法
         Args:
             offset_list: 坐标列表
+            img_path: 图片保存路径
 
         Returns:
             None
@@ -115,13 +117,13 @@ class Picture(object):
         # 新建空白图片
         captcha = Image.new("RGB", (13 * 20, 60 * 2 - 4))
         # 实例化原始图片Image对象
-        img = Image.open(f"{NormalConfig.DOC_DIR}/captcha.png")
+        img = Image.open(f"{img_path}/captcha.png")
 
         # 切割滑块验证码图片，将背景图和滑块图分开
         # (left, upper, right, lower)
         captcha_de = img.crop((0, 0, 260, 120 - 4))
         captcha_de = captcha_de.convert("RGBA")
-        captcha_de.save(f"{NormalConfig.DOC_DIR}/captcha.png")
+        captcha_de.save(f"{img_path}/captcha.png")
 
         for i, off in enumerate(offset_list):
             # 根据css backgound-position获取每张小图的坐标
@@ -132,7 +134,7 @@ class Picture(object):
             offset = Picture.convert_index_to_offset(i)
             # 根据当前坐标将小图粘贴到空白图片
             captcha.paste(regoin, offset)
-        captcha.save(f"{NormalConfig.DOC_DIR}/regoin.jpg")
+        captcha.save(f"{img_path}/regoin.jpg")
 
     @classmethod
     def reset_pic(cls, slide_data):

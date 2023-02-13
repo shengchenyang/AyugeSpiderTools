@@ -1,11 +1,12 @@
-![image-20221213151510988](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools_logo.png)
+![image-20221213151510988](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/artwork/ayugespidertools-logo.png)
 
 [![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
 ![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
 ![python](https://img.shields.io/badge/python-3.8%2B-blue)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/shengchenyang/AyugeSpiderTools)
+![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
+![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/ayugespidertools?label=pypi%20downloads)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads)
 
 
 # AyugeSpiderTools 工具说明
@@ -17,7 +18,7 @@
 
 刚开始我也只是想把它用来适配 `Mysql` 存储的场景，可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
 
-至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 的应用示例，你可以很快上手。
+至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/)中查看。
 
 **在使用过程中若遇到各种问题，或有任何优化建议欢迎提 Issues !**
 
@@ -54,7 +55,7 @@ pip install ayugespidertools -i https://pypi.org/simple
 
 使用方法示例 `GIF` 如下： 
 
-![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/ayugespidertools.gif)
+![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/examples/ayugespidertools-use.gif)
 
 对以上 `GIF` 中的步骤进行解释：
 
@@ -207,10 +208,10 @@ print("滑块验证码的缺口距离2为：", gap_distance)
 
 结果为：
 
-| 识别结果展示                                                 | 备注                                                   |
-| :----------------------------------------------------------- | ------------------------------------------------------ |
-| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/image-20220802110652131.png" alt="image-20220802110652131" style="zoom: 25%;" /> | 无                                                     |
-| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/ayugespidertools/docs/images/image-20220802110842737.png" alt="image-20220802110842737" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
+| 识别结果展示                                                                                                                                                                                      | 备注                                                   |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ------------------------------------------------------ |
+| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/examples/slider_notch_distance_recognite1.png" alt="slider_notch_distance_recognite1" style="zoom: 25%;" /> | 无                                                     |
+| <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/main/examples/slider_notch_distance_recognite2.png" alt="slider_notch_distance_recognite2" style="zoom: 25%;" /> | 可以展示只识别滑块小方块的结果，得到更精准的坐标数据。 |
 
 #### 2.2.2. 滑块验证轨迹生成
 

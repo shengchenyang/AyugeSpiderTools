@@ -1,11 +1,7 @@
 /.git/
 /.idea/
-/ayugespidertools/logs/
-/ayugespidertools/logs/error.log
-/ayugespidertools/logs/runtime.log
 /dist/
-/test/.pytest_cache/
-/tests/.pytest_cache/
-/tests/test_common/.pytest_cache/
-/tests/test_commands/.pytest_cache/
-/tests/__pycache__
+**/__pycache__
+**/.pytest_cache
+/ayugespidertools/logs/
+/docs/_build/

@@ -3,7 +3,6 @@ import urllib.parse
 
 import aiohttp
 from scrapy.http import HtmlResponse
-from twisted.internet.defer import Deferred
 
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Params import Param
@@ -13,18 +12,6 @@ __all__ = [
     "AiohttpMiddleware",
     "AiohttpAsyncMiddleware",
 ]
-
-
-def as_deferred(f):
-    """
-    transform a Twisted Deferred to an Asyncio Future
-    Args:
-        f: async function
-
-    Returns:
-        1).Deferred
-    """
-    return Deferred.fromFuture(asyncio.ensure_future(f))
 
 
 class AiohttpMiddleware(object):
@@ -200,7 +187,7 @@ class AiohttpMiddleware(object):
         Returns:
             1). Deferred
         """
-        return as_deferred(self._process_request(request, spider))
+        return ReuseOperation.as_deferred(self._process_request(request, spider))
 
     async def _spider_closed(self):
         pass
@@ -209,7 +196,7 @@ class AiohttpMiddleware(object):
         """
         当 spider closed 时调用
         """
-        return as_deferred(self._spider_closed())
+        return ReuseOperation.as_deferred(self._spider_closed())
 
 
 class AiohttpAsyncMiddleware(AiohttpMiddleware):
