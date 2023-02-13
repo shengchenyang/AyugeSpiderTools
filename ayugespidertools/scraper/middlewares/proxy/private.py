@@ -40,16 +40,14 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
 
     @retry(stop_max_attempt_number=Param.retry_num)
     def get_proxy_ip(self, size, isdict: Optional[bool] = None):
-        proxy_url = "http://dps.kdlapi.com/api/getdps?orderid={}&num={}&signature={}&format=json".format(
-            self.simidaili_config["orderid"], size, self.simidaili_config["signature"]
-        )
-        if not self.important_error:
-            try:
-                r = requests.get(proxy_url).json()
-            except Exception:
-                raise ValueError("快代理请求获取 ip 无响应，请检查是否能够正常访问快代理或者 nacos 的配置是否以及失效！")
-        else:
+        proxy_url = f"http://dps.kdlapi.com/api/getdps?orderid={self.simidaili_config['orderid']}&num={size}&signature={self.simidaili_config['signature']}&format=json"
+        if self.important_error:
             raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
+
+        try:
+            r = requests.get(proxy_url).json()
+        except Exception as e:
+            raise ValueError("快代理请求获取 ip 无响应，请检查是否能够正常访问快代理或者 nacos 的配置是否以及失效！") from e
 
         if r["code"] == 0:
             try:
@@ -78,14 +76,12 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
                 traceback.print_exc()
                 raise ValueError("ip 获取方式有误，请重构私密代理中间件获取ip的模块！")
 
+        elif msg := r.get("msg"):
+            self.WWX.send_text(f"私密代理特级警报：私密代理出现错误，错误原因是: {msg}")
+            raise ValueError(f"获取私密ip失败，原因是：{msg}")
         else:
-            msg = r.get("msg")
-            if msg:
-                self.WWX.send_text(f"私密代理特级警报：私密代理出现错误，错误原因是: {msg}")
-                raise ValueError(f"获取私密ip失败，原因是：{msg}")
-            else:
-                self.important_error = True
-                raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
+            self.important_error = True
+            raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
 
     def process_request(self, request, spider):
         # 初始化请求，随机选定一个 ip 进行访问
@@ -114,25 +110,25 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
     def process_response(self, request, response, spider):
-        if response.status in self.retry_http_codes:
-            # 如果出现返回异常的状态码则更换ip进行请求
-            current_ip_index = np.argmin(self.v_count)
-            current_ip = self.proxy_list[current_ip_index]
+        if response.status not in self.retry_http_codes:
+            return response
+        # 如果出现返回异常的状态码则更换ip进行请求
+        current_ip_index = np.argmin(self.v_count)
+        current_ip = self.proxy_list[current_ip_index]
 
-            # 统计请求速率
-            self.reqnum_count[current_ip_index] += 1
-            self.v_sum()
+        # 统计请求速率
+        self.reqnum_count[current_ip_index] += 1
+        self.v_sum()
 
-            if request.url.startswith("https://"):
-                request.meta["proxy"] = "https://{}".format(current_ip)
-            elif request.url.startswith("http://"):
-                request.meta["proxy"] = "http://{}".format(current_ip)
-            else:
-                spider.slog.error(f"request url error: {request.url}")
-            # request.meta["proxy"] = "http://{}".format(current_ip)
-            reason = response_status_message(response.status)
-            return self._retry(request, reason, spider) or response
-        return response
+        if request.url.startswith("https://"):
+            request.meta["proxy"] = f"https://{current_ip}"
+        elif request.url.startswith("http://"):
+            request.meta["proxy"] = f"http://{current_ip}"
+        else:
+            spider.slog.error(f"request url error: {request.url}")
+        # request.meta["proxy"] = "http://{}".format(current_ip)
+        reason = response_status_message(response.status)
+        return self._retry(request, reason, spider) or response
 
     def process_exception(self, request, exception, spider):
         if isinstance(exception, self.EXCEPTIONS_TO_RETRY):

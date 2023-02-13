@@ -1,4 +1,4 @@
-from ayugespidertools.scraper.middlewares import RandomRequestUaMiddleware
+from ayugespidertools.scraper.middlewares.headers.ua import RandomRequestUaMiddleware
 from ayugespidertools.scraper.middlewares.netlib.requestslib import (
     RequestByRequestsMiddleware,
 )

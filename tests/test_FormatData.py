@@ -13,7 +13,7 @@ def test_get_full_url():
 def test_click_point_deal():
     res = DataHandle.click_point_deal(13.32596516, 3)
     print(f"小数点保留 3 位后的 click_point_deal 为: {res}")
-    assert res
+    assert res == 13.326
 
 
 def test_normal_to_stamp():
@@ -52,7 +52,7 @@ def test_normal_to_stamp():
 def test_remove_tags():
     @DataHandle.remove_all_tags
     def true_test_remove_tags(html_content):
-        return html_content + "<p>无事发生</p>"
+        return f"{html_content}'<p>无事发生</p>'"
 
     res = true_test_remove_tags("""<a href="https://www.baidu.com">跳转到百度1</a>""")
     print(res)

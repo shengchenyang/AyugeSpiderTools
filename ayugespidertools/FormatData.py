@@ -24,10 +24,9 @@ class DataHandle(object):
             deal_url: 需要拼接的 url
 
         Returns:
-            full_url: 拼接完整的链接
+            1). 拼接完整的链接
         """
-        full_url = urljoin(domain_name, deal_url)
-        return full_url
+        return urljoin(domain_name, deal_url)
 
     @staticmethod
     def click_point_deal(decimal: float, decimal_places=2) -> float:
@@ -41,8 +40,8 @@ class DataHandle(object):
             decimal(float): 四舍五入后的小数点
         """
         # 先拼接需要保留的位数
-        decimal_deal = "%.{}f".format(decimal_places)
-        return float(decimal_deal % float(decimal))
+        decimal_deal = f"%.{decimal_places}f"
+        return float(decimal_deal % decimal)
 
     @staticmethod
     def judge_utc_time(local_time: str) -> bool:
@@ -55,18 +54,12 @@ class DataHandle(object):
             1): 是否为 utc 格式的数据
         """
         pattern = re.compile(r"""mon|tues|wed|thu|fri|sat|sun""")
-        res = pattern.findall(local_time.lower())
-        if res:
-            return True
-        return False
+        return bool(pattern.findall(local_time.lower()))
 
     @staticmethod
     def judge_include_letter(local_time: str) -> bool:
         pattern = re.compile(r"""[a-zA-Z]""")
-        res = pattern.findall(local_time.lower())
-        if res:
-            return True
-        return False
+        return bool(pattern.findall(local_time.lower()))
 
     @staticmethod
     def _get_format_t(
@@ -84,20 +77,18 @@ class DataHandle(object):
             hms_conn: 时分秒拼接的方式
 
         Returns:
-            finally_t_format: 最终的格式化拼接结果，比如：%Y-%m-%d %H-%M-%S
+            1).最终的格式化拼接结果，比如：%Y-%m-%d %H-%M-%S
         """
         # 年月日
         _y_m_d = ["%Y", "%m", "%d"]
-        # 时分秒
-        _h_m_s = ["%H", "%M", "%S"]
-
         _y_m_d_format = date_style.join(_y_m_d)
-        # 时分秒大都为":"连接
-        _h_m_s_format = hms_conn.join(_h_m_s)
 
         if date_is_full:
-            finally_t_format = specific_date_conn.join([_y_m_d_format, _h_m_s_format])
-            return finally_t_format
+            # 时分秒
+            _h_m_s = ["%H", "%M", "%S"]
+            # 时分秒大都为":"连接
+            _h_m_s_format = hms_conn.join(_h_m_s)
+            return specific_date_conn.join([_y_m_d_format, _h_m_s_format])
         return _y_m_d_format
 
     @staticmethod
@@ -108,13 +99,17 @@ class DataHandle(object):
             date_str: 需要判断格式的时间
 
         Returns:
-            1): 时间格式的标识，比如：-
+            1): 时间格式的标识，比如：-，若没有就返回空字符
         """
-        format_style_list = ["-", ".", "/", "年"]
-        for format_style in format_style_list:
-            if format_style in date_str:
-                return format_style
-        return ""
+        format_styles = ["-", ".", "/", "年"]
+        return next(
+            (
+                format_style
+                for format_style in format_styles
+                if format_style in date_str
+            ),
+            "",
+        )
 
     @classmethod
     def normal_to_stamp(
