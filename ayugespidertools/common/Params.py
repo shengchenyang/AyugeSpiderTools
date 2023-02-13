@@ -41,8 +41,8 @@ class Param:
     stop_max_delay = 5000
 
     # requests 连接超时，响应时间超时，随机休眠间隔等设置
-    requests_req_timeout = 1
-    requests_res_timeout = 1
+    requests_req_timeout = 3
+    requests_res_timeout = 5
     requests_time_sleep_list = [x / 10 for x in range(5, 19)]
     requests_time_sleep_random = random.choice(requests_time_sleep_list)
 

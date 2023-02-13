@@ -1,17 +1,5 @@
-from scrapy.spiders import CrawlSpider, Spider
-
-from ayugespidertools.AyugeSpider import AyuSpider
+from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
 
 __all__ = [
     "AyuCrawlSpider",
 ]
-
-
-class AyuCrawlSpider(AyuSpider, CrawlSpider):
-    """
-    初始 AyuSpider 配置，也初始化 CrawlSpider 的 spider 加强版本配置
-    """
-
-    def __init__(self, *args, **kwargs):
-        AyuSpider.__init__(self, *args, **kwargs)
-        CrawlSpider.__init__(self, *args, **kwargs)
