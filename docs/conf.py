@@ -20,13 +20,13 @@ author = "shengchenyang"
 #
 # The short X.Y version.
 try:
-    import ayugespidertools
+    from ayugespidertools.commands.version import AyuCommand
 
-    version = "1.1.0"
-    release = "1.1.0"
+    release = AyuCommand.version()
+    version = tuple(release.split(".")[:2])
 except ImportError:
-    version = ""
     release = ""
+    version = ""
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
