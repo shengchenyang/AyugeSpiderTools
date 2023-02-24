@@ -23,8 +23,8 @@ try:
     from ayugespidertools.commands.version import AyuCommand
 
     release = AyuCommand.version()
-    version = tuple(release.split(".")[:2])
-except ImportError:
+    version = ".".join(tuple(release.split(".")[:2]))
+except (ImportError, AttributeError):
     release = ""
     version = ""
 
