@@ -19,7 +19,7 @@ class AboutSql(object):
         rule: dict,
         base: Optional[str] = None,
         order_by: Optional[str] = None,
-        limit: Optional[Union[bool, int]] = False,
+        limit: Union[bool, int] = False,
     ) -> (str, tuple):
         """
         根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句（适用于简单情况）

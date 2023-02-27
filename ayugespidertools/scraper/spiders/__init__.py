@@ -46,7 +46,6 @@ class AyuSpider(Spider):
         "TELNETCONSOLE_ENABLED": False,
         "RETRY_TIMES": 3,
         "DEPTH_PRIORITY": -1,
-        "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
         "ENV": "dev",
     }
 
@@ -73,22 +72,14 @@ class AyuSpider(Spider):
 
     # 自定义 product 设置
     custom_product_settings = {
-        # 日志等级
         "LOG_LEVEL": "ERROR",
         "ROBOTSTXT_OBEY": False,
-        # 超时
         "DOWNLOAD_TIMEOUT": 20,
-        # 重试次数
         "RETRY_TIMES": 3,
-        # 禁用所有重定向
         "REDIRECT_ENABLED": False,
-        # 后进先出，深度优先
         "DEPTH_PRIORITY": -1,
-        # 环境
         "ENV": "prod",
-        # 数据库表枚举
         "DATA_ENUM": None,
-        # 是否记录程序的采集情况基本信息到 Mysql 数据库
         "RECORD_LOG_TO_MYSQL": False,
     }
 
@@ -224,6 +215,7 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider.stats = crawler.stats
 
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
@@ -233,7 +225,6 @@ class AyuSpider(Spider):
         if mysql_conf := cls.get_mysql_config(crawler.settings):
             spider.slog.info("项目中配置了 mysql_config 信息")
             spider.mysql_config = mysql_conf
-            spider.stats = crawler.stats
 
             # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_enabled:

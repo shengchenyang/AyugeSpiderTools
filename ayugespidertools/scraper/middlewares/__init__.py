@@ -7,6 +7,7 @@ from ayugespidertools.scraper.middlewares.netlib.requestslib import (
     RequestByRequestsMiddleware,
 )
 from ayugespidertools.scraper.middlewares.proxy.dynamic import (
+    AbuDynamicProxyDownloaderMiddleware,
     DynamicProxyDownloaderMiddleware,
 )
 from ayugespidertools.scraper.middlewares.proxy.exclusive import (
@@ -20,6 +21,7 @@ __all__ = [
     "RandomRequestUaMiddleware",
     "RequestByRequestsMiddleware",
     "DynamicProxyDownloaderMiddleware",
+    "AbuDynamicProxyDownloaderMiddleware",
     "ExclusiveProxyDownloaderMiddleware",
     "PrivateProxyDownloaderMiddleware",
 ]

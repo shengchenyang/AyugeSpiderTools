@@ -1,6 +1,6 @@
 import platform
 import random
-from typing import List, TypeVar, Union
+from typing import List, TypeVar
 
 from ayugespidertools.Items import MongoDataItem, MysqlDataItem, ScrapyClassicItem
 

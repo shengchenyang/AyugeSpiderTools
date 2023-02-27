@@ -11,20 +11,27 @@
 
 # AyugeSpiderTools 工具说明
 
-> 本文章用于说明在爬虫开发中遇到的各种通用方法，还有 `scrapy` 扩展库开发，将其打包成 `Pypi` 包以方便安装和使用，此工具会长久维护。
+> 一句话介绍：用于扩展 `Scrapy` 功能来解放双手，还内置一些爬虫开发中的通用方法。
 
 ## 前言
 在使用 `Python` `Scrapy` 库开发爬虫时，免不了会重复的修改和编写 `settings.py`，`middlewares.py`，`pipelines.py`，`item.py` 和一些通用方法或脚本，但其实各个项目中的这些文件内容大致相同，那为何不把他们统一整理在一起呢。虽说可以使用 `scrapy` 的模板功能，但是还是无法适配所有的开发场景，它只适用于锦上添花。
 
 刚开始我也只是想把它用来适配 `Mysql` 存储的场景，可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
 
-至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/)中查看。
+至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [AyugeSpiderTools readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/) 中查看。
+
+## 你可能在意的事
+
+> 此项目会慢慢丰富 `python` 开发中的遇到的通用方法，详情请见 [TodoList](# TodoList)。
+
+1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，你可以 `clone` 源码修改后自行 `build`。**只要你有开发库的经验，那么这对你来说非常容易**！
+2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy` 项目及其它组件，且你也可以根据上条须知来增强此库功能。因为模板功能天生就有及其明确的优缺点，我无法覆盖所有应用场景，**但是它的高效率的确会解放双手**。
 
 **在使用过程中若遇到各种问题，或有任何优化建议欢迎提 Issues !**
 
 ## 项目状态
 
-> 目前项目正处于**积极开发和维护**中
+> 目前项目正处于**积极开发和维护**中，具体内容请查看本文中的 [TodoList](# TodoList) 内容
 
 项目目前暂定主要包含**两大部分**：
 
@@ -32,8 +39,6 @@
   - 比如 `MongoDB`，`Mysql sql` 语句的生成，图像处理，数据处理相关 ... ...
 - `Scrapy` 扩展功能（**主推功能 — 解放双手**）
   - 使爬虫开发无须在意数据库和数据表结构，不用去管常规 `item, pipelines` 和 `middlewares` 的文件的编写
-
-注：具体内容请查看本文中的 [TodoList](# TodoList) 内容
 
 ## 1. 前提条件
 
@@ -296,14 +301,6 @@ js_res = RunJs.exec_js(ctx, "add", 1, 2)
 print("test_exec_js_by_file:", js_res)
 assert js_res
 ```
-
-## 3. 总结及补充
-
-> 此项目会慢慢丰富 `python` 开发中的遇到的通用方法。
-
-若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，可以 `clone` 源码修改后自行 `build`。
-
-具体的文档请在 [AyugeSpiderTools 说明文档](http://www.ayuge.top/mkdocs-material/ayuge/) 中查看。
 
 ## TodoList
 

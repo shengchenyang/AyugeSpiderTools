@@ -1,13 +1,14 @@
 import string
-from os.path import abspath, exists, join
+from os.path import abspath
 from pathlib import Path
-from shutil import copy2, copystat, ignore_patterns, move
+from shutil import ignore_patterns, move
 
 from scrapy.commands.startproject import Command
 from scrapy.exceptions import UsageError
 from scrapy.utils.template import render_templatefile, string_camelcase
 
 import ayugespidertools
+from ayugespidertools.common.Params import Param
 
 # 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
@@ -22,6 +23,8 @@ TEMPLATES_TO_RENDER = (
     ("${project_name}", "middlewares.py.tmpl"),
     # 添加 run.py 总运行文件
     ("${project_name}", "run.py.tmpl"),
+    # 渲染 common 文件夹下的 DataEnum.py 模板
+    ("${project_name}", "common/DataEnum.py.tmpl"),
 )
 
 IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
@@ -68,13 +71,23 @@ class AyuCommand(Command):
             )
 
         # 添加执行 shell 文件 run.sh 的生成
-        render_templatefile(
-            f"{project_dir}/{project_dir}/run.sh.tmpl",
-            project_startup_dir=abspath(project_dir),
-            ProjectStartupDir=string_camelcase(abspath(project_dir)),
-            project_name=project_name,
-            ProjectName=string_camelcase(project_name),
-        )
+        run_shell_path = f"{project_dir}/{project_dir}/run.sh.tmpl"
+        # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
+        if Param.IS_WINDOWS:
+            print("Info: The run.sh file is no longer generated under windows")
+            del_file = Path(run_shell_path)
+            if Path.exists(del_file):
+                del_file.unlink()
+
+        else:
+            render_templatefile(
+                run_shell_path,
+                project_startup_dir=abspath(project_dir),
+                ProjectStartupDir=string_camelcase(abspath(project_dir)),
+                project_name=project_name,
+                ProjectName=string_camelcase(project_name),
+            )
+
         print(
             f"New Scrapy project '{project_name}', using template directory "
             f"'{self.templates_dir}', created in:"

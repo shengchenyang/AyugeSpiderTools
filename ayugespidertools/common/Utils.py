@@ -47,7 +47,12 @@ class ToolsForAyu(object):
 
     @classmethod
     def get_kvs_detail_by_consul(
-        cls, host: str, port: int, token: str, key_values: str, group: str = None
+        cls,
+        host: str,
+        port: int,
+        token: str,
+        key_values: str,
+        group: Optional[str] = None,
     ) -> dict:
         """
         获取 consul 的 key_values 的详细信息
@@ -74,7 +79,12 @@ class ToolsForAyu(object):
 
     @classmethod
     def get_mysql_conf_by_consul(
-        cls, host: str, port: int, token: str, key_values: str, group: str = None
+        cls,
+        host: str,
+        port: int,
+        token: str,
+        key_values: str,
+        group: Optional[str] = None,
     ):
         """
         获取 consul 中的 mysql 配置信息
@@ -94,7 +104,12 @@ class ToolsForAyu(object):
 
     @classmethod
     def get_mongodb_conf_by_consul(
-        cls, host: str, port: int, token: str, key_values: str, group: str = None
+        cls,
+        host: str,
+        port: int,
+        token: str,
+        key_values: str,
+        group: Optional[str] = None,
     ):
         """
         获取 consul 中的 mysql 配置信息
@@ -321,4 +336,4 @@ class ToolsForAyu(object):
             if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
                 return item
             else:
-                raise Exception(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
+                raise ValueError(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
