@@ -93,3 +93,15 @@ Getting help
 
 :doc:`topics/logging`
     在 ayugespidertools 上学习如何使用日志。
+
+扩展 scrapy
+===========
+
+.. toctree::
+   :caption: 扩展 scrapy
+   :hidden:
+
+   topics/downloader-middleware
+
+:doc:`topics/downloader-middleware`
+    了解本库中的下载中间件及使用方法。

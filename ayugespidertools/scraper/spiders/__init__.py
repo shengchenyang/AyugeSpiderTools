@@ -224,6 +224,7 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider.stats = crawler.stats
 
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
@@ -233,7 +234,6 @@ class AyuSpider(Spider):
         if mysql_conf := cls.get_mysql_config(crawler.settings):
             spider.slog.info("项目中配置了 mysql_config 信息")
             spider.mysql_config = mysql_conf
-            spider.stats = crawler.stats
 
             # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_enabled:

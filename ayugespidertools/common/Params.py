@@ -1,12 +1,30 @@
 import platform
 import random
-from typing import List, TypeVar, Union
+from enum import Enum, unique
+from typing import List, TypeVar
 
 from ayugespidertools.Items import MongoDataItem, MysqlDataItem, ScrapyClassicItem
 
 __all__ = [
+    "TableEnumTypeVar",
     "Param",
 ]
+
+TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
+
+
+@unique
+class TableEnum(Enum):
+    """
+    数据库表枚举信息示例，用于限制存储信息类的字段及值不允许重复和修改
+    """
+
+    # 详情表示例信息
+    demo_detail_table = {
+        "value": "表名(eg: demo_detail)",
+        "notes": "表注释信息(eg: 详情表信息)",
+        "demand_code": "需求表对应数据(eg: Demo_detail_table_demand_code，此示例没有意义，需要自定义)",
+    }
 
 
 class Param:

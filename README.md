@@ -303,7 +303,7 @@ assert js_res
 
 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，可以 `clone` 源码修改后自行 `build`。
 
-具体的文档请在 [AyugeSpiderTools 说明文档](http://www.ayuge.top/mkdocs-material/ayuge/) 中查看。
+具体的文档请在 [AyugeSpiderTools 说明文档](https://ayugespidertools.readthedocs.io/en/latest/) 中查看。
 
 ## TodoList
 

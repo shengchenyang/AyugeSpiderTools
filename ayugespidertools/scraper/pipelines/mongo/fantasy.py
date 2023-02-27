@@ -1,5 +1,3 @@
-from typing import Optional, Type, TypeVar
-
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.MongoClient import MongoDbBase
@@ -16,7 +14,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
         self,
         mongodb_config: dict,
         app_conf_manage: bool,
-        collection_prefix: Optional[str] = "",
+        collection_prefix: str = "",
     ) -> None:
         """
         初始化 mongoDB 连接，正常的话会返回 mongoDB 的连接对象 `connect` 和 `db` 对象

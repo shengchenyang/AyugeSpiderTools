@@ -4,7 +4,13 @@
 
 > `AyugeSpiderTools` 相关信息：
 
-     1. 具体请查看对应链接：[AyugeSpiderTools](https://github.com/shengchenyang/AyugeSpiderTools)
+```shell
+ 1. 具体请查看对应链接：[AyugeSpiderTools](https://github.com/shengchenyang/AyugeSpiderTools)
+```
+
+## 注意：
+
+**如果你觉得某些功能实现未达到你的期望，比如某些中间件或管道等的实现方法你有更好的方式，你完全可以自行修改和 `build`，让其成为你个人或小组中的专属库。你可以修改任何你觉得有必要的部分，包括库名在内，希望本库能给你在爬虫开发或 `scrapy` 扩展开发方面有所指引。**
 
 ## 示例蜘蛛的演练
 
@@ -20,7 +26,7 @@ eg: 本示例使用的 project_name 为 DemoSpider
 
 > 创建爬虫脚本：
 
-```
+```shell
 进入项目根目录
 cd <project_name>
 

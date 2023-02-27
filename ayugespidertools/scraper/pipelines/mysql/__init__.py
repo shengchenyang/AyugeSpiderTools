@@ -1,14 +1,13 @@
 import datetime
 import warnings
-from enum import Enum, unique
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type
 
 import pymysql
 from retrying import retry
 
 from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.Params import Param, TableEnumTypeVar
 from ayugespidertools.common.Utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
@@ -19,22 +18,6 @@ warnings.filterwarnings(
 __all__ = [
     "AyuMysqlPipeline",
 ]
-
-TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
-
-
-@unique
-class TableEnum(Enum):
-    """
-    数据库表枚举信息示例，用于限制存储信息类的字段及值不允许重复和修改
-    """
-
-    # 详情表示例信息
-    demo_detail_table = {
-        "value": "表名(eg: demo_detail)",
-        "notes": "表注释信息(eg: 详情表信息)",
-        "demand_code": "需求表对应数据(eg: Demo_detail_table_demand_code，此示例没有意义，需要自定义)",
-    }
 
 
 class AyuMysqlPipeline(MysqlErrorHandlingMixin):
@@ -230,14 +213,6 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                 # 碰到其他的异常才打印错误日志，已处理的异常不打印
                 self.slog.error(f"ERROR:{e}")
 
-            try:
-                self.conn.ping(reconnect=True)
-            except Exception:
-                self.conn = self._connect(self.mysql_config)
-                self.cursor = self.conn.cursor()
-                self.cursor.execute(sql, tuple(new_item.values()) * 2)
-                self.slog.info(f"重新连接 db: =>{table}, =>{new_item} ")
-
     def close_spider(self, spider):
         # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
         if self.record_log_to_mysql:
@@ -300,7 +275,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                 self.insert_table_statistics(table_statistics)
 
     def insert_table_statistics(
-        self, data: dict, table: Optional[str] = "table_collection_statistics"
+        self, data: dict, table: str = "table_collection_statistics"
     ):
         """
         插入统计数据到表中
@@ -344,7 +319,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         wait_random_max=Param.retry_time_max,
     )
     def insert_script_statistics(
-        self, data: dict, table: Optional[str] = "script_collection_statistics"
+        self, data: dict, table: str = "script_collection_statistics"
     ):
         """
         存储运行脚本的统计信息
