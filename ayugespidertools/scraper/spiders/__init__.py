@@ -46,7 +46,6 @@ class AyuSpider(Spider):
         "TELNETCONSOLE_ENABLED": False,
         "RETRY_TIMES": 3,
         "DEPTH_PRIORITY": -1,
-        "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
         "ENV": "dev",
     }
 
@@ -73,22 +72,14 @@ class AyuSpider(Spider):
 
     # 自定义 product 设置
     custom_product_settings = {
-        # 日志等级
         "LOG_LEVEL": "ERROR",
         "ROBOTSTXT_OBEY": False,
-        # 超时
         "DOWNLOAD_TIMEOUT": 20,
-        # 重试次数
         "RETRY_TIMES": 3,
-        # 禁用所有重定向
         "REDIRECT_ENABLED": False,
-        # 后进先出，深度优先
         "DEPTH_PRIORITY": -1,
-        # 环境
         "ENV": "prod",
-        # 数据库表枚举
         "DATA_ENUM": None,
-        # 是否记录程序的采集情况基本信息到 Mysql 数据库
         "RECORD_LOG_TO_MYSQL": False,
     }
 

@@ -11,12 +11,12 @@ AyugeSpiderTools |version| documentation
 ==========================================
 
 
-在此之前，我们需要了解 Scrapy 是一个快速的高级 `网络爬虫`_ 和 `网页抓取`_ 的框架，用于抓取网站并从其网页中提取结构化数据。它可以用于广泛的目\
+在此之前，我们需要了解 ``Scrapy`` 是一个快速的高级 `网络爬虫`_ 和 `网页抓取`_ 的框架，用于抓取网站并从其网页中提取结构化数据。它可以用于广泛的目\
 的，从数据挖掘到监控和自动化测试。
 
-AyugeSpiderTools 是充分发挥 Scrapy 的模板功能的一个工具库，可以很方便地管理 Scrapy 项目，比如可以使得我们方便地生成 Scrapy 项目结构，当使\
-用本库内置工具时可以不用每次手动创建 items，middlewares，pipelines，settings 等，内置了比较通用和常见的 middlewares 和 pipelines。\
-但如果你常用的功能不在此库中，你可以自行添加修改后 build 成为你专属的工具库。
+``AyugeSpiderTools`` 是充分发挥 ``Scrapy`` 的模板功能的一个工具库，可以很方便地管理 ``Scrapy`` 项目，比如可以使得我们方便地生成 ``Scrapy`` 项目结构，当使\
+用本库内置工具时可以不用每次手动创建 ``items``，``middlewares``，``pipelines``，``settings`` 等，内置了比较通用和常见的 ``middlewares`` 和 ``pipelines``。\
+但如果你常用的功能不在此库中，你可以自行添加修改后 ``build`` 成为你专属的工具库。
 
 
 .. _网络爬虫: https://en.wikipedia.org/wiki/Web_crawler
@@ -29,8 +29,8 @@ Getting help
 
 遇到麻烦？请优先尝试使用以下方式提问！
 
-* 请在本库 `ayugespidertools github`_ 上提 issues。
-* 除非一些功能性 bug，其它的功能依赖于 scrapy，你或许能在 `scrapy issues`_ 或社区中找到答案。
+* 请在本库 `ayugespidertools github`_ 上提 ``issues``。
+* 除非一些功能性 ``bug``，其它的功能依赖于 ``scrapy``，你或许能在 `scrapy issues`_ 或社区中找到答案。
 * 若有其它问题也可尝试 `邮箱`_ 联系。
 
 .. _ayugespidertools github: https://github.com/shengchenyang/AyugeSpiderTools/issues
@@ -74,13 +74,13 @@ Getting help
    topics/loaders
 
 :doc:`topics/commands`
-    了解用于管理 Scrapy 项目的命令行工具。
+    了解用于管理 ``Scrapy`` 项目的命令行工具。
 
 :doc:`topics/items`
     定义要采集的数据。
 
 :doc:`topics/loaders`
-    用提取的数据填充你的 item。
+    用提取的数据填充你的 ``item``。
 
 内置服务
 ===========
@@ -92,7 +92,7 @@ Getting help
    topics/logging
 
 :doc:`topics/logging`
-    在 ayugespidertools 上学习如何使用日志。
+    在 ``ayugespidertools`` 上学习如何使用日志。
 
 扩展 scrapy
 ===========
