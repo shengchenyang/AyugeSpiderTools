@@ -23,6 +23,8 @@ TEMPLATES_TO_RENDER = (
     ("${project_name}", "middlewares.py.tmpl"),
     # 添加 run.py 总运行文件
     ("${project_name}", "run.py.tmpl"),
+    # 渲染 common 文件夹下的 DataEnum.py 模板
+    ("${project_name}", "common/DataEnum.py.tmpl"),
 )
 
 IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
@@ -85,6 +87,7 @@ class AyuCommand(Command):
                 project_name=project_name,
                 ProjectName=string_camelcase(project_name),
             )
+
         print(
             f"New Scrapy project '{project_name}', using template directory "
             f"'{self.templates_dir}', created in:"

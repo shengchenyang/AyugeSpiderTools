@@ -7,7 +7,8 @@ from retrying import retry
 
 from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param, TableEnumTypeVar
+from ayugespidertools.common.Params import Param
+from ayugespidertools.common.TypeVars import TableEnumTypeVar
 from ayugespidertools.common.Utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略

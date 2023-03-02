@@ -6,7 +6,8 @@ import pymysql
 from retrying import retry
 
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param, TableEnumTypeVar
+from ayugespidertools.common.Params import Param
+from ayugespidertools.common.TypeVars import TableEnumTypeVar
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -195,7 +196,7 @@ class MysqlErrorHandlingMixin(object):
         # 写入表枚举
         have_create_flag = False
         if table_enum:
-            for name, member in table_enum.__members__.items():
+            for _, member in table_enum.__members__.items():
                 table_name = f'{table_prefix}{member.value.get("value", "")}'
                 table_notes = member.value.get("notes", "")
                 demand_code = member.value.get("demand_code", "")

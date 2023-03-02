@@ -2,7 +2,7 @@
 /.idea
 /venv/
 /${project_name}_venv
-/${project_name}/VIT/.conf
+/${project_name}/VIT/
 /${project_name}/logs/
 /${project_name}/test/
 *.pyc
