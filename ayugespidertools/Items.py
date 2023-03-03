@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+import attr
 from scrapy.item import Field, Item
 
 __all__ = [
@@ -10,16 +11,17 @@ __all__ = [
 ]
 
 
+@attr.s(auto_attribs=True)
 class ScrapyClassicItem(Item):
     """
     scrapy 经典 item 示例
     """
 
     # 用于存放所有字段信息
-    alldata = Field()
+    alldata: dict = Field()
     # 用于存放存储的表名
-    table = Field()
-    item_mode = Field()
+    table: str = Field()
+    item_mode: str = Field()
 
 
 @dataclass
