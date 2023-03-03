@@ -18,16 +18,14 @@
 
 刚开始我也只是想把它用来适配 `Mysql` 存储的场景，可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
 
-至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/)中查看。
+至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [AyugeSpiderTools readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/) 中查看。
 
 ## 你可能在意的事
 
 > 此项目会慢慢丰富 `python` 开发中的遇到的通用方法，详情请见 [TodoList](# TodoList)。
 
-1. *若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，你可以 `clone` 源码修改后自行 `build`。**只要你有开发库的经验，那么这对你来说非常容易**！*
-2. *本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy` 项目及其它组件，且你也可以根据上条须知来增强此库功能。因为模板功能天生就有及其明确的优缺点，我无法覆盖所有应用场景，**但是它的高效率的确会解放双手**。*
-
-*具体的文档请在 [AyugeSpiderTools 说明文档](https://ayugespidertools.readthedocs.io/en/latest/) 中查看。*
+1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或者移除对你无用模块、修改库名称等，你可以 `clone` 源码修改后自行 `build`。**只要你有开发库的经验，那么这对你来说非常容易**！
+2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy` 项目及其它组件，且你也可以根据上条须知来增强此库功能。因为模板功能天生就有及其明确的优缺点，我无法覆盖所有应用场景，**但是它的高效率的确会解放双手**。
 
 **在使用过程中若遇到各种问题，或有任何优化建议欢迎提 Issues !**
 
