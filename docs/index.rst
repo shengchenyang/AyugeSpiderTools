@@ -102,6 +102,10 @@ Getting help
    :hidden:
 
    topics/downloader-middleware
+   topics/pipelines
 
 :doc:`topics/downloader-middleware`
     了解本库中的下载中间件及使用方法。
+
+:doc:`topics/pipelines`
+    了解本库中的管道及使用方法。

@@ -199,13 +199,52 @@ class DemoOneSpider(AyuSpider):
 
 **对以上 `Item` 相关信息解释：**
 
-- 第 10 行：先导入所需 `Item`
+- 先导入所需 `Item`
   - `mysql` 场景导入 `MysqlDataItem`
   - `mongo` 场景导入 `MongoDataItem`
-- 构建 `Item`
-  - 第 100-112 行：`MysqlDataItem` 构建示例
-  - 第 136-144 行：`MongoDataItem` 构建示例
+- 构建对应场景的 `Item`
+  - `MysqlDataItem` 构建 `Mysql` 存储场景
+  - `MongoDataItem` 构建 `MongoDB` 存储场景
 - 最后 `yield` 对应 `item` 即可
+
+## yield item
+
+> 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即 `ScrapyClassicItem`)，还有就是本库推荐的 `MysqlDataItem` 和 `MongoDataItem` 的形式。
+
+这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
+
+| item 字段             | 类型                      | 注释                                              |
+| --------------------- | ------------------------- | ------------------------------------------------- |
+| **alldata**           | dict(单层，或双层)        | `item` 所有需要存储的字段，其格式分类请在下方查看 |
+| **table**             | str                       | 存储至数据表或集合的名称                          |
+| **item_mode**         | str("Mysql" 或 "MongoDB") | 存储类型场景                                      |
+| **mongo_update-rule** | dict                      | `MongoDB item` 场景下的查重规则                   |
+
+注，对以上表格中内容进行扩充解释：
+
+- `alldata` 字段格式：
+  
+  - ```python
+    # alldata 示例一，推荐此代码编写风格
+    alldata1 = {
+        "article_detail_url": {
+            "key_value": article_detail_url,
+            "notes": "文章详情链接",
+        },
+        "article_title": {
+            "key_value": article_title,
+            "notes": "文章标题",
+        },
+    }
+    ```
+  
+  - ```python
+    # alldata 示例二
+    alldata2 = {
+        "article_detail_url": article_detail_url,
+        "article_title": article_title,
+    }
+    ```
 
 ## 自定义 Item 字段和实现 Item Loaders
 
