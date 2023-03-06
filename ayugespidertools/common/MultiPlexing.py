@@ -37,14 +37,16 @@ class ReuseOperation(object):
 
     @staticmethod
     def judge_file_style(
-        media_file_or_url: str, media_type: Optional[str] = None, strict: bool = False
+        media_file_or_url: str,
+        strict: bool = False,
+        media_type: Optional[str] = None,
     ) -> str:
         """
         判断新增图片的格式类型（此方法是为了防止图片地址格式不统一，造成图片格式提取错误）
         Args:
             media_file_or_url: 需要判断格式类型的文件或文件链接
-            media_type: media 文件的类型，image，vedio，voice 等
             strict: media 是否为严格模式，严格模式下也需要仔细判断
+            media_type: media 文件的类型，image，vedio，voice 等
 
         Returns:
             1): 文件的格式信息

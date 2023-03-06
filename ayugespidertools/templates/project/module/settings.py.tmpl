@@ -43,74 +43,66 @@ config_parser = configparser.ConfigParser()
 config_parser.read(f"{VIT_DIR}/.conf", encoding="utf-8")
 
 # Mysql 数据库配置
-if mysql_ini_exists := config_parser.has_section("MYSQL"):
-    mysql_ini = config_parser["MYSQL"]
-    LOCAL_MYSQL_CONFIG = {
-        "HOST": mysql_ini.get("HOST"),
-        "PORT": mysql_ini.getint("PORT", 3306),
-        "USER": mysql_ini.get("USER", "root"),
-        "PASSWORD": mysql_ini.get("PASSWORD"),
-        "CHARSET": mysql_ini.get("CHARSET", "utf8mb4"),
-        "DATABASE": mysql_ini.get("DATABASE"),
-        # 数据库 engin 采用的驱动，可不填此参数
-        "DRIVER": "mysqlconnector",
-    }
+LOCAL_MYSQL_CONFIG = {
+    "HOST": config_parser.get("MYSQL", "HOST", fallback=None),
+    "PORT": config_parser.getint("MYSQL", "PORT", fallback=3306),
+    "USER": config_parser.get("MYSQL", "USER", fallback="root"),
+    "PASSWORD": config_parser.get("MYSQL", "PASSWORD", fallback=None),
+    "CHARSET": config_parser.get("MYSQL", "CHARSET", fallback="utf8mb4"),
+    "DATABASE": config_parser.get("MYSQL", "DATABASE", fallback=None),
+    # 数据库 engin 采用的驱动，可不填此参数
+    "DRIVER": "mysqlconnector",
+}
 
 # MongoDB 数据库配置
-if mongodb_ini_exists := config_parser.has_section("MONGODB"):
-    mongodb_ini = config_parser["MONGODB"]
-    LOCAL_MONGODB_CONFIG = {
-        "HOST": mongodb_ini.get("HOST"),
-        "PORT": mongodb_ini.getint("PORT", 27017),
-        "AUTHSOURCE": mongodb_ini.get("AUTHSOURCE"),
-        "USER": mongodb_ini.get("USER", "admin"),
-        "PASSWORD": mongodb_ini.get("PASSWORD"),
-        "DATABASE": mongodb_ini.get("DATABASE"),
-    }
+LOCAL_MONGODB_CONFIG = {
+    "HOST": config_parser.get("MONGODB", "HOST", fallback=None),
+    "PORT": config_parser.getint("MONGODB", "PORT", fallback=27017),
+    "AUTHSOURCE": config_parser.get("MONGODB", "AUTHSOURCE", fallback="admin"),
+    "USER": config_parser.get("MONGODB", "USER", fallback="admin"),
+    "PASSWORD": config_parser.get("MONGODB", "PASSWORD", fallback=None),
+    "DATABASE": config_parser.get("MONGODB", "DATABASE", fallback=None),
+}
 
 # consul 应用管理的连接配置
-if consul_ini_exists := config_parser.has_section("CONSUL"):
-    consul_ini = config_parser["CONSUL"]
-    CONSUL_CONFIG = {
-        "HOST": consul_ini["HOST"],
-        "PORT": consul_ini["PORT"],
-        # 此 token 值只需要只读权限即可，只用于取配置值
-        "TOKEN": consul_ini["TOKEN"],
-        # 这个是应用管理中心最终的 key 值，如果不设置此值会默认设置值为中程序中的 ENV 值
-        "KEY_VALUES": consul_ini["KEY_VALUES"],
-        # 这个是此配置在应用管理中心所属的 group，默认为空(按需配置，如果不需要直接不配置此值或配置为空皆可)
-        "GROUP": consul_ini["GROUP"],
-    }
+CONSUL_CONFIG = {
+    "HOST": config_parser.get("CONSUL", "HOST", fallback=None),
+    "PORT": config_parser.getint("CONSUL", "PORT", fallback=8500),
+    # 此 token 值只需要只读权限即可，只用于取配置值
+    "TOKEN": config_parser.get("CONSUL", "TOKEN", fallback=None),
+    # 这个是应用管理中心最终的 key 值，如果不设置此值会默认设置值为中程序中的 ENV 值
+    "KEY_VALUES": config_parser.get("CONSUL", "KEY_VALUES", fallback=None),
+    # 这个是此配置在应用管理中心所属的 group，默认为空(按需配置，如果不需要直接不配置此值或配置为空皆可)
+    "GROUP": config_parser.get("CONSUL", "GROUP", fallback=None),
+}
 
 # 动态隧道代理（快代理版本）
-if kdl_dynamic_proxy_ini_exists := config_parser.has_section("KDL_DYNAMIC_PROXY"):
-    kdl_dynamic_proxy_ini = config_parser["KDL_DYNAMIC_PROXY"]
-    DYNAMIC_PROXY_CONFIG = {
-        "PROXY_URL": kdl_dynamic_proxy_ini["PROXY_URL"],
-        "USERNAME": kdl_dynamic_proxy_ini["USERNAME"],
-        "PASSWORD": kdl_dynamic_proxy_ini["PASSWORD"],
-    }
+DYNAMIC_PROXY_CONFIG = {
+    "PROXY_URL": config_parser.get("KDL_DYNAMIC_PROXY", "PROXY_URL", fallback=None),
+    "USERNAME": config_parser.get("KDL_DYNAMIC_PROXY", "USERNAME", fallback=None),
+    "PASSWORD": config_parser.get("KDL_DYNAMIC_PROXY", "PASSWORD", fallback=None),
+}
 
 # 独享代理（快代理版本）
-if kdl_exclusive_proxy_ini_exists := config_parser.has_section("KDL_EXCLUSIVE_PROXY"):
-    kdl_exclusive_proxy_ini = config_parser["KDL_EXCLUSIVE_PROXY"]
-    EXCLUSIVE_PROXY_CONFIG = {
-        "PROXY_URL": kdl_exclusive_proxy_ini["PROXY_URL"],
-        "USERNAME": kdl_exclusive_proxy_ini["USERNAME"],
-        "PASSWORD": kdl_exclusive_proxy_ini["PASSWORD"],
-        "PROXY_INDEX": kdl_exclusive_proxy_ini["PROXY_INDEX"],
-    }
+EXCLUSIVE_PROXY_CONFIG = {
+    "PROXY_URL": config_parser.get("KDL_EXCLUSIVE_PROXY", "PROXY_URL", fallback=None),
+    "USERNAME": config_parser.get("KDL_EXCLUSIVE_PROXY", "USERNAME", fallback=None),
+    "PASSWORD": config_parser.get("KDL_EXCLUSIVE_PROXY", "PASSWORD", fallback=None),
+    "PROXY_INDEX": config_parser.getint(
+        "KDL_EXCLUSIVE_PROXY", "PROXY_INDEX", fallback=1
+    ),
+}
 
 # ali oss 对象存储
-if ali_oss_ini_exists := config_parser.has_section("ALI_OSS"):
-    ali_oss_ini = config_parser["ALI_OSS"]
-    OSS_CONFIG = {
-        "OssAccessKeyId": ali_oss_ini["OssAccessKeyId"],
-        "OssAccessKeySecret": ali_oss_ini["OssAccessKeySecret"],
-        "Endpoint": ali_oss_ini["Endpoint"],
-        "examplebucket": ali_oss_ini["Examplebucket"],
-        "operateDoc": ali_oss_ini["OperateDoc"],
-    }
+OSS_CONFIG = {
+    "OssAccessKeyId": config_parser.get("ALI_OSS", "OssAccessKeyId", fallback=None),
+    "OssAccessKeySecret": config_parser.get(
+        "ALI_OSS", "OssAccessKeySecret", fallback=None
+    ),
+    "Endpoint": config_parser.get("ALI_OSS", "Endpoint", fallback=None),
+    "examplebucket": config_parser.get("ALI_OSS", "Examplebucket", fallback=None),
+    "operateDoc": config_parser.get("ALI_OSS", "OperateDoc", fallback=None),
+}
 
 # 日志管理
 LOG_FILE = f"{LOG_DIR}/$project_name.log"
