@@ -228,7 +228,12 @@ class AyuSpider(Spider):
 
             # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_enabled:
-                mysql_url = f'mysql+pymysql://{mysql_conf.get("user")}:{mysql_conf.get("password")}@{mysql_conf.get("host")}:{mysql_conf.get("port")}/{mysql_conf.get("database")}?charset={mysql_conf.get("charset")}'
+                mysql_url = (
+                    f'mysql+pymysql://{mysql_conf.get("user")}'
+                    f':{mysql_conf.get("password")}@{mysql_conf.get("host")}'
+                    f':{mysql_conf.get("port")}/{mysql_conf.get("database")}'
+                    f'?charset={mysql_conf.get("charset")}'
+                )
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
         # 2).配置 MongoDB 的相关信息，如果存在 MongoDB 配置，则把 mongodb_conf 添加到 spider 上
