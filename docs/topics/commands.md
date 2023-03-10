@@ -51,6 +51,8 @@ default = DemoSpider.settings
 
 ## 使用 AyugespiderTools 工具
 
+**注意：若你觉得 `ayugespidertools` 的 `cli` 名称过长，你可以使用 `ayuge` 来替代。** 
+
 您可以先运行不带参数的 `AyugeSpiderTools` 工具，它会打印一些使用帮助和可用的命令：
 
 ```shell

@@ -2,7 +2,6 @@ from collections import namedtuple
 from dataclasses import dataclass, field
 from typing import Literal
 
-import attr
 from scrapy.item import Field, Item
 
 __all__ = [
@@ -21,7 +20,6 @@ MongoDBItemModeStr = Literal["MongoDB"]
 DataItem = namedtuple("DataItem", ["key_value", "notes"])
 
 
-@attr.s(auto_attribs=True)
 class ScrapyClassicItem(Item):
     """
     scrapy 经典 item 示例
