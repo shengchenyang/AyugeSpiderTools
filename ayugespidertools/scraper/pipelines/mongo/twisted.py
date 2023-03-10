@@ -33,7 +33,12 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
             insert_data = item_dict.get("alldata")
             # 如果有 alldata 字段，则其为推荐格式
             if all([insert_data, isinstance(insert_data, dict)]):
-                if any(isinstance(v, dict) for v in insert_data.values()):
+                judge_item = next(iter(insert_data.values()))
+                if ReuseOperation.is_namedtuple_instance(judge_item):
+                    insert_data = {
+                        v: insert_data[v].key_value for v in insert_data.keys()
+                    }
+                elif isinstance(judge_item, dict):
                     insert_data = {
                         v: insert_data[v]["key_value"] for v in insert_data.keys()
                     }

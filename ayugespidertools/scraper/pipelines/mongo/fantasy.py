@@ -61,6 +61,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
         """
         mongoDB 存储的方法，item["mongo_update_rule"] 用于存储查询条件，如果查询数据存在的话就更新，不存在的话就插入；
         如果没有 mongo_update_rule 则每次都新增
+        此场景不需要像 Mysql 一样依赖备注来生成字段注释
         Args:
             item: scrapy item
             spider: scrapy spider
@@ -74,11 +75,17 @@ class AyuFtyMongoPipeline(MongoDbBase):
             insert_data = item_dict.get("alldata")
             # 如果有 alldata 字段，则其为推荐格式
             if all([insert_data, isinstance(insert_data, dict)]):
+                judge_item = next(iter(insert_data.values()))
                 # 判断数据中中的 alldata 的格式：
                 #     1.推荐：是嵌套 dict，就像 AyuMysqlPipeline 一样 -- 这是为了通用写法风格；
                 #     2. 是单层的 dict
-                # 如果是嵌套格式的话，需要再转化为正常格式，因为此场景不需要像 Mysql 一样依赖备注来生成字段注释
-                if any(isinstance(v, dict) for v in insert_data.values()):
+                # 是 namedtuple 类型
+                if ReuseOperation.is_namedtuple_instance(judge_item):
+                    insert_data = {
+                        v: insert_data[v].key_value for v in insert_data.keys()
+                    }
+                # 如果是嵌套 dict 格式的话，需要再转化为正常格式
+                elif isinstance(judge_item, dict):
                     insert_data = {
                         v: insert_data[v]["key_value"] for v in insert_data.keys()
                     }

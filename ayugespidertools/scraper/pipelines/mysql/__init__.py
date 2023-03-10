@@ -86,6 +86,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             1). 拼接成完整的数据表的值
         """
+        assert isinstance(table, str), "item 中 table 字段不是 str，或未传入 table 参数"
         full_table_name = f"{self.table_prefix}{table}"
 
         # 最终的数据表名不能含有空格
@@ -110,12 +111,20 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         # 若其存在且为 dict，则默认其为 Items 中的 alldata 数据类型而非单一字段值
         insert_data = item.get("alldata")
         if all([insert_data, isinstance(insert_data, dict)]):
-            # 如果是 Item 对象转化而来，则需要转换下，以便兼容写法
-            for key, value in insert_data.items():
-                if type(value) == dict:
+            judge_item = next(iter(insert_data.values()))
+            # 是 namedtuple 类型
+            if ReuseOperation.is_namedtuple_instance(judge_item):
+                for key, value in insert_data.items():
+                    new_item[key] = value.key_value
+                    notes_dic[key] = value.notes
+            # 是双层 dict 格式
+            elif isinstance(judge_item, dict):
+                for key, value in insert_data.items():
                     new_item[key] = value.get("key_value", "")
                     notes_dic[key] = value["notes"]
-                else:
+            # 其它默认为单层 dict 格式
+            else:
+                for key, value in insert_data.items():
                     new_item[key] = value
                     notes_dic[key] = key
 
@@ -150,7 +159,9 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             None
         """
-        new_item = item_o.get("new_item")
+        if not (new_item := item_o.get("new_item")):
+            return
+
         note_dic = item_o.get("notes_dic")
         keys = f"""`{"`, `".join(new_item.keys())}`"""
         values = ", ".join(["%s"] * len(new_item))
