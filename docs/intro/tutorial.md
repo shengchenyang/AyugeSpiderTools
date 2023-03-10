@@ -63,7 +63,7 @@ from scrapy.http.response.text import TextResponse
 from DemoSpider.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
 from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.Items import MysqlDataItem, MongoDataItem
+from ayugespidertools.Items import DataItem, MysqlDataItem, MongoDataItem
 
 """
 ####################################################################################################
@@ -153,11 +153,11 @@ class DemoOneSpider(AyuSpider):
 
             # 这是需要存储的字段信息
             article_info = {
-                "article_detail_url": {'key_value': article_detail_url, 'notes': '文章详情链接'},
-                "article_title": {'key_value': article_title, 'notes': '文章标题'},
-                "comment_count": {'key_value': comment_count, 'notes': '文章评论数量'},
-                "favor_count": {'key_value': favor_count, 'notes': '文章赞成数量'},
-                "nick_name": {'key_value': nick_name, 'notes': '文章作者昵称'}
+                "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
+                "article_title": DataItem(article_title, "文章标题"),
+                "comment_count": DataItem(comment_count, "文章评论数量"),
+                "favor_count": DataItem(favor_count, "favor_count"),
+                "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
             ArticleInfoMysqlItem = MysqlDataItem(
@@ -188,7 +188,6 @@ class DemoOneSpider(AyuSpider):
                 else:
                     self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
 
-            self.slog.error(f"test {nick_name}")
             # 这是 MongoDB 存储场景的示例
             AritleInfoMongoItem = MongoDataItem(
                 # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
