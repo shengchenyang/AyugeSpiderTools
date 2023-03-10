@@ -4,7 +4,7 @@ import json
 import os
 import random
 import re
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import cv2
 import numpy as np
@@ -34,6 +34,18 @@ class ReuseOperation(object):
             1).Deferred
         """
         return Deferred.fromFuture(asyncio.ensure_future(f))
+
+    @staticmethod
+    def is_namedtuple_instance(x: Any) -> bool:
+        """
+        判断 x 是否为 namedtuple 类型
+        Args:
+            x: 需要判断的参数
+
+        Returns:
+            1). 是否符合 namedtuple 类型
+        """
+        return isinstance(x, tuple) and hasattr(x, "_fields")
 
     @staticmethod
     def judge_file_style(

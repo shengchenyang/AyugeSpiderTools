@@ -1,3 +1,4 @@
+from collections import namedtuple
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -5,6 +6,7 @@ import attr
 from scrapy.item import Field, Item
 
 __all__ = [
+    "DataItem",
     "ScrapyClassicItem",
     "MysqlDataItem",
     "MongoDataItem",
@@ -15,6 +17,8 @@ ItemModeStr = Literal["Mysql", "MongoDB"]
 # python 3.8 无法优雅地使用 LiteralString，以下用 Literal 代替
 MysqlItemModeStr = Literal["Mysql"]
 MongoDBItemModeStr = Literal["MongoDB"]
+
+DataItem = namedtuple("DataItem", ["key_value", "notes"])
 
 
 @attr.s(auto_attribs=True)
