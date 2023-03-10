@@ -65,6 +65,8 @@ pip install ayugespidertools -i https://pypi.org/simple
 对以上 `GIF` 中的步骤进行解释：
 
 ```shell
+# 注：ayugespidertools cli 的名称也可用 ayuge 来代替，输入体验更友好。
+
 查看库版本
 ayugespidertools version
 
