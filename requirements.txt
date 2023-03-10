@@ -20,4 +20,3 @@ html2text
 mmh3
 pycryptodome
 aiomysql
-attrs

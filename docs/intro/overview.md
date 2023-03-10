@@ -16,12 +16,17 @@
 
 为了向您展示 `ayugespidertools` 带来了什么，我们将带您通过一个 `Scrapy Spider` 示例，使用最简单的方式来运行蜘蛛。
 
+**注意：若你觉得 `ayugespidertools` 的 `cli` 名称过长，你可以使用 `ayuge` 来替代。** 
+
 > 先创建项目：
 
 ```shell
+# eg: 本示例使用的 project_name 为 DemoSpider
+
 ayugespidertools startproject <project_name>
 
-eg: 本示例使用的 project_name 为 DemoSpider
+# 也可使用以下命令代替：
+ayuge startproject <project_name>
 ```
 
 > 创建爬虫脚本：
@@ -32,6 +37,9 @@ cd <project_name>
 
 生成脚本
 ayugespidertools genspider <spider_name> <example.com>
+
+# 也可使用以下命令代替：
+ayuge genspider <spider_name> <example.com>
 ```
 
 下面是从网站 [https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=](https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=) 抓取热榜信息的蜘蛛代码：
@@ -39,7 +47,7 @@ ayugespidertools genspider <spider_name> <example.com>
 ```python
 import json
 from scrapy.http import Request
-from ayugespidertools.Items import MysqlDataItem
+from ayugespidertools.Items import DataItem, MysqlDataItem
 from DemoSpider.common.DataEnum import TableEnum
 from ayugespidertools.AyugeSpider import AyuSpider
 from ayugespidertools.common.Utils import ToolsForAyu
@@ -123,15 +131,39 @@ class DemoOneSpider(AyuSpider):
 
             # 数据存储方式1，非常推荐此写法。article_info 含有所有需要存储至表中的字段
             article_info = {
-                "article_detail_url": {'key_value': article_detail_url, 'notes': '文章详情链接'},
-                "article_title": {'key_value': article_title, 'notes': '文章标题'},
-                "comment_count": {'key_value': comment_count, 'notes': '文章评论数量'},
-                "favor_count": {'key_value': favor_count, 'notes': '文章赞成数量'},
-                "nick_name": {'key_value': nick_name, 'notes': '文章作者昵称'}
+                "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
+                "article_title": DataItem(article_title, "文章标题"),
+                "comment_count": DataItem(comment_count, "文章评论数量"),
+                "favor_count": DataItem(favor_count, "favor_count"),
+                "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
             """
             # 当然这么写也可以，但是不推荐
+            article_info = {
+                "article_detail_url": {
+                    "key_value": article_detail_url,
+                    "notes": "文章详情链接",
+                },
+                "article_title": {
+                    "key_value": article_title,
+                    "notes": "文章标题",
+                },
+                "comment_count": {
+                    "key_value": comment_count,
+                    "notes": "文章评论数量",
+                },
+                "favor_count": {
+                    "key_value": favor_count,
+                    "notes": "文章赞成数量",
+                },
+                "nick_name": {
+                    "key_value": nick_name,
+                    "notes": "文章作者昵称",
+                },
+            }
+            
+            # 或者这么写，也不推荐
             article_info = {
                 "article_detail_url": article_detail_url,
                 "article_title": article_title,
@@ -145,36 +177,6 @@ class DemoOneSpider(AyuSpider):
                 alldata=article_info,
                 table=TableEnum.aritle_list_table.value['value'],
             )
-
-            '''
-            # 旧 scrapy 脚本也可方便地改写为 ayugespidertools 支持的示例
-            # 也可以不用修改，只需补充上所需要的 table 和 item_mode 字段，来指定存储表名和存储方式
-            item = dict()
-            item['article_detail_url'] = article_detail_url
-            item['article_title'] = article_title
-            item['comment_count'] = comment_count
-            item['favor_count'] = favor_count
-            item['nick_name'] = nick_name
-            
-            item['table'] = 'article_info_list'
-            item['item_mode'] = 'Mysql'
-            yield item
-            
-            # 或者这样写
-            item = {
-                'article_detail_url': article_detail_url,
-                'article_title': article_title,
-                'comment_count': comment_count,
-                'favor_count': favor_count,
-                'nick_name': nick_name,
-                
-                # 兼容旧写法，但是要添加 table 字段和 item_mode 字段
-                # (即需要存储的表格名称，注意：是去除表格前缀的表名, 比如表为 demo_article_info_list，前缀为 demo_，则 table 名为 article_info_list)
-                'table': 'article_info_list',
-                'item_mode': 'Mysql',
-            }
-            yield item
-            '''
 
             # 数据入库逻辑 -> 测试 mysql_engine 的去重功能
             try:
@@ -217,7 +219,7 @@ Available templates:
   csvfeed
   xmlfeed
 
-# 使用具体的示例命令
+# 使用具体的示例命令(都可以使用 `ayuge cli` 名称代替)
 ayugespidertools genspider -t <Available_templates> <spider_name> <example.com>
 
 eg: ayugespidertools gendpier -t async demom_async baidu.com
