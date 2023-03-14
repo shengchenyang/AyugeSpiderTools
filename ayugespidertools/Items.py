@@ -1,6 +1,5 @@
-from collections import namedtuple
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Any, Literal, NamedTuple
 
 from scrapy.item import Field, Item
 
@@ -17,7 +16,14 @@ ItemModeStr = Literal["Mysql", "MongoDB"]
 MysqlItemModeStr = Literal["Mysql"]
 MongoDBItemModeStr = Literal["MongoDB"]
 
-DataItem = namedtuple("DataItem", ["key_value", "notes"])
+
+class DataItem(NamedTuple):
+    """
+    用于描述 item 中字段
+    """
+
+    key_value: Any
+    notes: str = ""
 
 
 class ScrapyClassicItem(Item):
