@@ -20,7 +20,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
         """
         self.proxy = None
         # 查看独享代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(
+        is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_config=exclusive_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"],
         )

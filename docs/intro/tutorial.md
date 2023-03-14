@@ -25,30 +25,30 @@ ayugespidertools startproject DemoSpider
 
 ```ini
 DemoSpider/
-|-- DemoSpider								# project's Python module, you'll import your code from here
-|   |-- common								# 这里主要存放通用方法，自定义方法模块。
+|-- DemoSpider							# project's Python module, you'll import your code from here
+|   |-- common							# 这里主要存放通用方法，自定义方法模块。
 |   |   |-- DataEnum.py						# 数据库表枚举信息示例
 |   |-- __init__.py
-|   |-- items.py							# project items definition file
-|   |-- logs								# 日志管理文件夹，可以自定义规则
+|   |-- items.py						# project items definition file
+|   |-- logs							# 日志管理文件夹，可以自定义规则
 |   |   |-- DemoSpider.log					# scrapy 输出日志，文件名称为项目名
 |   |   |-- error.log						# loguru 日志 error 规则输出文件
 |   |   `-- runtime.log						# loguru 日志 debug 规则输出文件
-|   |-- middlewares.py						# project middlewares file
-|   |-- pipelines.py						# project pipelines file
-|   |-- run.py								# scrapy 运行文件
-|   |-- run.sh								# 项目运行 shell，运行以上的 run.py
-|   |-- settings.py							# project settings file
-|   |-- spiders								# a directory where you'll later put your spiders
+|   |-- middlewares.py						# project middlewares definition file
+|   |-- pipelines.py						# project pipelines definition file
+|   |-- run.py							# scrapy 运行文件
+|   |-- run.sh							# 项目运行 shell，运行以上的 run.py
+|   |-- settings.py						# project settings definition file
+|   |-- spiders							# a directory where you'll later put your spiders
 |   |   |-- __init__.py
 |   `-- VIT
-|       `-- 请修改.conf中的配置信息			  # 提示文件
-| 		`-- .conf							# 配置文件，用于修改 Mysql, MongoDB 等配置
-|-- .gitignore								# git ignore 文件
-|-- pyproject.toml							# 项目配置
-|-- README.md								# 说明文档
+|       `-- 请修改.conf中的配置信息			        # 提示文件
+| 		`-- .conf					# 配置文件，用于修改 Mysql, MongoDB 等配置
+|-- .gitignore							# git ignore 文件
+|-- pyproject.toml						# 项目配置
+|-- README.md							# 说明文档
 |-- requirements.txt						# 依赖文件
-`-- scrapy.cfg                              # deploy configuration file
+`-- scrapy.cfg                                                  # deploy configuration file
 ```
 
 ## 我们的第一个 Spider
@@ -151,12 +151,12 @@ class DemoOneSpider(AyuSpider):
                 json_data=curr_data,
                 query="nickName")
 
-            # 这是需要存储的字段信息
+            # 这是需要存储的所有字段信息
             article_info = {
                 "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
                 "article_title": DataItem(article_title, "文章标题"),
                 "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "favor_count"),
+                "favor_count": DataItem(favor_count, "文章赞成数量"),
                 "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
@@ -205,6 +205,11 @@ class DemoOneSpider(AyuSpider):
 - `name`: 标识蜘蛛。在一个项目中必须是唯一的，即不能为不同的Spiders设置相同的名字。
 - `start_requests()`: 必须返回一个可迭代的请求（你可以返回一个请求列表或编写一个生成器函数），蜘蛛将从中开始爬行。后续请求将从这些初始请求中依次生成。
 - `parse_first()`：将被调用以处理为每个请求下载的响应的方法。`response` 参数是 `TextResponse` 的一个实例，它保存页面内容，并有进一步的有用方法来处理它。该 `parse_first()` 方法通常解析响应，将抓取的数据提取为字典，并找到要遵循的新 URL 并从中创建新请求 ( `Request`)。
+
+另外，一些其它注意事项：
+- 示例中的一些配置和一些功能并不是每个项目中都必须要编写和配置的，只是用于展示一些功能
+- 据上条可知，可以写出很简洁的代码，删除你认为的无关配置和方法并将其配置成你自己的模板就更容易适配更多人的使用场景。
+
 
 ### 如何运行我们的蜘蛛
 

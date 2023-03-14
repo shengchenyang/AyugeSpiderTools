@@ -47,7 +47,7 @@ class MysqlErrorHandlingMixin(object):
             if conn:
                 conn.ping(reconnect=True)
 
-            if res := cursor.execute(sql):
+            if _ := cursor.execute(sql):
                 lines = cursor.fetchall()
                 if isinstance(lines, list):
                     # 注意，此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
