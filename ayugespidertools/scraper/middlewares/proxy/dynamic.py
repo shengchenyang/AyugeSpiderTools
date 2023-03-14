@@ -17,7 +17,7 @@ class DynamicProxyDownloaderMiddleware(object):
         """
         dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(
+        is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_config=dynamic_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )
@@ -74,7 +74,7 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         """
         dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
-        is_match = ReuseOperation.if_dict_meet_min_limit(
+        is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_config=dynamic_proxy_config,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )

@@ -160,7 +160,7 @@ class AyuSpider(Spider):
             return None
 
         # 1). 从本地 local_mysql_config 的参数中取值
-        if ReuseOperation.if_dict_meet_min_limit(
+        if ReuseOperation.is_dict_meet_min_limit(
             dict_config=local_mysql_config,
             key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"],
         ):
@@ -196,7 +196,7 @@ class AyuSpider(Spider):
             return None
 
         # 1). 从本地 local_mongo_conf 的参数中取值
-        if ReuseOperation.if_dict_meet_min_limit(
+        if ReuseOperation.is_dict_meet_min_limit(
             dict_config=local_mongodb_conf,
             key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"],
         ):

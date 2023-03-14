@@ -183,7 +183,7 @@ class ReuseOperation(object):
         return ret
 
     @classmethod
-    def if_dict_meet_min_limit(cls, dict_config: dict, key_list: list) -> bool:
+    def is_dict_meet_min_limit(cls, dict_config: dict, key_list: list) -> bool:
         """
         判断 dict_config 是否满足 key_list 中的 key 值限定
         Args:
@@ -196,10 +196,7 @@ class ReuseOperation(object):
         if any([not dict_config, not isinstance(dict_config, dict)]):
             return False
 
-        # 理想中的 dict_config 参数为 dict，且其 key 要有且只有 len(key_list) 个
-        ideal_keys_list = [x for x in list(dict_config.keys()) if x in key_list]
-        # 如果未配置 dict_config 为 dict，且其 key 不是 key_list 中的这几个值时返回 False
-        return len(ideal_keys_list) == len(key_list)
+        return all(key in dict_config for key in key_list)
 
     @classmethod
     def get_items_by_keys(cls, dict_config: dict, key_list: list) -> Union[dict, bool]:
@@ -215,7 +212,7 @@ class ReuseOperation(object):
         # 参数先要满足最小限定，然后再取出限定的参数值；否则直接返回 False
         return (
             {k: dict_config[k] for k in key_list}
-            if cls.if_dict_meet_min_limit(dict_config=dict_config, key_list=key_list)
+            if cls.is_dict_meet_min_limit(dict_config=dict_config, key_list=key_list)
             else False
         )
 
@@ -229,13 +226,6 @@ class ReuseOperation(object):
 
         Returns:
             1). dict_config 排除 key_list 中的键值后的值
-        """
-
-        # 或者这么写
-        """
-        for key in key_list:
-            dict(dict_config).pop(key, None)
-        return dict_config
         """
         return {k: dict_config[k] for k in dict_config if k not in key_list}
 
@@ -251,7 +241,7 @@ class ReuseOperation(object):
             None
         """
         # 判断 pymysql_dict_config 是否满足最少的 key 值
-        judge_pymysql_dict_config = cls.if_dict_meet_min_limit(
+        judge_pymysql_dict_config = cls.is_dict_meet_min_limit(
             dict_config=pymysql_dict_config,
             key_list=["host", "port", "user", "password", "charset"],
         )
@@ -401,6 +391,7 @@ class ReuseOperation(object):
         Returns:
             1).层级数
         """
+        # 其实直接返回 len(array) 即可
         return len(np.array(array).shape)
 
     @classmethod
