@@ -108,7 +108,7 @@ class DemoOneSpider(AyuSpider):
     def parse_first(self, response):
         data_list = json.loads(response.text)['data']
         for curr_data in data_list:
-            # 这里的所有解析规则可选择自己习惯的
+            # 这里的所有解析方式可选择自己习惯的其它任意库，xpath， json 或正则等等。
             article_detail_url = ToolsForAyu.extract_with_json(
                 json_data=curr_data,
                 query="articleDetailUrl")
@@ -129,17 +129,26 @@ class DemoOneSpider(AyuSpider):
                 json_data=curr_data,
                 query="nickName")
 
-            # 数据存储方式1，非常推荐此写法。article_info 含有所有需要存储至表中的字段
+            # 数据存储方式 1，非常推荐此写法。其中 article_info 含有所有需要存储至表中的字段
             article_info = {
                 "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
                 "article_title": DataItem(article_title, "文章标题"),
                 "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "favor_count"),
+                "favor_count": DataItem(favor_count, "文章赞成数量"),
                 "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
             """
-            # 当然这么写也可以，但是不推荐
+            # 2.或者这么写，在不需要字段注释功能时使用，但其实还不如直接按照下面 4 中的示例写法
+            article_info = {
+                "article_detail_url": DataItem(article_detail_url),
+                "article_title": DataItem(article_title),
+                "comment_count": DataItem(comment_count),
+                "favor_count": DataItem(favor_count),
+                "nick_name": DataItem(nick_name),
+            }
+            
+            # 3.当然这么写也可以，但是不推荐，复杂易错
             article_info = {
                 "article_detail_url": {
                     "key_value": article_detail_url,
@@ -163,7 +172,7 @@ class DemoOneSpider(AyuSpider):
                 },
             }
             
-            # 或者这么写，也不推荐
+            # 4.或者这么写
             article_info = {
                 "article_detail_url": article_detail_url,
                 "article_title": article_title,

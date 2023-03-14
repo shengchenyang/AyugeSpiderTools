@@ -14,6 +14,15 @@
 其实，本库就是推荐把所有字段统一存入 `alldata` 字段中，其它字段用于场景补充，比如：`table` 字段用于说明要存储的表名/集合名，`item_mode` 字段用于说明存储的方式，`mongo_update_rule` 字段是 `item_mode` 为 `MongoDB` 存储场景时的去重条件(可不设置此字段)。
 
 ```python
+class DataItem(NamedTuple):
+    """
+    用于描述 item 中字段
+    """
+
+    key_value: Any
+    notes: str = ""
+
+
 @dataclass
 class BaseItem:
     """
@@ -151,7 +160,7 @@ class DemoOneSpider(AyuSpider):
                 "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
                 "article_title": DataItem(article_title, "文章标题"),
                 "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "favor_count"),
+                "favor_count": DataItem(favor_count, "文章赞成数量"),
                 "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
@@ -231,9 +240,24 @@ class DemoOneSpider(AyuSpider):
         "article_title": DataItem(article_title, "文章标题"),
     }
     ```
+  - ```python
+    # alldata 示例二，也推荐此代码编写风格
+    alldata1 = {
+        "article_detail_url": DataItem(article_detail_url),
+        "article_title": DataItem(article_title),
+    }
+    ```
     
   - ```python
-    # alldata 示例二
+    # alldata 示例三
+    alldata3 = {
+        "article_detail_url": article_detail_url,
+        "article_title": article_title,
+    }
+    ```
+    
+  - ```python
+    # alldata 示例四，不推荐
     alldata2 = {
         "article_detail_url": {
             "key_value": article_detail_url,
@@ -246,13 +270,7 @@ class DemoOneSpider(AyuSpider):
     }
     ```
     
-  - ```python
-    # alldata 示例三
-    alldata3 = {
-        "article_detail_url": article_detail_url,
-        "article_title": article_title,
-    }
-    ```
+  
 
 ## 自定义 Item 字段和实现 Item Loaders
 

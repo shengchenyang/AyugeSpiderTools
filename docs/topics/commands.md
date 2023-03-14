@@ -35,6 +35,7 @@
 |   |   `-- spider1.py
 |   `-- VIT
 |       `-- 请修改.conf中的配置信息
+|       `-- .conf
 |-- .gitignore
 |-- pyproject.toml
 |-- README.md
