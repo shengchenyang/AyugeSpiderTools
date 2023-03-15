@@ -5,3 +5,4 @@
 **/.pytest_cache
 /ayugespidertools/logs/
 /docs/_build/
+/tests/VIT/.conf

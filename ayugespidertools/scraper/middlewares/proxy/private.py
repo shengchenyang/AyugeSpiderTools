@@ -16,24 +16,23 @@ from scrapy.utils.response import response_status_message
 from WorkWeixinRobot.work_weixin_robot import WWXRobot
 
 from ayugespidertools.common.Params import Param
-from ayugespidertools.config import NormalConfig
 
 
 class PrivateProxyDownloaderMiddleware(RetryMiddleware):
     """
-    基于独享代理的自定义动态代理中间件
+    基于独享代理的自定义动态代理中间件，此中间件暂不使用，后期优化
     """
 
-    def __init__(self):
+    def __init__(self, wwx_robot_key: str):
         self.settings = Settings()
         super(PrivateProxyDownloaderMiddleware, self).__init__(self.settings)
         self.important_error = False
-        self.WWX = WWXRobot(key=NormalConfig.WWXRobot_key)
+        self.WWX = WWXRobot(key=wwx_robot_key)
 
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
-        s = cls()
+        s = cls(wwx_robot_key=crawler.settings.get("WWXRobot_key", None))
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
         return s

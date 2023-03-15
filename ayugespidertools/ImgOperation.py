@@ -6,7 +6,6 @@ from PIL import Image
 
 from ayugespidertools.common.Encryption import EncryptOperation
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.config import NormalConfig
 
 __all__ = [
     "Picture",

@@ -1,5 +1,4 @@
 import string
-from os.path import abspath
 from pathlib import Path
 from shutil import ignore_patterns, move
 
@@ -72,6 +71,7 @@ class AyuCommand(Command):
 
         # 添加执行 shell 文件 run.sh 的生成
         run_shell_path = f"{project_dir}/{project_dir}/run.sh.tmpl"
+        run_shell_abspath = Path(run_shell_path).resolve()
         # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
         if Param.IS_WINDOWS:
             print("Info: The run.sh file is no longer generated under windows")
@@ -82,8 +82,8 @@ class AyuCommand(Command):
         else:
             render_templatefile(
                 run_shell_path,
-                project_startup_dir=abspath(project_dir),
-                ProjectStartupDir=string_camelcase(abspath(project_dir)),
+                project_startup_dir=run_shell_abspath,
+                ProjectStartupDir=string_camelcase(str(run_shell_abspath)),
                 project_name=project_name,
                 ProjectName=string_camelcase(project_name),
             )

@@ -1,10 +1,12 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import pymysql
 
 __all__ = [
     "MysqlOrm",
 ]
+
+SearchTypeStr = Literal["all", "one"]
 
 
 class MysqlOrm(object):
@@ -20,22 +22,14 @@ class MysqlOrm(object):
         self.connection.commit()
 
     def search_data(
-        self, sql_pre: str, sql_after: tuple, type: Optional[str] = None
-    ) -> (bool, tuple):
-        if not type:
-            type = "one"
-
+        self, sql_pre: str, sql_after: tuple, type: SearchTypeStr = "one"
+    ) -> tuple:
         self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
-        global select_res
         if type == "all":
-            select_res = self.cursor.fetchall()
-
+            return self.cursor.fetchall()
         elif type == "one":
-            select_res = self.cursor.fetchone()
-
-        # 判断查询结果
-        return (True, select_res) if select_res else (False, "")
+            return self.cursor.fetchone()
 
     def update_data(self, sql_pre: str, sql_after: tuple):
         self.connection.ping(reconnect=True)

@@ -8,7 +8,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 import configparser
-from os.path import abspath, dirname, join
+from pathlib import Path
 
 from environs import Env
 from loguru import logger
@@ -30,13 +30,13 @@ env = Env()
 env.read_env()
 
 # 项目根目录
-CONFIG_DIR = dirname(abspath(__file__))
+CONFIG_DIR = Path(__file__).parent
 # 日志文件存储目录
-LOG_DIR = join(CONFIG_DIR, "logs")
+LOG_DIR = CONFIG_DIR / "logs"
 # 依赖文件和存储文件的目录
-DOC_DIR = join(CONFIG_DIR, "docs")
+DOC_DIR = CONFIG_DIR / "docs"
 # 密钥配置等信息存储目录
-VIT_DIR = join(CONFIG_DIR, "VIT")
+VIT_DIR = CONFIG_DIR / "VIT"
 
 # 加载秘钥等配置信息
 config_parser = configparser.ConfigParser()
