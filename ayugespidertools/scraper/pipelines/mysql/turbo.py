@@ -56,5 +56,5 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
 
         # 添加 PooledDB 的配置
         self.mysql_config.update(self.pool_db_config)
-        self.conn = PooledDB(pymysql, **self.mysql_config).connection()
+        self.conn = PooledDB(creator=pymysql, **self.mysql_config).connection()
         self.cursor = self.conn.cursor()

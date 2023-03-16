@@ -17,14 +17,12 @@ class MysqlOrm(object):
         self.cursor = self.connection.cursor()
 
     def insert_data(self, sql_pre: str, sql_after: tuple):
-        self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
         self.connection.commit()
 
     def search_data(
         self, sql_pre: str, sql_after: tuple, type: SearchTypeStr = "one"
     ) -> tuple:
-        self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
         if type == "all":
             return self.cursor.fetchall()
@@ -32,7 +30,6 @@ class MysqlOrm(object):
             return self.cursor.fetchone()
 
     def update_data(self, sql_pre: str, sql_after: tuple):
-        self.connection.ping(reconnect=True)
         self.cursor.execute(sql_pre, sql_after)
         self.connection.commit()
 
