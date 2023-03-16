@@ -44,9 +44,6 @@ class MysqlErrorHandlingMixin(object):
             table_name = '{table}' and COLUMN_NAME= '{column}';"""
         column_type = None
         try:
-            if conn:
-                conn.ping(reconnect=True)
-
             if _ := cursor.execute(sql):
                 lines = cursor.fetchall()
                 if isinstance(lines, list):
@@ -156,7 +153,6 @@ class MysqlErrorHandlingMixin(object):
 
         try:
             if conn:
-                conn.ping(reconnect=True)
                 if cursor.execute(sql):
                     conn.commit()
             else:
@@ -262,7 +258,6 @@ class MysqlErrorHandlingMixin(object):
 
             try:
                 if conn:
-                    conn.ping(reconnect=True)
                     if cursor.execute(sql):
                         conn.commit()
                 else:
@@ -301,7 +296,6 @@ class MysqlErrorHandlingMixin(object):
             sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
             try:
                 if conn:
-                    conn.ping(reconnect=True)
                     if cursor.execute(sql):
                         conn.commit()
                 else:

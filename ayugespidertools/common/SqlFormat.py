@@ -1,8 +1,10 @@
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 __all__ = [
     "AboutSql",
 ]
+
+SqlModeStr = Literal["and", "or"]
 
 
 class AboutSql(object):
@@ -17,7 +19,7 @@ class AboutSql(object):
         db_table: str,
         key: list,
         rule: dict,
-        base: Optional[str] = None,
+        base: SqlModeStr = "and",
         order_by: Optional[str] = None,
         limit: Union[bool, int] = False,
     ) -> (str, tuple):
@@ -37,39 +39,19 @@ class AboutSql(object):
         """
         select_key = ", ".join(f"`{k}`" for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
-        # select_key = select_key.replace("""`count(1)`""", "count(1)")
+        select_key = select_key.replace("""`count(1)`""", "count(1)")
 
-        base_list = {
-            "and": " and ",
-            "or": " or ",
-        }
-
-        base_where = base_list[base] if base else " and "
-        select_where = base_where.join(
+        _base = f" {base} "
+        select_where = _base.join(
             f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
         )
-        if not order_by:
-            if limit:
-                select_sql = """select %s from `%s` where %s limit %s""" % (
-                    select_key,
-                    db_table,
-                    select_where,
-                    limit,
-                )
-            else:
-                select_sql = """select %s from `%s` where %s""" % (
-                    select_key,
-                    db_table,
-                    select_where,
-                )
-        else:
-            select_sql = """select %s from `%s` where %s order by %s desc limit 1""" % (
-                select_key,
-                db_table,
-                select_where,
-                order_by,
-            )
-        """order by id desc"""
+
+        _where = f"where {select_where}" if select_where else ""
+        _order_by = f"order by {order_by}" if order_by else ""
+        _limit = f"limit {limit}" if limit else ""
+        select_sql = (
+            f"""select {select_key} from {db_table} {_where} {_order_by} {_limit}"""
+        )
         return select_sql, tuple(rule.values())
 
     @staticmethod
@@ -91,7 +73,7 @@ class AboutSql(object):
 
     @staticmethod
     def update_generate(
-        db_table: str, data: dict, rule: dict, base: Optional[str] = None
+        db_table: str, data: dict, rule: dict, base: SqlModeStr = "and"
     ) -> (str, tuple):
         """
         根据一些参数来生成供 pymysql 之类的库中使用的 sql 更新语句
@@ -106,12 +88,8 @@ class AboutSql(object):
             tuple(rule.values()): 更新字段的参数名称
         """
         update_set = ", ".join(f"`{k}`=%s" for k in data)
-        base_list = {
-            "and": " and ",
-            "or": " or ",
-        }
 
-        base_where = base_list[base] if base else " and "
-        update_where = base_where.join(f"`{k}`=%s" for k in rule)
+        _base = f" {base} "
+        update_where = _base.join(f"`{k}`=%s" for k in rule)
         sql = f"""update `{db_table}` set {update_set} where {update_where}"""
         return sql, tuple(data.values()) + tuple(rule.values())

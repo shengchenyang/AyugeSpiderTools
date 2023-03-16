@@ -165,11 +165,10 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         note_dic = item_o.get("notes_dic")
         keys = f"""`{"`, `".join(new_item.keys())}`"""
         values = ", ".join(["%s"] * len(new_item))
-        update = ",".join([" `{key}` = %s".format(key=key) for key in new_item])
+        update = ",".join([f" `{key}` = %s" for key in new_item])
         sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
 
         try:
-            self.conn.ping(reconnect=True)
             if self.cursor.execute(sql, tuple(new_item.values()) * 2):
                 self.conn.commit()
 
@@ -268,7 +267,6 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         ) from information_schema.tables
         where TABLE_SCHEMA='{database}' and TABLE_NAME in (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
         """
-        self.conn.ping(reconnect=True)
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
         if sql_list := [row[0] for row in results]:
@@ -298,7 +296,6 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         Returns:
             None
         """
-        self.conn.ping(reconnect=True)
         self.cursor.execute(
             f"""
             CREATE TABLE IF NOT EXISTS `{table}` (
@@ -315,10 +312,9 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
 
         keys = f"""`{"`, `".join(data.keys())}`"""
         values = ", ".join(["%s"] * len(data))
-        update = ",".join([" `{key}` = %s".format(key=key) for key in data])
+        update = ",".join([f" `{key}` = %s" for key in data])
         sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
         try:
-            self.conn.ping(reconnect=True)
             if self.cursor.execute(sql, tuple(data.values()) * 2):
                 self.conn.commit()
         except Exception as e:
@@ -367,10 +363,9 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
 
         keys = f"""`{"`, `".join(data.keys())}`"""
         values = ", ".join(["%s"] * len(data))
-        update = ",".join([" `{key}` = %s".format(key=key) for key in data])
+        update = ",".join([f" `{key}` = %s" for key in data])
         sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
         try:
-            self.conn.ping(reconnect=True)
             if self.cursor.execute(sql, tuple(data.values()) * 2):
                 self.conn.commit()
         except Exception as e:

@@ -63,7 +63,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         note_dic = item_o.get("notes_dic")
         keys = f"""`{"`, `".join(new_item.keys())}`"""
         values = ", ".join(["%s"] * len(new_item))
-        update = ",".join([" `{key}` = %s".format(key=key) for key in new_item])
+        update = ",".join([f" `{key}` = %s" for key in new_item])
         sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
 
         try:

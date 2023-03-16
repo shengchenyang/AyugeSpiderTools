@@ -65,9 +65,7 @@ class AliOssBase(object):
             )
         except oss2.exceptions.NoSuchKey as e:
             raise ValueError(
-                "delete_oss error: status={0}, request_id={1}".format(
-                    e.status, e.request_id
-                )
+                f"delete_oss error: status={e.status}, request_id={e.request_id}"
             ) from e
 
     @retry(
