@@ -54,7 +54,7 @@ class AboutPyppeteer(object):
         Returns:
             None
         """
-        read_log = subprocess.getstatusoutput("tail -n %d %s" % (line, fn))
+        read_log = subprocess.getstatusoutput(f"tail -n {line} {fn}")
 
         # 当运行成功时
         if not read_log[0]:

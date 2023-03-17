@@ -27,7 +27,7 @@ ayugespidertools startproject DemoSpider
 DemoSpider/
 |-- DemoSpider							# project's Python module, you'll import your code from here
 |   |-- common							# 这里主要存放通用方法，自定义方法模块。
-|   |   |-- DataEnum.py						# 数据库表枚举信息示例
+|   |   |-- DataEnum.py				                # 数据库表枚举信息示例
 |   |-- __init__.py
 |   |-- items.py						# project items definition file
 |   |-- logs							# 日志管理文件夹，可以自定义规则
@@ -43,7 +43,7 @@ DemoSpider/
 |   |   |-- __init__.py
 |   `-- VIT
 |       `-- 请修改.conf中的配置信息			        # 提示文件
-| 		`-- .conf					# 配置文件，用于修改 Mysql, MongoDB 等配置
+|       `-- .conf        				        # 配置文件，用于修改 Mysql, MongoDB 等配置
 |-- .gitignore							# git ignore 文件
 |-- pyproject.toml						# 项目配置
 |-- README.md							# 说明文档

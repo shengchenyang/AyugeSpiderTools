@@ -1,8 +1,8 @@
 from ayugespidertools import MysqlClient
 from ayugespidertools.common.SqlFormat import AboutSql
-from ayugespidertools.config import NormalConfig
+from tests import PYMYSQL_CONFIG
 
-mysql_client = MysqlClient.MysqlOrm(NormalConfig.PYMYSQL_CONFIG)
+mysql_client = MysqlClient.MysqlOrm(PYMYSQL_CONFIG)
 
 
 def test_select_data():

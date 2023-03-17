@@ -49,10 +49,9 @@ class AyuStatisticsMysqlPipeline(MysqlErrorHandlingMixin):
         data = dataclasses.asdict(data_item)
         keys = f"""`{"`, `".join(data.keys())}`"""
         values = ", ".join(["%s"] * len(data))
-        update = ",".join([" `{key}` = %s".format(key=key) for key in data])
+        update = ",".join([f" `{key}` = %s" for key in data])
         sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
         try:
-            self.conn.ping(reconnect=True)
             if self.cursor.execute(sql, tuple(data.values()) * 2):
                 self.conn.commit()
         except Exception as e:
