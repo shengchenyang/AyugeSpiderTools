@@ -25,7 +25,6 @@ def test_key_connect():
 def test_auth_connect():
     """测试 mongoDB 的 auth 认证链接方式 (pymongo 3.11.0 及以下版本使用)"""
     MONGODB_CONFIG["connect_style"] = "A"
-    print(MONGODB_CONFIG)
     mongodb = MongoDbBase(**MONGODB_CONFIG)
     select_res = mongodb.find("test", {"name": "标题名称3"})
     print("select_res:", list(select_res))
