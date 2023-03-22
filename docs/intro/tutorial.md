@@ -42,7 +42,6 @@ DemoSpider/
 |   |-- spiders							# a directory where you'll later put your spiders
 |   |   |-- __init__.py
 |   `-- VIT
-|       `-- 请修改.conf中的配置信息			        # 提示文件
 |       `-- .conf        				        # 配置文件，用于修改 Mysql, MongoDB 等配置
 |-- .gitignore							# git ignore 文件
 |-- pyproject.toml						# 项目配置

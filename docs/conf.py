@@ -71,3 +71,5 @@ source_parsers = {
     ".md": CommonMarkParser,
 }
 source_suffix = [".rst", ".md"]
+
+autodoc_mock_imports = ["ayugespidertools"]

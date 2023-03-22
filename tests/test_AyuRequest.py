@@ -18,5 +18,4 @@ def test_aiohttp_reqeust():
             "curr_page": 1,
         },
     )
-    print(r)
     assert r is not None

@@ -28,19 +28,20 @@ class AboutPyppeteer(object):
         return len(res)
 
     @classmethod
-    def quit_process(cls, sudo_pwd: str):
+    def quit_process(cls, process_name: str, sudo_pwd: str):
         """
         退出程序的方法
         Args:
+            process_name: 需要关闭的进程名称
             sudo_pwd: sudo 需要输入的 root 账号密码
 
         Returns:
             None
         """
-        command = "ps aux | grep run_tmall | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
-        os.system(f"echo {sudo_pwd}|sudo -S {command}")
-
-        command = "ps aux | grep tmall_by_goods | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
+        command = (
+            "ps aux | grep %s | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
+            % process_name
+        )
         os.system(f"echo {sudo_pwd}|sudo -S {command}")
 
     @classmethod
@@ -64,7 +65,9 @@ class AboutPyppeteer(object):
             # 当连续输出 scrapy 的统计信息 3 次时，则卡住
             if block_times >= 3:
                 # logger.info("quit process success")
-                cls.quit_process("自行替换 sudo root 的密码")
+                cls.quit_process(
+                    process_name="curr_process", sudo_pwd="自行替换 sudo root 的密码"
+                )
 
             # 当最新四行日志中未出现 scrapy 统计，则为正常状态，并清空日志
             elif block_times == 0:

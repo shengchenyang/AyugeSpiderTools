@@ -1,7 +1,9 @@
 import configparser
 from pathlib import Path
 
+tests_dir = Path(__file__).parent
 tests_vitdir = str(Path(__file__).parent.resolve() / "VIT")
+tests_sqlfiledir = str(Path(__file__).parent.resolve() / "docs/sqlfile")
 config_parser = configparser.ConfigParser()
 config_parser.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 

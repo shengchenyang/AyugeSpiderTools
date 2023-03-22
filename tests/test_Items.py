@@ -15,30 +15,23 @@ def test_items():
 
     # 或者这样的数据格式
     # mdi.alldata = {"key1": {"key_value": "key_value_data1", "notes": "notes_data1"}}
-    print("mdi:", mdi)
-    print("mdi type:", type(mdi))
 
-    d_adapter = ItemAdapter(mdi)
-    all_data = d_adapter.get("alldata")
-    print("get alldata data:", all_data)
-    assert ItemAdapter.is_item(mdi)
+    all_data = ItemAdapter(mdi).get("alldata")
+    assert ItemAdapter.is_item(mdi), all_data == {"key1": "value1"}
 
     sci = ScrapyClassicItem()
     sci["table"] = "s_table"
     sci["alldata"] = {"s_all_data": 2}
     sci["item_mode"] = "Mysql"
-    print("sci:", sci)
-    print("sci type:", type(sci))
+    assert ItemAdapter.is_item(sci)
 
     a = {
         "alldata": {"k": "v"},
         "table": "save_table_name",
         "item_mode": "Mysql",
     }
-    my_dict_adapter = ItemAdapter(a)
-    all_data = my_dict_adapter.get("alldata")
-    print("my alldata:", all_data, ItemAdapter.is_item(a))
-    assert mdi is not None
+    all_data = ItemAdapter(a).get("alldata")
+    assert ItemAdapter.is_item(a), all_data == {"k": "v"}
 
 
 def test_dataclass():
@@ -47,7 +40,7 @@ def test_dataclass():
     mine_item.default_output_processor = TakeFirst()
     mine_item.add_value("table", "save_table_name")
     item = mine_item.load_item()
-    print("item:", item)
+    assert item == {"table": "save_table_name"}, type(item) == ScrapyClassicItem
 
     """以下 [2.] [3.] 部分介绍扩展本库中 Item 字段以方便支持 add_value 等特性"""
     # [2.] ScrapyClassicItem 如何自定义增加字段，并支持 Item Loaders 的特性
@@ -82,7 +75,12 @@ def test_dataclass():
     mine_item.add_value("book_name", "book_name_data")
     # mine_item.add_xpath("book_intro", "get_book_intro_xpath")
     item = mine_item.load_item()
-    print("item:", item)
+    assert item == MineItem(
+        book_name="book_name_data",
+        book_intro=None,
+        item_mode="Mysql",
+        table="save_table_name",
+    ), isinstance(item, MineItem)
 
     """
     以上，可以发现 scrapy 是推荐固定 Item 字段的，需要什么类型的字段就提前创建好其字段。

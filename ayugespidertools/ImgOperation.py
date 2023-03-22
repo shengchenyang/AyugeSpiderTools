@@ -125,7 +125,7 @@ class Picture(object):
         captcha_de.save(f"{img_path}/captcha.png")
 
         for i, off in enumerate(offset_list):
-            # 根据css backgound-position获取每张小图的坐标
+            # 根据css background-position获取每张小图的坐标
             box = Picture.convert_css_to_offset(off)
             # 抠图
             regoin = img.crop(box)
