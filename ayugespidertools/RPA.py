@@ -28,19 +28,20 @@ class AboutPyppeteer(object):
         return len(res)
 
     @classmethod
-    def quit_process(cls, sudo_pwd: str):
+    def quit_process(cls, process_name: str, sudo_pwd: str):
         """
         退出程序的方法
         Args:
+            process_name: 需要关闭的进程名称
             sudo_pwd: sudo 需要输入的 root 账号密码
 
         Returns:
             None
         """
-        command = "ps aux | grep run_tmall | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
-        os.system(f"echo {sudo_pwd}|sudo -S {command}")
-
-        command = "ps aux | grep tmall_by_goods | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
+        command = (
+            "ps aux | grep %s | grep -v grep | awk '{print $2}' | xargs sudo kill -9"
+            % process_name
+        )
         os.system(f"echo {sudo_pwd}|sudo -S {command}")
 
     @classmethod
