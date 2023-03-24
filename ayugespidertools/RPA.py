@@ -65,7 +65,9 @@ class AboutPyppeteer(object):
             # 当连续输出 scrapy 的统计信息 3 次时，则卡住
             if block_times >= 3:
                 # logger.info("quit process success")
-                cls.quit_process("自行替换 sudo root 的密码")
+                cls.quit_process(
+                    process_name="curr_process", sudo_pwd="自行替换 sudo root 的密码"
+                )
 
             # 当最新四行日志中未出现 scrapy 统计，则为正常状态，并清空日志
             elif block_times == 0:
