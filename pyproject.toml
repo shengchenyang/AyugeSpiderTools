@@ -18,7 +18,7 @@ opencv-python = "^4.6.0.66"
 PyMySQL = "^1.0.2"
 environs = "^9.5.0"
 loguru = "^0.6.0"
-numpy = "^1.23.3"
+numpy = "1.24.2"
 PyExecJS = "^1.5.1"
 requests = "^2.28.1"
 Pillow = "^9.2.0"
@@ -37,6 +37,7 @@ pycryptodome = "^3.15.0"
 oss2 = "^2.16.0"
 aiomysql = "^0.1.1"
 attrs = "^22.2.0"
+toml = "^0.10.2"
 
 [tool.poetry.scripts]
 ayuge = "ayugespidertools.utils.cmdline:execute"
@@ -48,17 +49,70 @@ black = "^23.1.0"
 isort = "^5.12.0"
 sphinx-rtd-theme = "^1.2.0"
 recommonmark = "^0.7.1"
+coverage = "^7.2.2"
+tox = "^4.4.8"
 
 [[tool.poetry.source]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.pytest.ini_options]
+xfail_strict = true
+python_files = "test_*.py __init__.py"
+python_classes = ""
+testpaths = [
+    "tests",
+]
+norecursedirs = ["dist", "build", "docs", "examples"]
+addopts = "--assert=plain --doctest-modules"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore:scrapy.downloadermiddlewares.decompression is deprecated",
+    "ignore:Module scrapy.utils.reqser is deprecated",
+    "ignore:typing.re is deprecated",
+    "ignore:typing.io is deprecated"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["ayugespidertools"]
+parallel = true
+omit = [
+    "tests/docs/*",
+    "tests/VIT/*",
+    "tests/conftest.py",
+    "tests/**/__init__.py",
+    "ayugespidertools/**/__init__.py",
+    "ayugespidertools/utils/cmdline.py",
+    "ayugespidertools/scraper/pipelines/*",
+    "ayugespidertools/scraper/http/*",
+    "ayugespidertools/scraper/middlewares/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if __name__ == '__main__':",
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "__repr__",
+    "__str__",
+]
+precision = 2
+fail_under = 30
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "coverage.xml"
 
 [tool.black]
 line-length = 88
 
 [tool.isort]
 profile = "black"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

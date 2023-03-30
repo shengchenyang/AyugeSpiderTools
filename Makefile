@@ -21,6 +21,10 @@ else
     endif
 endif
 
+start:
+	pip install poetry
+	poetry install
+
 build:
 	poetry build
 
@@ -39,14 +43,31 @@ release:
 	poetry publish
 
 test:
-	pytest -W ignore::DeprecationWarning tests/test_MysqlClient.py
+	coverage run -m pytest
+	coverage combine
+	coverage report
+	make clean
+
+pytest:
+	pytest -W ignore::DeprecationWarning
 
 
 path = $(subst /,$(strip $(PATHSEP)),$1)
 
 clean:
 	-$(RMDIR) $(call path,.pytest_cache)
+	-$(RMDIR) $(call path,ayugespidertools$(PATHSEP)__pycache__)
+	-$(RMDIR) $(call path,ayugespidertools$(PATHSEP)common$(PATHSEP)__pycache__)
+	-$(RMDIR) $(call path,ayugespidertools$(PATHSEP)scraper$(PATHSEP)__pycache__)
+	-$(RMDIR) $(call path,dist)
+	-$(RMDIR) $(call path,docs$(PATHSEP)_build)
+	-$(RMDIR) $(call path,htmlcov)
 	-$(RMDIR) $(call path,tests$(PATHSEP)__pycache__)
 	-$(RMDIR) $(call path,tests$(PATHSEP).pytest_cache)
-	-$(RMDIR) $(call path,dist)
+	-$(RMDIR) $(call path,tests$(PATHSEP)test_commands$(PATHSEP).pytest_cache)
+	-$(RMDIR) $(call path,tests$(PATHSEP)test_common$(PATHSEP).pytest_cache)
+	-$(RM) $(call path,.coverage)
+	-$(RM) $(call path,.coverage.*)
+	-$(RM) $(call path,coverage.xml)
+	-$(RMDIR) $(call path,.tox)
 	pip uninstall -y ayugespidertools

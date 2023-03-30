@@ -1,3 +1,5 @@
+import pytest
+
 from ayugespidertools.Oss import AliOssBase
 
 OSS_CONFIG = {
@@ -8,10 +10,10 @@ OSS_CONFIG = {
     "operateDoc": "",
 }
 
-ali_oss = AliOssBase(**OSS_CONFIG)
 
-
+@pytest.mark.skip()
 def test_put_oss():
+    ali_oss = AliOssBase(**OSS_CONFIG)
     # 连接 ali oss
     with open("docs/image/1.png", "rb") as f:
         file_bytes = f.read()
@@ -24,7 +26,9 @@ def test_put_oss():
     assert put_status is True
 
 
+@pytest.mark.skip()
 def test_enumer_file_by_pre():
+    ali_oss = AliOssBase(**OSS_CONFIG)
     res = ali_oss.enumer_file_by_pre(prefix="Video_Dir")
     print(res)
     res = ali_oss.enumer_file_by_pre(prefix="Video_Dir", count_by_type="mp3")

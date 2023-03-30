@@ -128,11 +128,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-/.git
-/.idea
-/${project_name}_venv
-/${project_name}/VIT/
-/${project_name}/logs/
-/${project_name}/test/
 *.pyc
 .cache/
+/.git
+/.idea
+/${project_name}_venv/
+/${project_name}/VIT/
+/${project_name}/logs/
+/${project_name}/tests/
+/venv/

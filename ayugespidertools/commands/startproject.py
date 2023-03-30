@@ -15,6 +15,7 @@ TEMPLATES_TO_RENDER = (
     ("pyproject.toml",),
     ("README.md",),
     ("requirements.txt",),
+    (".gitignore",),
     ("scrapy.cfg",),
     ("${project_name}", "settings.py.tmpl"),
     ("${project_name}", "items.py.tmpl"),
@@ -66,6 +67,8 @@ class AyuCommand(Command):
             render_templatefile(
                 tplfile,
                 project_name=project_name,
+                # 这个 py 就只为了处理模板中 .gitignore 多余的 $py 干扰
+                py="$py",
                 ProjectName=string_camelcase(project_name),
             )
 
