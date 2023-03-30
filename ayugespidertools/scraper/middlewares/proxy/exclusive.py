@@ -12,30 +12,30 @@ class ExclusiveProxyDownloaderMiddleware(object):
     独享代理中间件
     """
 
-    def __init__(self, exclusive_proxy_config):
+    def __init__(self, exclusive_proxy_conf):
         """
         初始化独享代理设置
         Args:
-            exclusive_proxy_config: 使用的独享代理的配置信息
+            exclusive_proxy_conf: 使用的独享代理的配置信息
         """
         self.proxy = None
         # 查看独享代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
-            dict_config=exclusive_proxy_config,
+            dict_conf=exclusive_proxy_conf,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"],
         )
-        assert is_match, f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_config_example}"
+        assert is_match, f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_conf_example}"
 
-        self.proxy_url = exclusive_proxy_config["PROXY_URL"]
-        self.username = exclusive_proxy_config["USERNAME"]
-        self.password = exclusive_proxy_config["PASSWORD"]
-        self.proxy_index = exclusive_proxy_config["PROXY_INDEX"]
+        self.proxy_url = exclusive_proxy_conf["PROXY_URL"]
+        self.username = exclusive_proxy_conf["USERNAME"]
+        self.password = exclusive_proxy_conf["PASSWORD"]
+        self.proxy_index = exclusive_proxy_conf["PROXY_INDEX"]
 
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
         s = cls(
-            exclusive_proxy_config=crawler.settings.get("EXCLUSIVE_PROXY_CONFIG", None)
+            exclusive_proxy_conf=crawler.settings.get("EXCLUSIVE_PROXY_CONFIG", None)
         )
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s

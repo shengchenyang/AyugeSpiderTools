@@ -1,8 +1,9 @@
 import pytest
 
 from ayugespidertools.common.SqlFormat import AboutSql
+from ayugespidertools.MysqlClient import MysqlOrm
 from tests import tests_sqlfiledir
-from tests.conftest import test_table
+from tests.conftest import PYMYSQL_CONFIG, test_table
 
 
 @pytest.fixture(scope="module")
@@ -95,3 +96,70 @@ def test_update_data(mysql_first_step, mysql_db_cursor):
     mysql_db_cursor.execute(select_sql, select_value)
     _select_res = mysql_db_cursor.fetchall()
     assert _select_res[0][1] == _favor_count_updated
+
+
+# 以上测试使用的是测试中的 mysql_db_cursor，以下真正使用的是库中的 MysqlOrm 来测试
+@pytest.fixture(scope="class")
+def mysqlorm_conn():
+    yield MysqlOrm(pymsql_connect_conf=PYMYSQL_CONFIG)
+
+
+class TestMysqlOrm:
+    def test_mysqlorm_insert_data(self, mysqlorm_conn, mysql_db_cursor):
+        insert_sql, insert_value = AboutSql.insert_generate(
+            db_table=test_table,
+            data={
+                "article_detail_url": "https://blog.csdn.net/scm_2008/article/details/129387927",
+                "article_title": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
+                "comment_count": "160",
+                "favor_count": "174",
+                "nick_name": "天罡gg_ttt",
+            },
+        )
+        mysqlorm_conn.insert_data(sql_pre=insert_sql, sql_after=insert_value)
+
+        # 插入后查询这条数据，如果搜索结果中存在一条及以上则正常
+        select_sql, select_value = AboutSql.select_generate(
+            db_table=test_table,
+            key=["id", "article_title"],
+            rule={
+                "nick_name|=": "天罡gg_ttt",
+                "article_title|=": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
+            },
+        )
+
+        mysql_db_cursor.execute(select_sql, select_value)
+        _select_res = mysql_db_cursor.fetchall()
+        assert len(_select_res) >= 1
+
+    def test_mysqlorm_search_data(self, mysqlorm_conn, mysql_db_cursor):
+        select_sql, select_value = AboutSql.select_generate(
+            db_table=test_table,
+            key=["id", "article_title"],
+            rule={"nick_name|=": "youcans_"},
+            limit=1,
+        )
+        status, res = mysqlorm_conn.search_data(
+            sql_pre=select_sql, sql_after=select_value
+        )
+        assert status == 1, res == "【ChatGPT 视觉模型】Visual ChatGPT 深度解析"
+
+    def test_mysqlorm_update_data(self, mysqlorm_conn, mysql_db_cursor):
+        _favor_count_updated = "200"
+        update_sql, update_value = AboutSql.update_generate(
+            db_table=test_table,
+            data={"favor_count": _favor_count_updated},
+            rule={"id": "1"},
+        )
+        mysqlorm_conn.update_data(sql_pre=update_sql, sql_after=update_value)
+
+        # 更新后查询这条数据，如果确实修改则正常
+        select_sql, select_value = AboutSql.select_generate(
+            db_table=test_table,
+            key=["id", "favor_count"],
+            rule={"id|=": "1"},
+        )
+
+        mysql_db_cursor.execute(select_sql, select_value)
+        _select_res = mysql_db_cursor.fetchall()
+        assert _select_res[0][1] == _favor_count_updated

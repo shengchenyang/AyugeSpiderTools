@@ -12,20 +12,20 @@ __all__ = ["AsyncMysqlPipeline"]
 
 class AsyncMysqlPipeline(AyuMysqlPipeline):
     def open_spider(self, spider):
-        assert hasattr(spider, "mysql_config"), "未配置 Mysql 连接信息！"
+        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
 
         self.slog = spider.slog
-        self.mysql_config = spider.mysql_config
+        self.mysql_conf = spider.mysql_conf
         self.collate = ToolsForAyu.get_collate_by_charset(
-            mysql_config=self.mysql_config
+            mysql_conf=self.mysql_conf
         )
         return ReuseOperation.as_deferred(self._open_spider(spider))
 
     async def _open_spider(self, spider):
-        # 将 mysql_config 改为 aiomysql 所需要的配置
-        self.mysql_config["db"] = self.mysql_config.pop("database")
-        self.mysql_config["cursorclass"] = aiomysql.DictCursor
-        self.pool = await aiomysql.create_pool(**self.mysql_config)
+        # 将 mysql_conf 改为 aiomysql 所需要的配置
+        self.mysql_conf["db"] = self.mysql_conf.pop("database")
+        self.mysql_conf["cursorclass"] = aiomysql.DictCursor
+        self.pool = await aiomysql.create_pool(**self.mysql_conf)
         # 创建列表以存储任务
         self.tasks = []
 

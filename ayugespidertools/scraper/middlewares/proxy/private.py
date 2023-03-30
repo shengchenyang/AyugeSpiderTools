@@ -39,7 +39,7 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
 
     @retry(stop_max_attempt_number=Param.retry_num)
     def get_proxy_ip(self, size, isdict: Optional[bool] = None):
-        proxy_url = f"http://dps.kdlapi.com/api/getdps?orderid={self.simidaili_config['orderid']}&num={size}&signature={self.simidaili_config['signature']}&format=json"
+        proxy_url = f"http://dps.kdlapi.com/api/getdps?orderid={self.simidaili_conf['orderid']}&num={size}&signature={self.simidaili_conf['signature']}&format=json"
         if self.important_error:
             raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
 
@@ -133,8 +133,8 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
         if isinstance(exception, self.EXCEPTIONS_TO_RETRY):
             current_ip = request.meta["proxy"].split("" // "")[-1]
             url = "https://dps.kdlapi.com/api/checkdpsvalid?orderid={}&signature={}&proxy={}".format(
-                self.simidaili_config["orderid"],
-                self.simidaili_config["signature"],
+                self.simidaili_conf["orderid"],
+                self.simidaili_conf["signature"],
                 current_ip,
             )
             is_exists = requests.get(url).json()
@@ -199,11 +199,10 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
     def spider_opened(self, spider):
         settings = get_project_settings()
         # TODO: 根据 nacos/consul 获取代理配置信息
-        # resx = get_nacos_config(env="prod", data_id="KUAI_PROXY_PRIVATE")
         resx = json.dumps({"username": "***", "password": "***"})
-        self.simidaili_config = json.loads(resx)
-        self.username = self.simidaili_config["username"]
-        self.password = self.simidaili_config["password"]
+        self.simidaili_conf = json.loads(resx)
+        self.username = self.simidaili_conf["username"]
+        self.password = self.simidaili_conf["password"]
 
         if settings.get("SMPPSIZE"):
             if settings.get("SMPPSIZE") < 1:

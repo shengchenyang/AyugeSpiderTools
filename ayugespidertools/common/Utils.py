@@ -1,10 +1,14 @@
 import copy
 import dataclasses
 import json
-from typing import List, Optional, Union
+import xml.etree.ElementTree as ET
+from typing import List, Literal, Optional, Union
+from urllib.parse import urlparse
 
+import hcl2
 import pandas
 import requests
+import yaml
 from itemadapter import ItemAdapter
 
 import ayugespidertools.Items
@@ -17,6 +21,9 @@ from ayugespidertools.FormatData import DataHandle
 __all__ = [
     "ToolsForAyu",
 ]
+
+ConsulFormatStr = Literal["JSON", "HCL", "YAML", "XML"]
+ConsulConfNameStr = Literal["MONGODB", "MYSQL"]
 
 
 class ToolsForAyu(object):
@@ -48,84 +55,69 @@ class ToolsForAyu(object):
     @classmethod
     def get_kvs_detail_by_consul(
         cls,
-        host: str,
-        port: int,
-        token: str,
-        key_values: str,
-        group: Optional[str] = None,
-    ) -> dict:
+        url: str,
+        token: Optional[str] = None,
+    ) -> str:
         """
         获取 consul 的 key_values 的详细信息
         Args:
-            host: consul host
-            port: consul port
-            token: consul token，最好只要有只读权限的 token 即可
-            key_values: 需要获取的 consul key_values 参数值
-            group: key_values 所属的 group，如果没有的话不设置此值即可
+            token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
+            url: 当前 consul 所需配置的 url
 
         Returns:
             conf_value: consul 的 group 下 key_values 的详细信息
         """
-        if group:
-            consul_url = f"http://{host}:{port}/v1/kv/{group}/{key_values}?dc=dc1"
-        else:
-            consul_url = f"http://{host}:{port}/v1/kv/{key_values}?dc=dc1"
+        url_params = urlparse(url).query
 
         curr_consul_headers = copy.deepcopy(Param.consul_headers)
         curr_consul_headers["X-Consul-Token"] = token
-        r = requests.get(consul_url, headers=curr_consul_headers, verify=False)
-        conf_value = EncryptOperation.base64_decode(decode_data=r.json()[0]["Value"])
-        return json.loads(conf_value)
+        r = requests.get(url, headers=curr_consul_headers, verify=False)
+        # 判断是否返回的 raw 原始数据
+        if "raw" in url_params:
+            return r.text
+        return EncryptOperation.base64_decode(decode_data=r.json()[0]["Value"])
 
     @classmethod
-    def get_mysql_conf_by_consul(
+    def get_conf_by_consul(
         cls,
-        host: str,
-        port: int,
-        token: str,
-        key_values: str,
-        group: Optional[str] = None,
+        conf_name: ConsulConfNameStr,
+        url: str,
+        format: ConsulFormatStr = "json",
+        token: Optional[str] = None,
     ):
         """
         获取 consul 中的 mysql 配置信息
         Args:
-            host: consul host
-            port: consul port
-            token: consul token，最好只要有只读权限的 token 即可
-            key_values: 需要获取的 consul key_values 参数值
-            group: key_values 所属的 group，如果没有的话不设置此值即可
+            conf_name: 需要获取的配置，本选项只有 "MYSQL" 和 "MONGODB"。
+            token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
+            format: consul 中的配置格式，默认为 json 格式
+            url: 当前 consul 所需配置的 url
 
         Returns:
             1). consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
         """
-        conf_value = cls.get_kvs_detail_by_consul(host, port, token, key_values, group)
-        mysql_conf = conf_value["MYSQL"] or conf_value["mysql"]
-        return ReuseOperation.dict_keys_to_lower(mysql_conf)
+        conf_value = cls.get_kvs_detail_by_consul(url, token)
+        if format == "json":
+            conf_data = json.loads(conf_value)
+        elif format == "hcl":
+            conf_data = hcl2.loads(conf_value)
+        elif format == "yaml":
+            conf_data = yaml.safe_load(conf_value)
+        elif format == "xml":
+            root = ET.fromstring(conf_value)
+            # 将 XML 数据转换成 Python 字典
+            conf_data = {}
+            for child in root:
+                conf_data[child.tag] = {}
+                for sub_child in child:
+                    conf_data[child.tag][sub_child.tag] = sub_child.text
+        else:
+            raise ValueError("consul 暂不支持该格式的配置")
 
-    @classmethod
-    def get_mongodb_conf_by_consul(
-        cls,
-        host: str,
-        port: int,
-        token: str,
-        key_values: str,
-        group: Optional[str] = None,
-    ):
-        """
-        获取 consul 中的 mysql 配置信息
-        Args:
-            host: consul host
-            port: consul port
-            token: consul token，最好只要有只读权限的 token 即可
-            key_values: 需要获取的 consul key_values 参数值
-            group: key_values 所属的 group，如果没有的话不设置此值即可
-
-        Returns:
-            1). consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
-        """
-        conf_value = cls.get_kvs_detail_by_consul(host, port, token, key_values, group)
-        mysql_conf = conf_value["MONGODB"] or conf_value["mongodb"]
-        return ReuseOperation.dict_keys_to_lower(mysql_conf)
+        _conf = conf_data.get(conf_name, {})
+        if not _conf:
+            logger.info(f"consul 中未设置 {conf_name} 的配置信息")
+        return ReuseOperation.dict_keys_to_lower(_conf)
 
     @classmethod
     @DataHandle.simple_deal_for_extract
@@ -224,11 +216,11 @@ class ToolsForAyu(object):
         return ""
 
     @staticmethod
-    def get_collate_by_charset(mysql_config: dict) -> str:
+    def get_collate_by_charset(mysql_conf: dict) -> str:
         """
         根据 mysql 的 charset 获取对应默认的 collate
         Args:
-            mysql_config: mysql 连接配置
+            mysql_conf: mysql 连接配置
 
         Returns:
             collate: 排序规则
@@ -245,10 +237,10 @@ class ToolsForAyu(object):
             "euckr": "euckr_korean_ci",
             "greek": "greek_general_ci",
         }
-        collate = charset_collate_map.get(mysql_config["charset"])
+        collate = charset_collate_map.get(mysql_conf["charset"])
         assert (
             collate is not None
-        ), f"数据库配置出现未知 charset：{mysql_config['charset']}，若抛错请查看或手动创建所需数据表！"
+        ), f"数据库配置出现未知 charset：{mysql_conf['charset']}，若抛错请查看或手动创建所需数据表！"
         return collate
 
     @staticmethod

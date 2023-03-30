@@ -1218,6 +1218,28 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
+name = "lark"
+version = "1.1.5"
+description = "a modern parsing library"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lark-1.1.5-py3-none-any.whl", hash = "sha256:8476f9903e93fbde4f6c327f74d79e9b4bd0ed9294c5dfa3164ab8c581b5de2a"},
+    {file = "lark-1.1.5.tar.gz", hash = "sha256:4b534eae1f9af5b4ea000bea95776350befe1981658eea3820a01c37e504bb4d"},
+]
+
+[package.extras]
+atomic-cache = ["atomicwrites"]
+nearley = ["js2py"]
+regex = ["regex"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
 name = "loguru"
 version = "0.6.0"
 description = "Python logging made (stupidly) simple"
@@ -2363,6 +2385,26 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
+name = "python-hcl2"
+version = "4.3.0"
+description = "A parser for HCL2"
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "python-hcl2-4.3.0.tar.gz", hash = "sha256:41e37e2a9b3d223da5e8ebc99e72b40d2315087e966f458f7eac13c7831d9b9e"},
+    {file = "python_hcl2-4.3.0-py3-none-any.whl", hash = "sha256:6c76d1d523b6fb8ca6d1f70308459f310853e124c4bbfe9fcc018bcacdc78a40"},
+]
+
+[package.dependencies]
+lark = ">=1,<2"
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
 name = "pytz"
 version = "2022.4"
 description = "World timezone definitions, modern and historical"
@@ -3414,4 +3456,4 @@ reference = "aliyun"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ed3733de02a56b4602276266f8c90604fdf853867e32d6c6a3ef72d4a773a27f"
+content-hash = "dab912aae7c78d7ac76783d3474f951189ece86c930cb14c85d13e0e124860cf"

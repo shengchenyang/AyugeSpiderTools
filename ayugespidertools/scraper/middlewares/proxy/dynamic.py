@@ -15,17 +15,17 @@ class DynamicProxyDownloaderMiddleware(object):
         """
         从 scrapy 配置中取出动态隧道代理的信息
         """
-        dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
+        dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
-            dict_config=dynamic_proxy_config,
+            dict_conf=dynamic_proxy_conf,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )
-        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
+        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
 
-        self.proxy_url = dynamic_proxy_config["PROXY_URL"]
-        self.username = dynamic_proxy_config["USERNAME"]
-        self.password = dynamic_proxy_config["PASSWORD"]
+        self.proxy_url = dynamic_proxy_conf["PROXY_URL"]
+        self.username = dynamic_proxy_conf["USERNAME"]
+        self.password = dynamic_proxy_conf["PASSWORD"]
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -72,17 +72,17 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         Args:
             settings: scrapy 配置信息
         """
-        dynamic_proxy_config = settings.get("DYNAMIC_PROXY_CONFIG", None)
+        dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
-            dict_config=dynamic_proxy_config,
+            dict_conf=dynamic_proxy_conf,
             key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
         )
-        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_config_example}"
+        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
 
-        self.proxy_url = dynamic_proxy_config["PROXY_URL"]
-        self.username = dynamic_proxy_config["USERNAME"]
-        self.password = dynamic_proxy_config["PASSWORD"]
+        self.proxy_url = dynamic_proxy_conf["PROXY_URL"]
+        self.username = dynamic_proxy_conf["USERNAME"]
+        self.password = dynamic_proxy_conf["PASSWORD"]
 
     @classmethod
     def from_crawler(cls, crawler):

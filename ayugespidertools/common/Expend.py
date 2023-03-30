@@ -22,7 +22,6 @@ class MysqlErrorHandlingMixin(object):
 
     def get_column_type(
         self,
-        conn,
         cursor,
         database: str,
         table: str,
@@ -31,7 +30,6 @@ class MysqlErrorHandlingMixin(object):
         """
         获取数据字段存储类型
         Args:
-            conn: 类型为 pymysql.connections.Connection, mysql conn
             cursor: 类型为 pymysql.cursors.Cursor, mysql cursor
             database: 数据库名
             table: 数据表名
@@ -102,29 +100,29 @@ class MysqlErrorHandlingMixin(object):
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(self, pymysql_dict_config: dict):
+    def _connect(self, pymysql_dict_conf: dict):
         """
         链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
         Args:
-            pymysql_dict_config: 链接所需的参数
+            pymysql_dict_conf: 链接所需的参数
 
         Returns:
             1).pymysql.connections.Connection, 链接句柄
         """
         try:
-            conn = pymysql.connect(**pymysql_dict_config)
+            conn = pymysql.connect(**pymysql_dict_conf)
         except Exception as e:
-            logger.warning(f"目标数据库：{pymysql_dict_config['database']} 不存在，尝试创建中...")
+            logger.warning(f"目标数据库：{pymysql_dict_conf['database']} 不存在，尝试创建中...")
             if "1049" in str(e):
                 # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
-                ReuseOperation.create_database(pymysql_dict_config)
+                ReuseOperation.create_database(pymysql_dict_conf)
         else:
             # 连接没有问题就直接返回连接对象
             return conn
         # 出现数据库不存在问题后，在创建数据库 create_database 后，再次返回连接对象
-        return pymysql.connect(**pymysql_dict_config)
+        return pymysql.connect(**pymysql_dict_conf)
 
     def deal_1054_error(self, err_msg: str, conn, cursor, table: str, note_dic: dict):
         """
@@ -251,7 +249,7 @@ class MysqlErrorHandlingMixin(object):
             colum = text[0]
             notes = note_dic[colum]
             column_type = self.get_column_type(
-                conn=conn, cursor=cursor, database=database, table=table, column=colum
+                cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
@@ -290,7 +288,7 @@ class MysqlErrorHandlingMixin(object):
             colum = text[0]
             notes = note_dic[colum]
             column_type = self.get_column_type(
-                conn=conn, cursor=cursor, database=database, table=table, column=colum
+                cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
@@ -316,7 +314,7 @@ class MysqlErrorHandlingMixin(object):
         Returns:
             log_info: 日志信息
         """
-        mysql_config = spider.mysql_config
+        mysql_conf = spider.mysql_conf
         text = {}
         stats = spider.stats.get_stats()
         error_reason = ""
@@ -354,11 +352,11 @@ class MysqlErrorHandlingMixin(object):
                 text[k.replace("/", "_")] = v
 
         log_info = {
-            "database": mysql_config["database"],
+            "database": mysql_conf["database"],
             # 脚本名称
             "spider_name": spider.name,
             # uid
-            "uid": f'{mysql_config["database"]}|{spider.name}',
+            "uid": f'{mysql_conf["database"]}|{spider.name}',
             # 请求次数统计
             "request_counts": text.get("downloader_request_count", 0),
             # 接收次数统计

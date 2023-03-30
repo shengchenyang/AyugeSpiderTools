@@ -19,7 +19,7 @@ class AyuStatisticsMysqlPipeline(MysqlErrorHandlingMixin):
         self.conn = None
         self.cursor = None
         self.collate = None
-        self.mysql_config = None
+        self.mysql_conf = None
         self.crawl_time = datetime.date.today()
 
     @classmethod
@@ -28,12 +28,10 @@ class AyuStatisticsMysqlPipeline(MysqlErrorHandlingMixin):
 
     def open_spider(self, spider):
         self.slog = spider.slog
-        self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(
-            mysql_config=self.mysql_config
-        )
+        self.mysql_conf = spider.mysql_conf
+        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
 
-        self.conn = self._connect(self.mysql_config)
+        self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
     def insert(self, data_item, table):

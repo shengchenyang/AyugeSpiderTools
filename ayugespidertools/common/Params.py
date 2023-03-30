@@ -60,13 +60,13 @@ class Param:
     IS_LINUX = platform.system().lower() == "linux"
 
     # 动态隧道代理配置示例
-    dynamic_proxy_config_example = {
+    dynamic_proxy_conf_example = {
         "PROXY_URL": "动态隧道代理地址：***.***.com:*****",
         "USERNAME": "隧道代理用户名",
         "PASSWORD": "对应用户的密码",
     }
     # 独享代理配置示例
-    exclusive_proxy_config_example = {
+    exclusive_proxy_conf_example = {
         "PROXY_URL": "独享代理地址：'http://***.com/api/***&num=100&format=json'",
         "USERNAME": "独享代理用户名",
         "PASSWORD": "对应用户的密码",

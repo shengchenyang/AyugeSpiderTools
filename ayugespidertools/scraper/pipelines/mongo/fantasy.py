@@ -12,45 +12,39 @@ class AyuFtyMongoPipeline(MongoDbBase):
 
     def __init__(
         self,
-        mongodb_config: dict,
-        app_conf_manage: bool,
         collection_prefix: str = "",
     ) -> None:
         """
-        初始化 mongoDB 连接，正常的话会返回 mongoDB 的连接对象 `connect` 和 `db` 对象
+        初始化
         Args:
-            mongodb_config: mongDB 的连接配置
-            app_conf_manage: 应用配置管理是否开启，用于从 consul 中取值；
-                只有当 app_conf_manage 开启且不存在本地配置 LOCAL_MONGODB_CONFIG 时，才会从 consul 中取值！
+            mongodb_conf: mongDB 的连接配置
             collection_prefix: mongDB 存储集合的前缀，默认为空字符
         """
-        assert any([mongodb_config, app_conf_manage]), "未配置 MongoDB 连接信息！"
         assert isinstance(collection_prefix, str), "mongoDB 所要存储的集合前缀名称需要是 str 格式！"
 
         self.collection_prefix = collection_prefix or ""
-        self.mongodb_config = None
-        # 优先从本地中取配置
-        if mongodb_config:
-            self.mongodb_config = ReuseOperation.dict_keys_to_lower(mongodb_config)
-            super(AyuFtyMongoPipeline, self).__init__(**self.mongodb_config)
+        self.mongodb_conf = None
+        # conn 和 db 为父类的属性，用于存储连接信息
+        self.conn = None
+        self.db = None
 
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            mongodb_config=crawler.settings.get("LOCAL_MONGODB_CONFIG"),
-            app_conf_manage=crawler.settings.get("APP_CONF_MANAGE"),
             collection_prefix=crawler.settings.get("MONGODB_COLLECTION_PREFIX", ""),
         )
 
     def open_spider(self, spider):
-        if not self.mongodb_config:
-            self.mongodb_config = ReuseOperation.dict_keys_to_lower(spider.mongodb_conf)
-            super(AyuFtyMongoPipeline, self).__init__(**self.mongodb_config)
+        assert hasattr(
+            spider, "mongodb_conf"
+        ), "未配置 MongoDB 连接信息，请查看 .conf 或 consul 上对应配置信息！"
+        self.mongodb_conf = ReuseOperation.dict_keys_to_lower(spider.mongodb_conf)
+        super(AyuFtyMongoPipeline, self).__init__(**self.mongodb_conf)
 
         # 用于输出日志
         if all([self.conn, self.db]):
             spider.slog.info(
-                f"已连接至 host: {self.mongodb_config['host']}, database: {self.mongodb_config['database']} 的 MongoDB 目标数据库"
+                f"已连接至 host: {self.mongodb_conf['host']}, database: {self.mongodb_conf['database']} 的 MongoDB 目标数据库"
             )
 
     def close_spider(self, spider):
@@ -78,7 +72,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
                 judge_item = next(iter(insert_data.values()))
                 # 判断数据中中的 alldata 的格式：
                 #     1.推荐：是嵌套 dict，就像 AyuMysqlPipeline 一样 -- 这是为了通用写法风格；
-                #     2. 是单层的 dict
+                #     2.是单层的 dict
                 # 是 namedtuple 类型
                 if ReuseOperation.is_namedtuple_instance(judge_item):
                     insert_data = {
@@ -93,7 +87,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
             # 否则为旧格式
             else:
                 insert_data = ReuseOperation.get_items_except_keys(
-                    dict_config=item_dict,
+                    dict_conf=item_dict,
                     key_list=["table", "item_mode", "mongo_update_rule"],
                 )
 

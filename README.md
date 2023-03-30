@@ -28,7 +28,7 @@
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！**你也可以根据 [3.3](#3.3. Build-Your-Own-Library) 自定义库**
+注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！**你也可以根据 [3.3](#3.3.-Build-Your-Own-Library) 自定义库**
 
 ## 2. 使用方法
 
@@ -106,9 +106,9 @@ scrapy crawl <spider_name>
 
 > 这里不再一一列举所有功能，大概介绍下包含的大致功能。
 
-- **数据处理相关：**比如一些字符串处理，`url` 拼接处理。
-- **常用加解密、编码：**`rsa`, `mm3` 等，其实更推荐 [chepy](https://github.com/securisec/chepy) 库 - 你能用 [icyberchef](https://icyberchef.com/) 测试跑通的加解密都可以用此库更方便地实现，两三行代码即可搞定。
-- **sql 语句拼接：**只能做到最简单的逻辑，如果需要灵活或稍复杂的情况，请参考 `directsql`, `python-sql`, `pypika`或 `pymilk` 等其它第三方类似功能库的实现方法。
+- **数据处理相关:** 比如一些字符串处理，`url` 拼接处理。
+- **常用加解密、编码:** `rsa`, `mm3` 等，其实更推荐 [chepy](https://github.com/securisec/chepy) 库 - 你能用 [icyberchef](https://icyberchef.com/) 测试跑通的加解密都可以用此库更方便地实现，两三行代码即可搞定。
+- **sql 语句拼接:** 只能做到最简单的逻辑，如果需要灵活或稍复杂的情况，请参考 `directsql`, `python-sql`, `pypika`或 `pymilk` 等其它第三方类似功能库的实现方法。
 - **滑块图片缺口位置识别及轨迹生成**
 
 注：
@@ -137,7 +137,7 @@ scrapy crawl <spider_name>
 
 ### 3.2. 你可能在意的事
 
-> 此项目会慢慢丰富 `python` 开发中的遇到的通用方法，详情请见 [TodoList](# TodoList)。
+> 此项目会慢慢丰富 `python` 开发中的遇到的通用方法，详情请见 [TodoList](#TodoList)。
 
 1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或移除对你无用模块、修改库名等，你可以自行修改后 `build`。
 2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy` 项目及其它组件，且你也可以根据上条须知来增强此库功能。因为模板功能天生就有及其明确的优缺点，我无法覆盖所有应用场景，**但是它的高效率的确会解放双手**。
@@ -146,7 +146,7 @@ scrapy crawl <spider_name>
 
 > 具体内容请以 [poetry 官方文档](https://python-poetry.org/docs/) 为准。
 
-据 [3.2](#3.2. 你可能在意的事) 可知，你可以 `clone` 源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板等），修改完成后 `poetry  build` 或 `make build` 即可打包使用。
+据 [3.2](#3.2.-你可能在意的事) 可知，你可以 `clone` 源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板等），修改完成后 `poetry  build` 或 `make build` 即可打包使用。
 
 比如你可能需要更新依赖库中 `pymongo` 为新版本 `x.x.x`，那只需 `poetry install` 安装现有依赖后，再 `poetry add pymongo@x.x.x` 安装目标版本（尽量不要使用 `poetry update pymongo`），确定测试正常了即可 `poetry build` 打包使用。
 

@@ -183,27 +183,27 @@ class ReuseOperation(object):
         return ret
 
     @classmethod
-    def is_dict_meet_min_limit(cls, dict_config: dict, key_list: list) -> bool:
+    def is_dict_meet_min_limit(cls, dict_conf: dict, key_list: list) -> bool:
         """
-        判断 dict_config 是否满足 key_list 中的 key 值限定
+        判断 dict_conf 是否满足 key_list 中的 key 值限定
         Args:
-            dict_config: 需要判断的参数
-            key_list: dict_config 中需要包含的 key 值列表，示例为：['proxy', 'username', 'password']
+            dict_conf: 需要判断的参数
+            key_list: dict_conf 中需要包含的 key 值列表，示例为：['proxy', 'username', 'password']
 
         Returns:
             1). 是否满足 key 值限制
         """
-        if any([not dict_config, not isinstance(dict_config, dict)]):
+        if any([not dict_conf, not isinstance(dict_conf, dict)]):
             return False
 
-        return all(key in dict_config for key in key_list)
+        return all(key in dict_conf for key in key_list)
 
     @classmethod
-    def get_items_by_keys(cls, dict_config: dict, key_list: list) -> Union[dict, bool]:
+    def get_items_by_keys(cls, dict_conf: dict, key_list: list) -> Union[dict, bool]:
         """
-        获取 dict_config 中的含有 key_list 的 key 的字段
+        获取 dict_conf 中的含有 key_list 的 key 的字段
         Args:
-            dict_config: 需要处理的参数
+            dict_conf: 需要处理的参数
             key_list: 需要取的 key 值列表
 
         Returns:
@@ -211,55 +211,55 @@ class ReuseOperation(object):
         """
         # 参数先要满足最小限定，然后再取出限定的参数值；否则直接返回 False
         return (
-            {k: dict_config[k] for k in key_list}
-            if cls.is_dict_meet_min_limit(dict_config=dict_config, key_list=key_list)
+            {k: dict_conf[k] for k in key_list}
+            if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=key_list)
             else False
         )
 
     @classmethod
-    def get_items_except_keys(cls, dict_config, key_list: list) -> dict:
+    def get_items_except_keys(cls, dict_conf, key_list: list) -> dict:
         """
-        获取 dict_config 中的不含有 key_list 的 key 的字段
+        获取 dict_conf 中的不含有 key_list 的 key 的字段
         Args:
-            dict_config: 需要处理的参数
+            dict_conf: 需要处理的参数
             key_list: 需要排除的 key 值列表
 
         Returns:
-            1). dict_config 排除 key_list 中的键值后的值
+            1). dict_conf 排除 key_list 中的键值后的值
         """
-        return {k: dict_config[k] for k in dict_config if k not in key_list}
+        return {k: dict_conf[k] for k in dict_conf if k not in key_list}
 
     @classmethod
-    def create_database(cls, pymysql_dict_config: dict):
+    def create_database(cls, pymysql_dict_conf: dict):
         """
         创建数据库
         由于这是在连接数据库，报数据库不存在错误时的场景，则需要新建(不指定数据库)连接创建好所需数据库即可
         Args:
-            pymysql_dict_config: pymysql 的数据库连接配置 dict
+            pymysql_dict_conf: pymysql 的数据库连接配置 dict
 
         Returns:
             None
         """
-        # 判断 pymysql_dict_config 是否满足最少的 key 值
-        judge_pymysql_dict_config = cls.is_dict_meet_min_limit(
-            dict_config=pymysql_dict_config,
+        # 判断 pymysql_dict_conf 是否满足最少的 key 值
+        judge_pymysql_dict_conf = cls.is_dict_meet_min_limit(
+            dict_conf=pymysql_dict_conf,
             key_list=["host", "port", "user", "password", "charset"],
         )
         assert (
-            judge_pymysql_dict_config
+            judge_pymysql_dict_conf
         ), "创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！"
 
-        pymysql_dict_config_tmp = copy.deepcopy(pymysql_dict_config)
-        if "database" in pymysql_dict_config_tmp:
-            del pymysql_dict_config_tmp["database"]
-        conn = pymysql.connect(**pymysql_dict_config_tmp)
+        pymysql_dict_conf_tmp = copy.deepcopy(pymysql_dict_conf)
+        if "database" in pymysql_dict_conf_tmp:
+            del pymysql_dict_conf_tmp["database"]
+        conn = pymysql.connect(**pymysql_dict_conf_tmp)
         cursor = conn.cursor()
         cursor.execute(
-            f"""CREATE DATABASE `{pymysql_dict_config["database"]}` character set {pymysql_dict_config["charset"]};"""
+            f"""CREATE DATABASE `{pymysql_dict_conf["database"]}` character set {pymysql_dict_conf["charset"]};"""
         )
         conn.close()
         logger.info(
-            f"""创建数据库 {pymysql_dict_config["database"]} 成功，其 charset 类型是：{pymysql_dict_config["charset"]}!"""
+            f"""创建数据库 {pymysql_dict_conf["database"]} 成功，其 charset 类型是：{pymysql_dict_conf["charset"]}!"""
         )
 
     @classmethod
@@ -314,20 +314,13 @@ class ReuseOperation(object):
         Returns:
             consul_conf_dict_min: 满足要求的最少要求的 consul 配置
         """
-        consul_conf_dict = settings.get("CONSUL_CONFIG")
+        consul_conf_dict = settings.get("CONSUL_CONFIG", {})
         consul_conf_dict_lowered = cls.dict_keys_to_lower(consul_conf_dict)
-        # 取最少需要配置的值，consul 一般情况下最少需要 host, port 和 token 共三个值
+        # 取最少需要配置的值，consul 一般情况下最少需要 token, url 两个值，format 默认为 json
         consul_conf_dict_min = cls.get_items_by_keys(
-            dict_config=consul_conf_dict_lowered, key_list=["host", "port", "token"]
+            dict_conf=consul_conf_dict_lowered, key_list=["token", "url", "format"]
         )
         assert consul_conf_dict_min, f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！"
-        # 添加 key_values 的值，如果没有设置，则默认取全局配置中的 ENV 值
-        consul_conf_dict_min["key_values"] = (
-            consul_conf_dict_lowered["key_values"]
-            if consul_conf_dict_lowered.get("key_values")
-            else settings.get("ENV")
-        )
-        consul_conf_dict_min["group"] = consul_conf_dict_lowered["group"]
         return consul_conf_dict_min
 
     @classmethod

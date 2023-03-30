@@ -47,7 +47,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         self.record_log_to_mysql = record_log_to_mysql
         # 排序规则，用于创建数据库时使用
         self.collate = None
-        self.mysql_config = None
+        self.mysql_conf = None
         self.conn = None
         self.slog = None
         self.cursor = None
@@ -67,14 +67,12 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         )
 
     def open_spider(self, spider):
-        assert hasattr(spider, "mysql_config"), "未配置 Mysql 连接信息！"
+        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
 
         self.slog = spider.slog
-        self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(
-            mysql_config=self.mysql_config
-        )
-        self.conn = self._connect(self.mysql_config)
+        self.mysql_conf = spider.mysql_conf
+        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
+        self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
     def get_table_name(self, table: str) -> str:
@@ -132,7 +130,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         else:
             # 将存入表的无关字段给去掉
             save_data_item = ReuseOperation.get_items_except_keys(
-                dict_config=item, key_list=["table", "item_mode"]
+                dict_conf=item, key_list=["table", "item_mode"]
             )
             for key, value in save_data_item.items():
                 new_item[key] = value
@@ -192,7 +190,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     err_msg=err_msg,
                     table_prefix=self.table_prefix,
                     cursor=self.cursor,
-                    charset=self.mysql_config["charset"],
+                    charset=self.mysql_conf["charset"],
                     collate=self.collate,
                     table_enum=self.table_enum,
                 )
@@ -203,7 +201,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     err_msg=err_msg,
                     conn=self.conn,
                     cursor=self.cursor,
-                    database=self.mysql_config["database"],
+                    database=self.mysql_conf["database"],
                     table=table,
                     note_dic=note_dic,
                 )
@@ -214,7 +212,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
                     err_msg=err_msg,
                     conn=self.conn,
                     cursor=self.cursor,
-                    database=self.mysql_config["database"],
+                    database=self.mysql_conf["database"],
                     table=table,
                     note_dic=note_dic,
                 )
@@ -235,7 +233,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             self.insert_script_statistics(log_info)
             self.table_collection_statistics(
                 spider_name=spider.name,
-                database=spider.mysql_config["database"],
+                database=spider.mysql_conf["database"],
                 crawl_time=self.crawl_time,
             )
 

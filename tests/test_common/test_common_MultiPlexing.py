@@ -16,7 +16,7 @@ def test_judge_str_is_json():
 
 
 def test_get_items_except_keys():
-    dict_config = {
+    dict_conf = {
         "alldata": {
             "article_title": DataItem("如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件", "文章标题"),
             "comment_count": DataItem("69", "文章评论数量"),
@@ -27,7 +27,7 @@ def test_get_items_except_keys():
         "item_mode": "Mysql",
     }
     res = ReuseOperation.get_items_except_keys(
-        dict_config=dict_config, key_list=["table", "item_mode"]
+        dict_conf=dict_conf, key_list=["table", "item_mode"]
     )
     print("res:", res)
     assert list(res.keys()) == ["alldata"]
@@ -36,11 +36,11 @@ def test_get_items_except_keys():
 def test_is_dict_meet_min_limit():
     judge_dict = {"user": "admin", "age": 18, "height": 170}
     res = ReuseOperation.is_dict_meet_min_limit(
-        dict_config=judge_dict,
+        dict_conf=judge_dict,
         key_list=["user", "age"],
     )
     res2 = ReuseOperation.is_dict_meet_min_limit(
-        dict_config=judge_dict,
+        dict_conf=judge_dict,
         key_list=["user", "address"],
     )
     assert all([res is True, res2 is False])

@@ -46,7 +46,7 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
             # 否则为旧格式
             else:
                 insert_data = ReuseOperation.get_items_except_keys(
-                    dict_config=item_dict,
+                    dict_conf=item_dict,
                     key_list=["table", "item_mode", "mongo_update_rule"],
                 )
 

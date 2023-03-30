@@ -12,13 +12,13 @@ SearchTypeStr = Literal["all", "one"]
 class MysqlOrm(object):
     """数据库的简单使用，结合 SqlFormat 方法使用（临时使用）"""
 
-    def __init__(self, pymsql_connect_config: dict):
-        self.connection = pymysql.connect(**pymsql_connect_config)
-        self.cursor = self.connection.cursor()
+    def __init__(self, pymsql_connect_conf: dict):
+        self.conn = pymysql.connect(**pymsql_connect_conf)
+        self.cursor = self.conn.cursor()
 
     def insert_data(self, sql_pre: str, sql_after: tuple):
         self.cursor.execute(sql_pre, sql_after)
-        self.connection.commit()
+        self.conn.commit()
 
     def search_data(
         self, sql_pre: str, sql_after: tuple, type: SearchTypeStr = "one"
@@ -31,12 +31,12 @@ class MysqlOrm(object):
 
     def update_data(self, sql_pre: str, sql_after: tuple):
         self.cursor.execute(sql_pre, sql_after)
-        self.connection.commit()
+        self.conn.commit()
 
     def close(self):
         self.cursor.close()
-        self.connection.close()
+        self.conn.close()
 
     def __del__(self):
         self.cursor.close()
-        self.connection.close()
+        self.conn.close()

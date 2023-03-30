@@ -20,22 +20,20 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def open_spider(self, spider):
         self.slog = spider.slog
-        self.mysql_config = spider.mysql_config
-        self.collate = ToolsForAyu.get_collate_by_charset(
-            mysql_config=self.mysql_config
-        )
+        self.mysql_conf = spider.mysql_conf
+        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
 
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         # 记录日志时需要此连接对象，否则直接关闭
         if self.record_log_to_mysql:
-            self.conn = self._connect(pymysql_dict_config=self.mysql_config)
+            self.conn = self._connect(pymysql_dict_conf=self.mysql_conf)
             self.cursor = self.conn.cursor()
         else:
-            self._connect(pymysql_dict_config=self.mysql_config).close()
+            self._connect(pymysql_dict_conf=self.mysql_conf).close()
 
-        self.mysql_config["cursorclass"] = cursors.DictCursor
+        self.mysql_conf["cursorclass"] = cursors.DictCursor
         self.dbpool = adbapi.ConnectionPool(
-            "pymysql", cp_reconnect=True, **self.mysql_config
+            "pymysql", cp_reconnect=True, **self.mysql_conf
         )
         query = self.dbpool.runInteraction(self.db_create)
         query.addErrback(self.db_create_err)
@@ -88,7 +86,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     err_msg=err_msg,
                     table_prefix=self.table_prefix,
                     cursor=cursor,
-                    charset=self.mysql_config["charset"],
+                    charset=self.mysql_conf["charset"],
                     collate=self.collate,
                     table_enum=self.table_enum,
                 )
@@ -99,7 +97,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     err_msg=err_msg,
                     conn=None,
                     cursor=cursor,
-                    database=self.mysql_config["database"],
+                    database=self.mysql_conf["database"],
                     table=table,
                     note_dic=note_dic,
                 )
@@ -110,7 +108,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                     err_msg=err_msg,
                     conn=None,
                     cursor=cursor,
-                    database=self.mysql_config["database"],
+                    database=self.mysql_conf["database"],
                     table=table,
                     note_dic=note_dic,
                 )
@@ -127,8 +125,8 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def close_spider(self, spider):
         # 不删除 cursorclass 其实也不影响
-        if "cursorclass" in self.mysql_config.keys():
-            del self.mysql_config["cursorclass"]
+        if "cursorclass" in self.mysql_conf.keys():
+            del self.mysql_conf["cursorclass"]
 
         # 这里新建数据库链接，是为了正常继承父类的脚本运行统计的方法（需要 self 的 mysql 连接对象存在）
         super(AyuTwistedMysqlPipeline, self).close_spider(spider)

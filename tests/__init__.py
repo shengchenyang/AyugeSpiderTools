@@ -8,29 +8,29 @@ config_parser = configparser.ConfigParser()
 config_parser.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 
 # 测试环境中各种配置信息，已脱敏，请自行配置 VIT 的 .conf 文件后测试
-mysql_config = config_parser["MYSQL"]
-mongodb_config = config_parser["MONGODB"]
-oss_config = config_parser["ALI_OSS"]
+mysql_conf = config_parser["MYSQL"]
+mongodb_conf = config_parser["MONGODB"]
+oss_conf = config_parser["ALI_OSS"]
 
 # 测试 Mysql 数据库配置
 PYMYSQL_CONFIG = {
-    "host": mysql_config["HOST"],
-    "port": mysql_config.getint("PORT"),
-    "user": mysql_config["USER"],
-    "password": mysql_config["PASSWORD"],
-    "database": mysql_config["DATABASE"],
-    "charset": mysql_config["CHARSET"],
+    "host": mysql_conf["HOST"],
+    "port": mysql_conf.getint("PORT"),
+    "user": mysql_conf["USER"],
+    "password": mysql_conf["PASSWORD"],
+    "database": mysql_conf["DATABASE"],
+    "charset": mysql_conf["CHARSET"],
     # "cursorclass": pymysql.cursors.Cursor,
 }
 
 # 测试 MongoDB 数据库配置
 MONGODB_CONFIG = {
-    "host": mongodb_config["HOST"],
-    "port": mongodb_config.getint("PORT"),
-    "user": mongodb_config["USER"],
-    "password": mongodb_config["PASSWORD"],
-    "authsource": mongodb_config["AUTHSOURCE"],
-    "database": mongodb_config["DATABASE"],
+    "host": mongodb_conf["HOST"],
+    "port": mongodb_conf.getint("PORT"),
+    "user": mongodb_conf["USER"],
+    "password": mongodb_conf["PASSWORD"],
+    "authsource": mongodb_conf["AUTHSOURCE"],
+    "database": mongodb_conf["DATABASE"],
 }
 
 # 测试 MongoDB 数据库配置
@@ -38,9 +38,16 @@ MONGODB_CONN_URI = config_parser["MONGODB_URI"]["CONN_URI"]
 
 # 读取 Oss 配置信息，已脱敏，请自行配置后测试
 OSS_CONFIG = {
-    "OssAccessKeyId": oss_config["OSSACCESSKEYID"],
-    "OssAccessKeySecret": oss_config["OSSACCESSKEYSECRET"],
-    "Endpoint": oss_config["ENDPOINT"],
-    "examplebucket": oss_config["EXAMPLEBUCKET"],
-    "operateDoc": oss_config["OPERATEDOC"],
+    "OssAccessKeyId": oss_conf["OSSACCESSKEYID"],
+    "OssAccessKeySecret": oss_conf["OSSACCESSKEYSECRET"],
+    "Endpoint": oss_conf["ENDPOINT"],
+    "examplebucket": oss_conf["EXAMPLEBUCKET"],
+    "operateDoc": oss_conf["OPERATEDOC"],
+}
+
+# consul 应用管理的连接配置
+CONSUL_CONFIG = {
+    "TOKEN": config_parser.get("CONSUL", "TOKEN", fallback=None),
+    "URL": config_parser.get("CONSUL", "URL", fallback=None),
+    "FORMAT": config_parser.get("CONSUL", "FORMAT", fallback="json"),
 }
