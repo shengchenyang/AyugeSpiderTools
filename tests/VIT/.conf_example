@@ -22,11 +22,9 @@ PASSWORD=***
 CONN_URI=***
 
 [CONSUL]
-HOST=***
-PORT=8500
 TOKEN=***
-KEY_VALUES=***
-GROUP=
+URL=http://host:port/v1/kv/...?dc=dc1
+FORMAT=json
 
 [WWXRobot]
 key=***

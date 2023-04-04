@@ -1,10 +1,13 @@
 from pymysql import cursors
 from twisted.enterprise import adbapi
 
+from ayugespidertools.common.MysqlErrorHandle import TwistedAsynchronous, deal_mysql_err
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
-__all__ = ["AyuTwistedMysqlPipeline"]
+__all__ = [
+    "AyuTwistedMysqlPipeline",
+]
 
 
 class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
@@ -26,15 +29,21 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         # 记录日志时需要此连接对象，否则直接关闭
         if self.record_log_to_mysql:
-            self.conn = self._connect(pymysql_dict_conf=self.mysql_conf)
+            self.conn = self._connect(self.mysql_conf)
             self.cursor = self.conn.cursor()
         else:
-            self._connect(pymysql_dict_conf=self.mysql_conf).close()
+            self._connect(self.mysql_conf).close()
 
-        self.mysql_conf["cursorclass"] = cursors.DictCursor
-        self.dbpool = adbapi.ConnectionPool(
-            "pymysql", cp_reconnect=True, **self.mysql_conf
-        )
+        _mysql_conf = {
+            "user": spider.mysql_conf.user,
+            "password": spider.mysql_conf.password,
+            "host": spider.mysql_conf.host,
+            "port": spider.mysql_conf.port,
+            "db": spider.mysql_conf.database,
+            "charset": spider.mysql_conf.charset,
+            "cursorclass": cursors.DictCursor,
+        }
+        self.dbpool = adbapi.ConnectionPool("pymysql", cp_reconnect=True, **_mysql_conf)
         query = self.dbpool.runInteraction(self.db_create)
         query.addErrback(self.db_create_err)
 
@@ -56,13 +65,11 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         item_o = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
         table = super(AyuTwistedMysqlPipeline, self).get_table_name(item["table"])
 
-        # 以下逻辑直接 copy 父类的 insert_item 方法，只是剔除了 commit 方法和修改 cursor 而已
-        new_item = item_o.get("new_item")
+        if not (new_item := item_o.get("new_item")):
+            return
+
         note_dic = item_o.get("notes_dic")
-        keys = f"""`{"`, `".join(new_item.keys())}`"""
-        values = ", ".join(["%s"] * len(new_item))
-        update = ",".join([f" `{key}` = %s" for key in new_item])
-        sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+        sql = self._get_sql_by_item(table=table, item=new_item)
 
         try:
             cursor.execute(sql, tuple(new_item.values()) * 2)
@@ -70,53 +77,19 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         except Exception as e:
             self.slog.warning(f":{e}")
             self.slog.warning(f"Item:{new_item}  Table: {table}")
-            err_msg = str(e)
-            if "1054" in err_msg:
-                self.deal_1054_error(
-                    err_msg=err_msg,
-                    conn=None,
-                    cursor=cursor,
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.db_insert(cursor, item)
-
-            elif "1146" in err_msg:
-                self.deal_1146_error(
-                    err_msg=err_msg,
-                    table_prefix=self.table_prefix,
-                    cursor=cursor,
-                    charset=self.mysql_conf["charset"],
-                    collate=self.collate,
-                    table_enum=self.table_enum,
-                )
-                return self.db_insert(cursor, item)
-
-            elif "1406" in err_msg:
-                self.deal_1406_error(
-                    err_msg=err_msg,
-                    conn=None,
-                    cursor=cursor,
-                    database=self.mysql_conf["database"],
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.db_insert(cursor, item)
-
-            elif "1265" in err_msg:
-                self.deal_1265_error(
-                    err_msg=err_msg,
-                    conn=None,
-                    cursor=cursor,
-                    database=self.mysql_conf["database"],
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.db_insert(cursor, item)
-
-            else:
-                # 碰到其他的异常才打印错误日志，已处理的异常不打印
-                self.slog.error(f"ERROR:{e}")
+            deal_mysql_err(
+                TwistedAsynchronous(),
+                err_msg=str(e),
+                cursor=cursor,
+                charset=self.mysql_conf.charset,
+                collate=self.collate,
+                database=self.mysql_conf.database,
+                table=table,
+                table_prefix=self.table_prefix,
+                table_enum=self.table_enum,
+                note_dic=note_dic,
+            )
+            return self.db_insert(cursor, item)
 
         return item
 
@@ -124,9 +97,5 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         self.slog.error(f"插入数据失败:{failure}, item: {item}")
 
     def close_spider(self, spider):
-        # 不删除 cursorclass 其实也不影响
-        if "cursorclass" in self.mysql_conf.keys():
-            del self.mysql_conf["cursorclass"]
-
         # 这里新建数据库链接，是为了正常继承父类的脚本运行统计的方法（需要 self 的 mysql 连接对象存在）
         super(AyuTwistedMysqlPipeline, self).close_spider(spider)

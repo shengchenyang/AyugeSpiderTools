@@ -1,5 +1,4 @@
 import copy
-import dataclasses
 import json
 import xml.etree.ElementTree as ET
 from typing import List, Literal, Optional, Union
@@ -11,10 +10,10 @@ import requests
 import yaml
 from itemadapter import ItemAdapter
 
-import ayugespidertools.Items
 from ayugespidertools.common.Encryption import EncryptOperation
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.Params import Param
+from ayugespidertools.common.TypeVars import MysqlConfig
 from ayugespidertools.config import logger
 from ayugespidertools.FormatData import DataHandle
 
@@ -84,7 +83,7 @@ class ToolsForAyu(object):
         url: str,
         format: ConsulFormatStr = "json",
         token: Optional[str] = None,
-    ):
+    ) -> dict:
         """
         获取 consul 中的 mysql 配置信息
         Args:
@@ -216,7 +215,7 @@ class ToolsForAyu(object):
         return ""
 
     @staticmethod
-    def get_collate_by_charset(mysql_conf: dict) -> str:
+    def get_collate_by_charset(mysql_conf: MysqlConfig) -> str:
         """
         根据 mysql 的 charset 获取对应默认的 collate
         Args:
@@ -237,35 +236,11 @@ class ToolsForAyu(object):
             "euckr": "euckr_korean_ci",
             "greek": "greek_general_ci",
         }
-        collate = charset_collate_map.get(mysql_conf["charset"])
+        collate = charset_collate_map.get(mysql_conf.charset)
         assert (
             collate is not None
-        ), f"数据库配置出现未知 charset：{mysql_conf['charset']}，若抛错请查看或手动创建所需数据表！"
+        ), f"数据库配置出现未知 charset：{mysql_conf.charset}，若抛错请查看或手动创建所需数据表！"
         return collate
-
-    @staticmethod
-    def convert_item_to_dict(item) -> dict:
-        """
-        将 item 结构数据转为 dict 格式（这种转换方法太过啰嗦，已放弃，请使用下面的 convert_items_to_dict 方法）
-        Args:
-            item: 需要转换的参数
-
-        Returns:
-            1). 转换为 dict 格式的结果
-        """
-        # MongoDataItem 等其它的场景不再转换为 dict，直接使用 dataclass 即可
-        if isinstance(item, ayugespidertools.Items.MysqlDataItem):
-            return dataclasses.asdict(item)
-
-        elif isinstance(item, dict):
-            return item
-
-        elif isinstance(item, ayugespidertools.Items.ScrapyClassicItem):
-            return dict(item)
-
-        else:
-            logger.warning(f"出现未知 item 格式，item: {item}")
-            return dict(item)
 
     @staticmethod
     def convert_items_to_dict(item) -> ItemAdapter:

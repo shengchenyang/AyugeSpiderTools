@@ -1,10 +1,12 @@
 from twisted.internet import defer, reactor
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
+from ayugespidertools.common.MongoDBPipe import TwistedAsynchronous, mongodb_pipe
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 
-__all__ = ["AyuTwistedMongoPipeline"]
+__all__ = [
+    "AyuTwistedMongoPipeline",
+]
 
 
 class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
@@ -30,29 +32,10 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
         item_dict = ToolsForAyu.convert_items_to_dict(item)
         # 先查看存储场景是否匹配
         if item_dict["item_mode"] == "MongoDB":
-            insert_data = item_dict.get("alldata")
-            # 如果有 alldata 字段，则其为推荐格式
-            if all([insert_data, isinstance(insert_data, dict)]):
-                judge_item = next(iter(insert_data.values()))
-                if ReuseOperation.is_namedtuple_instance(judge_item):
-                    insert_data = {
-                        v: insert_data[v].key_value for v in insert_data.keys()
-                    }
-                elif isinstance(judge_item, dict):
-                    insert_data = {
-                        v: insert_data[v]["key_value"] for v in insert_data.keys()
-                    }
-
-            # 否则为旧格式
-            else:
-                insert_data = ReuseOperation.get_items_except_keys(
-                    dict_conf=item_dict,
-                    key_list=["table", "item_mode", "mongo_update_rule"],
-                )
-
-            # 真实的集合名称为：集合前缀名 + 集合名称
-            collection_name = f"""{self.collection_prefix}{item_dict["table"]}"""
-            self.db[collection_name].update(
-                item_dict["mongo_update_rule"], {"$set": insert_data}, True
+            mongodb_pipe(
+                TwistedAsynchronous(),
+                item_dict=item_dict,
+                db=self.db,
+                collection_prefix=self.collection_prefix,
             )
             reactor.callFromThread(out.callback, item_dict)

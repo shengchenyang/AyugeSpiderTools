@@ -16,16 +16,19 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
 
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(
-            mysql_conf=self.mysql_conf
-        )
+        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=spider.mysql_conf)
         return ReuseOperation.as_deferred(self._open_spider(spider))
 
     async def _open_spider(self, spider):
-        # 将 mysql_conf 改为 aiomysql 所需要的配置
-        self.mysql_conf["db"] = self.mysql_conf.pop("database")
-        self.mysql_conf["cursorclass"] = aiomysql.DictCursor
-        self.pool = await aiomysql.create_pool(**self.mysql_conf)
+        # aiomysql 所需要的配置
+        self.pool = await aiomysql.create_pool(
+            user=spider.mysql_conf.user,
+            password=spider.mysql_conf.password,
+            host=spider.mysql_conf.host,
+            port=spider.mysql_conf.port,
+            db=spider.mysql_conf.database,
+            charset=spider.mysql_conf.charset,
+        )
         # 创建列表以存储任务
         self.tasks = []
 
@@ -45,7 +48,6 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
                     item_dict["table"]
                 )
                 new_item = item_o.get("new_item")
-                # note_dic = item_o.get("notes_dic")
                 keys = f"""`{"`, `".join(new_item.keys())}`"""
                 values = ", ".join(["%s"] * len(new_item))
                 update = ",".join([f" `{key}` = %s" for key in new_item])

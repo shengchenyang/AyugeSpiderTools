@@ -1,13 +1,15 @@
 import dataclasses
 import datetime
 
-from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
+from ayugespidertools.common.Expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.Utils import ToolsForAyu
 
-__all__ = ["AyuStatisticsMysqlPipeline"]
+__all__ = [
+    "AyuStatisticsMysqlPipeline",
+]
 
 
-class AyuStatisticsMysqlPipeline(MysqlErrorHandlingMixin):
+class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     """
     Mysql 存储且记录脚本运行状态的简单示例
     """

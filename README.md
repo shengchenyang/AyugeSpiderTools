@@ -98,6 +98,13 @@ scrapy crawl <spider_name>
 
 + 11).demo_proxy_one: 快代理动态隧道代理示例
 + 12).demo_proxy_two: 测试快代理独享代理
+
++13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
++14).demo_crawl: 支持 scrapy CrawlSpider 的示例
+
+# 本库中给出支持 Item Loaders 特性的示例(文档地址：https://ayugespidertools.readthedocs.io/en/latest/topics/loaders.html)
++15).demo_item_loader: 本库 ScrapyClassicItem 及原生 scrapy item 动态添加 item 字段及支持 Item Loaders 的示例
++16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例
 ```
 
 注：具体内容及时效性请以 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中描述为准。
@@ -153,17 +160,17 @@ scrapy crawl <spider_name>
 ## TodoList
 
 - [x] `scrapy` 的扩展功能场景
-  - [ ] ~~`scrapy` 结合 `crawlab` 的日志统计功能~~ 
+  - [ ] ~~`scrapy` 结合 `crawlab` 的日志统计功能~~
   - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
   - [x] 自定义模板，在 `ayugespidertools startproject <projname>` 和 `ayugespidertools genspider <spidername>` 时生成适合本库的模板文件
   - [x] ~~增加根据 `nacos` 来获取配置的功能~~ -> 改为增加根据 `consul` 来获取配置的功能
   - [x] 代理中间件（独享代理、动态隧道代理）
   - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
   - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求
-    - [ ] `selenum`: 性能没有 `pyppeteer` 强
+    - [ ] ~~`selenium`: 性能没有 `pyppeteer` 强~~
     - [x] `pyppeteer`: `Gerapy-pyppeteer` 库已经实现此功能
     - [x] `requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率
-    - [ ] `splash`: 继承 `splash` 渲染 `js` 的功能
+    - [ ] ~~`splash`: 继承 `splash` 渲染 `js` 的功能~~
     - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
   - [x] `Mysql` 存储的场景下适配
     - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
@@ -184,3 +191,8 @@ scrapy crawl <spider_name>
     - [x] 根据滑块距离生成轨迹数组的方法
     - [x] 识别点选验证码位置及点击顺序，识别结果不太好，待优化
     - [x] 图片乱序混淆的还原方法示例
+
+注：
+
+- 不再开发结合 `selenium` 扩展的功能，推荐使用 `scrapy-playwright`，`Gerapy-pyppeteer` 等其它库；
+- 不再开发结合 `splash` 的功能，如果使用 `splash http api` 的话，在 `scrapy` ，本库或自写脚本中都比较容易扩展。如果要使用 `lua` `api` 等复杂的功能那还是推荐 `scrapy-splash` 这类的扩展库。

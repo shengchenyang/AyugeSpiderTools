@@ -1,16 +1,17 @@
 import asyncio
-import copy
 import json
 import os
 import random
 import re
-from typing import Any, Optional, Union
+from typing import Any, List, Union
 
 import cv2
 import numpy as np
 import pymysql
+from scrapy.settings import Settings
 from twisted.internet.defer import Deferred
 
+from ayugespidertools.common.TypeVars import MysqlConfig
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -48,41 +49,6 @@ class ReuseOperation(object):
         return isinstance(x, tuple) and hasattr(x, "_fields")
 
     @staticmethod
-    def judge_file_style(
-        media_file_or_url: str,
-        strict: bool = False,
-        media_type: Optional[str] = None,
-    ) -> str:
-        """
-        判断新增图片的格式类型（此方法是为了防止图片地址格式不统一，造成图片格式提取错误）
-        Args:
-            media_file_or_url: 需要判断格式类型的文件或文件链接
-            strict: media 是否为严格模式，严格模式下也需要仔细判断
-            media_type: media 文件的类型，image，vedio，voice 等
-
-        Returns:
-            1): 文件的格式信息
-        """
-        if any([media_file_or_url.startswith("http"), strict]):
-            image_style = [
-                ".svg",
-                ".png",
-                ".jpg",
-                ".jpeg",
-                ".bmp",
-                ".wav",
-                ".mp3",
-                ".ogg",
-                ".flv",
-            ]
-            for image_format in image_style:
-                if image_format in media_file_or_url:
-                    return image_format[1:]
-
-        # 否则就是文件，则返回文件后缀即可
-        return media_file_or_url.split(".")[-1]
-
-    @staticmethod
     def get_file_name_by_url(file_url: str) -> str:
         """
         根据文件链接取出文件的名称
@@ -97,9 +63,8 @@ class ReuseOperation(object):
             return file_name_list[0]
         return ""
 
-    # TODO: 优化此方法，修改方法名称等
     @staticmethod
-    def get_voice_files(path: str) -> list:
+    def get_files_from_path(path: str) -> list:
         """
         获取 path 文件夹下的所有文件
         Args:
@@ -127,7 +92,10 @@ class ReuseOperation(object):
         return file_bytes
 
     @staticmethod
-    def read_image_data(bg: Union[bytes, str], tp: Union[bytes, str]):
+    def read_image_data(
+        bg: Union[bytes, str],
+        tp: Union[bytes, str],
+    ) -> (np.ndarray, np.ndarray):
         """
         用 opencv 读取图片数据
         Args:
@@ -183,7 +151,7 @@ class ReuseOperation(object):
         return ret
 
     @classmethod
-    def is_dict_meet_min_limit(cls, dict_conf: dict, key_list: list) -> bool:
+    def is_dict_meet_min_limit(cls, dict_conf: dict, key_list: List[str]) -> bool:
         """
         判断 dict_conf 是否满足 key_list 中的 key 值限定
         Args:
@@ -199,7 +167,11 @@ class ReuseOperation(object):
         return all(key in dict_conf for key in key_list)
 
     @classmethod
-    def get_items_by_keys(cls, dict_conf: dict, key_list: list) -> Union[dict, bool]:
+    def get_items_by_keys(
+        cls,
+        dict_conf: dict,
+        key_list: List[str],
+    ) -> Union[dict, bool]:
         """
         获取 dict_conf 中的含有 key_list 的 key 的字段
         Args:
@@ -217,7 +189,7 @@ class ReuseOperation(object):
         )
 
     @classmethod
-    def get_items_except_keys(cls, dict_conf, key_list: list) -> dict:
+    def get_items_except_keys(cls, dict_conf, key_list: List[str]) -> dict:
         """
         获取 dict_conf 中的不含有 key_list 的 key 的字段
         Args:
@@ -230,36 +202,30 @@ class ReuseOperation(object):
         return {k: dict_conf[k] for k in dict_conf if k not in key_list}
 
     @classmethod
-    def create_database(cls, pymysql_dict_conf: dict):
+    def create_database(cls, mysql_conf: MysqlConfig) -> None:
         """
         创建数据库
         由于这是在连接数据库，报数据库不存在错误时的场景，则需要新建(不指定数据库)连接创建好所需数据库即可
         Args:
-            pymysql_dict_conf: pymysql 的数据库连接配置 dict
+            mysql_conf: pymysql 的数据库连接配置
 
         Returns:
             None
         """
-        # 判断 pymysql_dict_conf 是否满足最少的 key 值
-        judge_pymysql_dict_conf = cls.is_dict_meet_min_limit(
-            dict_conf=pymysql_dict_conf,
-            key_list=["host", "port", "user", "password", "charset"],
+        conn = pymysql.connect(
+            user=mysql_conf.user,
+            password=mysql_conf.password,
+            host=mysql_conf.host,
+            port=mysql_conf.port,
+            charset=mysql_conf.charset,
         )
-        assert (
-            judge_pymysql_dict_conf
-        ), "创建数据库时的 pymysql 连接参数不满足条件，可能多了 database 参数，或者少了某些参数！"
-
-        pymysql_dict_conf_tmp = copy.deepcopy(pymysql_dict_conf)
-        if "database" in pymysql_dict_conf_tmp:
-            del pymysql_dict_conf_tmp["database"]
-        conn = pymysql.connect(**pymysql_dict_conf_tmp)
         cursor = conn.cursor()
         cursor.execute(
-            f"""CREATE DATABASE `{pymysql_dict_conf["database"]}` character set {pymysql_dict_conf["charset"]};"""
+            f"CREATE DATABASE `{mysql_conf.database}` character set {mysql_conf.charset};"
         )
         conn.close()
         logger.info(
-            f"""创建数据库 {pymysql_dict_conf["database"]} 成功，其 charset 类型是：{pymysql_dict_conf["charset"]}!"""
+            f"创建数据库 {mysql_conf.database} 成功，其 charset 类型是：{mysql_conf.charset}!"
         )
 
     @classmethod
@@ -305,7 +271,7 @@ class ReuseOperation(object):
         return str_key_to_upper_dict
 
     @classmethod
-    def get_consul_conf(cls, settings: dict) -> dict:
+    def get_consul_conf(cls, settings: Settings) -> dict:
         """
         获取项目中的 consul 配置，且要根据项目整体情况来取出满足最少要求的 consul 配置
         Args:
@@ -316,12 +282,9 @@ class ReuseOperation(object):
         """
         consul_conf_dict = settings.get("CONSUL_CONFIG", {})
         consul_conf_dict_lowered = cls.dict_keys_to_lower(consul_conf_dict)
-        # 取最少需要配置的值，consul 一般情况下最少需要 token, url 两个值，format 默认为 json
-        consul_conf_dict_min = cls.get_items_by_keys(
+        return cls.get_items_by_keys(
             dict_conf=consul_conf_dict_lowered, key_list=["token", "url", "format"]
         )
-        assert consul_conf_dict_min, f"consul 配置：{consul_conf_dict} 不满足最小参数配置要求！"
-        return consul_conf_dict_min
 
     @classmethod
     def judge_str_is_json(cls, judge_str: str) -> bool:

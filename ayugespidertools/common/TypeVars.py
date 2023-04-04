@@ -3,9 +3,14 @@
 # However, it is more convenient to put the concise TypeVar in Params.py in the same directory,
 # such as NoneType = type(None), etc.
 from enum import Enum, unique
-from typing import TypedDict, TypeVar
+from typing import NamedTuple, Optional, TypedDict, TypeVar
 
-__all__ = ["TableTemplate", "TableEnumTypeVar"]
+__all__ = [
+    "TableTemplate",
+    "TableEnumTypeVar",
+    "MysqlConfig",
+    "MongoDBConfig",
+]
 
 TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
 
@@ -30,3 +35,21 @@ class TableEnum(Enum):
         notes="表注释信息(eg: 示例表信息)",
         demand_code="需求表对应数据(eg: Demo_table_demand_code，此示例没有意义，需要自定义)",
     )
+
+
+class MysqlConfig(NamedTuple):
+    host: str
+    port: int
+    user: str
+    password: str
+    database: Optional[str] = None
+    charset: Optional[str] = "utf8mb4"
+
+
+class MongoDBConfig(NamedTuple):
+    host: str
+    port: int
+    user: str
+    password: str
+    database: Optional[str] = None
+    authsource: Optional[str] = None

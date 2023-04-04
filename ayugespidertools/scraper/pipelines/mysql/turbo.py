@@ -4,7 +4,9 @@ from dbutils.pooled_db import PooledDB
 from ayugespidertools.common.Utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
-__all__ = ["AyuTurboMysqlPipeline"]
+__all__ = [
+    "AyuTurboMysqlPipeline",
+]
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
@@ -50,9 +52,17 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
 
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。这个并不需要此连接对象，直接关闭即可
-        self._connect(pymysql_dict_conf=self.mysql_conf).close()
+        self._connect(spider.mysql_conf).close()
 
         # 添加 PooledDB 的配置
-        self.mysql_conf.update(self.pool_db_conf)
-        self.conn = PooledDB(creator=pymysql, **self.mysql_conf).connection()
+        self.conn = PooledDB(
+            creator=pymysql,
+            user=self.mysql_conf.user,
+            password=self.mysql_conf.password,
+            host=self.mysql_conf.host,
+            port=self.mysql_conf.port,
+            database=self.mysql_conf.database,
+            charset=self.mysql_conf.charset,
+            **self.pool_db_conf
+        ).connection()
         self.cursor = self.conn.cursor()

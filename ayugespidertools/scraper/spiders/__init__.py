@@ -1,12 +1,15 @@
 import threading
 import time
-from typing import Union
 
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
 
 from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.SpiderDBConf import (
+    MongoDBConfCreator,
+    MysqlConfCreator,
+    get_spider_db_conf,
+)
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -107,8 +110,11 @@ class AyuSpider(Spider):
     @property
     def slog(self):
         """
-        本库的日志管理模块，使用 loguru 来管理日志；
-        本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
+        本库的日志管理模块，使用 loguru 来管理日志
+        注：
+            1. 本库不是通过适配器模式或 mixin 等方法对 scrapy logger 重写或扩展，而是
+        新增一个 slog 的日志管理方法，目前感觉这样最适合；
+            2. 本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
         """
         # 设置 loguru 日志配置
         loguru_conf_tmp = self.crawler.settings.get("LOGURU_CONFIG")
@@ -137,87 +143,9 @@ class AyuSpider(Spider):
             inner_settings["DATA_ENUM"] = custom_table_enum
 
         # 内置配置 inner_settings 优先级介于 project 和 spider 之间
-        # 即优先级顺序：settings.py < inner_settings < custom_settings
+        # 即优先级顺序：settings < inner_settings < custom_settings
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
-
-    @classmethod
-    def get_mysql_conf(
-        cls,
-        settings,
-    ) -> Union[dict, None]:
-        """
-        根据环境获取相应的 Mysql 数据库配置，获取其他自定义配置
-        Args:
-            settings: crawler settings 配置信息
-
-        Returns:
-            1). Mysql 数据库链接配置
-        """
-        # 自定义 mysql 链接配置
-        local_mysql_conf = settings.get("LOCAL_MYSQL_CONFIG", {})
-        # 是否开启应用配置管理
-        app_conf_manage = settings.get("APP_CONF_MANAGE", False)
-        if all([not local_mysql_conf.get("DATABASE"), not app_conf_manage]):
-            return None
-
-        # 1). 如果开启应用管理，从 consul 中获取应用配置
-        if app_conf_manage:
-            consul_conf = ReuseOperation.get_consul_conf(settings=settings)
-            return ToolsForAyu.get_conf_by_consul(conf_name="MYSQL", **consul_conf)
-
-        # 2). 从本地 local_mysql_config 的参数中取值
-        if ReuseOperation.is_dict_meet_min_limit(
-            dict_conf=local_mysql_conf,
-            key_list=["HOST", "PORT", "USER", "PASSWORD", "CHARSET", "DATABASE"],
-        ):
-            return {
-                "host": local_mysql_conf.get("HOST"),
-                "port": local_mysql_conf.get("PORT"),
-                "user": local_mysql_conf.get("USER"),
-                "password": local_mysql_conf.get("PASSWORD"),
-                "database": local_mysql_conf.get("DATABASE"),
-                "charset": local_mysql_conf.get("CHARSET") or "utf8mb4",
-            }
-
-    @classmethod
-    def get_mongodb_conf(
-        cls,
-        settings,
-    ) -> Union[dict, None]:
-        """
-        根据环境获取相应的 mongoDB 数据库配置，获取其他自定义配置
-        Args:
-            settings: crawler settings 配置信息
-
-        Returns:
-            1). MongoDB 数据库链接配置
-        """
-        # 自定义 mysql 链接配置
-        local_mongodb_conf = settings.get("LOCAL_MONGODB_CONFIG", {})
-        # 是否开启应用配置管理
-        app_conf_manage = settings.get("APP_CONF_MANAGE", False)
-        if all([not local_mongodb_conf.get("DATABASE"), not app_conf_manage]):
-            return None
-
-        # 1). 如果开启应用管理，从 consul 中获取应用配置
-        if app_conf_manage:
-            consul_conf = ReuseOperation.get_consul_conf(settings=settings)
-            return ToolsForAyu.get_conf_by_consul(conf_name="MONGODB", **consul_conf)
-
-        # 2). 从本地 local_mongo_conf 的参数中取值
-        if ReuseOperation.is_dict_meet_min_limit(
-            dict_conf=local_mongodb_conf,
-            key_list=["HOST", "PORT", "USER", "PASSWORD", "DATABASE"],
-        ):
-            return {
-                "host": local_mongodb_conf.get("HOST"),
-                "port": local_mongodb_conf.get("PORT"),
-                "user": local_mongodb_conf.get("USER"),
-                "password": local_mongodb_conf.get("PASSWORD"),
-                "authsource": local_mongodb_conf.get("AUTHSOURCE"),
-                "database": local_mongodb_conf.get("DATABASE"),
-            }
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -226,26 +154,31 @@ class AyuSpider(Spider):
 
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
-        spider.slog.debug(f"scrapy 当前配置为: {dict(crawler.settings)}")
 
+        _consul_conf = ReuseOperation.get_consul_conf(settings=crawler.settings)
         # 1).先配置 Mysql 的相关信息，如果存在 Mysql 配置，则把 mysql_conf 添加到 spider 上
-        if mysql_conf := cls.get_mysql_conf(settings=crawler.settings):
+        if mysql_conf := get_spider_db_conf(
+            MysqlConfCreator().create_product(
+                settings=crawler.settings, consul_conf=_consul_conf
+            )
+        ):
             spider.slog.info("项目中配置了 mysql_conf 信息")
             spider.mysql_conf = mysql_conf
-
-            # 如果打开了 mysql_engine_enabled 参数(用于 spiders 中数据入库前去重查询)
             if cls.mysql_engine_enabled:
                 mysql_url = (
-                    f'mysql+pymysql://{mysql_conf.get("user")}'
-                    f':{mysql_conf.get("password")}@{mysql_conf.get("host")}'
-                    f':{mysql_conf.get("port")}/{mysql_conf.get("database")}'
-                    f'?charset={mysql_conf.get("charset")}'
+                    f"mysql+pymysql://{mysql_conf.user}"
+                    f":{mysql_conf.password}@{mysql_conf.host}"
+                    f":{mysql_conf.port}/{mysql_conf.database}"
+                    f"?charset={mysql_conf.charset}"
                 )
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
         # 2).配置 MongoDB 的相关信息，如果存在 MongoDB 配置，则把 mongodb_conf 添加到 spider 上
-        if mongodb_conf := cls.get_mongodb_conf(settings=crawler.settings):
+        if mongodb_conf := get_spider_db_conf(
+            MongoDBConfCreator().create_product(
+                settings=crawler.settings, consul_conf=_consul_conf
+            )
+        ):
             spider.slog.info("项目中配置了 mongodb_conf 信息")
             spider.mongodb_conf = mongodb_conf
-
         return spider

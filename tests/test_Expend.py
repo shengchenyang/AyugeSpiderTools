@@ -1,4 +1,4 @@
-from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
+from ayugespidertools.common.Expend import MysqlPipeEnhanceMixin
 
 
 def test_get_column_type():

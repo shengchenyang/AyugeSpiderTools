@@ -94,7 +94,7 @@ class RequestByRequestsMiddleware(object):
             )
 
         except Exception as e:
-            """这里比较重要，还是推荐捕获所有错误；不建议只抛错 requests.exceptions.ConnectTimeout:"""
+            # 这里比较重要，还是推荐捕获所有错误；不建议只抛错 requests.exceptions.ConnectTimeout:
             return HtmlResponse(
                 url=request.url,
                 status=202,

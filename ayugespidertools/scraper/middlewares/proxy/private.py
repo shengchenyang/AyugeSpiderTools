@@ -31,7 +31,6 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
 
     @classmethod
     def from_crawler(cls, crawler):
-        # This method is used by Scrapy to create your spiders.
         s = cls(wwx_robot_key=crawler.settings.get("WWXRobot_key", None))
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)

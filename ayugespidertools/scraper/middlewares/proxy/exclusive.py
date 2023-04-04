@@ -33,7 +33,6 @@ class ExclusiveProxyDownloaderMiddleware(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        # This method is used by Scrapy to create your spiders.
         s = cls(
             exclusive_proxy_conf=crawler.settings.get("EXCLUSIVE_PROXY_CONFIG", None)
         )

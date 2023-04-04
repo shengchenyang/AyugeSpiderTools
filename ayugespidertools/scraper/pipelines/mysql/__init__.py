@@ -5,10 +5,11 @@ from typing import Optional, Type
 import pymysql
 from retrying import retry
 
-from ayugespidertools.common.Expend import MysqlErrorHandlingMixin
+from ayugespidertools.common.Expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.MultiPlexing import ReuseOperation
+from ayugespidertools.common.MysqlErrorHandle import Synchronize, deal_mysql_err
 from ayugespidertools.common.Params import Param
-from ayugespidertools.common.TypeVars import TableEnumTypeVar
+from ayugespidertools.common.TypeVars import MysqlConfig, TableEnumTypeVar
 from ayugespidertools.common.Utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class AyuMysqlPipeline(MysqlErrorHandlingMixin):
+class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     """
     Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例
     """
@@ -47,7 +48,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
         self.record_log_to_mysql = record_log_to_mysql
         # 排序规则，用于创建数据库时使用
         self.collate = None
-        self.mysql_conf = None
+        self.mysql_conf: Optional[MysqlConfig] = None
         self.conn = None
         self.slog = None
         self.cursor = None
@@ -161,10 +162,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             return
 
         note_dic = item_o.get("notes_dic")
-        keys = f"""`{"`, `".join(new_item.keys())}`"""
-        values = ", ".join(["%s"] * len(new_item))
-        update = ",".join([f" `{key}` = %s" for key in new_item])
-        sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+        sql = self._get_sql_by_item(table=table, item=new_item)
 
         try:
             if self.cursor.execute(sql, tuple(new_item.values()) * 2):
@@ -174,53 +172,20 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             self.slog.warning(f":{e}")
             self.slog.warning(f"Item:{new_item}  Table: {table}")
             self.conn.rollback()
-            err_msg = str(e)
-            if "1054" in err_msg:
-                self.deal_1054_error(
-                    err_msg=err_msg,
-                    conn=self.conn,
-                    cursor=self.cursor,
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.insert_item(item_o, table)
-
-            elif "1146" in err_msg:
-                self.deal_1146_error(
-                    err_msg=err_msg,
-                    table_prefix=self.table_prefix,
-                    cursor=self.cursor,
-                    charset=self.mysql_conf["charset"],
-                    collate=self.collate,
-                    table_enum=self.table_enum,
-                )
-                return self.insert_item(item_o, table)
-
-            elif "1406" in err_msg:
-                self.deal_1406_error(
-                    err_msg=err_msg,
-                    conn=self.conn,
-                    cursor=self.cursor,
-                    database=self.mysql_conf["database"],
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.insert_item(item_o, table)
-
-            elif "1265" in err_msg:
-                self.deal_1265_error(
-                    err_msg=err_msg,
-                    conn=self.conn,
-                    cursor=self.cursor,
-                    database=self.mysql_conf["database"],
-                    table=table,
-                    note_dic=note_dic,
-                )
-                return self.insert_item(item_o, table)
-
-            else:
-                # 碰到其他的异常才打印错误日志，已处理的异常不打印
-                self.slog.error(f"ERROR:{e}")
+            deal_mysql_err(
+                Synchronize(),
+                err_msg=str(e),
+                conn=self.conn,
+                cursor=self.cursor,
+                charset=self.mysql_conf.charset,
+                collate=self.collate,
+                database=self.mysql_conf.database,
+                table=table,
+                table_prefix=self.table_prefix,
+                table_enum=self.table_enum,
+                note_dic=note_dic,
+            )
+            return self.insert_item(item_o, table)
 
     def close_spider(self, spider):
         # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
@@ -233,7 +198,7 @@ class AyuMysqlPipeline(MysqlErrorHandlingMixin):
             self.insert_script_statistics(log_info)
             self.table_collection_statistics(
                 spider_name=spider.name,
-                database=spider.mysql_conf["database"],
+                database=spider.mysql_conf.database,
                 crawl_time=self.crawl_time,
             )
 

@@ -33,10 +33,10 @@ class MongoDbBase(object):
             authsource: mongoDB 身份验证需要的数据库名称，默认为 admin
             database: mongoDB 链接需要的数据库
             connect_style: mongoDB 的链接方式，参数选择有：
-                            1). uri: uri 方式；
-                            2). key: 关键字变量方式；
-                            3). auth: authenticate 或 admin 认证方式;
-                            默认为 uri 方式，但其实对外使用还是只传 user, password ... connect_style 的形式
+                1). uri: uri 方式；
+                2). key: 关键字变量方式；
+                3). auth: authenticate 或 admin 认证方式;
+                默认为 uri 方式，但其实对外使用还是只传 user, password ... connect_style 的形式
         """
         # uri 方式，默认使用此方式连接
         if any([not connect_style, connect_style in {"uri", "U"}]):
