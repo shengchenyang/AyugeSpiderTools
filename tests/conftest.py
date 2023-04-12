@@ -11,6 +11,18 @@ mongodb_database = MONGODB_CONFIG["database"]
 mongodb_ori = copy.deepcopy(MONGODB_CONFIG)
 
 
+class ForTestConfig:
+    """
+    用于测试需要的全局配置
+    """
+
+    # scrapy 默认配置
+    scrapy_default_settings = {
+        "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
+        "FEED_EXPORT_ENCODING": "utf-8",
+    }
+
+
 @pytest.fixture(scope="session")
 def mysql_db_conn():
     # 创建测试时可能需要的 mysql 数据库连接

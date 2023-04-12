@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 
-from gridfs import *
+from gridfs import GridFS
 from pymongo import MongoClient
 
 __all__ = [

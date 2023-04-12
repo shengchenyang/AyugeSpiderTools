@@ -38,8 +38,25 @@ def test_mmh3_hash128_encode():
 
 
 def test_rsa_encrypt():
-    rsa_key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCuR3+MuPOVYuAKOS6O+J/ds+JAesgyFforFupDiDBBMTItdXyMrG6gUPFxj/pT/9uQSq8Zxl7BrdiKdi0G2ppEn4Nym+VRLTv2+lNa3kvlrj25Lop7wDZkVRecK5oDvdaQHrm4KKiF7jZNbHEreWGsINLpGvzBMRNztRtOJ6+XEQIDAQAB"
+    rsa_key = (
+        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCuR3+MuPOVYuAKOS6O+J/ds+JAesgyFforFupDiDBBMTItdXyMrG6gUPFxj/pT/9uQSq8Z"
+        "xl7BrdiKdi0G2ppEn4Nym+VRLTv2+lNa3kvlrj25Lop7wDZkVRecK5oDvdaQHrm4KKiF7jZNbHEreWGsINLpGvzBMRNztRtOJ6+XEQIDAQAB"
+    )
     rsa_encrypted = EncryptOperation.rsa_encrypt(
         rsa_public_key=rsa_key, encode_data="123456"
     )
     assert rsa_encrypted is not None
+
+
+def test_uni_to_char():
+    char_res = EncryptOperation.uni_to_chr(uni="006A")
+    assert char_res == "j"
+
+    char_res = EncryptOperation.uni_to_chr(uni="U+006A")
+    assert char_res == "j"
+
+    char_res = EncryptOperation.uni_to_chr(uni="uni50")
+    assert char_res == "P"
+
+    char_res = EncryptOperation.uni_to_chr(uni="uni8EAB")
+    assert char_res == "身"

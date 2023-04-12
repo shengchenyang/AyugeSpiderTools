@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import re
 from typing import Union
 
 import mmh3
@@ -98,3 +99,19 @@ class EncryptOperation(object):
         o = mmh3.hash128(encode_data)
         hash128_encoded = hex(((o & 0xFFFFFFFFFFFFFFFF) << 64) + (o >> 64))
         return hash128_encoded[2:]
+
+    @staticmethod
+    def uni_to_chr(uni: str) -> str:
+        """
+        将 Unicode 码位表示的字符串转换正常的字符，用于获取字体映射时使用
+        Args:
+            uni: 需要转换的 unicode 字符串，
+                如：006A，但它可能是非标准的，可能需要去掉前面的 0x 或 uni。
+
+        Returns:
+            1). 转换后的字符
+        """
+        _uni = re.sub(r"^(0x|U\+|uni)", "", uni)
+        unicode_value = int(_uni, 16)
+        # 使用 chr() 函数将整数值转换为字符
+        return chr(unicode_value)

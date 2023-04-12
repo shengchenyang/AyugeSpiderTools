@@ -7,13 +7,13 @@ from scrapy import signals
 from scrapy.http import HtmlResponse, Request
 from scrapy.linkextractors import LinkExtractor
 from scrapy.settings import Settings
-from scrapy.spiders import CrawlSpider, Rule, Spider, XMLFeedSpider
+from scrapy.spiders import CrawlSpider, Rule, Spider
 from scrapy.utils.test import get_crawler
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.scraper.spiders import AyuSpider
 from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
 from tests import CONSUL_CONFIG, MONGODB_CONFIG, PYMYSQL_CONFIG
+from tests.conftest import ForTestConfig
 
 
 class TestSpider:
@@ -102,7 +102,10 @@ class TestSpider:
         record = sink[0]
         assert str(record).strip() == slog_info
 
-    def test_get_mysql_config(self):
+    def test_from_crawler_get_mysql_conf(self):
+        """
+        测试从爬虫 AyugeSpider(即 spider) 中获取 mysql 配置的方法
+        """
         # 测试本地 mysql 配置
         local_mysql_conf = {
             "HOST": PYMYSQL_CONFIG["host"],
@@ -116,14 +119,16 @@ class TestSpider:
             key.lower(): value for key, value in local_mysql_conf.items()
         }
         spider_settings = {"APP_CONF_MANAGE": False}
+        spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {"LOCAL_MYSQL_CONFIG": local_mysql_conf}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        spider = self.spider_class("example.com")
-        mysql_conf_res = spider.get_mysql_conf(settings=settings)
-        assert mysql_conf_res == true_mysql_conf
+        crawler = get_crawler(settings_dict=settings)
+        spider = self.spider_class.from_crawler(crawler, "example.com")
+        assert hasattr(spider, "mysql_conf")
+        assert spider.mysql_conf._asdict() == true_mysql_conf
 
         # 测试应用管理中心 mysql 配置
         CONSUL_CONF = {
@@ -132,6 +137,7 @@ class TestSpider:
             "FORMAT": CONSUL_CONFIG["FORMAT"],
         }
         spider_settings = {"APP_CONF_MANAGE": True}
+        spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {
             "CONSUL_CONFIG": CONSUL_CONF,
         }
@@ -139,11 +145,16 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        consul_mysql_conf = spider.get_mysql_conf(settings)
-        assert consul_mysql_conf == true_mysql_conf
+        crawler = get_crawler(settings_dict=settings)
+        spider = self.spider_class.from_crawler(crawler, "example.com")
+        assert hasattr(spider, "mysql_conf")
+        assert spider.mysql_conf._asdict() == true_mysql_conf
 
-    def test_get_mongodb_config(self):
-        # 测试本地 mysql 配置
+    def test_from_crawler_get_mongodb_conf(self):
+        """
+        测试从爬虫 AyugeSpider(即 spider) 中获取 mongodb 配置的方法
+        """
+        # 测试本地 mongodb 配置
         local_mongodb_conf = {
             "HOST": MONGODB_CONFIG["host"],
             "PORT": MONGODB_CONFIG["port"],
@@ -156,22 +167,25 @@ class TestSpider:
             key.lower(): value for key, value in local_mongodb_conf.items()
         }
         spider_settings = {"APP_CONF_MANAGE": False}
+        spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {"LOCAL_MONGODB_CONFIG": local_mongodb_conf}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        spider = self.spider_class("example.com")
-        mongodb_conf_res = spider.get_mongodb_conf(settings)
-        assert mongodb_conf_res == true_mongodb_conf
+        crawler = get_crawler(settings_dict=settings)
+        spider = self.spider_class.from_crawler(crawler, "example.com")
+        assert hasattr(spider, "mongodb_conf")
+        assert spider.mongodb_conf._asdict() == true_mongodb_conf
 
-        # 测试应用管理中心 mysql 配置
+        # 测试应用管理中心 mongodb 配置
         CONSUL_CONF = {
             "TOKEN": CONSUL_CONFIG["TOKEN"],
             "URL": CONSUL_CONFIG["URL"],
             "FORMAT": CONSUL_CONFIG["FORMAT"],
         }
         spider_settings = {"APP_CONF_MANAGE": True}
+        spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {
             "CONSUL_CONFIG": CONSUL_CONF,
         }
@@ -179,8 +193,10 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        consul_mongo_conf = spider.get_mongodb_conf(settings)
-        assert consul_mongo_conf == true_mongodb_conf
+        crawler = get_crawler(settings_dict=settings)
+        spider = self.spider_class.from_crawler(crawler, "example.com")
+        assert hasattr(spider, "mongodb_conf")
+        assert spider.mongodb_conf._asdict() == true_mongodb_conf
 
 
 class TestCrawlSpider(TestSpider):

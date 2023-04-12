@@ -43,6 +43,7 @@ release:
 	poetry publish
 
 test:
+	flake8 .
 	coverage run -m pytest
 	coverage combine
 	coverage report

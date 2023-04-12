@@ -2,10 +2,10 @@ from dataclasses import field, make_dataclass
 
 import scrapy
 from itemadapter import ItemAdapter
-from itemloaders.processors import Join, MapCompose, TakeFirst
+from itemloaders.processors import TakeFirst
 from scrapy.loader import ItemLoader
 
-from ayugespidertools.Items import MysqlDataItem, OldMongoDataItem, ScrapyClassicItem
+from ayugespidertools.Items import MysqlDataItem, ScrapyClassicItem
 
 
 def test_items():

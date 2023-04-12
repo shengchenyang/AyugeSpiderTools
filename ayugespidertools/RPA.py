@@ -71,4 +71,4 @@ class AboutPyppeteer(object):
 
             # 当最新四行日志中未出现 scrapy 统计，则为正常状态，并清空日志
             elif block_times == 0:
-                clean_log = subprocess.getstatusoutput(f"> {fn}")
+                subprocess.getstatusoutput(f"> {fn}")

@@ -1,5 +1,4 @@
 import asyncio
-import urllib.parse
 
 import aiohttp
 from scrapy.http import HtmlResponse
@@ -75,9 +74,10 @@ class AiohttpMiddleware(object):
 
         # set proxy
 
+        # todo: 此部分中的 domain 参数暂时不使用，后续考虑是否需要
         # set cookies domain 参数
-        parse_result = urllib.parse.urlsplit(request.url)
-        domain = parse_result.hostname
+        # parse_result = urllib.parse.urlsplit(request.url)
+        # domain = parse_result.hostname
 
         # _timeout = self.download_timeout
         # if aiohttp_meta.get('timeout') is not None:

@@ -66,16 +66,14 @@ class ReuseOperation(object):
     @staticmethod
     def get_files_from_path(path: str) -> list:
         """
-        获取 path 文件夹下的所有文件
+        获取 path 文件夹下的所有文件，而且输出以 path 为根目录的相对路径
         Args:
             path: 需要判断的文件夹路径
 
         Returns:
             file_list: path 文件夹下的文件列表
         """
-        # 得到文件夹下的所有文件名称
-        files = os.listdir(path)
-        return [file for file in files if not os.path.isdir(path + "\\" + file)]
+        return [f.path for f in os.scandir(path) if f.is_file()]
 
     @staticmethod
     def get_bytes_by_file(file_path: str) -> bytes:
@@ -301,7 +299,7 @@ class ReuseOperation(object):
 
         try:
             json.loads(judge_str)
-        except Exception as e:
+        except Exception:
             return False
         else:
             return True
@@ -338,7 +336,7 @@ class ReuseOperation(object):
         }
 
     @staticmethod
-    def get_array_dimension(array: list) -> int:
+    def get_array_dimension(array: Union[frozenset, list, set, tuple]) -> int:
         """
         获取 array 的维度
         Args:

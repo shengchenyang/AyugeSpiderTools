@@ -48,7 +48,7 @@ def test_is_dict_meet_min_limit():
 
 def test_get_ck_dict_from_headers():
     ck_str = (
-        "__gads=ID=5667bf1cc1623793-229892aad3d400f4:T=1656574796:RT=1656574796:S=ALNI_"
+        "__gads=ID=5667bf1cc1623793:T=1656574796:RT=1656574796:S=ALNI_"
         "MYD2F7TGXOAaJFaIjtXL1pKiz8IwQ; _gid=GA1.2.1261442913.1661823137; _ga_5RS2C633VL"
         "=GS1.1.1661912227.10.0.1661912227.0.0.0; _ga=GA1.1.1076553851.1656574796; __gpi="
         "UID=000007372209e6e0:T=1656574796:RT=1661912226:S=ALNI_MZkxoWl7cZYRkWzt2WKaxXQ7b47xw"
@@ -56,7 +56,7 @@ def test_get_ck_dict_from_headers():
     res = ReuseOperation.get_ck_dict_from_headers(headers_ck_str=ck_str)
     print("ck_dict_res:", res, type(res))
     assert res == {
-        "__gads": "ID=5667bf1cc1623793-229892aad3d400f4:T=1656574796:RT=1656574796:S=ALNI_MYD2F7TGXOAaJFaIjtXL1pKiz8IwQ",
+        "__gads": "ID=5667bf1cc1623793:T=1656574796:RT=1656574796:S=ALNI_MYD2F7TGXOAaJFaIjtXL1pKiz8IwQ",
         "_gid": "GA1.2.1261442913.1661823137",
         "_ga_5RS2C633VL": "GS1.1.1661912227.10.0.1661912227.0.0.0",
         "_ga": "GA1.1.1076553851.1656574796",

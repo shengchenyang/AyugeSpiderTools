@@ -48,9 +48,12 @@ class AbstractClass(ABC):
         if demand_code != "":
             tabel_notes = f"{demand_code}_{tabel_notes}"
 
-        sql = f"""CREATE TABLE IF NOT EXISTS `{table_name}` (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
-            PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET={charset} 
-            COLLATE={collate} COMMENT='{tabel_notes}'; """
+        sql = f"""
+        CREATE TABLE IF NOT EXISTS `{table_name}`
+        (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`))
+        ENGINE=InnoDB DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{tabel_notes}';
+        """
+
         try:
             # 执行 sql 查询，获取数据
             data = cursor.execute(sql)
@@ -80,8 +83,10 @@ class AbstractClass(ABC):
         Returns:
             column_type: 字段存储类型
         """
-        sql = f"""select COLUMN_TYPE from information_schema.columns where table_schema = '{database}' and 
-            table_name = '{table}' and COLUMN_NAME= '{column}';"""
+        sql = f"""
+        select COLUMN_TYPE from information_schema.columns
+        where table_schema = '{database}' and table_name = '{table}' and COLUMN_NAME= '{column}';
+        """
         column_type = None
         try:
             if _ := cursor.execute(sql):
@@ -262,7 +267,10 @@ class AbstractClass(ABC):
                 cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
-            sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
+            sql = f"""
+            ALTER TABLE `{table}` CHANGE COLUMN
+            `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";
+            """
             return sql, f"1406: 更新 {colum} 字段类型为 {change_colum_type} 时失败"
 
     def deal_1265_error(
@@ -294,7 +302,10 @@ class AbstractClass(ABC):
                 cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
-            sql = f"""ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}" ;"""
+            sql = f"""
+            ALTER TABLE `{table}` CHANGE COLUMN
+            `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";
+            """
             return sql, f"1265: 更新 {colum} 字段类型为 {change_colum_type} 时失败"
 
     @abstractmethod

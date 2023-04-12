@@ -1,15 +1,15 @@
 import dataclasses
 import datetime
 
-from ayugespidertools.common.Expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.scraper.pipelines import AyuMysqlPipeline
 
 __all__ = [
     "AyuStatisticsMysqlPipeline",
 ]
 
 
-class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
+class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
     """
     Mysql 存储且记录脚本运行状态的简单示例
     """
@@ -47,15 +47,8 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             None
         """
         data = dataclasses.asdict(data_item)
-        keys = f"""`{"`, `".join(data.keys())}`"""
-        values = ", ".join(["%s"] * len(data))
-        update = ",".join([f" `{key}` = %s" for key in data])
-        sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
-        try:
-            if self.cursor.execute(sql, tuple(data.values()) * 2):
-                self.conn.commit()
-        except Exception as e:
-            self.slog.warning(f":{e}")
+        sql = self._get_sql_by_item(table=table, item=data)
+        self._log_record(sql=sql, data=tuple(data.values()) * 2)
 
     def close_spider(self, spider):
         log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)

@@ -1,4 +1,4 @@
-from scrapy.spiders import CrawlSpider, Spider
+from scrapy.spiders import CrawlSpider
 
 from ayugespidertools.scraper.spiders import AyuSpider
 

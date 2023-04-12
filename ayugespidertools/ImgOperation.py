@@ -1,7 +1,6 @@
 from typing import Optional, Union
 
 import cv2
-import requests
 from PIL import Image
 
 from ayugespidertools.common.Encryption import EncryptOperation
@@ -16,48 +15,6 @@ class Picture(object):
     """
     对验证码图片的一些操作
     """
-
-    @classmethod
-    def get_captcha(cls, url: str, img_path: str) -> None:
-        """
-        下载完美滑块的图片，并将缺口图和滑块在一起的图片切割
-        Args:
-            url: 完美滑块的滑块图片链接
-            img_path: 图片保存路径
-
-        Returns:
-            None
-        """
-        session = requests.Session()
-        session.headers = {
-            "authority": "captchas-1251008858.file.myqcloud.com",
-            "pragma": "no-cache",
-            "cache-control": "no-cache",
-            "sec-ch-ua": '" Not;A Brand";v="99", "Google Chrome";v="91", "Chromium";v="91"',
-            "sec-ch-ua-mobile": "?0",
-            "upgrade-insecure-requests": "1",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36",
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "sec-fetch-site": "none",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-user": "?1",
-            "sec-fetch-dest": "document",
-            "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-        }
-        text = session.get(url).content
-        with open(f"{img_path}/captcha.png", "wb") as f:
-            f.write(text)
-
-        # 新建空白图片
-        # captcha = Image.new('RGB', (50, 120))
-        # 实例化原始图片 Image 对象
-        img = Image.open(f"{img_path}/captcha.png")
-
-        # 切割滑块验证码图片，将背景图和滑块图分开
-        # (left, upper, right, lower)
-        captcha = img.crop((260, 0, 325, 120 - 4))
-        captcha = captcha.convert("RGBA")
-        captcha.save(f"{img_path}/captcha_slide.png")
 
     @classmethod
     def convert_index_to_offset(cls, index):
@@ -146,17 +103,17 @@ class Picture(object):
             true_pic_list: 真实图片的顺序坐标
         """
         c = 260
-        d = 120
-        l = 20
-        s = 9
-        a = 61
+        # d = 120
+        _l = 20
+        # s = 9
+        # a = 61
         true_pic_list = []
         for curr_data in slide_data:
             curr_position_list = []
-            if curr_data < l:
-                curr_position_list.extend((int(c / l * curr_data), 0))
+            if curr_data < _l:
+                curr_position_list.extend((int(c / _l * curr_data), 0))
             else:
-                curr_position_list.extend((int(c / l * (curr_data % l)), 60))
+                curr_position_list.extend((int(c / _l * (curr_data % _l)), 60))
             true_pic_list.append(curr_position_list)
         return true_pic_list
 

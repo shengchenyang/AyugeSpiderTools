@@ -160,17 +160,13 @@ scrapy crawl <spider_name>
 ## TodoList
 
 - [x] `scrapy` 的扩展功能场景
-  - [ ] ~~`scrapy` 结合 `crawlab` 的日志统计功能~~
   - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
   - [x] 自定义模板，在 `ayugespidertools startproject <projname>` 和 `ayugespidertools genspider <spidername>` 时生成适合本库的模板文件
   - [x] ~~增加根据 `nacos` 来获取配置的功能~~ -> 改为增加根据 `consul` 来获取配置的功能
   - [x] 代理中间件（独享代理、动态隧道代理）
   - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
   - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求
-    - [ ] ~~`selenium`: 性能没有 `pyppeteer` 强~~
-    - [x] `pyppeteer`: `Gerapy-pyppeteer` 库已经实现此功能
     - [x] `requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率
-    - [ ] ~~`splash`: 继承 `splash` 渲染 `js` 的功能~~
     - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
   - [x] `Mysql` 存储的场景下适配
     - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
@@ -183,7 +179,10 @@ scrapy crawl <spider_name>
   - [x] `sql` 语句拼接，只是简单场景，后续优化。已给出优化方向，参考库等信息。
   - [x] `mongoDB` 语句拼接
   - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
-  - [ ] 字体反爬还原方法
+  - [x] 字体反爬还原方法
+    - [x] 基于 `ttf`，`woff` 之类的字体文件映射，或结合 `css` 等实现
+      - [x] 可以直接在字体文件 `xml` 中找到映射关系的：使用 [fontforge](https://github.com/fontforge/fontforge/releases) 工具导出映射即可。
+      - [x] 无法找到映射关系的，则一般使用 `ocr` 识别（准确率非百分百），通过 `fontforge` 导出每个映射的 `png`，后再通过各种方式识别。
   - [x] `html` 格式转 `markdown` 格式
   - [x] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等等等
   - [x] 添加常用的图片验证码中的处理方法
@@ -192,7 +191,7 @@ scrapy crawl <spider_name>
     - [x] 识别点选验证码位置及点击顺序，识别结果不太好，待优化
     - [x] 图片乱序混淆的还原方法示例
 
-注：
+**注：**
 
-- 不再开发结合 `selenium` 扩展的功能，推荐使用 `scrapy-playwright`，`Gerapy-pyppeteer` 等其它库；
-- 不再开发结合 `splash` 的功能，如果使用 `splash http api` 的话，在 `scrapy` ，本库或自写脚本中都比较容易扩展。如果要使用 `lua` `api` 等复杂的功能那还是推荐 `scrapy-splash` 这类的扩展库。
+1. 由于 `scrapy` 扩展库的开源项目众多，在使用本库的基础上扩展它们，与使用 `scrapy` 时扩展它们的用法一致，所以不再开发一些其它工具已经拥有且稳定的功能，但也会尽量开发一些常用且通用的方法来提升效率。
+2. 字体反爬部分不会给出详细解决示例，不管是使用 `fontforge`，`fontTools` 或 `ocr` 等工具，已经脱离本库的范围了，我会给出部分依赖的方法，但不会添加以上工具库的依赖了，而导致本库依赖过于杂糅。而且，若要实现高可用的字体映射也比较简单，请自行实现，可能会考虑新开 `pypi` 库来实现此部分。

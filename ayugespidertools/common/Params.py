@@ -2,6 +2,9 @@ import platform
 import random
 from typing import List, TypeVar
 
+import pymongo
+import pymysql
+
 from ayugespidertools.Items import MongoDataItem, MysqlDataItem, ScrapyClassicItem
 
 __all__ = [

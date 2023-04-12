@@ -70,7 +70,21 @@ class ToolsForAyu(object):
 
         curr_consul_headers = copy.deepcopy(Param.consul_headers)
         curr_consul_headers["X-Consul-Token"] = token
-        r = requests.get(url, headers=curr_consul_headers, verify=False)
+        try:
+            r = requests.get(
+                url,
+                headers=curr_consul_headers,
+                verify=False,
+                timeout=(
+                    Param.requests_req_timeout,
+                    Param.requests_res_timeout,
+                ),
+            )
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.ConnectTimeout,
+        ) as e:
+            raise ValueError("请求 consul 超时，请检查 consul 是否正常运行!") from e
         # 判断是否返回的 raw 原始数据
         if "raw" in url_params:
             return r.text

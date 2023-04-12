@@ -38,7 +38,11 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
 
     @retry(stop_max_attempt_number=Param.retry_num)
     def get_proxy_ip(self, size, isdict: Optional[bool] = None):
-        proxy_url = f"http://dps.kdlapi.com/api/getdps?orderid={self.simidaili_conf['orderid']}&num={size}&signature={self.simidaili_conf['signature']}&format=json"
+        proxy_url = (
+            "http://dps.kdlapi.com/api/getdps"
+            f"?orderid={self.simidaili_conf['orderid']}&num={size}"
+            f"&signature={self.simidaili_conf['signature']}&format=json"
+        )
         if self.important_error:
             raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
 
@@ -69,7 +73,7 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
                         return iplist
                 else:
                     raise ValueError("ip 获取方式有误，请重构私密代理中间件获取 ip 的模块！")
-            except:
+            except Exception:
                 self.important_error = True
                 traceback.print_exc()
                 raise ValueError("ip 获取方式有误，请重构私密代理中间件获取ip的模块！")

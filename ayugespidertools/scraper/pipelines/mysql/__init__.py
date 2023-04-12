@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import Optional, Type
+from typing import Optional, Tuple, Type
 
 import pymysql
 from retrying import retry
@@ -220,15 +220,10 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         """
         sql = f"""
         select concat(
-            'select "',
-            TABLE_NAME,
-            '", count(id) as num , crawl_time from ',
-            TABLE_SCHEMA,
-            '.',
-            TABLE_NAME,
-                ' where crawl_time = "{crawl_time}"'
-        ) from information_schema.tables
-        where TABLE_SCHEMA='{database}' and TABLE_NAME in (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
+        'select "', TABLE_NAME, '", count(id) as num , crawl_time from ', TABLE_SCHEMA, '.', TABLE_NAME,
+        ' where crawl_time = "{crawl_time}"') from information_schema.tables
+        where TABLE_SCHEMA='{database}' and TABLE_NAME in
+        (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
         """
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
@@ -259,30 +254,21 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         Returns:
             None
         """
-        self.cursor.execute(
-            f"""
-            CREATE TABLE IF NOT EXISTS `{table}` (
+        create_table_sql = f"""
+        CREATE TABLE IF NOT EXISTS `{table}` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
-            `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',            
+            `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',
             `crawl_time` datetime NOT NULL COMMENT '程序运行/数据采集时间',
             `table_name` varchar(255) NOT NULL COMMENT '此项目所在库（一般某个项目放在单独的数据库中）的当前表名',
-            `number` varchar(255) NOT NULL COMMENT '当前表的当前 crawl_time 的采集个数',            
+            `number` varchar(255) NOT NULL COMMENT '当前表的当前 crawl_time 的采集个数',
             PRIMARY KEY (`id`) USING BTREE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目对应库中各表采集统计表';
-            """
-        )
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目对应库中各表采集统计表';
+        """
+        self.cursor.execute(create_table_sql)
 
-        keys = f"""`{"`, `".join(data.keys())}`"""
-        values = ", ".join(["%s"] * len(data))
-        update = ",".join([f" `{key}` = %s" for key in data])
-        sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
-        try:
-            if self.cursor.execute(sql, tuple(data.values()) * 2):
-                self.conn.commit()
-        except Exception as e:
-            self.conn.rollback()
-            self.slog.warning(f":{e}")
+        sql = self._get_sql_by_item(table=table, item=data)
+        self._log_record(sql=sql, data=tuple(data.values()) * 2)
 
     @retry(
         stop_max_attempt_number=Param.retry_num,
@@ -304,32 +290,41 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.cursor.execute(
             f"""
             CREATE TABLE IF NOT EXISTS `{table}` (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
-            `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',
-            `uid` varchar(255) NOT NULL DEFAULT '-' COMMENT 'uid',
-            `request_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '请求次数统计',
-            `received_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '接收次数统计',
-            `item_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集数据量',
-            `info_count` varchar(255) NOT NULL DEFAULT '-' COMMENT 'info 数据统计',
-            `warning_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '警告数据统计',
-            `error_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '错误数据统计',
-            `start_time` datetime NOT NULL COMMENT '开始时间',
-            `finish_time` datetime NOT NULL COMMENT '结束时间',
-            `spend_minutes` varchar(255) NOT NULL DEFAULT '-' COMMENT '花费时间',
-            `crawl_time` datetime NOT NULL COMMENT '程序运行/数据采集时间',
-            `log_count_ERROR` varchar(255) DEFAULT NULL COMMENT '错误原因',
-            PRIMARY KEY (`id`) USING BTREE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目运行脚本统计信息表';
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
+                `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',
+                `uid` varchar(255) NOT NULL DEFAULT '-' COMMENT 'uid',
+                `request_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '请求次数统计',
+                `received_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '接收次数统计',
+                `item_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集数据量',
+                `info_count` varchar(255) NOT NULL DEFAULT '-' COMMENT 'info 数据统计',
+                `warning_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '警告数据统计',
+                `error_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '错误数据统计',
+                `start_time` datetime NOT NULL COMMENT '开始时间',
+                `finish_time` datetime NOT NULL COMMENT '结束时间',
+                `spend_minutes` varchar(255) NOT NULL DEFAULT '-' COMMENT '花费时间',
+                `crawl_time` datetime NOT NULL COMMENT '程序运行/数据采集时间',
+                `log_count_ERROR` varchar(255) DEFAULT NULL COMMENT '错误原因',
+                PRIMARY KEY (`id`) USING BTREE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目运行脚本统计信息表';
             """
         )
 
-        keys = f"""`{"`, `".join(data.keys())}`"""
-        values = ", ".join(["%s"] * len(data))
-        update = ",".join([f" `{key}` = %s" for key in data])
-        sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+        sql = self._get_sql_by_item(table=table, item=data)
+        self._log_record(sql=sql, data=tuple(data.values()) * 2)
+
+    def _log_record(self, sql: str, data: Tuple) -> None:
+        """
+        执行日志记录的 sql 语句
+        Args:
+            sql: sql 语句
+            data: sql 语句中的参数
+
+        Returns:
+            None
+        """
         try:
-            if self.cursor.execute(sql, tuple(data.values()) * 2):
+            if self.cursor.execute(sql, data):
                 self.conn.commit()
         except Exception as e:
             self.conn.rollback()

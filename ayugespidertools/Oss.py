@@ -105,7 +105,7 @@ class AliOssBase(object):
                 f"{self.operateDoc}/{input_file_name}.{file_format}",
                 put_bytes_or_url,
             )
-        except Exception as e:
+        except Exception:
             return False, ""
         return True, input_file_name
 

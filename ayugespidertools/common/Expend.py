@@ -127,11 +127,11 @@ class MysqlPipeEnhanceMixin(object):
                 text[k.replace("/", "_")] = v
 
         log_info = {
-            "database": mysql_conf["database"],
+            "database": mysql_conf.database,
             # 脚本名称
             "spider_name": spider.name,
             # uid
-            "uid": f'{mysql_conf["database"]}|{spider.name}',
+            "uid": f"{mysql_conf.database}|{spider.name}",
             # 请求次数统计
             "request_counts": text.get("downloader_request_count", 0),
             # 接收次数统计

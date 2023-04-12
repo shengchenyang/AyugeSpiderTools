@@ -105,6 +105,7 @@ OSS_CONFIG = {
 }
 
 # 日志管理
+LOG_LEVEL = env.str("LOG_LEVEL", "ERROR")
 LOG_FILE = f"{LOG_DIR}/$project_name.log"
 logger.add(
     env.str("LOG_ERROR_FILE", f"{LOG_DIR}/error.log"),

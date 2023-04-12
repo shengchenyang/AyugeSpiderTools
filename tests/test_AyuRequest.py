@@ -11,7 +11,7 @@ def test_aiohttp_reqeust():
         callback=callback_tmp,
         method="GET",
         headers={
-            "USER_AGENT": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3100.0 Safari/537.36",
+            "USER_AGENT": "Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16",
         },
         cookies={"name": "ayuge"},
         meta={
