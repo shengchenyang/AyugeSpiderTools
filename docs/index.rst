@@ -109,3 +109,15 @@ Getting help
 
 :doc:`topics/pipelines`
     了解本库中的管道及使用方法。
+
+补充说明
+============
+
+.. toctree::
+   :caption: 补充说明
+   :hidden:
+
+   additional/news
+
+:doc:`additional/news`
+    查看最近的 AyugeSpiderTools 版本中有哪些变化。

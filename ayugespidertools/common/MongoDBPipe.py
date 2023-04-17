@@ -17,12 +17,12 @@ class AbstractClass(ABC):
     用于处理 mysql 异常的模板方法类
     """
 
-    def _get_collection_name(self, collection_prefix: str, table: str) -> str:
+    def _get_collection_name(self, table: str, collection_prefix: str = "") -> str:
         """
         获取集合名称
         Args:
-            collection_prefix: 集合前缀
             table: item 中的 table 字段
+            collection_prefix: 集合前缀
 
         Returns:
             full_collection_name: 完整的集合名称
@@ -39,7 +39,7 @@ class AbstractClass(ABC):
         self,
         item_dict: ItemAdapter,
         db: Param.PymongoDataBase,
-        collection_prefix: str,
+        collection_prefix: str = "",
     ) -> None:
         """
         模板方法，用于 mongodb 存储场景
@@ -76,7 +76,7 @@ class AbstractClass(ABC):
 
         # 真实的集合名称为：集合前缀名 + 集合名称
         collection_name = self._get_collection_name(
-            collection_prefix=collection_prefix, table=item_dict["table"]
+            table=item_dict["table"], collection_prefix=collection_prefix
         )
         # 如果没有查重字段时，就直接插入数据（不去重）
         if not item_dict.get("mongo_update_rule"):
@@ -114,7 +114,7 @@ def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: ItemAdapter,
     db: Param.PymongoDataBase,
-    collection_prefix: str,
+    collection_prefix: str = "",
 ) -> None:
     abstract_class.template_method(
         item_dict=item_dict, db=db, collection_prefix=collection_prefix

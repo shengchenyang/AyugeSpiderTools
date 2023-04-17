@@ -31,9 +31,6 @@ IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
 
 
 class AyuCommand(Command):
-    requires_project = False
-    default_settings = {"LOG_ENABLED": False, "SPIDER_LOADER_WARN_ONLY": True}
-
     def run(self, args, opts):
         if len(args) not in (1, 2):
             raise UsageError()
@@ -41,8 +38,10 @@ class AyuCommand(Command):
         project_name = args[0]
 
         if len(args) == 2:
+            _has_project_dir_args = True
             project_dir = Path(args[1])
         else:
+            _has_project_dir_args = False
             project_dir = Path(args[0])
 
         if (project_dir / "scrapy.cfg").exists():
@@ -73,8 +72,11 @@ class AyuCommand(Command):
             )
 
         # 添加执行 shell 文件 run.sh 的生成
-        run_shell_path = f"{project_dir}/{project_dir}/run.sh.tmpl"
-        run_shell_abspath = Path(run_shell_path).resolve()
+        if _has_project_dir_args:
+            run_shell_path = f"{project_dir}/{project_name}/run.sh.tmpl"
+        else:
+            run_shell_path = f"{project_dir}/{project_dir}/run.sh.tmpl"
+        run_shell_abspath = Path(project_dir).resolve()
         # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
         if Param.IS_WINDOWS:
             print("Info: The run.sh file is no longer generated under windows")

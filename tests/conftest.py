@@ -3,10 +3,13 @@ import copy
 import pymysql
 import pytest
 from pymongo import MongoClient
+from scrapy.utils.reactor import install_reactor
 
 from tests import MONGODB_CONFIG, PYMYSQL_CONFIG
 
 test_table = "_test_article_info_table"
+script_coll_table = "script_collection_statistics"
+table_coll_table = "table_collection_statistics"
 mongodb_database = MONGODB_CONFIG["database"]
 mongodb_ori = copy.deepcopy(MONGODB_CONFIG)
 
@@ -39,6 +42,8 @@ def mysql_db_cursor():
 
             # 清理 mysql 测试产生的数据
             cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
+            cursor.execute(f"DROP TABLE IF EXISTS {script_coll_table}")
+            cursor.execute(f"DROP TABLE IF EXISTS {table_coll_table}")
 
 
 @pytest.fixture(scope="session")
@@ -51,3 +56,16 @@ def mongodb_conn():
 
         # 清理 mongodb 测试产生的数据
         conn[database][test_table].drop()
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--reactor",
+        default="default",
+        choices=["default", "asyncio"],
+    )
+
+
+def pytest_configure(config):
+    if config.getoption("--reactor") == "asyncio":
+        install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")

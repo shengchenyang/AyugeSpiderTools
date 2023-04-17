@@ -22,7 +22,7 @@ PASSWORD=***
 CONN_URI=***
 
 [CONSUL]
-TOKEN=***
+TOKEN=
 URL=http://host:port/v1/kv/...?dc=dc1
 FORMAT=json
 

@@ -66,14 +66,9 @@ LOCAL_MONGODB_CONFIG = {
 
 # consul 应用管理的连接配置
 CONSUL_CONFIG = {
-    "HOST": config_parser.get("CONSUL", "HOST", fallback=None),
-    "PORT": config_parser.getint("CONSUL", "PORT", fallback=8500),
-    # 此 token 值只需要只读权限即可，只用于取配置值
     "TOKEN": config_parser.get("CONSUL", "TOKEN", fallback=None),
-    # 这个是应用管理中心最终的 key 值，如果不设置此值会默认设置值为中程序中的 ENV 值
-    "KEY_VALUES": config_parser.get("CONSUL", "KEY_VALUES", fallback=None),
-    # 这个是此配置在应用管理中心所属的 group，默认为空(按需配置，如果不需要直接不配置此值或配置为空皆可)
-    "GROUP": config_parser.get("CONSUL", "GROUP", fallback=None),
+    "URL": config_parser.get("CONSUL", "URL", fallback=None),
+    "FORMAT": config_parser.get("CONSUL", "FORMAT", fallback="json"),
 }
 
 # 动态隧道代理（快代理版本）

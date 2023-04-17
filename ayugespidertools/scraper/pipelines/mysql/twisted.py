@@ -62,13 +62,13 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         return item
 
     def db_insert(self, cursor, item):
-        item_o = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
+        alter_item = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
         table = super(AyuTwistedMysqlPipeline, self).get_table_name(item["table"])
 
-        if not (new_item := item_o.get("new_item")):
+        if not (new_item := alter_item.new_item):
             return
 
-        note_dic = item_o.get("notes_dic")
+        note_dic = alter_item.notes_dic
         sql = self._get_sql_by_item(table=table, item=new_item)
 
         try:

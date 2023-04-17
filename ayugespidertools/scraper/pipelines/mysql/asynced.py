@@ -43,11 +43,11 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
         async with self.pool.acquire() as aiomysql_conn:
             async with aiomysql_conn.cursor() as aiomysql_cursor:
                 item_dict = ToolsForAyu.convert_items_to_dict(item)
-                item_o = super(AsyncMysqlPipeline, self).get_new_item(item_dict)
+                alter_item = super(AsyncMysqlPipeline, self).get_new_item(item_dict)
                 table = super(AsyncMysqlPipeline, self).get_table_name(
                     item_dict["table"]
                 )
-                new_item = item_o.get("new_item")
+                new_item = alter_item.new_item
                 keys = f"""`{"`, `".join(new_item.keys())}`"""
                 values = ", ".join(["%s"] * len(new_item))
                 update = ",".join([f" `{key}` = %s" for key in new_item])

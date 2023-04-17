@@ -83,7 +83,6 @@ class AiohttpMiddleware(object):
         # if aiohttp_meta.get('timeout') is not None:
         #     _timeout = aiohttp_meta.get('timeout')
 
-        spider.slog.debug(f"crawling {request.url}")
         html_content = None
         try:
             # 获取请求头信息

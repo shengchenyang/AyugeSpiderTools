@@ -43,13 +43,14 @@ release:
 	poetry publish
 
 test:
-	flake8 .
+	poetry install
 	coverage run -m pytest
 	coverage combine
 	coverage report
 	make clean
 
 pytest:
+	poetry install
 	pytest -W ignore::DeprecationWarning
 
 
@@ -71,4 +72,5 @@ clean:
 	-$(RM) $(call path,.coverage.*)
 	-$(RM) $(call path,coverage.xml)
 	-$(RMDIR) $(call path,.tox)
+	-$(RM) $(call path,tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
 	pip uninstall -y ayugespidertools

@@ -2,7 +2,7 @@
 
 [![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
 ![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python](https://img.shields.io/badge/python-3.8%2B-blue)
+![python](https://img.shields.io/badge/python-3.8.1%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -28,7 +28,7 @@
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-注：本库依赖中的 `pymongo` 版本要在 `3.12.3` 及以下是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.12.3` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！**你也可以根据 [3.3](#3.3.-Build-Your-Own-Library) 自定义库**
+注：本库依赖中的 `pymongo` 版本要在 `^3.12.3` (即`3.13.0` 及以下) 是因为我的 `mongoDB` 的版本为 `3.4`，`pymogo` 官方从 `3.13.0` 以后的版本开始不再支持 `3.6` 版本以下的 `MongoDB` 数据库了，望周知！**你也可以根据 [3.3](#3.3.-Build-Your-Own-Library) 自定义库**
 
 ## 2. 使用方法
 

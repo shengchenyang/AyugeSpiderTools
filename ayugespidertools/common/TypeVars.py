@@ -8,6 +8,7 @@ from typing import NamedTuple, Optional, TypedDict, TypeVar
 __all__ = [
     "TableTemplate",
     "TableEnumTypeVar",
+    "AlterItem",
     "MysqlConfig",
     "MongoDBConfig",
 ]
@@ -53,3 +54,8 @@ class MongoDBConfig(NamedTuple):
     password: str
     database: Optional[str] = None
     authsource: Optional[str] = None
+
+
+class AlterItem(NamedTuple):
+    new_item: dict
+    notes_dic: dict

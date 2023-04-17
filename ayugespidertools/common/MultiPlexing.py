@@ -169,7 +169,7 @@ class ReuseOperation(object):
         cls,
         dict_conf: dict,
         key_list: List[str],
-    ) -> Union[dict, bool]:
+    ) -> dict:
         """
         获取 dict_conf 中的含有 key_list 的 key 的字段
         Args:
@@ -179,11 +179,11 @@ class ReuseOperation(object):
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
-        # 参数先要满足最小限定，然后再取出限定的参数值；否则直接返回 False
+        # 参数先要满足最小限定，然后再取出限定的参数值；否则返回空字典
         return (
             {k: dict_conf[k] for k in key_list}
             if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=key_list)
-            else False
+            else {}
         )
 
     @classmethod

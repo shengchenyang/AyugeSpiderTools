@@ -9,7 +9,7 @@ from ayugespidertools.common.Expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.MultiPlexing import ReuseOperation
 from ayugespidertools.common.MysqlErrorHandle import Synchronize, deal_mysql_err
 from ayugespidertools.common.Params import Param
-from ayugespidertools.common.TypeVars import MysqlConfig, TableEnumTypeVar
+from ayugespidertools.common.TypeVars import AlterItem, MysqlConfig, TableEnumTypeVar
 from ayugespidertools.common.Utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
@@ -94,11 +94,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         ), "数据表名不能含空格，请检查 MYSQL_TABLE_PREFIX 参数和 item 中的 table 参数"
         return full_table_name
 
-    def get_new_item(self, item):
+    def get_new_item(self, item) -> AlterItem:
         """
         重新整合 item
         Args:
-            item: scrapy yield 的 item 信息
+            item: scrapy item
 
         Returns:
             1). 整合后的 item
@@ -137,31 +137,32 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 new_item[key] = value
                 notes_dic[key] = key
 
-        return {"new_item": new_item, "notes_dic": notes_dic}
+        return AlterItem(new_item=new_item, notes_dic=notes_dic)
 
     def process_item(self, item, spider):
         item_dict = ToolsForAyu.convert_items_to_dict(item)
         # 先查看存储场景是否匹配
         if item_dict["item_mode"] == "Mysql":
             self.insert_item(
-                self.get_new_item(item_dict), self.get_table_name(item_dict["table"])
+                alter_item=self.get_new_item(item_dict),
+                table=self.get_table_name(item_dict["table"]),
             )
         return item
 
-    def insert_item(self, item_o, table):
+    def insert_item(self, alter_item: AlterItem, table: str):
         """
         通用插入数据，将 item 数据存入 Mysql 中，item 中的 key 需要跟 Mysql 数据中的字段名称一致
         Args:
-            item_o: item
+            alter_item: 经过转变后的 item
             table: 数据库表名
 
         Returns:
             None
         """
-        if not (new_item := item_o.get("new_item")):
+        if not (new_item := alter_item.new_item):
             return
 
-        note_dic = item_o.get("notes_dic")
+        note_dic = alter_item.notes_dic
         sql = self._get_sql_by_item(table=table, item=new_item)
 
         try:
@@ -185,7 +186,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 table_enum=self.table_enum,
                 note_dic=note_dic,
             )
-            return self.insert_item(item_o, table)
+            return self.insert_item(alter_item, table)
 
     def close_spider(self, spider):
         # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息

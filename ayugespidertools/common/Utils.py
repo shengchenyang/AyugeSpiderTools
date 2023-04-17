@@ -21,7 +21,7 @@ __all__ = [
     "ToolsForAyu",
 ]
 
-ConsulFormatStr = Literal["JSON", "HCL", "YAML", "XML"]
+ConsulFormatStr = Literal["json", "hcl", "yaml", "xml"]
 ConsulConfNameStr = Literal["MONGODB", "MYSQL"]
 
 
@@ -29,27 +29,6 @@ class ToolsForAyu(object):
     """
     这里用于存放框架所依赖的方法
     """
-
-    @classmethod
-    def consul_get_all_group(cls, host: str, port: int, token: str) -> list:
-        """
-        获取 consul 的所有 group 信息
-        Args:
-            host: host
-            port: port
-            token: 请求 consul 所需要的 token 值
-
-        Returns:
-            1). consul 的所有 group 信息
-        """
-        curr_consul_headers = copy.deepcopy(Param.consul_headers)
-        curr_consul_headers["X-Consul-Token"] = token
-        r = requests.get(
-            url=f"http://{host}:{port}/v1/kv/?keys&dc=dc1&separator=%2F",
-            headers=curr_consul_headers,
-            verify=False,
-        )
-        return r.json()
 
     @classmethod
     def get_kvs_detail_by_consul(
