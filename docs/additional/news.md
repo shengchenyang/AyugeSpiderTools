@@ -23,15 +23,8 @@
 
 ### Bug fixes
 
-- 修复模板中 `settings` 中的 `CONSUL` 配置信息不匹配的问题：
-
-对以上 `bug` 进行详细描述：
-
-| 序号 | bug 详述                                                     | 相关                                                         | 原因                                                         | 影响 | 是否修复 | 备注 |
-| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ---- | -------- | ---- |
-| 1    | 模板中 `settings` 的 `CONSUL` 配置信息没有更新为 `v1.1.6` 版本推荐的使用方法。[^1] | https://github.com/shengchenyang/AyugeSpiderTools/releases/tag/ayugespidertools-1.1.6 | 在多台设备上开发又结合 `ssh` 远程开发时，同步代码错乱且最终提交未认真审核所致。 | 中   | 是       |      |
-
-[^1]:很抱歉发生如此低级丧智的 bug 事件。
+- 修复模板中 `settings` 的 `CONSUL` 配置信息没有更新为 `v1.1.6` 版本推荐的使用方法的问题。([releases ayugespidertools-1.1.6](https://github.com/shengchenyang/AyugeSpiderTools/releases/tag/ayugespidertools-1.1.6))
+- 修复在 `startproject` 创建项目时生成的 `run.sh` 中的路径信息错误问题。
 
 ### Code optimizations
 

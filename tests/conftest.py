@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from scrapy.utils.reactor import install_reactor
 
 from tests import MONGODB_CONFIG, PYMYSQL_CONFIG
+from tests.docs.keys import generate_keys
 
 test_table = "_test_article_info_table"
 script_coll_table = "script_collection_statistics"
@@ -69,3 +70,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     if config.getoption("--reactor") == "asyncio":
         install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+
+
+# 生成某些测试需要的本地主机证书文件
+generate_keys()

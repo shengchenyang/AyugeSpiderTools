@@ -2,7 +2,6 @@ import argparse
 import json
 import random
 import sys
-from html import escape
 from pathlib import Path
 from shutil import rmtree
 from subprocess import PIPE, Popen
@@ -131,7 +130,7 @@ class Follow(LeafResource):
         for nl in nlist:
             args[b"n"] = [to_bytes(str(nl))]
             argstr = urlencode(args, doseq=True)
-            s += f"<a href='/follow?{escape(argstr)}'>follow {escape(nl)}</a><br>"
+            s += f"<a href='/follow?{argstr}'>follow {nl}</a><br>"
         s += """</body>"""
         request.write(to_bytes(s))
         request.finish()
