@@ -2,8 +2,8 @@ import base64
 
 from scrapy import signals
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.params import Param
 
 
 class DynamicProxyDownloaderMiddleware(object):
@@ -19,13 +19,13 @@ class DynamicProxyDownloaderMiddleware(object):
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_conf=dynamic_proxy_conf,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
+            key_list=["proxy", "username", "password"],
         )
         assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
 
-        self.proxy_url = dynamic_proxy_conf["PROXY_URL"]
-        self.username = dynamic_proxy_conf["USERNAME"]
-        self.password = dynamic_proxy_conf["PASSWORD"]
+        self.proxy_url = dynamic_proxy_conf["proxy"]
+        self.username = dynamic_proxy_conf["username"]
+        self.password = dynamic_proxy_conf["password"]
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -75,13 +75,13 @@ class AbuDynamicProxyDownloaderMiddleware(object):
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_conf=dynamic_proxy_conf,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD"],
+            key_list=["proxy", "username", "password"],
         )
         assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
 
-        self.proxy_url = dynamic_proxy_conf["PROXY_URL"]
-        self.username = dynamic_proxy_conf["USERNAME"]
-        self.password = dynamic_proxy_conf["PASSWORD"]
+        self.proxy_url = dynamic_proxy_conf["proxy"]
+        self.username = dynamic_proxy_conf["username"]
+        self.password = dynamic_proxy_conf["password"]
 
     @classmethod
     def from_crawler(cls, crawler):

@@ -60,13 +60,15 @@ class MongoDataItem(BaseItem):
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import pandas
-from scrapy.http import Request
 from DemoSpider.settings import logger
 from scrapy.http.response.text import TextResponse
-from DemoSpider.common.DataEnum import TableEnum
-from ayugespidertools.AyugeSpider import AyuSpider
-from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.Items import DataItem, MysqlDataItem, MongoDataItem
+
+from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem
+from ayugespidertools.spiders import AyuSpider
+from scrapy.http import Request
+
+from DemoSpider.items import TableEnum
 
 """
 ####################################################################################################
@@ -99,13 +101,13 @@ class DemoOneSpider(AyuSpider):
         'MONGODB_COLLECTION_PREFIX': "demo_basic_",
         'ITEM_PIPELINES': {
             # 激活此项则数据会存储至 Mysql
-            'ayugespidertools.Pipelines.AyuFtyMysqlPipeline': 300,
+            'ayugespidertools.pipelines.AyuFtyMysqlPipeline': 300,
             # 激活此项则数据会存储至 MongoDB
-            'ayugespidertools.Pipelines.AyuFtyMongoPipeline': 301,
+            'ayugespidertools.pipelines.AyuFtyMongoPipeline': 301,
         },
         'DOWNLOADER_MIDDLEWARES': {
             # 随机请求头
-            'ayugespidertools.Middlewares.RandomRequestUaMiddleware': 400,
+            'ayugespidertools.middlewares.RandomRequestUaMiddleware': 400,
         },
     }
 

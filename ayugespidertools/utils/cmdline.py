@@ -87,7 +87,7 @@ def _print_header(settings, inproject):
 def _print_commands(settings, inproject):
     _print_header(settings, inproject)
     print("Usage:")
-    print("  ayugespidertools <command> [options] [args]\n")
+    print("  ayuge <command> [options] [args]\n")
     print("Available commands:")
     cmds = _get_commands_dict(settings, inproject)
     for cmdname, cmdclass in sorted(cmds.items()):
@@ -96,13 +96,13 @@ def _print_commands(settings, inproject):
         print()
         print("  [ more ]      More commands available when run from project directory")
     print()
-    print('Use "ayugespidertools <command> -h" to see more info about a command')
+    print('Use "ayuge <command> -h" to see more info about a command')
 
 
 def _print_unknown_command(settings, cmdname, inproject):
     _print_header(settings, inproject)
     print(f"Unknown command: {cmdname}\n")
-    print('Use "ayugespidertools" to see available commands')
+    print('Use "ayuge" to see available commands')
 
 
 def _run_print_help(parser, func, *a, **kw):

@@ -3,8 +3,8 @@ import contextlib
 
 import aiomysql
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = ["AsyncMysqlPipeline"]

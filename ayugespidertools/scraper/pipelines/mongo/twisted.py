@@ -1,7 +1,7 @@
 from twisted.internet import defer, reactor
 
-from ayugespidertools.common.MongoDBPipe import TwistedAsynchronous, mongodb_pipe
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.mongodbpipe import TwistedAsynchronous, mongodb_pipe
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 
 __all__ = [

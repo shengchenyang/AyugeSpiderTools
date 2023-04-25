@@ -15,7 +15,7 @@ from scrapy.utils.project import get_project_settings
 from scrapy.utils.response import response_status_message
 from WorkWeixinRobot.work_weixin_robot import WWXRobot
 
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.params import Param
 
 
 class PrivateProxyDownloaderMiddleware(RetryMiddleware):
@@ -31,7 +31,7 @@ class PrivateProxyDownloaderMiddleware(RetryMiddleware):
 
     @classmethod
     def from_crawler(cls, crawler):
-        s = cls(wwx_robot_key=crawler.settings.get("WWXRobot_key", None))
+        s = cls(wwx_robot_key=crawler.settings.get("wxbot", None))
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
         return s

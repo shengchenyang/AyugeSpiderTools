@@ -1,6 +1,6 @@
 # AyugeSpiderTools 一目了然
 
-`AyugeSpiderTools` 是一个对 `Scrapy` 扩展模块，对其 `spider`，`item`，`middleware`，`pipeline` 等模块中的常用功能进行模板化生成和配置。比如使用生成常见的 `spider` ，运行 `sh` 和 `settings` 配置等脚本和固定项目文件结构，也对其不同模块功能扩展，比如给 `spider` 挂上 `Mysql engine` 的单例句柄用于 `yield` 前的去重逻辑，给 `pipeline` 添加自动生成 `Mysql` 存储场景下所依赖的数据库、数据表、数据字段及注释，也可以解决常见的（字段编码，`Data too long`，存储字段不存在等等）错误场景。还有很多功能，请在其 `Github` 上查看。
+`AyugeSpiderTools` 是 `Scrapy` 的功能扩展模块，对其 `spider`，`item`，`middleware`，`pipeline` 等模块中的常用功能进行模板化生成和配置。比如生成常见的 `spider` ，运行 `sh` 和 `settings` 配置等脚本和固定项目文件结构；也对其不同模块进行功能扩展，比如给 `spider` 挂上 `Mysql engine` 的单例句柄可用于 `yield` 入库前的去重方式之一，给 `pipeline` 添加自动生成 `Mysql` 存储场景下所依赖的数据库、数据表、数据字段及注释，也可以解决常见的（字段编码，`Data too long`，存储字段不存在等等）错误场景。还有很多功能，请在其 `Github` 上查看。
 
 > `AyugeSpiderTools` 相关信息：
 
@@ -11,6 +11,8 @@
 ## 注意：
 
 **如果你觉得某些功能实现未达到你的期望，比如某些中间件或管道等的实现方法你有更好的方式，你完全可以自行修改和 `build`，让其成为你个人或小组中的专属库。你可以修改任何你觉得有必要的部分，包括库名在内，希望本库能给你在爬虫开发或 `scrapy` 扩展开发方面有所指引。**
+
+**当然，你也可以选择给此项目做出贡献，比如增加或优化某些功能等，但在此之前请提相关的 `ISSUES` 经确认后再开发和提交 `PULL REQUESTS`，以免不太符合本库场景或已废弃等原因造成你的贡献浪费，那就太可惜了！**
 
 ## 示例蜘蛛的演练
 
@@ -23,9 +25,6 @@
 ```shell
 # eg: 本示例使用的 project_name 为 DemoSpider
 
-ayugespidertools startproject <project_name>
-
-# 也可使用以下命令代替：
 ayuge startproject <project_name>
 ```
 
@@ -36,9 +35,6 @@ ayuge startproject <project_name>
 cd <project_name>
 
 生成脚本
-ayugespidertools genspider <spider_name> <example.com>
-
-# 也可使用以下命令代替：
 ayuge genspider <spider_name> <example.com>
 ```
 
@@ -46,46 +42,52 @@ ayuge genspider <spider_name> <example.com>
 
 ```python
 import json
+
+from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.items import DataItem, MysqlDataItem
+from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
-from ayugespidertools.Items import DataItem, MysqlDataItem
-from DemoSpider.common.DataEnum import TableEnum
-from ayugespidertools.AyugeSpider import AyuSpider
-from ayugespidertools.common.Utils import ToolsForAyu
+from scrapy.http.response.text import TextResponse
+
+from DemoSpider.items import TableEnum
+from DemoSpider.settings import logger
 
 """
-####################################################################################################
+########################################################################################################################
 # collection_website: CSDN - 专业开发者社区
 # collection_content: 热榜文章排名 Demo 采集示例 - 存入 Mysql (配置根据本地 settings 的 LOCAL_MYSQL_CONFIG 中取值)
 # create_time: 2022-07-30
 # explain:
-# demand_code_prefix = ''
-####################################################################################################
+# demand_code_prefix = ""
+########################################################################################################################
 """
 
 
 class DemoOneSpider(AyuSpider):
-    name = 'demo_one'
-    allowed_domains = ['blog.csdn.net']
-    start_urls = ['https://blog.csdn.net/']
+    name = "demo_one"
+    allowed_domains = ["blog.csdn.net"]
+    start_urls = ["https://blog.csdn.net/"]
 
     # 数据库表的枚举信息，当前项目所依赖的表信息，一般用于存储数据时使用
     custom_table_enum = TableEnum
-    # 初始化配置的类型，初始化设置
+    # 初始化配置的类型，初始化设置（不需要直接不用配置）
     settings_type = 'debug'
     custom_settings = {
-        # 日志等级，此参数值与 ayugespidertools 库中的 loguru 日志等级一致
+        # scrapy 日志等级
         'LOG_LEVEL': 'DEBUG',
-        # 是否开启记录项目相关运行统计信息，其实默认就是关闭，为了展示此参数
-        'RECORD_LOG_TO_MYSQL': False,
-        # Mysql 数据表的前缀名称，用于标记属于哪个项目（也可不配置此参数，按需配置）
-        'MYSQL_TABLE_PREFIX': "demo1_",
-        'ITEM_PIPELINES': {
-            # 激活此项则数据会存储至 Mysql，其 Mysql 链接配置在 VIT 目录下的 .conf 中查看
-            'ayugespidertools.Pipelines.AyuFtyMysqlPipeline': 300,
+        # 是否开启记录项目相关运行统计信息。不配置默认为 False
+        "RECORD_LOG_TO_MYSQL": True,
+        # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
+        "LOGURU_CONFIG": logger,
+        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
+        "MYSQL_TABLE_PREFIX": "demo1_",
+        "ITEM_PIPELINES": {
+            # 激活此项则数据会存储至 Mysql
+            "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
         },
-        'DOWNLOADER_MIDDLEWARES': {
-            # 随机请求头，请求头优先级与 `fake_useragent` 中的一致
-            'ayugespidertools.Middlewares.RandomRequestUaMiddleware': 400,
+        "DOWNLOADER_MIDDLEWARES": {
+            # 随机请求头
+            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
     }
 
@@ -100,36 +102,36 @@ class DemoOneSpider(AyuSpider):
             url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
             callback=self.parse_first,
             headers={
-                'referer': 'https://blog.csdn.net/rank/list',
+                "referer": "https://blog.csdn.net/rank/list",
             },
-            dont_filter=True
+            dont_filter=True,
         )
 
-    def parse_first(self, response):
-        data_list = json.loads(response.text)['data']
+    def parse_first(self, response: TextResponse):
+        data_list = json.loads(response.text)["data"]
         for curr_data in data_list:
             # 这里的所有解析方式可选择自己习惯的其它任意库，xpath， json 或正则等等。
             article_detail_url = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleDetailUrl")
+                json_data=curr_data, query="articleDetailUrl"
+            )
 
             article_title = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleTitle")
+                json_data=curr_data, query="articleTitle"
+            )
 
             comment_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="commentCount")
+                json_data=curr_data, query="commentCount"
+            )
 
             favor_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="favorCount")
+                json_data=curr_data, query="favorCount"
+            )
 
             nick_name = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="nickName")
+                json_data=curr_data, query="nickName"
+            )
 
-            # 数据存储方式 1，非常推荐此写法。其中 article_info 含有所有需要存储至表中的字段
+            # 数据存储方式1，非常推荐此写法。article_info 含有所有需要存储至表中的字段
             article_info = {
                 "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
                 "article_title": DataItem(article_title, "文章标题"),
@@ -139,7 +141,7 @@ class DemoOneSpider(AyuSpider):
             }
 
             """
-            # 2.或者这么写，在不需要字段注释功能时使用，但其实还不如直接按照下面 4 中的示例写法
+            # 2.或者这么写，在不需要注释参数时，那不如直接按照下面 4 中的示例写法
             article_info = {
                 "article_detail_url": DataItem(article_detail_url),
                 "article_title": DataItem(article_title),
@@ -148,7 +150,7 @@ class DemoOneSpider(AyuSpider):
                 "nick_name": DataItem(nick_name),
             }
             
-            # 3.当然这么写也可以，但是不推荐，复杂易错
+            # 3.当然这么写也可以，但是不推荐，写法复杂易错
             article_info = {
                 "article_detail_url": {
                     "key_value": article_detail_url,
@@ -184,24 +186,19 @@ class DemoOneSpider(AyuSpider):
 
             ArticleInfoItem = MysqlDataItem(
                 alldata=article_info,
-                table=TableEnum.aritle_list_table.value['value'],
+                table=TableEnum.article_list_table.value["value"],
             )
+            self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
+            # yield ArticleInfoItem
 
-            # 数据入库逻辑 -> 测试 mysql_engine 的去重功能
-            try:
-                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.aritle_list_table.value['value'], article_detail_url)
-                df = pandas.read_sql(sql, self.mysql_engine)
-
-                # 如果为空，说明此数据不存在于数据库，则新增
-                if df.empty:
-                    yield ArticleInfoItem
-
-                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-                else:
-                    logger.debug(f"标题为 ”{article_title}“ 的数据已存在")
-
-            except Exception:
-                yield ArticleInfoItem
+            # 数据入库逻辑 -> 测试 mysql_engine 的去重功能，你可以自行实现。mysql_engine 也已经给你了
+            save_table = f'{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}'
+            sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+            yield ToolsForAyu.filter_data_before_yield(
+                sql=sql,
+                mysql_engine=self.mysql_engine,
+                item=ArticleInfoItem,
+            )
 ```
 
 ### 刚刚发生了什么？
@@ -218,7 +215,7 @@ class DemoOneSpider(AyuSpider):
 
 ```shell
 # 查看支持的脚本模板示例
-ayugespidertools genspider -l
+ayuge genspider -l
 
 <output>
 Available templates:
@@ -228,10 +225,10 @@ Available templates:
   csvfeed
   xmlfeed
 
-# 使用具体的示例命令(都可以使用 `ayuge cli` 名称代替)
-ayugespidertools genspider -t <Available_templates> <spider_name> <example.com>
+# 使用具体的示例命令
+ayuge genspider -t <Available_templates> <spider_name> <example.com>
 
-eg: ayugespidertools gendpier -t async demom_async baidu.com
+eg: ayuge gendpier -t async demom_async baidu.com
 ```
 
 ## 下一步是什么？

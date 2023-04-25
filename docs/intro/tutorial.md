@@ -26,18 +26,15 @@ ayugespidertools startproject DemoSpider
 ```ini
 DemoSpider/
 |-- DemoSpider							# project's Python module, you'll import your code from here
-|   |-- common							# 这里主要存放通用方法，自定义方法模块。
-|   |   |-- DataEnum.py				                # 数据库表枚举信息示例
 |   |-- __init__.py
-|   |-- items.py						# project items definition file
+|   |-- items.py						# project items definition file, 数据库表枚举信息示例也迁移至此
 |   |-- logs							# 日志管理文件夹，可以自定义规则
 |   |   |-- DemoSpider.log					# scrapy 输出日志，文件名称为项目名
 |   |   |-- error.log						# loguru 日志 error 规则输出文件
-|   |   `-- runtime.log						# loguru 日志 debug 规则输出文件
 |   |-- middlewares.py						# project middlewares definition file
 |   |-- pipelines.py						# project pipelines definition file
 |   |-- run.py							# scrapy 运行文件
-|   |-- run.sh							# 项目运行 shell，运行以上的 run.py
+|   |-- run.sh							# 项目运行 shell，运行以上的 run.py，win 平台不会生成此文件
 |   |-- settings.py						# project settings definition file
 |   |-- spiders							# a directory where you'll later put your spiders
 |   |   |-- __init__.py
@@ -55,52 +52,49 @@ DemoSpider/
 这是我们第一个 `Spider` 的代码。`demo_one.py`将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
 
 ```python
-import pandas
+from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem
+from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
-from DemoSpider.settings import logger
-from scrapy.http.response.text import TextResponse
-from DemoSpider.common.DataEnum import TableEnum
-from ayugespidertools.AyugeSpider import AyuSpider
-from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.Items import DataItem, MysqlDataItem, MongoDataItem
+
+from DemoSpider.items import TableEnum
 
 """
-####################################################################################################
+########################################################################################################################
 # collection_website: CSDN - 专业开发者社区
-# collection_content: 热榜文章排名 Demo 采集示例 - 同时存入 Mysql 和 MongoDB 的场景 (配置根据本地 settings 的中取值)
-# create_time: 2023-01-10
-# explain:
-# demand_code_prefix = ''
-####################################################################################################
+# collection_content: 热榜文章排名 Demo 采集示例 - 同时存入 Mysql 和 MongoDB 的场景
+# create_time: 2022-08-22
+# explain: 根据本项目中的 demo_one 脚本修改而得
+# demand_code_prefix = ""
+########################################################################################################################
 """
 
 
-class DemoOneSpider(AyuSpider):
-    name = 'demo_one'
-    allowed_domains = ['blog.csdn.net']
-    start_urls = ['https://blog.csdn.net/']
+class DemoEightSpider(AyuSpider):
+    name = "demo_eight"
+    allowed_domains = ["blog.csdn.net"]
+    start_urls = ["https://blog.csdn.net/"]
 
     # 数据库表的枚举信息
     custom_table_enum = TableEnum
     # 初始化配置的类型
-    settings_type = 'debug'
+    settings_type = "debug"
     custom_settings = {
-        # scrapy 日志等级配置
-        'LOG_LEVEL': 'DEBUG',
-        'LOGURU_ENABLED': False,
-        # 是否开启记录项目相关运行统计信息。不配置默认为 False
-        'RECORD_LOG_TO_MYSQL': False,
-        # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
-        'LOGURU_CONFIG': logger,
-        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
-        'MYSQL_TABLE_PREFIX': "demo_basic_",
-        # MongoDB 集合的前缀名称，用于标记属于哪个项目，也可以不用配置
-        'MONGODB_COLLECTION_PREFIX': "demo_basic_",
-        'ITEM_PIPELINES': {
+        # 是否开启记录项目相关运行统计信息
+        "RECORD_LOG_TO_MYSQL": False,
+        # 数据表的前缀名称，用于标记属于哪个项目，也可以不用添加
+        "MYSQL_TABLE_PREFIX": "demo8_",
+        # 数据表的前缀名称，用于标记属于哪个项目（也可不配置此参数，按需配置）
+        "MONGODB_COLLECTION_PREFIX": "demo8_",
+        "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
-            'ayugespidertools.Pipelines.AyuFtyMysqlPipeline': 300,
+            "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
             # 激活此项则数据会存储至 MongoDB
-            'ayugespidertools.Pipelines.AyuFtyMongoPipeline': 301,
+            "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
+        },
+        "DOWNLOADER_MIDDLEWARES": {
+            # 随机请求头
+            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
     }
 
@@ -115,42 +109,37 @@ class DemoOneSpider(AyuSpider):
             url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
             callback=self.parse_first,
             headers={
-                'referer': 'https://blog.csdn.net/rank/list',
+                "referer": "https://blog.csdn.net/rank/list",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
             },
-            cb_kwargs=dict(
-                curr_site="csdn",
-            ),
-            dont_filter=True
+            dont_filter=True,
         )
 
-    def parse_first(self, response: TextResponse, curr_site: str):
-        # 日志使用: scrapy 的 self.logger 或本库的 self.slog 或直接使用全局的 logger handle 也行（根据场景自行选择）
-        self.slog.info(f"当前采集的站点为: {curr_site}")
-
-        # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
-        data_list = ToolsForAyu.extract_with_json(json_data=response.json(), query="data")
+    def parse_first(self, response):
+        data_list = ToolsForAyu.extract_with_json(
+            json_data=response.json(), query="data"
+        )
         for curr_data in data_list:
             article_detail_url = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleDetailUrl")
+                json_data=curr_data, query="articleDetailUrl"
+            )
 
             article_title = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleTitle")
+                json_data=curr_data, query="articleTitle"
+            )
 
             comment_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="commentCount")
+                json_data=curr_data, query="commentCount"
+            )
 
             favor_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="favorCount")
+                json_data=curr_data, query="favorCount"
+            )
 
             nick_name = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="nickName")
+                json_data=curr_data, query="nickName"
+            )
 
-            # 这是需要存储的所有字段信息
             article_info = {
                 "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
                 "article_title": DataItem(article_title, "文章标题"),
@@ -159,44 +148,21 @@ class DemoOneSpider(AyuSpider):
                 "nick_name": DataItem(nick_name, "文章作者昵称"),
             }
 
-            ArticleInfoMysqlItem = MysqlDataItem(
+            ArticleMysqlInfoItem = MysqlDataItem(
                 alldata=article_info,
-                table=TableEnum.article_list_table.value['value'],
+                table=TableEnum.article_list_table.value["value"],
             )
+            yield ArticleMysqlInfoItem
 
-            self.slog.info(f"ArticleInfoMysqlItem: {ArticleInfoMysqlItem}")
-
-            # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
-            try:
-                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
-                    self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.article_list_table.value['value'],
-                    article_detail_url)
-                df = pandas.read_sql(sql, self.mysql_engine)
-
-                # 如果为空，说明此数据不存在于数据库，则新增
-                if df.empty:
-                    yield ArticleInfoMysqlItem
-
-                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-                else:
-                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
-
-            except Exception as e:
-                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                    yield ArticleInfoMysqlItem
-                else:
-                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
-
-            # 这是 MongoDB 存储场景的示例
-            AritleInfoMongoItem = MongoDataItem(
+            ArticleInfoMongoItem = MongoDataItem(
                 # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
                 alldata=article_info,
                 # table 为 mongo 的存储 Collection 集合的名称
-                table=TableEnum.article_list_table.value['value'],
+                table=TableEnum.article_list_table.value["value"],
                 # mongo_update_rule 为查询数据是否存在的规则
                 mongo_update_rule={"article_detail_url": article_detail_url},
             )
-            yield AritleInfoMongoItem
+            yield ArticleInfoMongoItem
 ```
 
 如您所见，我们的 `Spider` 子类化`AyugeSpider.AyuSpider` 并定义了一些属性和方法：
@@ -206,6 +172,7 @@ class DemoOneSpider(AyuSpider):
 - `parse_first()`：将被调用以处理为每个请求下载的响应的方法。`response` 参数是 `TextResponse` 的一个实例，它保存页面内容，并有进一步的有用方法来处理它。该 `parse_first()` 方法通常解析响应，将抓取的数据提取为字典，并找到要遵循的新 URL 并从中创建新请求 ( `Request`)。
 
 另外，一些其它注意事项：
+
 - 示例中的一些配置和一些功能并不是每个项目中都必须要编写和配置的，只是用于展示一些功能
 - 据上条可知，可以写出很简洁的代码，删除你认为的无关配置和方法并将其配置成你自己的模板就更容易适配更多人的使用场景。
 
@@ -219,7 +186,7 @@ class DemoOneSpider(AyuSpider):
 scrapy crawl demo_one
 
 # 或者执行项目根目录下的 run.py(需要编辑自己需要执行的脚本)
-python3 run.py
+python run.py
 
 # 或者执行项目根目录下的 run.sh，其实它也是通过调用 run.py 来执行的。只不过 shell 文件中包含了虚拟环境的 activate 了而已
 sh run.sh

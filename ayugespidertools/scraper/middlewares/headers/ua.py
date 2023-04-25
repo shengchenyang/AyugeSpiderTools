@@ -2,7 +2,7 @@ import random
 
 from scrapy import signals
 
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.params import Param
 
 __all__ = [
     "RandomRequestUaMiddleware",

@@ -1,5 +1,56 @@
 # Release notes
 
+## AyugeSpiderTools 2.0.1 (2023-04-27)
+
+此版本为大版本更新，修改了项目结构以统一本库及与 `scrapy` 结合的代码风格，也有一些功能完善等。最新功能示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider/) 或 [readthedocs](https://ayugespidertools.readthedocs.io/en/ayugespidertools-2.0.1/) 中查看。
+
+### Deprecation removals
+
+- 一些 `api` 变动：
+
+| 更改前                                                       | 更改后                                                  | 备注        |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ----------- |
+| from ayugespidertools.AyugeSpider import AyuSpider           | from ayugespidertools.spiders import AyuSpider          |             |
+| from ayugespidertools.AyuRequest import AioFormRequest       | from ayugespidertools.request import AiohttpFormRequest |             |
+| from ayugespidertools.AyuRequest import AiohttpRequest       | from ayugespidertools.request import AiohttpRequest     |             |
+| from ayugespidertools.common.Utils import *                  | from ayugespidertools.common.utils import *             |             |
+| from ayugespidertools.Items import *                         | from ayugespidertools.items import *                    |             |
+| from <DemoSpider>.common.DataEnum import TableEnum           | from <DemoSpider>.items import TableEnum                |             |
+| from ayugespidertools.AyugeCrawlSpider import AyuCrawlSpider | from ayugespidertools.spiders import AyuCrawlSpider     |             |
+| ayugespidertools.Pipelines                                   | ayugespidertools.pipelines                              | pipelines   |
+| ayugespidertools.Middlewares                                 | ayugespidertools.middlewares                            | middlweares |
+
+- 一些参数配置变动：
+
+| 更改前      | 更改后 | 备注            |
+| ----------- | ------ | --------------- |
+| PROXY_URL   | proxy  | 代理 proxy 参数 |
+| PROXY_INDEX | index  | 代理配置等      |
+
+注：所有配置的 `key` 都统一改为小写
+
+- 一些使用方法更改：
+  - 使用 `AiohttpRequest` 构造请求时，由之前的 `meta` 中的 `aiohttp_args` 配置参数，改为由 `args` 的新增参数取代，其参数类型同样为 `dict`，也可以为 `AiohttpRequestArgs` 类型，更容易输入。
+
+### Deprecations 
+
+- 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
+
+### New features
+
+- 丰富 `aiohttp` 请求场景，增加重试，代理，`ssl` 等功能。
+
+
+### Bug fixes
+
+- 无
+
+### Code optimizations
+
+- 更新测试用例。
+
+<hr/>
+
 ## AyugeSpiderTools 1.1.9 (2023-04-20)
 
 这是一个维护版本，具有次要功能、错误修复和清理。

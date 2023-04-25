@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "1.1.9"
+version = "2.0.1"
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手，还内置一些爬虫开发中的通用方法。"
 authors = ["ayuge <ayugesheng@gmail.com>"]
 maintainers = ["ayuge <ayugesheng@gmail.com>"]
@@ -87,9 +87,6 @@ omit = [
     "tests/**/__init__.py",
     "ayugespidertools/**/__init__.py",
     "ayugespidertools/utils/cmdline.py",
-    "ayugespidertools/scraper/pipelines/*",
-    "ayugespidertools/scraper/http/*",
-    "ayugespidertools/scraper/middlewares/*",
 ]
 
 [tool.coverage.report]

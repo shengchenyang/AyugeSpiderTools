@@ -1,48 +1,45 @@
-[NOTICE]
+[notice]
 info=这是 .conf 文件的示例；跑通部分测试文件，可能需要在同目录下配置 .conf 文件！
 detail=以下为所需的配置信息，具体值请自行添加。
 
-[MYSQL]
-HOST=***
-PORT=3306
-USER=***
-PASSWORD=***
-DATABASE=***
-CHARSET=***
+[mysql]
+host=***
+port=3306
+user=***
+password=***
+database=***
+charset=***
 
-[MONGODB]
-HOST=***
-PORT=27017
-DATABASE=***
-AUTHSOURCE=***
-USER=***
-PASSWORD=***
+[mongodb]
+host=***
+port=27017
+database=***
+authsource=***
+user=***
+password=***
 
-[MONGODB_URI]
-CONN_URI=***
+[consul]
+token=
+url=http://host:port/v1/kv/...?dc=dc1
+format=json
 
-[CONSUL]
-TOKEN=
-URL=http://host:port/v1/kv/...?dc=dc1
-FORMAT=json
-
-[WWXRobot]
+[wxbot]
 key=***
 
-[KDL_DYNAMIC_PROXY]
-PROXY_URL=o668.kdltps.com:15818
-USERNAME=***
-PASSWORD=***
+[kdl_dynamic_proxy]
+proxy=o668.kdltps.com:15818
+username=***
+password=***
 
-[KDL_EXCLUSIVE_PROXY]
-PROXY_URL=http://kps.kdlapi.com/api/getkps?orderid=***&num=100&format=json
-USERNAME=***
-PASSWORD=***
-PROXY_INDEX=1
+[kdl_exclusive_proxy]
+proxy=http://kps.kdlapi.com/api/getkps?orderid=***&num=100&format=json
+username=***
+password=***
+index=1
 
-[ALI_OSS]
-OssAccessKeyId=LTA***
-OssAccessKeySecret=***
-Endpoint=https://oss-cn-***.aliyuncs.com
-Examplebucket=***
-OperateDoc=***
+[ali_oss]
+accesskeyid=LTA***
+accesskeysecret=***
+endpoint=https://oss-cn-***.aliyuncs.com
+bucket=***
+doc=***

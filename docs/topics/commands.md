@@ -18,8 +18,6 @@
 
 ```shell
 |-- DemoSpider
-|   |-- common
-|   |   `-- DataEnum.py
 |   |-- __init__.py
 |   |-- items.py
 |   |-- logs
@@ -59,7 +57,7 @@ default = DemoSpider.settings
 AyugeSpiderTools None - no active project
 
 Usage:
-  ayugespidertools <command> [options] [args]
+  ayuge <command> [options] [args]
 
 Available commands:
   genspider     Generate new spider using pre-defined templates
@@ -68,7 +66,7 @@ Available commands:
 
   [ more ]      More commands available when run from project directory
 
-Use "ayugespidertools <command> -h" to see more info about a command
+Use "ayuge <command> -h" to see more info about a command
 ```
 
 ### 创建项目
@@ -76,7 +74,7 @@ Use "ayugespidertools <command> -h" to see more info about a command
 您通常使用该工具做的第一件事是创建您的项目：
 
 ```shell
-ayugespidertools startproject myproject [project_dir]
+ayuge startproject myproject [project_dir]
 ```
 
 这将在该目录下创建一个 `Scrapy` 项目 `project_dir`。如果 `project_dir` 未指定，则项目目录将与 `myproject` 相同。
@@ -96,12 +94,12 @@ cd project_dir
 例如，要创建一个新的蜘蛛：
 
 ```shell
-ayugespidertools genspider mydomain mydomain.com
+ayuge genspider mydomain mydomain.com
 ```
 
 ## 启动项目
 
-- 句法：`ayugespidertools startproject <project_name> [project_dir]`
+- 句法：`ayuge startproject <project_name> [project_dir]`
 - 需要项目：*无*
 
 在 `project dir` 目录下创建一个名为 `project_name` 的新项目。如果未指定项目目录，则项目目录将与项目名称相同。
@@ -109,7 +107,7 @@ ayugespidertools genspider mydomain mydomain.com
 使用示例：
 
 ```shell
-ayugespidertools startproject myproject
+ayuge startproject myproject
 ```
 
 ## 可用的工具命令
@@ -117,18 +115,18 @@ ayugespidertools startproject myproject
 本节包含可用内置命令的列表以及说明和一些用法示例。请记住，您始终可以通过运行以下命令获取有关每个命令的更多信息：
 
 ```shell
-ayugespidertools <command> -h
+ayuge <command> -h
 ```
 
 您可以使用以下命令查看所有可用命令：
 
 ```shell
-ayugespidertools -h
+ayuge -h
 ```
 
 ### 启动项目
 
-- 句法：`ayugespidertools startproject <project_name> [project_dir]`
+- 句法：`ayuge startproject <project_name> [project_dir]`
 - 需要项目：*无*
 
 在 `project dir` 目录下创建一个名为 `project name` 的新项目。如果未指定项目目录，则项目目录将与项目名称相同。
@@ -136,18 +134,18 @@ ayugespidertools -h
 使用示例：
 
 ```shell
-ayugespidertools startproject myproject
+ayuge startproject myproject
 ```
 
 ### genspider
 
-- 句法：`ayugespidertools genspider [-t template] <name> <domain or URL>`
+- 句法：`ayuge genspider [-t template] <name> <domain or URL>`
 - 需要项目：*无*
 
 使用示例：
 
 ```shell
-$ ayugespidertools genspider -l
+$ ayuge genspider -l
 Available templates:
   async
   basic
@@ -155,9 +153,9 @@ Available templates:
   csvfeed
   xmlfeed
 
-$ ayugespidertools genspider example example.com
+$ ayuge genspider example example.com
 Created spider 'example' using template 'basic'
 
-$ ayugespidertools genspider -t crawl scrapyorg scrapy.org
+$ ayuge genspider -t crawl scrapyorg scrapy.org
 Created spider 'scrapyorg' using template 'crawl'
 ```

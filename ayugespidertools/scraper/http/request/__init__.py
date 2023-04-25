@@ -1,9 +1,10 @@
 import copy
+from dataclasses import asdict
 from typing import Callable, List, Optional, Union
 
 from scrapy import Request
 
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.typevars import AiohttpRequestArgs
 
 __all__ = [
     "AiohttpRequest",
@@ -24,21 +25,20 @@ class AiohttpRequest(Request):
         body: Optional[Union[bytes, str]] = None,
         cookies: Optional[Union[dict, List[dict]]] = None,
         meta: Optional[dict] = None,
-        *args,
+        args: Union[AiohttpRequestArgs, dict] = None,
         **kwargs,
     ) -> None:
         # 用 meta 缓存 scrapy meta 的参数
         meta = copy.deepcopy(meta) or {}
-        aiohttp_meta = meta.get("aiohttp_args") or {}
+        aiohttp_meta = meta.setdefault("aiohttp", {})
 
-        # TODO: 可添加和修改默认参数的值，后续可以在此完善功能
-        self.proxy = aiohttp_meta.get("proxy", {"http:": "http://10.10.10.10:10000"})
-        self.timeout = aiohttp_meta.get("timeout", Param.aiohttp_req_timeout)
-        self.sleep = aiohttp_meta.get("sleep", None)
+        _args = {"url": url}
+        if isinstance(args, AiohttpRequestArgs):
+            args = asdict(args)
+        _args.update(args or {})
+        _args.update(aiohttp_meta.get("args", {}))
+        aiohttp_meta["args"] = _args
 
-        aiohttp_meta = meta.setdefault("aiohttp_args", {})
-        aiohttp_meta["proxy"] = self.proxy
-        aiohttp_meta["timeout"] = self.timeout
         super(AiohttpRequest, self).__init__(
             url,
             callback,
@@ -47,6 +47,5 @@ class AiohttpRequest(Request):
             body=body,
             cookies=cookies,
             meta=meta,
-            *args,
             **kwargs,
         )

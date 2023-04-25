@@ -1,9 +1,9 @@
 from typing import Optional
 
-from ayugespidertools.common.MongoDBPipe import Synchronize, mongodb_pipe
-from ayugespidertools.common.TypeVars import MongoDBConfig
-from ayugespidertools.common.Utils import ToolsForAyu
-from ayugespidertools.MongoClient import MongoDbBase
+from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
+from ayugespidertools.common.typevars import MongoDBConfig
+from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.mongoclient import MongoDbBase
 
 __all__ = [
     "AyuFtyMongoPipeline",

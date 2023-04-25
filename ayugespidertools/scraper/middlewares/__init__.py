@@ -3,8 +3,12 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 from ayugespidertools.scraper.middlewares.headers.ua import RandomRequestUaMiddleware
+from ayugespidertools.scraper.middlewares.netlib.aiohttplib import (
+    AiohttpAsyncDownloaderMiddleware,
+    AiohttpDownloaderMiddleware,
+)
 from ayugespidertools.scraper.middlewares.netlib.requestslib import (
-    RequestByRequestsMiddleware,
+    RequestsDownloaderMiddleware,
 )
 from ayugespidertools.scraper.middlewares.proxy.dynamic import (
     AbuDynamicProxyDownloaderMiddleware,
@@ -19,7 +23,9 @@ from ayugespidertools.scraper.middlewares.proxy.private import (
 
 __all__ = [
     "RandomRequestUaMiddleware",
-    "RequestByRequestsMiddleware",
+    "RequestsDownloaderMiddleware",
+    "AiohttpAsyncDownloaderMiddleware",
+    "AiohttpDownloaderMiddleware",
     "DynamicProxyDownloaderMiddleware",
     "AbuDynamicProxyDownloaderMiddleware",
     "ExclusiveProxyDownloaderMiddleware",

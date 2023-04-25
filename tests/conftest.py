@@ -49,10 +49,11 @@ def mysql_db_cursor():
 
 @pytest.fixture(scope="session")
 def mongodb_conn():
-    database = MONGODB_CONFIG.pop("database")
-    MONGODB_CONFIG.pop("authsource")
-    MONGODB_CONFIG["username"] = MONGODB_CONFIG.pop("user")
-    with MongoClient(**MONGODB_CONFIG) as conn:
+    pymongo_conf = copy.deepcopy(MONGODB_CONFIG)
+    database = pymongo_conf.pop("database")
+    pymongo_conf["username"] = pymongo_conf.pop("user")
+    pymongo_conf["authSource"] = pymongo_conf.pop("authsource")
+    with MongoClient(**pymongo_conf) as conn:
         yield conn
 
         # 清理 mongodb 测试产生的数据

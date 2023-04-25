@@ -51,19 +51,19 @@ pip install ayugespidertools -i https://pypi.org/simple
 对以上 `GIF` 中的步骤进行解释：
 
 ```shell
-# 注：ayugespidertools cli 的名称也可用 ayuge 来代替，输入体验更友好。
+# 注：更推荐使用 ayuge 的 cli 名称，输入体验更友好，（ayugespidertools 的 cli 则会在下一大版本中会剔除）。
 
 # 查看库版本
-ayugespidertools version
+ayuge version
 
 # 创建项目
-ayugespidertools startproject <project_name>
+ayuge startproject <project_name>
 
 # 进入项目根目录
 cd <project_name>
 
 # 生成爬虫脚本
-ayugespidertools genspider <spider_name> <example.com>
+ayuge genspider <spider_name> <example.com>
 
 # 替换(覆盖)为真实的配置 .conf 文件；
 # 这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上相关配置即可
@@ -148,6 +148,7 @@ scrapy crawl <spider_name>
 
 1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，或移除对你无用模块、修改库名等，你可以自行修改后 `build`。
 2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy` 项目及其它组件，且你也可以根据上条须知来增强此库功能。因为模板功能天生就有及其明确的优缺点，我无法覆盖所有应用场景，**但是它的高效率的确会解放双手**。
+3. **当然，你也可以选择给此项目做出贡献，比如增加或优化某些功能等，但在此之前请提相关的 `ISSUES` 经确认后再开发和提交 `PULL REQUESTS`，以免不太符合本库场景或已废弃等原因造成你的贡献浪费，那就太可惜了！**
 
 ### 3.3. Build-Your-Own-Library
 

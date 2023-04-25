@@ -5,7 +5,7 @@
 需要使用本库中的配置，需要在 `spider` 中修改如下，此为前提：
 
 ```python
-from ayugespidertools.AyugeSpider import AyuSpider
+from ayugespidertools.spiders import AyuSpider
 
 
 # 当前 spider 要继承 AyuSpider
@@ -27,7 +27,7 @@ class DemoOneSpider(AyuSpider):
 custom_settings = {
     "ITEM_PIPELINES": {
         # 激活此项则数据会存储至 Mysql
-        "ayugespidertools.Pipelines.AyuFtyMysqlPipeline": 300,
+        "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
     },
 }
 ```
@@ -48,7 +48,7 @@ custom_settings = {
 custom_settings = {
     "ITEM_PIPELINES": {
         # 激活此项则数据会存储至 Mysql
-        "ayugespidertools.Pipelines.AyuTwistedMysqlPipeline": 300,
+        "ayugespidertools.pipelines.AyuTwistedMysqlPipeline": 300,
     },
 }
 ```

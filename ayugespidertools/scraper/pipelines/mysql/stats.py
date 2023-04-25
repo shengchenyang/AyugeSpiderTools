@@ -1,7 +1,7 @@
 import dataclasses
 import datetime
 
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines import AyuMysqlPipeline
 
 __all__ = [

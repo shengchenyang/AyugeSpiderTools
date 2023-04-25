@@ -1,8 +1,8 @@
 from pymysql import cursors
 from twisted.enterprise import adbapi
 
-from ayugespidertools.common.MysqlErrorHandle import TwistedAsynchronous, deal_mysql_err
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.mysqlerrhandle import TwistedAsynchronous, deal_mysql_err
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [

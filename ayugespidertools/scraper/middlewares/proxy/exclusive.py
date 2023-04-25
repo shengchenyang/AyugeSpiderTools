@@ -3,8 +3,8 @@ import base64
 import requests
 from scrapy import signals
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.params import Param
 
 
 class ExclusiveProxyDownloaderMiddleware(object):
@@ -22,14 +22,14 @@ class ExclusiveProxyDownloaderMiddleware(object):
         # 查看独享代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
             dict_conf=exclusive_proxy_conf,
-            key_list=["PROXY_URL", "USERNAME", "PASSWORD", "PROXY_INDEX"],
+            key_list=["proxy", "username", "password", "index"],
         )
         assert is_match, f"没有配置独享代理，配置示例为：{Param.exclusive_proxy_conf_example}"
 
-        self.proxy_url = exclusive_proxy_conf["PROXY_URL"]
-        self.username = exclusive_proxy_conf["USERNAME"]
-        self.password = exclusive_proxy_conf["PASSWORD"]
-        self.proxy_index = exclusive_proxy_conf["PROXY_INDEX"]
+        self.proxy_url = exclusive_proxy_conf["proxy"]
+        self.username = exclusive_proxy_conf["username"]
+        self.password = exclusive_proxy_conf["password"]
+        self.proxy_index = exclusive_proxy_conf["index"]
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -51,7 +51,7 @@ class ExclusiveProxyDownloaderMiddleware(object):
                 raise Exception("独享代理索引超出范围，请确认独享代理服务情况。")
 
         except Exception:
-            raise Exception("获取独享代理是失败，请及时查看。")
+            raise Exception("获取独享代理时失败，请查看独享配置及网络是否正常。")
 
     def process_request(self, request, spider):
         if request.url.startswith("https://"):

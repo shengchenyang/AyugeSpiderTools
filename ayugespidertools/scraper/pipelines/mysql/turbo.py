@@ -1,7 +1,7 @@
 import pymysql
 from dbutils.pooled_db import PooledDB
 
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [

@@ -1,12 +1,16 @@
 import requests
 from scrapy.http import HtmlResponse
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.Params import Param
-from ayugespidertools.common.Utils import ToolsForAyu
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.params import Param
+from ayugespidertools.common.utils import ToolsForAyu
+
+__all__ = [
+    "RequestsDownloaderMiddleware",
+]
 
 
-class RequestByRequestsMiddleware(object):
+class RequestsDownloaderMiddleware(object):
     """
     将 scrapy 的 Request 请求替换为 requests
     """

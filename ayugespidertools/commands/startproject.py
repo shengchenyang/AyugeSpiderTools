@@ -7,7 +7,7 @@ from scrapy.exceptions import UsageError
 from scrapy.utils.template import render_templatefile, string_camelcase
 
 import ayugespidertools
-from ayugespidertools.common.Params import Param
+from ayugespidertools.common.params import Param
 
 # 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
@@ -23,8 +23,6 @@ TEMPLATES_TO_RENDER = (
     ("${project_name}", "middlewares.py.tmpl"),
     # 添加 run.py 总运行文件
     ("${project_name}", "run.py.tmpl"),
-    # 渲染 common 文件夹下的 DataEnum.py 模板
-    ("${project_name}", "common/DataEnum.py.tmpl"),
 )
 
 IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
@@ -103,7 +101,7 @@ class AyuCommand(Command):
         print("    scrapy genspider example example.com")
         # 添加本库的文字提示内容
         print("Or you can start your first spider with ayugespidertools:")
-        print("    ayugespidertools genspider example example.com")
+        print("    ayuge genspider example example.com")
 
     @property
     def templates_dir(self) -> str:

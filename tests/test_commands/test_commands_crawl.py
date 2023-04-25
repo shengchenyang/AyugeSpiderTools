@@ -93,7 +93,7 @@ class CrawlCommandTest(CommandTest):
 
     def test_no_output(self):
         spider_code = """
-from ayugespidertools.AyugeSpider import AyuSpider
+from ayugespidertools.spiders import AyuSpider
 
 class MySpider(AyuSpider):
     name = 'myspider'

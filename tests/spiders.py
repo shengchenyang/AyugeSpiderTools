@@ -3,9 +3,9 @@ import json
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import Rule
 
-from ayugespidertools import AioFormRequest, AiohttpRequest
-from ayugespidertools.AyugeCrawlSpider import AyuCrawlSpider
-from ayugespidertools.AyugeSpider import AyuSpider
+from ayugespidertools import AiohttpFormRequest, AiohttpRequest
+from ayugespidertools.common.typevars import AiohttpRequestArgs
+from ayugespidertools.spiders import AyuCrawlSpider, AyuSpider
 from tests import PYMYSQL_CONFIG
 
 
@@ -42,19 +42,19 @@ class RecordLogToMysqlSpider(SimpleSpider):
     custom_settings = {
         "RECORD_LOG_TO_MYSQL": True,
         "ITEM_PIPELINES": {
-            "ayugespidertools.Pipelines.AyuFtyMysqlPipeline": 300,
+            "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
         },
         "DOWNLOADER_MIDDLEWARES": {
             # 随机请求头
-            "ayugespidertools.Middlewares.RandomRequestUaMiddleware": 400,
+            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
         "LOCAL_MYSQL_CONFIG": {
-            "HOST": PYMYSQL_CONFIG["host"],
-            "PORT": PYMYSQL_CONFIG["port"],
-            "USER": PYMYSQL_CONFIG["user"],
-            "PASSWORD": PYMYSQL_CONFIG["password"],
-            "CHARSET": PYMYSQL_CONFIG["charset"],
-            "DATABASE": PYMYSQL_CONFIG["database"],
+            "host": PYMYSQL_CONFIG["host"],
+            "port": PYMYSQL_CONFIG["port"],
+            "user": PYMYSQL_CONFIG["user"],
+            "password": PYMYSQL_CONFIG["password"],
+            "charset": PYMYSQL_CONFIG["charset"],
+            "database": PYMYSQL_CONFIG["database"],
         },
     }
 
@@ -122,24 +122,20 @@ class DemoAiohttpSpider(AyuSpider):
     name = "demo_aiohttp_example"
     allowed_domains = ["httpbin.org"]
     start_urls = ["http://httpbin.org/"]
-
-    # 初始化配置的类型
-    settings_type = "debug"
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
         "DOWNLOADER_MIDDLEWARES": {
             # 随机请求头
-            "ayugespidertools.Middlewares.RandomRequestUaMiddleware": 400,
+            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
             # 将 scrapy Request 替换为 aiohttp 方式
-            "ayugespidertools.DownloaderMiddlewares.AiohttpMiddleware": 543,
-            # 'ayugespidertools.DownloaderMiddlewares.AiohttpAsyncMiddleware': 543,
+            "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
         },
         # scrapy Request 替换为 aiohttp 的配置示例
         "LOCAL_AIOHTTP_CONFIG": {
-            "TIMEOUT": 5,
-            "PROXY": "127.0.0.1:1080",
-            "SLEEP": 0,
-            "RETRY_TIMES": 3,
+            "timeout": 30,
+            # "proxy": "http://127.0.0.1:7890",
+            "sleep": 0,
+            "retry_times": 3,
         },
     }
 
@@ -162,11 +158,11 @@ class DemoAiohttpSpider(AyuSpider):
             },
             meta={
                 "meta_data": "这是用来测试 parse_get_fir meta 的功能",
-                "aiohttp_args": {
-                    "timeout": 3,
-                    "proxy": "这个功能暂不提供，后续添加",
-                },
             },
+            args=AiohttpRequestArgs(
+                timeout=35,
+                url="http://httpbin.org/get?get_args=1",
+            ),
             dont_filter=True,
         )
 
@@ -185,16 +181,12 @@ class DemoAiohttpSpider(AyuSpider):
             },
             meta={
                 "meta_data": "这是用来测试 parse_post_fir meta 的功能",
-                "aiohttp_args": {
-                    "timeout": 3,
-                    "proxy": "这个功能暂不提供，后续添加",
-                },
             },
             dont_filter=True,
         )
 
         # 测试 POST 请求示例二
-        yield AioFormRequest(
+        yield AiohttpFormRequest(
             url="http://httpbin.org/post",
             headers={"Cookie": "headers_cookies_key1=headers_cookie_value1;"},
             cookies={
@@ -204,10 +196,6 @@ class DemoAiohttpSpider(AyuSpider):
             callback=self.parse_post_sec,
             meta={
                 "meta_data": "这是用来测试 parse_post_sec meta 的功能",
-                "aiohttp_args": {
-                    "timeout": 3,
-                    "proxy": "这个功能暂不提供，后续添加",
-                },
             },
             dont_filter=True,
         )

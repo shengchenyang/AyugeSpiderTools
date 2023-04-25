@@ -4,8 +4,8 @@ import time
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
 
-from ayugespidertools.common.MultiPlexing import ReuseOperation
-from ayugespidertools.common.SpiderDBConf import (
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.spiderdbconf import (
     MongoDBConfCreator,
     MysqlConfCreator,
     get_spider_db_conf,
