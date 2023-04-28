@@ -1,3 +1,4 @@
+from ayugespidertools.scraper.pipelines.mongo.asynced import AsyncMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.twisted import AyuTwistedMongoPipeline
 from ayugespidertools.scraper.pipelines.mysql.asynced import AsyncMysqlPipeline
@@ -9,6 +10,7 @@ __all__ = [
     "AyuFtyMysqlPipeline",
     "AyuTurboMysqlPipeline",
     "AyuTwistedMysqlPipeline",
+    "AsyncMongoPipeline",
     "AsyncMysqlPipeline",
     "AyuFtyMongoPipeline",
     "AyuTwistedMongoPipeline",

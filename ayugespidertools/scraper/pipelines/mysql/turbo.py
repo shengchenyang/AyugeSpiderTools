@@ -41,9 +41,9 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
             self.pool_db_conf = {
                 # 连接池允许的最大连接数
                 "maxconnections": 5,
-                # 连接池中空闲连接的最大数量。默认0，即无最大数量限制
+                # 连接池中空闲连接的最大数量。默认 0，即无最大数量限制
                 "maxcached": 0,
-                # 连接的最大使用次数。默认0，即无使用次数限制
+                # 连接的最大使用次数。默认 0，即无使用次数限制
                 "maxusage": 0,
                 # 连接数达到最大时，新连接是否可阻塞。默认False，即达到最大连接数时，再取新连接将会报错
                 "blocking": True,

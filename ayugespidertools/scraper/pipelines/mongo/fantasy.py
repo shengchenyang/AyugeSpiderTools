@@ -1,7 +1,4 @@
-from typing import Optional
-
 from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
-from ayugespidertools.common.typevars import MongoDBConfig
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.mongoclient import MongoDbBase
 
@@ -28,7 +25,6 @@ class AyuFtyMongoPipeline(MongoDbBase):
         assert isinstance(collection_prefix, str), "mongoDB 所要存储的集合前缀名称需要是 str 格式！"
 
         self.collection_prefix = collection_prefix or ""
-        self.mongodb_conf: Optional[MongoDBConfig] = None
         # conn 和 db 为父类的属性，用于存储连接信息
         self.conn = None
         self.db = None
