@@ -100,7 +100,7 @@ class AyuCommand(Command):
         print(f"    cd {project_dir}")
         print("    scrapy genspider example example.com")
         # 添加本库的文字提示内容
-        print("Or you can start your first spider with ayugespidertools:")
+        print("Or you can start your first spider with ayuge:")
         print("    ayuge genspider example example.com")
 
     @property

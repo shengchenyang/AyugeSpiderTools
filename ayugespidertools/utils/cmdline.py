@@ -143,7 +143,7 @@ def execute(argv=None, settings=None):
     cmd = cmds[cmdname]
     parser = ScrapyArgumentParser(
         formatter_class=ScrapyHelpFormatter,
-        usage=f"ayugespidertools {cmdname} {cmd.syntax()}",
+        usage=f"ayuge {cmdname} {cmd.syntax()}",
         conflict_handler="resolve",
         description=cmd.long_desc(),
     )

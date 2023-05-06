@@ -6,9 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import sys
 from datetime import datetime
-from pathlib import Path
 
 project = "AyugeSpiderTools"
 copyright = f"{datetime.now().year}, shengchenyang"
@@ -22,7 +20,7 @@ author = "shengchenyang"
 try:
     from ayugespidertools.commands.version import AyuCommand
 
-    release = AyuCommand.version()
+    release = AyuCommand()._version()
     version = ".".join(tuple(release.split(".")[:2]))
 except (ImportError, AttributeError):
     release = ""
@@ -32,7 +30,7 @@ except (ImportError, AttributeError):
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "recommonmark",
+    "myst_parser",
     "sphinx_markdown_tables",
     "hoverxref.extension",
     "notfound.extension",
@@ -65,10 +63,8 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 html_static_path = []
 
-from recommonmark.parser import CommonMarkParser
-
 source_parsers = {
-    ".md": CommonMarkParser,
+    ".md": "sphinx_markdown_parser.parser.MySTParser",
 }
 source_suffix = [".rst", ".md"]
 

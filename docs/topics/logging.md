@@ -77,4 +77,3 @@ class MySpider(ayugespidertools.AyuSpider):
         # 此条日志在默认下会持久化存储至 error.log 中
         self.slog.error(f"error: Parse function called on {response.url}")
 ```
-
