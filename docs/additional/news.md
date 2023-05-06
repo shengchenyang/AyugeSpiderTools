@@ -1,5 +1,40 @@
 # Release notes
 
+## AyugeSpiderTools 2.0.2 (2023-05-05)
+
+此版本为微小变动。
+
+### Deprecation removals
+
+- 无
+
+### Deprecations 
+
+- 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
+
+### New features
+
+- 添加 `mongodb` 的 `asyncio` 的示例。
+
+### Bug fixes
+
+- 无
+
+### Code optimizations
+
+- 无
+
+
+### Bug fixes
+
+- 无
+
+### Code optimizations
+
+- 无
+
+<hr/>
+
 ## AyugeSpiderTools 2.0.1 (2023-04-27)
 
 此版本为大版本更新，修改了项目结构以统一本库及与 `scrapy` 结合的代码风格，也有一些功能完善等。最新功能示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider/) 或 [readthedocs](https://ayugespidertools.readthedocs.io/en/ayugespidertools-2.0.1/) 中查看。
