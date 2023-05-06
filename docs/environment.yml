@@ -1,6 +1,0 @@
-name: myenv
-channels:
-  - conda-forge
-dependencies:
-  - python=3.9
-  - openssl=1.1.1k
