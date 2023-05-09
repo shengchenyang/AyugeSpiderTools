@@ -1,5 +1,31 @@
 # Release notes
 
+## AyugeSpiderTools 2.1.0 (2023-05-09)
+
+这是一个主要更改了 `scrapy` 依赖库为 `2.9.0` 版本，含有 `bug` 修复。
+
+### Deprecation removals
+
+- `tox` 去除 `windows` 平台的测试场景。
+
+### Deprecations 
+
+- 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
+
+### New features
+
+- 本库依赖库 `scrapy` 版本升级为 `2.9.0`。
+
+### Bug fixes
+
+- 修复使用 `ayuge` 及 `ayuge -h` 命令时，未显示当前库版本的问题。
+
+### Code optimizations
+
+- `readthedocs` 的 `markdown` 解析由 `recommonmark` 改为 `myst-parser`，以支持更多的 `markdown` 语法。
+
+<hr/>
+
 ## AyugeSpiderTools 2.0.3 (2023-05-06)
 
 此版本为微小变动。
