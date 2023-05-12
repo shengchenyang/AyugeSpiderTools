@@ -22,7 +22,7 @@
 
 ### Code optimizations
 
-- `readthedocs` 的 `markdown` 解析由 `recommonmark` 改为 `myst-parser`，以支持更多的 `markdown` 语法。
+- 无。
 
 <hr/>
 

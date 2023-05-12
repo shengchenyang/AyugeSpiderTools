@@ -18,8 +18,6 @@
 
 为了向您展示 `ayugespidertools` 带来了什么，我们将带您通过一个 `Scrapy Spider` 示例，使用最简单的方式来运行蜘蛛。
 
-**注意：若你觉得 `ayugespidertools` 的 `cli` 名称过长，你可以使用 `ayuge` 来替代。** 
-
 > 先创建项目：
 
 ```shell

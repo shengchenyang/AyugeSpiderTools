@@ -25,26 +25,25 @@ ayugespidertools startproject DemoSpider
 
 ```ini
 DemoSpider/
-|-- DemoSpider							# project's Python module, you'll import your code from here
+|-- DemoSpider			# project's Python module, you'll import your code from here
 |   |-- __init__.py
-|   |-- items.py						# project items definition file, 数据库表枚举信息示例也迁移至此
-|   |-- logs							# 日志管理文件夹，可以自定义规则
-|   |   |-- DemoSpider.log					# scrapy 输出日志，文件名称为项目名
-|   |   |-- error.log						# loguru 日志 error 规则输出文件
-|   |-- middlewares.py						# project middlewares definition file
-|   |-- pipelines.py						# project pipelines definition file
-|   |-- run.py							# scrapy 运行文件
-|   |-- run.sh							# 项目运行 shell，运行以上的 run.py，win 平台不会生成此文件
-|   |-- settings.py						# project settings definition file
-|   |-- spiders							# a directory where you'll later put your spiders
+|   |-- items.py		# project items definition file, 数据库表枚举信息示例也迁移至此
+|   |-- logs			# 日志管理文件夹，可以自定义规则
+|   |   |-- DemoSpider.log	# scrapy 输出日志，文件名称为项目名
+|   |   |-- error.log		# loguru 日志 error 规则输出文件
+|   |-- middlewares.py		# project middlewares definition file
+|   |-- pipelines.py		# project pipelines definition file
+|   |-- run.py			# scrapy 运行文件
+|   |-- run.sh			# 项目运行 shell，运行以上的 run.py，win 平台不会生成此文件
+|   |-- settings.py		# project settings definition file
+|   |-- spiders			# a directory where you'll later put your spiders
 |   |   |-- __init__.py
 |   `-- VIT
-|       `-- .conf        				        # 配置文件，用于修改 Mysql, MongoDB 等配置
-|-- .gitignore							# git ignore 文件
-|-- pyproject.toml						# 项目配置
-|-- README.md							# 说明文档
-|-- requirements.txt						# 依赖文件
-`-- scrapy.cfg                                                  # deploy configuration file
+|       `-- .conf        	# 配置文件，用于修改 Mysql, MongoDB 等配置
+|-- pyproject.toml		# 项目配置
+|-- README.md			# 说明文档
+|-- requirements.txt		# 依赖文件
+`-- scrapy.cfg                  # deploy configuration file
 ```
 
 ## 我们的第一个 Spider
