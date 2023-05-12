@@ -2765,14 +2765,14 @@ reference = "aliyun"
 
 [[package]]
 name = "scrapy"
-version = "2.9.0"
+version = "2.8.0"
 description = "A high-level Web Crawling and Web Scraping framework"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Scrapy-2.9.0-py2.py3-none-any.whl", hash = "sha256:908fdb7874d235230a16fa288637e3f673813cf27fb177f589b5a22bad00b0f9"},
-    {file = "Scrapy-2.9.0.tar.gz", hash = "sha256:564c972b56e54b83141f395ce3f6a25bfe2093d61d13f9b81d05384e19db98da"},
+    {file = "Scrapy-2.8.0-py2.py3-none-any.whl", hash = "sha256:814b92d71c695628e24e9110273a3bcf34f185c2cfe761662e6cad008b7ba3e5"},
+    {file = "Scrapy-2.8.0.tar.gz", hash = "sha256:8071ac6c65f185ec2c76fe8509f94d99fea080519fdc206f908a920d5e05fe43"},
 ]
 
 [package.dependencies]
@@ -3728,4 +3728,4 @@ reference = "aliyun"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "684d43ef75aee49d7fdd4a80edbc3830cd1b94667e3d5fa2e822dc53fca92848"
+content-hash = "286e579a11cf9e4a8137b273bf1b2f0768cbee36d4791156bf5c819c261e6030"
