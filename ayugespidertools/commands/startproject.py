@@ -11,11 +11,9 @@ from ayugespidertools.common.params import Param
 
 # 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
-    (".gitignore",),
     ("pyproject.toml",),
     ("README.md",),
     ("requirements.txt",),
-    (".gitignore",),
     ("scrapy.cfg",),
     ("${project_name}", "settings.py.tmpl"),
     ("${project_name}", "items.py.tmpl"),
@@ -64,8 +62,6 @@ class AyuCommand(Command):
             render_templatefile(
                 tplfile,
                 project_name=project_name,
-                # 这个 py 就只为了处理模板中 .gitignore 多余的 $py 干扰
-                py="$py",
                 ProjectName=string_camelcase(project_name),
             )
 
@@ -77,7 +73,7 @@ class AyuCommand(Command):
         run_shell_abspath = Path(project_dir).resolve()
         # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
         if Param.IS_WINDOWS:
-            print("Info: The run.sh file is no longer generated under windows")
+            print("Info: The run.sh file is no longer generated under windows.")
             del_file = Path(run_shell_path)
             if Path.exists(del_file):
                 del_file.unlink()

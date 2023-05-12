@@ -123,7 +123,7 @@ custom_settings = {
     "LOCAL_AIOHTTP_CONFIG": {
         "timeout": 2,
         "proxy": "http://127.0.0.1:7890",
-        "sleep": 0,
+        "sleep": 1,
         "retry_times": 3,
     },
 }

@@ -33,7 +33,6 @@
 |   |   `-- spider1.py
 |   `-- VIT
 |       `-- .conf
-|-- .gitignore
 |-- pyproject.toml
 |-- README.md
 |-- requirements.txt
@@ -49,12 +48,18 @@ default = DemoSpider.settings
 
 ## 使用 AyugespiderTools 工具
 
-**注意：若你觉得 `ayugespidertools` 的 `cli` 名称过长，你可以使用 `ayuge` 来替代。** 
-
 您可以先运行不带参数的 `AyugeSpiderTools` 工具，它会打印一些使用帮助和可用的命令：
 
+命令如下：
+
 ```shell
-AyugeSpiderTools None - no active project
+ayuge -h
+```
+
+输出示例如下：
+
+```shell
+AyugeSpiderTools 2.1.0 - no active project
 
 Usage:
   ayuge <command> [options] [args]

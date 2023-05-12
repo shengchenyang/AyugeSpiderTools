@@ -62,6 +62,8 @@ logger.info("this is a info log")
 
 ## 从 spider 记录
 
+以下是本库 `slog` 日志在 `spider` 中的使用示例：
+
 ```python
 import ayugespidertools
 
@@ -77,3 +79,4 @@ class MySpider(ayugespidertools.AyuSpider):
         # 此条日志在默认下会持久化存储至 error.log 中
         self.slog.error(f"error: Parse function called on {response.url}")
 ```
+注：不影响 `scrapy` 自带的日志记录，可自行选择或同时使用。

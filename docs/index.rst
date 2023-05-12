@@ -25,7 +25,7 @@ AyugeSpiderTools |version| documentation
 .. _getting-help:
 
 Getting help
-============
+==================================
 
 遇到麻烦？请优先尝试使用以下方式提问！
 
@@ -39,7 +39,7 @@ Getting help
 
 
 第一步
-===========
+==================================
 
 .. toctree::
    :caption: 第一步
@@ -63,7 +63,7 @@ Getting help
     通过一个简单示例来了解一些信息。
 
 基本概念
-===========
+==================================
 
 .. toctree::
    :caption: 基本概念
@@ -83,7 +83,7 @@ Getting help
     用提取的数据填充你的 ``item``。
 
 内置服务
-===========
+==================================
 
 .. toctree::
    :caption: 内置服务
@@ -95,7 +95,7 @@ Getting help
     在 ``ayugespidertools`` 上学习如何使用日志。
 
 扩展 scrapy
-===========
+==================================
 
 .. toctree::
    :caption: 扩展 scrapy
@@ -110,8 +110,20 @@ Getting help
 :doc:`topics/pipelines`
     了解本库中的管道及使用方法。
 
+构建你的专属库
+==================================
+
+.. toctree::
+   :caption: 构建你的专属库
+   :hidden:
+
+   diy/myself
+
+:doc:`diy/myself`
+    如何将本库构建成为你的专属库。
+
 补充说明
-============
+==================================
 
 .. toctree::
    :caption: 补充说明
@@ -120,4 +132,4 @@ Getting help
    additional/news
 
 :doc:`additional/news`
-    查看最近的 AyugeSpiderTools 版本中有哪些变化。
+    查看最近的 ``AyugeSpiderTools`` 版本中有哪些变化。

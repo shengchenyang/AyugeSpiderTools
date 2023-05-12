@@ -69,7 +69,14 @@ custom_settings = {
 
 ### 2.2. 异步存储
 
+#### 2.2.1。 twisted 实现
+
 ```python
 # 依赖 AyuTwistedMongoPipeline
 ```
 
+#### 2.2.2. asyncio motor 实现
+
+```python
+# 依赖 AsyncMongoPipeline
+```
