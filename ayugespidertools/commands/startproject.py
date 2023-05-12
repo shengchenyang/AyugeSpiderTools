@@ -73,7 +73,7 @@ class AyuCommand(Command):
         run_shell_abspath = Path(project_dir).resolve()
         # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
         if Param.IS_WINDOWS:
-            print("Info: The run.sh file is no longer generated under windows")
+            print("Info: The run.sh file is no longer generated under windows.")
             del_file = Path(run_shell_path)
             if Path.exists(del_file):
                 del_file.unlink()
