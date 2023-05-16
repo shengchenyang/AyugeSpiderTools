@@ -1,5 +1,6 @@
 import json
 
+from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.utils import ToolsForAyu
 from tests import CONSUL_CONFIG
 
@@ -56,7 +57,8 @@ def test_get_kvs_detail_by_consul():
         url=CONSUL_CONFIG["url"],
     )
     _res = json.loads(res)
-    assert _res.get("mysql") is not None, _res.get("mongodb") is not None
+    _res_lower = ReuseOperation.dict_keys_to_lower(_res)
+    assert _res_lower.get("mysql") is not None, _res_lower.get("mongodb") is not None
 
 
 def test_get_conf_by_consul():

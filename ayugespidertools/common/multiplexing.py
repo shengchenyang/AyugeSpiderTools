@@ -1,4 +1,5 @@
 import asyncio
+import configparser
 import json
 import os
 import random
@@ -13,6 +14,7 @@ from twisted.internet.defer import Deferred
 
 from ayugespidertools.common.typevars import MysqlConfig
 from ayugespidertools.config import logger
+from ayugespidertools.items import MongoDataItem, MysqlDataItem, ScrapyItem
 
 __all__ = [
     "ReuseOperation",
@@ -35,6 +37,96 @@ class ReuseOperation(object):
             1).Deferred
         """
         return Deferred.fromFuture(asyncio.ensure_future(f))
+
+    @staticmethod
+    def get_conf_by_settings(vit_dir: str, inner_settings: Settings) -> Settings:
+        """
+        通过 settings 获取所需配置，并将其添加到 inner_settings 中
+        Args:
+            vit_dir: 配置文件所在的目录
+            inner_settings: scrapy 的 inner_settings
+
+        Returns:
+            inner_settings: 本库所需的配置
+        """
+        # 加载秘钥等配置信息
+        config_parser = configparser.ConfigParser()
+        config_parser.read(f"{vit_dir}/.conf", encoding="utf-8")
+        # Mysql 数据库配置
+        inner_settings["LOCAL_MYSQL_CONFIG"] = {
+            "host": config_parser.get("mysql", "host", fallback=None),
+            "port": config_parser.getint("mysql", "port", fallback=3306),
+            "user": config_parser.get("mysql", "user", fallback="root"),
+            "password": config_parser.get("mysql", "password", fallback=None),
+            "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
+            "database": config_parser.get("mysql", "database", fallback=None),
+            # 数据库 engin 采用的驱动，可不填此参数
+            "driver": "mysqlconnector",
+        }
+        # MongoDB 数据库配置
+        inner_settings["LOCAL_MONGODB_CONFIG"] = {
+            "host": config_parser.get("mongodb", "host", fallback=None),
+            "port": config_parser.getint("mongodb", "port", fallback=27017),
+            "authsource": config_parser.get("mongodb", "authsource", fallback="admin"),
+            "user": config_parser.get("mongodb", "user", fallback="admin"),
+            "password": config_parser.get("mongodb", "password", fallback=None),
+            "database": config_parser.get("mongodb", "database", fallback=None),
+        }
+        # consul 应用管理的连接配置
+        inner_settings["CONSUL_CONFIG"] = {
+            "token": config_parser.get("consul", "token", fallback=None),
+            "url": config_parser.get("consul", "url", fallback=None),
+            "format": config_parser.get("consul", "format", fallback="json"),
+        }
+        # 动态隧道代理（快代理版本）
+        inner_settings["DYNAMIC_PROXY_CONFIG"] = {
+            "proxy": config_parser.get("kdl_dynamic_proxy", "proxy", fallback=None),
+            "username": config_parser.get(
+                "kdl_dynamic_proxy", "username", fallback=None
+            ),
+            "password": config_parser.get(
+                "kdl_dynamic_proxy", "password", fallback=None
+            ),
+        }
+        # 独享代理（快代理版本）
+        inner_settings["EXCLUSIVE_PROXY_CONFIG"] = {
+            "proxy": config_parser.get("kdl_exclusive_proxy", "proxy", fallback=None),
+            "username": config_parser.get(
+                "kdl_exclusive_proxy", "username", fallback=None
+            ),
+            "password": config_parser.get(
+                "kdl_exclusive_proxy", "password", fallback=None
+            ),
+            "index": config_parser.getint("kdl_exclusive_proxy", "index", fallback=1),
+        }
+        # ali oss 对象存储
+        inner_settings["OSS_CONFIG"] = {
+            "accesskeyid": config_parser.get("ali_oss", "accesskeyid", fallback=None),
+            "accesskeysecret": config_parser.get(
+                "ali_oss", "accesskeysecret", fallback=None
+            ),
+            "endpoint": config_parser.get("ali_oss", "endpoint", fallback=None),
+            "bucket": config_parser.get("ali_oss", "bucket", fallback=None),
+            "doc": config_parser.get("ali_oss", "doc", fallback=None),
+        }
+        return inner_settings
+
+    @staticmethod
+    def item_to_dict(
+        item: Union[MysqlDataItem, MongoDataItem, ScrapyItem, dict]
+    ) -> dict:
+        """
+        将 item 转换为 dict 类型
+        将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
+        Args:
+            item: spider 中的 yield 的 item
+
+        Returns:
+            1). dict 类型的 item
+        """
+        if isinstance(item, (MongoDataItem, MysqlDataItem)):
+            return item.asdict()
+        return dict(item)
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
@@ -236,15 +328,18 @@ class ReuseOperation(object):
         Returns:
             1).处理后的 dict 值
         """
-        str_key_to_lower_dict = {
-            k.lower(): v for k, v in deal_dict.items() if isinstance(k, str)
-        }
-        not_str_key_dict = {
-            k: v for k, v in deal_dict.items() if not isinstance(k, str)
-        }
-        # python 3.9+ 可优化为：str_key_to_lower_dict |= not_str_key_dict
-        str_key_to_lower_dict.update(not_str_key_dict)
-        return str_key_to_lower_dict
+        key_to_lower_dict = {}
+        for key, value in deal_dict.items():
+            if isinstance(value, dict):
+                if isinstance(key, str):
+                    key_to_lower_dict[key.lower()] = cls.dict_keys_to_lower(value)
+                else:
+                    key_to_lower_dict[key] = cls.dict_keys_to_lower(value)
+            elif isinstance(key, str):
+                key_to_lower_dict[key.lower()] = value
+            else:
+                key_to_lower_dict[key] = value
+        return key_to_lower_dict
 
     @classmethod
     def dict_keys_to_upper(cls, deal_dict: dict) -> dict:
@@ -256,17 +351,18 @@ class ReuseOperation(object):
         Returns:
             1).处理后的 dict 值
         """
-        # 找出 str 类型的 key 字段数据，并将其大写
-        str_key_to_upper_dict = {
-            k.upper(): v for k, v in deal_dict.items() if isinstance(k, str)
-        }
-        # 找出非 str 类型的数据
-        not_str_key_dict = {
-            k: v for k, v in deal_dict.items() if not isinstance(k, str)
-        }
-        # 将大写处理的字典加上非 str 类型的 key 字段数据
-        str_key_to_upper_dict.update(not_str_key_dict)
-        return str_key_to_upper_dict
+        key_to_upper_dict = {}
+        for key, value in deal_dict.items():
+            if isinstance(value, dict):
+                if isinstance(key, str):
+                    key_to_upper_dict[key.upper()] = cls.dict_keys_to_upper(value)
+                else:
+                    key_to_upper_dict[key] = cls.dict_keys_to_upper(value)
+            elif isinstance(key, str):
+                key_to_upper_dict[key.upper()] = value
+            else:
+                key_to_upper_dict[key] = value
+        return key_to_upper_dict
 
     @classmethod
     def get_consul_conf(cls, settings: Settings) -> dict:

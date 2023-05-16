@@ -64,6 +64,39 @@ def test_get_ck_dict_from_headers():
     }
 
 
+def test_dict_keys_to_lower():
+    ori_dict = {
+        "Name": "John",
+        "Address": {"City": "New York", "State": "NY"},
+        "Phone": {"Home": "QWER", "Work": "WASD"},
+        2: {22: "AAA", "Work": "ABC", "THIRD": {"A": 1, "B": 2}},
+    }
+    res = ReuseOperation.dict_keys_to_lower(deal_dict=ori_dict)
+    assert res == {
+        "name": "John",
+        "address": {"city": "New York", "state": "NY"},
+        "phone": {"home": "QWER", "work": "WASD"},
+        2: {22: "AAA", "work": "ABC", "third": {"a": 1, "b": 2}},
+    }
+
+
+def test_dict_keys_to_upper():
+    ori_dict = {
+        "name": "John",
+        "address": {"city": "New York", "state": "NY"},
+        "Phone": {"home": "QWER", "work": "WASD"},
+        2: {22: "aaa", "work": "ABC", "third": {"a": 1, "b": 2}},
+    }
+    res = ReuseOperation.dict_keys_to_upper(deal_dict=ori_dict)
+    print("res:", res)
+    assert res == {
+        "NAME": "John",
+        "ADDRESS": {"CITY": "New York", "STATE": "NY"},
+        "PHONE": {"HOME": "QWER", "WORK": "WASD"},
+        2: {22: "aaa", "WORK": "ABC", "THIRD": {"A": 1, "B": 2}},
+    }
+
+
 def test_get_req_dict_from_scrapy():
     scrapy_body_str = "post_key1=post_value1&post_key2=post_value2"
 

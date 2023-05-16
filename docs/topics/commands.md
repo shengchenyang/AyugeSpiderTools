@@ -59,7 +59,7 @@ ayuge -h
 输出示例如下：
 
 ```shell
-AyugeSpiderTools 2.1.0 - no active project
+AyugeSpiderTools 3.0.1 - no active project
 
 Usage:
   ayuge <command> [options] [args]

@@ -51,7 +51,7 @@ pip install ayugespidertools -i https://pypi.org/simple
 对以上 `GIF` 中的步骤进行解释：
 
 ```shell
-# 注：更推荐使用 ayuge 的 cli 名称，输入体验更友好，（ayugespidertools 的 cli 则会在下一大版本中会剔除）。
+# 注：ayugespidertools 的 cli 已剔除，现只能使用 ayuge。
 
 # 查看库版本
 ayuge version
@@ -71,18 +71,19 @@ cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # 运行脚本
 scrapy crawl <spider_name>
+# 注：也可以使用 ayuge crawl <spider_name>
 ```
 
 具体使用方法请在 [DemoSpider 之 AyugeSpiderTools 工具应用示例](https://github.com/shengchenyang/DemoSpider) 项目中查看，目前已适配以下场景：
 
 ```diff
 # 采集数据存入 `Mysql` 的场景：
-- 1).demo_one: 配置根据本地 `settings` 的 `LOCAL_MYSQL_CONFIG` 中取值
++ 1).demo_one: 配置根据本地 `settings` 的 `LOCAL_MYSQL_CONFIG` 中取值
 + 3).demo_three: 配置根据 `consul` 的应用管理中心中取值
 + 5).demo_five: 异步存入 `Mysql` 的场景
 
 # 采集数据存入 `MongoDB` 的场景：
-- 2).demo_two: 采集数据存入 `MongoDB` 的场景（配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值）
++ 2).demo_two: 采集数据存入 `MongoDB` 的场景（配置根据本地 `settings` 的 `LOCAL_MONGODB_CONFIG` 中取值）
 + 4).demo_four: 采集数据存入 `MongoDB` 的场景（配置根据 `consul` 的应用管理中心中取值）
 + 6).demo_six: 异步存入 `MongoDB` 的场景
 
@@ -93,7 +94,7 @@ scrapy crawl <spider_name>
 
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
 
-- 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
++ 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景，提供了各种请求场景示例（GET,POST）
 + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
 + 11).demo_proxy_one: 快代理动态隧道代理示例
@@ -103,8 +104,8 @@ scrapy crawl <spider_name>
 +14).demo_crawl: 支持 scrapy CrawlSpider 的示例
 
 # 本库中给出支持 Item Loaders 特性的示例(文档地址：https://ayugespidertools.readthedocs.io/en/latest/topics/loaders.html)
-+15).demo_item_loader: 本库 ScrapyClassicItem 及原生 scrapy item 动态添加 item 字段及支持 Item Loaders 的示例
-+16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例
++15).demo_item_loader: 本库中使用 Item Loaders 的示例
+-16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例，此示例已删除，可查看上个 demo_item_loader 中的示例，目标已经可以很方便的使用 Item Loaders 功能了
 
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 ```

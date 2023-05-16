@@ -24,7 +24,7 @@ class AbstractClass(ABC):
         table_name: str,
         charset: str,
         collate: str,
-        tabel_notes: str = "",
+        table_notes: str = "",
         demand_code: str = "",
     ) -> None:
         """
@@ -38,31 +38,31 @@ class AbstractClass(ABC):
             table_name: 创建表的名称
             charset: charset
             collate: collate
-            tabel_notes: 创建表的注释
+            table_notes: 创建表的注释
             demand_code: 创建表的需求对应的 code 值，用于和需求中的任务对应
 
         Returns:
             None
         """
-        # 用于表格 comment 的参数生成(即 tabel_notes 参数)
+        # 用于表格 comment 的参数生成(即 table_notes 参数)
         if demand_code != "":
-            tabel_notes = f"{demand_code}_{tabel_notes}"
+            table_notes = f"{demand_code}_{table_notes}"
 
         sql = f"""
         CREATE TABLE IF NOT EXISTS `{table_name}`
         (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`))
-        ENGINE=InnoDB DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{tabel_notes}';
+        ENGINE=InnoDB DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{table_notes}';
         """
 
         try:
             # 执行 sql 查询，获取数据
             data = cursor.execute(sql)
             if any([data == 0, not data]):
-                logger.info(f"创建数据表 {tabel_notes}: {table_name} 成功！")
+                logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
 
         except Exception as e:
             logger.error(
-                f"创建表失败，tabel_notes：{tabel_notes}，table_name：{table_name}，error：{e}"
+                f"创建表失败，table_notes：{table_notes}，table_name：{table_name}，error：{e}"
             )
 
     def _get_column_type(
@@ -149,6 +149,8 @@ class AbstractClass(ABC):
                 table_name=table_name,
                 charset=charset,
                 collate=collate,
+                table_notes=table_notes,
+                demand_code=demand_code,
             )
 
         elif "1406" in err_msg:

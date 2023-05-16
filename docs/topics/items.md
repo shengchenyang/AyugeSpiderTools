@@ -13,41 +13,53 @@
 
 其实，本库就是推荐把所有字段统一存入 `alldata` 字段中，其它字段用于场景补充，比如：`table` 字段用于说明要存储的表名/集合名，`item_mode` 字段用于说明存储的方式，`mongo_update_rule` 字段是 `item_mode` 为 `MongoDB` 存储场景时的去重条件(可不设置此字段)。
 
+本库，
+
 ```python
-class DataItem(NamedTuple):
-    """
-    用于描述 item 中字段
-    """
+def parse(self, response):
+	# 存储到 Mysql 场景时需要的 Item 构建示例
+    ArticleMysqlItem = MysqlDataItem(
+        article_detail_url=DataItem(article_detail_url, "文章详情链接"),
+        article_title=DataItem(article_title, "文章标题"),
+        comment_count=DataItem(comment_count, "文章评论数量"),
+        favor_count=DataItem(favor_count, "文章赞成数量"),
+        nick_name=DataItem(nick_name, "文章作者昵称"),
+        _table=TableEnum.article_list_table.value["value"],
+    )
+    # 存储到 MongoDB 场景时需要的 Item 构建示例
+    ArticleMongoItem = MongoDataItem(
+        article_detail_url=article_detail_url,
+        article_title=article_title,
+        comment_count=comment_count,
+        favor_count=favor_count,
+        nick_name=nick_name,
+        _table=TableEnum.article_list_table.value["value"],
+        # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
+        _mongo_update_rule={"article_detail_url": article_detail_url},
+    )
+```
 
-    key_value: Any
-    notes: str = ""
+以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 即为存储至库中字段，`value` 为存储内容。
 
+当然，目前也支持动态赋值，但是我不推荐使用，直接按照上个方式即可：
 
-@dataclass
-class BaseItem:
-    """
-    用于构建 scrapy item 的基本结构，所有需要存储的表对应的结构都放在 alldata 中
-    """
-    alldata: dict = field(default=None)
-    table: str = field(default=None)
+```python
+ def parse(self, response):
+    mdi = MysqlDataItem(_table="table0")
+    mdi.add_field("add_field1", "value1")
+    mdi.add_field("add_field2", DataItem(key_value="value2"))
+    mdi.add_field("add_field3", DataItem(key_value="value3", notes="add_field3值"))
+    # _table 修改可通过以下方式，同样不推荐使用
+    mdi._table = "table1"
+```
 
+另外，本库的 `item` 提供类型转换，以方便后续的各种使用场景：
 
-@dataclass
-class MysqlDataItem(BaseItem):
-    """
-    这个是 Scrapy item 的 Mysql 的存储结构
-    """
-    item_mode: str = field(default="Mysql")
-
-
-@dataclass
-class MongoDataItem(BaseItem):
-    """
-    这个是 Scrapy item 的 MongoDB 的存储结构
-    这个 mongo_update_rule 字段是用于 Mongo 存储时作查询使用
-    """
-    item_mode: str = field(default="MongoDB")
-    mongo_update_rule: dict = field(default=None)
+```python
+# 将本库 Item 转为 dict 的方法
+item_dict = mdi.asdict()
+# 将本库 Item 转为 scrapy Item 的方法
+item = mdi.asitem()
 ```
 
 ## 使用示例
@@ -157,52 +169,27 @@ class DemoOneSpider(AyuSpider):
                 json_data=curr_data,
                 query="nickName")
 
-            # 这是需要存储的字段信息
-            article_info = {
-                "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
-                "article_title": DataItem(article_title, "文章标题"),
-                "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "文章赞成数量"),
-                "nick_name": DataItem(nick_name, "文章作者昵称"),
-            }
-
-            ArticleInfoMysqlItem = MysqlDataItem(
-                alldata=article_info,
-                table=TableEnum.article_list_table.value['value'],
+            ArticleMysqlItem = MysqlDataItem(
+                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
+                article_title=DataItem(article_title, "文章标题"),
+                comment_count=DataItem(comment_count, "文章评论数量"),
+                favor_count=DataItem(favor_count, "文章赞成数量"),
+                nick_name=DataItem(nick_name, "文章作者昵称"),
+                _table=TableEnum.article_list_table.value["value"],
             )
-            self.slog.info(f"ArticleInfoMysqlItem: {ArticleInfoMysqlItem}")
+            yield ArticleMysqlItem
 
-            # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
-            try:
-                sql = '''select `id` from `{}` where `article_detail_url` = "{}" limit 1'''.format(
-                    self.custom_settings.get('MYSQL_TABLE_PREFIX', '') + TableEnum.article_list_table.value['value'],
-                    article_detail_url)
-                df = pandas.read_sql(sql, self.mysql_engine)
-
-                # 如果为空，说明此数据不存在于数据库，则新增
-                if df.empty:
-                    yield ArticleInfoMysqlItem
-
-                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-                else:
-                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
-
-            except Exception as e:
-                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                    yield ArticleInfoMysqlItem
-                else:
-                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
-
-            # 这是 MongoDB 存储场景的示例
-            ArticleInfoMongoItem = MongoDataItem(
-                # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
-                alldata=article_info,
-                # table 为 mongo 的存储 Collection 集合的名称
-                table=TableEnum.article_list_table.value['value'],
-                # mongo_update_rule 为查询数据是否存在的规则
-                mongo_update_rule={"article_detail_url": article_detail_url},
+            ArticleMongoItem = MongoDataItem(
+                article_detail_url=article_detail_url,
+                article_title=article_title,
+                comment_count=comment_count,
+                favor_count=favor_count,
+                nick_name=nick_name,
+                _table=TableEnum.article_list_table.value["value"],
+                # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
+                _mongo_update_rule={"article_detail_url": article_detail_url},
             )
-            yield ArticleInfoMongoItem
+            yield ArticleMongoItem
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。
@@ -224,55 +211,16 @@ class DemoOneSpider(AyuSpider):
 
 这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
 
-| item 字段             | 类型                      | 注释                                              |
-| --------------------- | ------------------------- | ------------------------------------------------- |
-| **alldata**           | dict(单层，或双层)        | `item` 所有需要存储的字段，其格式分类请在下方查看 |
-| **table**             | str                       | 存储至数据表或集合的名称                          |
-| **item_mode**         | str("Mysql" 或 "MongoDB") | 存储类型场景                                      |
-| **mongo_update-rule** | dict                      | `MongoDB item` 场景下的查重规则                   |
+| item 字段              | 类型                      | 注释                                                         |
+| ---------------------- | ------------------------- | ------------------------------------------------------------ |
+| **自定义字段**         | DataItem，Any             | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
+| **_table**             | str                       | 存储至数据表或集合的名称                                     |
+| **_item_mode**         | str("Mysql" 或 "MongoDB") | 存储类型场景，不用设置此值，有默认参数。而且赋值错误时 IDE 也会提示。 |
+| **_mongo_update-rule** | dict                      | `MongoDB item` 场景下的查重规则                              |
 
 注，对以上表格中内容进行扩充解释：
 
-- `alldata` 字段格式：
-  
-  - ```python
-    # alldata 示例一，推荐此代码编写风格
-    alldata1 = {
-        "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
-        "article_title": DataItem(article_title, "文章标题"),
-    }
-    ```
-  - ```python
-    # alldata 示例二，也推荐此代码编写风格
-    alldata1 = {
-        "article_detail_url": DataItem(article_detail_url),
-        "article_title": DataItem(article_title),
-    }
-    ```
-    
-  - ```python
-    # alldata 示例三
-    alldata3 = {
-        "article_detail_url": article_detail_url,
-        "article_title": article_title,
-    }
-    ```
-    
-  - ```python
-    # alldata 示例四，不推荐
-    alldata2 = {
-        "article_detail_url": {
-            "key_value": article_detail_url,
-            "notes": "文章详情链接",
-        },
-        "article_title": {
-            "key_value": article_title,
-            "notes": "文章标题",
-        },
-    }
-    ```
-    
-  
+- 自定义字段使用示例请在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/intro/tutorial.html) 中查看。
 
 ## 自定义 Item 字段和实现 Item Loaders
 

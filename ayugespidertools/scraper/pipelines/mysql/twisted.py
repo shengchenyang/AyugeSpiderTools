@@ -1,6 +1,7 @@
 from pymysql import cursors
 from twisted.enterprise import adbapi
 
+from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import TwistedAsynchronous, deal_mysql_err
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
@@ -54,16 +55,16 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         self.slog.error(f"创建数据表失败: {failure}")
 
     def process_item(self, item, spider):
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
+        item_dict = ReuseOperation.item_to_dict(item)
         # 先查看存储场景是否匹配
-        if item_dict["item_mode"] == "Mysql":
+        if item_dict["_item_mode"] == "Mysql":
             query = self.dbpool.runInteraction(self.db_insert, item_dict)
             query.addErrback(self.handle_error, item)
         return item
 
     def db_insert(self, cursor, item):
         alter_item = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
-        table = super(AyuTwistedMysqlPipeline, self).get_table_name(item["table"])
+        table = super(AyuTwistedMysqlPipeline, self).get_table_name(item["_table"])
 
         if not (new_item := alter_item.new_item):
             return

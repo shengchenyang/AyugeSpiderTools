@@ -42,12 +42,8 @@ class $classname(AyuCrawlSpider):
         book_name = "".join(book_name_list).strip()
         self.slog.debug(f"book_name: {book_name}")
 
-        novel_info = {
-            "book_name": {"key_value": book_name, "notes": "图书名称"},
-        }
-
         NovelInfoItem = MysqlDataItem(
-            alldata=novel_info,
-            table=TableEnum.article_list_table.value["value"],
+            book_name=book_name,
+            _table=TableEnum.article_list_table.value["value"],
         )
         yield NovelInfoItem

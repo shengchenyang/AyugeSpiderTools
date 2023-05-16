@@ -18,7 +18,7 @@
 在开始抓取之前，您必须设置一个新的 `ayugespidertools` 项目。输入您要存储代码的目录并运行：
 
 ```shell
-ayugespidertools startproject DemoSpider
+ayuge startproject DemoSpider
 ```
 
 这将创建一个 `DemoSpider` 包含以下内容的目录：
@@ -139,29 +139,27 @@ class DemoEightSpider(AyuSpider):
                 json_data=curr_data, query="nickName"
             )
 
-            article_info = {
-                "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
-                "article_title": DataItem(article_title, "文章标题"),
-                "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "文章赞成数量"),
-                "nick_name": DataItem(nick_name, "文章作者昵称"),
-            }
-
-            ArticleMysqlInfoItem = MysqlDataItem(
-                alldata=article_info,
-                table=TableEnum.article_list_table.value["value"],
+            ArticleMysqlItem = MysqlDataItem(
+                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
+                article_title=DataItem(article_title, "文章标题"),
+                comment_count=DataItem(comment_count, "文章评论数量"),
+                favor_count=DataItem(favor_count, "文章赞成数量"),
+                nick_name=DataItem(nick_name, "文章作者昵称"),
+                _table=TableEnum.article_list_table.value["value"],
             )
-            yield ArticleMysqlInfoItem
+            yield ArticleMysqlItem
 
-            ArticleInfoMongoItem = MongoDataItem(
-                # alldata 用于存储 mongo 的 Document 文档所需要的字段映射
-                alldata=article_info,
-                # table 为 mongo 的存储 Collection 集合的名称
-                table=TableEnum.article_list_table.value["value"],
-                # mongo_update_rule 为查询数据是否存在的规则
-                mongo_update_rule={"article_detail_url": article_detail_url},
+            ArticleMongoItem = MongoDataItem(
+                article_detail_url=article_detail_url,
+                article_title=article_title,
+                comment_count=comment_count,
+                favor_count=favor_count,
+                nick_name=nick_name,
+                _table=TableEnum.article_list_table.value["value"],
+                # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
+                _mongo_update_rule={"article_detail_url": article_detail_url},
             )
-            yield ArticleInfoMongoItem
+            yield ArticleMongoItem
 ```
 
 如您所见，我们的 `Spider` 子类化`AyugeSpider.AyuSpider` 并定义了一些属性和方法：
