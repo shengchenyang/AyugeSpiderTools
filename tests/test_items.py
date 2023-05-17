@@ -1,90 +1,150 @@
-from dataclasses import field, make_dataclass
-
-import scrapy
 from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
 from scrapy.loader import ItemLoader
 
-from ayugespidertools.items import MysqlDataItem, ScrapyClassicItem
+from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem, ScrapyItem
 
 
-def test_items():
-    mdi = MysqlDataItem()
-    mdi.table = "save_table_name"
-    mdi.alldata = {"key1": "value1"}
-
-    # 或者这样的数据格式
-    # mdi.alldata = {"key1": {"key_value": "key_value_data1", "notes": "notes_data1"}}
-
-    all_data = ItemAdapter(mdi).get("alldata")
-    assert ItemAdapter.is_item(mdi), all_data == {"key1": "value1"}
-
-    sci = ScrapyClassicItem()
-    sci["table"] = "s_table"
-    sci["alldata"] = {"s_all_data": 2}
-    sci["item_mode"] = "Mysql"
-    assert ItemAdapter.is_item(sci)
-
-    a = {
-        "alldata": {"k": "v"},
-        "table": "save_table_name",
-        "item_mode": "Mysql",
-    }
-    all_data = ItemAdapter(a).get("alldata")
-    assert ItemAdapter.is_item(a), all_data == {"k": "v"}
-
-
-def test_dataclass():
-    # [1.] 本库中 ScrapyClassicItem 使用 add_value, add_xpath, add_css 的示例
-    mine_item = ItemLoader(item=ScrapyClassicItem(), respnose=None)
-    mine_item.default_output_processor = TakeFirst()
-    mine_item.add_value("table", "save_table_name")
-    item = mine_item.load_item()
-    assert item == {"table": "save_table_name"}, type(item) == ScrapyClassicItem
-
-    """以下 [2.] [3.] 部分介绍扩展本库中 Item 字段以方便支持 add_value 等特性"""
-    # [2.] ScrapyClassicItem 如何自定义增加字段，并支持 Item Loaders 的特性
-    """
-    本库是为了用手动管理 item 模块，比如需存储的字段数量，字段类型等；
-    其需要存储的字段全部放在 alldata 的 item 字段中，可以自定义扩展，但是无法使用 Item Loaders 的 add_value 等特性
-    若要支持 Item Loaders 的特性，需要自己补充完整 item 字段，比如下面代码：
-    """
-    # 先补充需要管理的 item 字段
-    ScrapyClassicItem.fields["add_key1"] = scrapy.Field()
-    ScrapyClassicItem.fields["add_key2"] = scrapy.Field()
-
-    # 然后就可以使用 [1.] 中的代码了
-
-    # [3.] 本库中 MysqlDataItem, MongoDataItem 如何自定义增加字段，并支持 Item Loaders 的特性
-    """
-    本库中的 MysqlDataItem 和 MongoDataItem 已经使用了 @dataclass 的装饰器了，
-    不再很优雅和方便地对其扩展字段了，推荐使用 make_dataclass 自行设置
-    """
-    MineItem = make_dataclass(
-        "MineItem",
+def test_items_MysqlDataItem():
+    mdi = MysqlDataItem(_table="table")
+    mdi.add_field("field1", "value1")
+    mdi.add_field("field2", "value2")
+    mdi._table = "table1"
+    mdi._item_mode = "Mysql"
+    mdi["field3"] = DataItem(key_value="field3_key", notes="key值")
+    assert all(
         [
-            ("book_name", str, field(default=None)),
-            ("book_intro", str, field(default=None)),
-            ("item_mode", str, field(default="Mysql")),
-            ("table", str, field(default="save_table_name")),
+            type(mdi) == MysqlDataItem,
+            mdi._table == "table1",
+            mdi._item_mode == "Mysql",
+            mdi.fields == ["field1", "field2", "field3"],
+        ]
+    )
+
+    mdi_dict = mdi.asdict()
+    assert all(
+        [
+            type(mdi_dict) == dict,
+            mdi_dict["field1"] == "value1",
+            mdi_dict
+            == {
+                "field1": "value1",
+                "field2": "value2",
+                "field3": DataItem(key_value="field3_key", notes="key值"),
+                "_table": "table1",
+                "_item_mode": "Mysql",
+            },
         ],
     )
 
-    mine_item = ItemLoader(item=MineItem(), selector=None)
-    mine_item.default_output_processor = TakeFirst()
-    mine_item.add_value("book_name", "book_name_data")
-    # mine_item.add_xpath("book_intro", "get_book_intro_xpath")
-    item = mine_item.load_item()
-    assert item == MineItem(
-        book_name="book_name_data",
-        book_intro=None,
-        item_mode="Mysql",
-        table="save_table_name",
-    ), isinstance(item, MineItem)
+    mdi_item = mdi.asitem()
+    assert all(
+        [
+            type(mdi_item) == ScrapyItem,
+            ItemAdapter.is_item(mdi_item),
+            mdi_item["field1"] == "value1",
+        ]
+    )
 
-    """
-    以上，可以发现 scrapy 是推荐固定 Item 字段的，需要什么类型的字段就提前创建好其字段。
-    本库中 Item 则是直接将存储字段全存到 alldata 中即可。
-        本库主推便捷，不太推荐使用以上代码自定义增加 Item 字段来适配 Item Loaders 的特性，除非
-        某些场景下使用 Item Loaders 能够极大方便开发时，才推荐使用下。
-    """
+    # 另一种赋值方式
+    mdi_sec = MysqlDataItem(
+        _table="table_one",
+        field1="value1",
+        field2="value2",
+        field3=DataItem(key_value="field3_key", notes="key值"),
+    )
+    mdi_sec_dict = mdi_sec.asdict()
+    assert all(
+        [
+            type(mdi_sec) == MysqlDataItem,
+            mdi_sec_dict
+            == {
+                "_table": "table_one",
+                "field1": "value1",
+                "field2": "value2",
+                "field3": DataItem(key_value="field3_key", notes="key值"),
+                "_item_mode": "Mysql",
+            },
+        ]
+    )
+
+    # 以下是 item loaders 的使用
+    test_item = MysqlDataItem(
+        _table="table1",
+        book_name=None,
+    )
+    mine_item = ItemLoader(item=test_item.asitem(), selector=None)
+    mine_item.default_output_processor = TakeFirst()
+    mine_item.add_value("_table", "_table_data_sec")
+    mine_item.add_value("book_name", "book_name_data22")
+    item = mine_item.load_item()
+    assert all(
+        [
+            ItemAdapter.is_item(item),
+            dict(item)
+            == {
+                "_item_mode": "Mysql",
+                "_table": "table1",
+                "book_name": "book_name_data22",
+            },
+        ]
+    )
+
+
+def test_items_MongoDataItem():
+    mdi = MongoDataItem(
+        _table="table_third",
+        _mongo_update_rule={"title": "title_data"},
+        field1="value1",
+    )
+
+    print("mmmm:", mdi)
+    mdi_dict = mdi.asdict()
+    assert all(
+        [
+            type(mdi_dict) == dict,
+            mdi_dict
+            == {
+                "_table": "table_third",
+                "_mongo_update_rule": {"title": "title_data"},
+                "field1": "value1",
+                "_item_mode": "MongoDB",
+            },
+        ]
+    )
+
+    mdi_item = mdi.asitem()
+    assert all(
+        [
+            ItemAdapter.is_item(mdi_item),
+            mdi_item["field1"] == "value1",
+        ]
+    )
+
+    # 以下是 item loaders 的使用
+    test_item = MongoDataItem(
+        _table="table1",
+        _mongo_update_rule={"title": "title_data"},
+        book_name=None,
+    )
+    print("ttttt:", test_item)
+    mine_item = ItemLoader(item=test_item.asitem(), selector=None)
+    mine_item.default_output_processor = TakeFirst()
+    # 注意，此处不会修改 _table 的值，如果想要修改，需要
+    # 把 test_item 中的 _table 初始化为 None 即可重新赋值。比如 book_name 字段。
+    mine_item.add_value("_table", "_table_data_sec")
+    mine_item.add_value("book_name", "book_name_data22")
+    item = mine_item.load_item()
+    print("iiiii:", item, type(item), item["book_name"], dict(item))
+    assert all(
+        [
+            ItemAdapter.is_item(item),
+            dict(item)
+            == {
+                "_item_mode": "MongoDB",
+                "_mongo_update_rule": {"title": "title_data"},
+                "_table": "table1",
+                "book_name": "book_name_data22",
+            },
+        ]
+    )

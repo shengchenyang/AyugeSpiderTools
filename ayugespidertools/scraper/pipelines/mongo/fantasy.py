@@ -1,5 +1,5 @@
 from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
-from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.mongoclient import MongoDbBase
 
 __all__ = [
@@ -70,9 +70,9 @@ class AyuFtyMongoPipeline(MongoDbBase):
         Returns:
             item: scrapy item
         """
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
+        item_dict = ReuseOperation.item_to_dict(item)
         # 先查看存储场景是否匹配
-        if item_dict["item_mode"] == "MongoDB":
+        if item_dict["_item_mode"] == "MongoDB":
             mongodb_pipe(
                 Synchronize(),
                 item_dict=item_dict,

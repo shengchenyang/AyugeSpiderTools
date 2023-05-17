@@ -142,6 +142,14 @@ class AyuSpider(Spider):
         if custom_table_enum:
             inner_settings["DATA_ENUM"] = custom_table_enum
 
+        if vit_dir := settings.get("VIT_DIR", None):
+            # 根据 vit_dir 配置，获取对应的 inner_settings 配置
+            inner_settings = ReuseOperation.get_conf_by_settings(
+                vit_dir=vit_dir, inner_settings=inner_settings
+            )
+
+        else:
+            logger.warning("请在 settings.py 中配置 VIT_DIR 的路径参数，用于本库运行所需配置 .conf 的读取！")
         # 内置配置 inner_settings 优先级介于 project 和 spider 之间
         # 即优先级顺序：settings < inner_settings < custom_settings
         settings.setdict(inner_settings, priority="project")

@@ -40,15 +40,15 @@ class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
         )
 
     async def process_item(self, item, spider):
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
-        if item_dict["item_mode"] == "Mysql":
+        item_dict = ReuseOperation.item_to_dict(item)
+        if item_dict["_item_mode"] == "Mysql":
             async with self.db.cursor() as cursor:
                 async with self.lock:
                     alter_item = super(AsyncNormalMysqlPipeline, self).get_new_item(
                         item_dict
                     )
                     table = super(AsyncNormalMysqlPipeline, self).get_table_name(
-                        item_dict["table"]
+                        item_dict["_table"]
                     )
                     new_item = alter_item.new_item
                     sql = self._get_sql_by_item(table=table, item=new_item)
@@ -94,13 +94,13 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
         )
 
     async def process_item(self, item, spider):
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
-        if item_dict["item_mode"] == "Mysql":
+        item_dict = ReuseOperation.item_to_dict(item)
+        if item_dict["_item_mode"] == "Mysql":
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cursor:
                     alter_item = super(AsyncMysqlPipeline, self).get_new_item(item_dict)
                     table = super(AsyncMysqlPipeline, self).get_table_name(
-                        item_dict["table"]
+                        item_dict["_table"]
                     )
                     new_item = alter_item.new_item
                     sql = self._get_sql_by_item(table=table, item=new_item)

@@ -129,63 +129,29 @@ class DemoOneSpider(AyuSpider):
                 json_data=curr_data, query="nickName"
             )
 
-            # 数据存储方式1，非常推荐此写法。article_info 含有所有需要存储至表中的字段
-            article_info = {
-                "article_detail_url": DataItem(article_detail_url, "文章详情链接"),
-                "article_title": DataItem(article_title, "文章标题"),
-                "comment_count": DataItem(comment_count, "文章评论数量"),
-                "favor_count": DataItem(favor_count, "文章赞成数量"),
-                "nick_name": DataItem(nick_name, "文章作者昵称"),
-            }
-
-            """
-            # 2.或者这么写，在不需要注释参数时，那不如直接按照下面 4 中的示例写法
-            article_info = {
-                "article_detail_url": DataItem(article_detail_url),
-                "article_title": DataItem(article_title),
-                "comment_count": DataItem(comment_count),
-                "favor_count": DataItem(favor_count),
-                "nick_name": DataItem(nick_name),
-            }
-            
-            # 3.当然这么写也可以，但是不推荐，写法复杂易错
-            article_info = {
-                "article_detail_url": {
-                    "key_value": article_detail_url,
-                    "notes": "文章详情链接",
-                },
-                "article_title": {
-                    "key_value": article_title,
-                    "notes": "文章标题",
-                },
-                "comment_count": {
-                    "key_value": comment_count,
-                    "notes": "文章评论数量",
-                },
-                "favor_count": {
-                    "key_value": favor_count,
-                    "notes": "文章赞成数量",
-                },
-                "nick_name": {
-                    "key_value": nick_name,
-                    "notes": "文章作者昵称",
-                },
-            }
-            
-            # 4.或者这么写
-            article_info = {
-                "article_detail_url": article_detail_url,
-                "article_title": article_title,
-                "comment_count": comment_count,
-                "favor_count": favor_count,
-                "nick_name": nick_name,
-            }
-            """
-
+            # 数据存储方式 1，需要添加注释时的写法
             ArticleInfoItem = MysqlDataItem(
-                alldata=article_info,
-                table=TableEnum.article_list_table.value["value"],
+                # 这里也可以写为 article_detail_url = DataItem(article_detail_url)，但没有注释
+                # 功能了，那不如使用下面的数据存储方式 2
+                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
+                article_title=DataItem(article_title, "文章标题"),
+                comment_count=DataItem(comment_count, "文章评论数量"),
+                favor_count=DataItem(favor_count, "文章赞成数量"),
+                nick_name=DataItem(nick_name, "文章作者昵称"),
+                _table=TableEnum.article_list_table.value["value"],
             )
+
+            # 数据存储方式 2，若不需要注释，也可以这样写，但不要两种风格混用
+            """
+            ArticleInfoItem = MysqlDataItem(
+                article_detail_url=article_detail_url,
+                article_title=article_title,
+                comment_count=comment_count,
+                favor_count=favor_count,
+                nick_name=nick_name,
+                _table=TableEnum.article_list_table.value["value"],
+            )
+            """
             self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
             # yield ArticleInfoItem
 

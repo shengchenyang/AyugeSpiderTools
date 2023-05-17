@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import Optional, Tuple, Type
+from typing import Any, Dict, Optional, Tuple, Type
 
 import pymysql
 from retrying import retry
@@ -94,58 +94,42 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         ), "数据表名不能含空格，请检查 MYSQL_TABLE_PREFIX 参数和 item 中的 table 参数"
         return full_table_name
 
-    def get_new_item(self, item) -> AlterItem:
+    def get_new_item(self, item_dict: Dict[str, Any]) -> AlterItem:
         """
         重新整合 item
         Args:
-            item: scrapy item
+            item_dict: dict 类型的 item
 
         Returns:
             1). 整合后的 item
         """
         new_item = {}
         notes_dic = {}
-        # 如果是 ayugespidertools.Items 中的各个自封装类型时
-        # alldata 可以认为是关键字，需要判断其是否存在，且是否为 dict。
-        # 若其存在且为 dict，则默认其为 Items 中的 alldata 数据类型而非单一字段值
-        insert_data = item.get("alldata")
-        if all([insert_data, isinstance(insert_data, dict)]):
-            judge_item = next(iter(insert_data.values()))
-            # 是 namedtuple 类型
-            if ReuseOperation.is_namedtuple_instance(judge_item):
-                for key, value in insert_data.items():
-                    new_item[key] = value.key_value
-                    notes_dic[key] = value.notes
-            # 是双层 dict 格式
-            elif isinstance(judge_item, dict):
-                for key, value in insert_data.items():
-                    new_item[key] = value.get("key_value", "")
-                    notes_dic[key] = value["notes"]
-            # 其它默认为单层 dict 格式
-            else:
-                for key, value in insert_data.items():
-                    new_item[key] = value
-                    notes_dic[key] = key
 
-        # 兼容旧写法，直接 dict 格式的 item 即可
+        insert_data = ReuseOperation.get_items_except_keys(
+            dict_conf=item_dict, key_list=["_item_mode", "_table"]
+        )
+        judge_item = next(iter(insert_data.values()))
+        # 是 namedtuple 类型
+        if ReuseOperation.is_namedtuple_instance(judge_item):
+            for key, value in insert_data.items():
+                new_item[key] = value.key_value
+                notes_dic[key] = value.notes
+        # 是普通的 dict 类型
         else:
-            # 将存入表的无关字段给去掉
-            save_data_item = ReuseOperation.get_items_except_keys(
-                dict_conf=item, key_list=["table", "item_mode"]
-            )
-            for key, value in save_data_item.items():
+            for key, value in insert_data.items():
                 new_item[key] = value
-                notes_dic[key] = key
+                notes_dic[key] = ""
 
         return AlterItem(new_item=new_item, notes_dic=notes_dic)
 
     def process_item(self, item, spider):
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
+        item_dict = ReuseOperation.item_to_dict(item)
         # 先查看存储场景是否匹配
-        if item_dict["item_mode"] == "Mysql":
+        if item_dict["_item_mode"] == "Mysql":
             self.insert_item(
                 alter_item=self.get_new_item(item_dict),
-                table=self.get_table_name(item_dict["table"]),
+                table=self.get_table_name(item_dict["_table"]),
             )
         return item
 

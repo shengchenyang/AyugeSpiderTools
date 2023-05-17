@@ -5,7 +5,6 @@ import motor.motor_asyncio
 
 from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import ToolsForAyu
 
 
 class AsyncMongoPipeline(object):
@@ -49,8 +48,8 @@ class AsyncMongoPipeline(object):
         self.client.close()
 
     async def process_item(self, item, spider):
-        item_dict = ToolsForAyu.convert_items_to_dict(item)
-        if item_dict["item_mode"] == "MongoDB":
+        item_dict = ReuseOperation.item_to_dict(item)
+        if item_dict["_item_mode"] == "MongoDB":
             await asyncio.shield(
                 AsyncioAsynchronous().process_item_template(
                     item_dict=item_dict,
