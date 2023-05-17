@@ -1,5 +1,35 @@
 # Release notes
 
+## AyugeSpiderTools 3.0.1 (2023-05-17)
+
+这是一个 `major` 版本更新，含有 `bug` 修复、代码优化等。
+
+### Deprecation removals
+
+- 删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
+
+### Deprecations 
+
+- 无。
+
+### New features
+
+- 修改 `item` 实现方式，不再通过将字段都存入 `alldata` 中即可实现动态设置字段的功能，使用更清晰，且能更方便地使用 `ItemLoaders` 的功能，具体内容及示例请查看 [readthedocs](https://ayugespidertools.readthedocs.io/en/ayugespidertools-3.0.1/topics/items.html) 上对应内容，具体案例请查看 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目。
+
+### Bug fixes
+
+- 修复不会创建表注释的问题。
+
+### Code optimizations
+
+- 修改 `dict_keys_to_lower` 和 `dict_keys_to_upper` 的将字典 key 转为大写或小写的功能优化为嵌套字典中所有 key 都转为大写或小写。
+- 将模板中 `settings.py` 中的配置读取放入库中 `update_settings` 实现，简化 `settings.py` 文件内容。
+- 优化 `Makefile` 功能，简化清理 `__pycache__` 文件夹的功能。
+- 修改部分 `typo` 问题。
+- 更新 `readthedocs` 内容，更新测试文件。
+
+<hr/>
+
 ## AyugeSpiderTools 2.1.0 (2023-05-09)
 
 这是一个主要更改了 `scrapy` 依赖库为 `2.9.0` 版本，含有 `bug` 修复。
