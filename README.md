@@ -105,7 +105,7 @@ scrapy crawl <spider_name>
 
 # 本库中给出支持 Item Loaders 特性的示例(文档地址：https://ayugespidertools.readthedocs.io/en/latest/topics/loaders.html)
 +15).demo_item_loader: 本库中使用 Item Loaders 的示例
--16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例，此示例已删除，可查看上个 demo_item_loader 中的示例，目标已经可以很方便的使用 Item Loaders 功能了
+-16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例，此示例已删除，可查看上个 demo_item_loader 中的示例，目前已经可以很方便的使用 Item Loaders 功能了
 
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 ```

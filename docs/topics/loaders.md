@@ -21,7 +21,7 @@ class Product(scrapy.Item):
 
 但是本库不固定 `Item field` 的内容，这样丧失了解放双手的目的。
 
-虽然，`scrapy` 也可以通过使用如下方法来新增字段，但总归 scrapy 是不推荐这样的写法且不太方便：
+虽然，`scrapy` 也可以通过使用如下方法来新增字段，但总归 `scrapy` 是不推荐这样的写法且不太方便：
 
 ```python
 Product.fields["add_field1"] = scrapy.Field()
@@ -49,6 +49,7 @@ def parse(self, response):
     l.add_value('last_updated', 'today') # you can also use literal values
     yield l.load_item()
 
+
 # 这是本库中的实现示例：
 def parse(self, response):
     # 先定义所需字段
@@ -58,7 +59,7 @@ def parse(self, response):
         book_intro=None,
         _table=TableEnum.article_list_table.value["value"],
     )
-    # 然后可使用 asitem 的方法使用常规的 ItemLoader 功能
+    # 然后可根据 asitem 来使用常规的 ItemLoader 功能
     mine_item = ItemLoader(item=my_product.asitem(), selector=None)
     mine_item.default_output_processor = TakeFirst()
     mine_item.add_value("book_name", book_name)
@@ -72,7 +73,7 @@ def parse(self, response):
 
 那本库的方式在使用 `ItemLoader` 时有没有缺点呢？
 
-是的，有缺点，由于本库虽然支持动态添加 `Item` 字段，但是其实不太好实现 `dataclass items` 的字段类型约束和参数 `default` 的相关设置。本库是不推荐固定 `Item` 字段（比如 `ayugespidertools` `v3.0.0` 之前的版本中，会把数据都存入 `alldata` 的固定字段中），也不推荐不同 `spider` 就需要定义其对应的不同 `Item class` 的。其实各有优缺点，只是本库选择了牺牲此部分。
+是的，有缺点，本库虽然支持动态添加 `Item` 字段，但是其实不太好实现 `dataclass items` 的字段类型约束和参数 `default` 的相关设置。本库是不推荐固定 `Item` 字段（比如 `ayugespidertools` `v3.0.0` 之前的版本中，会把数据都存入 `alldata` 的固定字段中），也不推荐 `spider` 中若存在不同 `Item`  数据类型就需要定义其对应的 `Item class` 的。其实各有优缺点，只是本库选择了牺牲此部分。
 
 ## 输入和输出处理器
 
