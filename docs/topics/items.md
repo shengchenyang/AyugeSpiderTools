@@ -11,9 +11,7 @@
 
 > 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
 
-其实，本库就是推荐把所有字段统一存入 `alldata` 字段中，其它字段用于场景补充，比如：`table` 字段用于说明要存储的表名/集合名，`item_mode` 字段用于说明存储的方式，`mongo_update_rule` 字段是 `item_mode` 为 `MongoDB` 存储场景时的去重条件(可不设置此字段)。
-
-本库，
+本库将所有需要存储的字段直接在对应的 `Item` (`MysqlDataItem` 或 `MongoDataItem`) 中赋值即可，其中下划线开头的参数为必须参数，需要自定义（但 IDE 会提示参数的，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
 
 ```python
 def parse(self, response):
