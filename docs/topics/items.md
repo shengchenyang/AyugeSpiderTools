@@ -222,6 +222,5 @@ class DemoOneSpider(AyuSpider):
 
 ## 自定义 Item 字段和实现 Item Loaders
 
-> 本库支持 [scrapy Item](https://docs.scrapy.org/en/latest/topics/items.html) 的格式，或者 `dict` 格式，`DemoSpider` 中 [demo_one](https://github.com/shengchenyang/DemoSpider/blob/main/DemoSpider/spiders/demo_one.py) 已有示例。
+具体请在下一章浏览。
 
-由于本库推荐将所有存储字段统一存储至 `alldata` 中来维护的，而且本库 `Item` 已使用了 `scrapy` 推荐的 [dataclass](https://docs.python.org/zh-cn/3/library/dataclasses.html) 实现，自然是不推荐自定义 `Item` 字段的，但是也是可以实现的。具体请在下一章浏览。
