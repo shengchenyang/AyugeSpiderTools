@@ -22,7 +22,7 @@
 
 ## 1. 前提条件
 
-> `python 3.8+` 可以直接输入以下命令：
+> `python 3.8.1+` 可以直接输入以下命令：
 
 ```shell
 pip install ayugespidertools -i https://pypi.org/simple
@@ -62,12 +62,13 @@ ayuge startproject <project_name>
 # 进入项目根目录
 cd <project_name>
 
+# 替换(覆盖)为真实的配置 .conf 文件：
+# 这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上你需要的配置即可
+# 不需要的配置设置为空，或者不用理会它，或者删除它也可以，看个人选择
+cp /root/mytemp/.conf DemoSpider/VIT/.conf
+
 # 生成爬虫脚本
 ayuge genspider <spider_name> <example.com>
-
-# 替换(覆盖)为真实的配置 .conf 文件；
-# 这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上相关配置即可
-cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # 运行脚本
 scrapy crawl <spider_name>
