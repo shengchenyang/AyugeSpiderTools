@@ -1,4 +1,6 @@
-.PHONY: clean build install build_dist test release
+.PHONY: start clean build install build_dist test release pytest
+
+refresh: clean build install
 
 ifeq ($(OS),Windows_NT)
     RM = cmd.exe /C del /F /Q
@@ -35,8 +37,6 @@ build:
 	poetry build
 
 install:
-	make clean
-	make build
 	$(PIPINSTALL)
 
 build_dist:
