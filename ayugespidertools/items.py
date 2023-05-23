@@ -137,6 +137,9 @@ class MysqlDataItem(metaclass=ItemMeta):
 
 @dataclass
 class MongoDataItem(metaclass=ItemMeta):
+    """
+    这个是 Scrapy item 的 mongoDB 的存储结构
+    """
     _table: str = None
     _item_mode: MongoDBItemModeStr = "MongoDB"
     _mongo_update_rule: Dict[str, Any] = None
