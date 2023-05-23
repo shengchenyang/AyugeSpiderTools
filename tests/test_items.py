@@ -98,7 +98,6 @@ def test_items_MongoDataItem():
         field1="value1",
     )
 
-    print("mmmm:", mdi)
     mdi_dict = mdi.asdict()
     assert all(
         [
@@ -127,7 +126,6 @@ def test_items_MongoDataItem():
         _mongo_update_rule={"title": "title_data"},
         book_name=None,
     )
-    print("ttttt:", test_item)
     mine_item = ItemLoader(item=test_item.asitem(), selector=None)
     mine_item.default_output_processor = TakeFirst()
     # 注意，此处不会修改 _table 的值，如果想要修改，需要
@@ -135,7 +133,6 @@ def test_items_MongoDataItem():
     mine_item.add_value("_table", "_table_data_sec")
     mine_item.add_value("book_name", "book_name_data22")
     item = mine_item.load_item()
-    print("iiiii:", item, type(item), item["book_name"], dict(item))
     assert all(
         [
             ItemAdapter.is_item(item),
