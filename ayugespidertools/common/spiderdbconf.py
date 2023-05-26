@@ -4,7 +4,7 @@ from typing import Union
 from scrapy.settings import Settings
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.typevars import MongoDBConfig, MysqlConfig
+from ayugespidertools.common.typevars import MongoDBConf, MysqlConf
 from ayugespidertools.common.utils import ToolsForAyu
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
 
 class Product(ABC):
     @abstractmethod
-    def get_db_conn_conf(self) -> Union[MysqlConfig, MongoDBConfig, None]:
+    def get_db_conn_conf(self) -> Union[MysqlConf, MongoDBConf, None]:
         """
         获取数据库链接配置信息，目前支持 mysql 和 mongodb
         """
@@ -34,7 +34,7 @@ class MysqlConfProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_db_conn_conf(self) -> Union[MysqlConfig, None]:
+    def get_db_conn_conf(self) -> Union[MysqlConf, None]:
         # 自定义 mysql 链接配置
         local_mysql_conf = self._settings.get("LOCAL_MYSQL_CONFIG", {})
         # 是否开启应用配置管理
@@ -47,14 +47,14 @@ class MysqlConfProduct(Product):
             _consul_conf_dict = ToolsForAyu.get_conf_by_consul(
                 conf_name="mysql", **self._consul_conf
             )
-            return MysqlConfig(**_consul_conf_dict)
+            return MysqlConf(**_consul_conf_dict)
 
         # 2). 从本地 local_mysql_config 的参数中取值
         if ReuseOperation.is_dict_meet_min_limit(
             dict_conf=local_mysql_conf,
             key_list=["host", "port", "user", "password", "charset", "database"],
         ):
-            return MysqlConfig(
+            return MysqlConf(
                 host=local_mysql_conf.get("host"),
                 port=local_mysql_conf.get("port"),
                 user=local_mysql_conf.get("user"),
@@ -69,7 +69,7 @@ class MongoDBConfProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_db_conn_conf(self) -> Union[MongoDBConfig, None]:
+    def get_db_conn_conf(self) -> Union[MongoDBConf, None]:
         # 自定义 mysql 链接配置
         local_mongodb_conf = self._settings.get("LOCAL_MONGODB_CONFIG", {})
         # 是否开启应用配置管理
@@ -82,14 +82,14 @@ class MongoDBConfProduct(Product):
             _consul_conf_dict = ToolsForAyu.get_conf_by_consul(
                 conf_name="mongodb", **self._consul_conf
             )
-            return MongoDBConfig(**_consul_conf_dict)
+            return MongoDBConf(**_consul_conf_dict)
 
         # 2). 从本地 local_mongo_conf 的参数中取值
         if ReuseOperation.is_dict_meet_min_limit(
             dict_conf=local_mongodb_conf,
             key_list=["host", "port", "user", "password", "database"],
         ):
-            return MongoDBConfig(
+            return MongoDBConf(
                 host=local_mongodb_conf.get("host"),
                 port=local_mongodb_conf.get("port"),
                 user=local_mongodb_conf.get("user"),
@@ -111,5 +111,5 @@ class MongoDBConfCreator(Creator):
 
 def get_spider_db_conf(
     product: Product,
-) -> Union[MysqlConfig, MongoDBConfig, None]:
+) -> Union[MysqlConf, MongoDBConf, None]:
     return product.get_db_conn_conf()

@@ -18,6 +18,16 @@ authsource=***
 user=***
 password=***
 
+[mq]
+host=***
+port=5672
+username=***
+password=***
+virtualhost=***
+queue=***
+exchange=***
+routing_key=***
+
 [consul]
 token=
 url=http://host:port/v1/kv/...?dc=dc1

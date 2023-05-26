@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.1.0 (2023-05-29)
+
+### Deprecation removals
+
+- 无。
+
+### Deprecations 
+
+- 无。
+
+### New features
+
+- 添加 `mq` 推送的示例，具体内容及示例请查看 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/topics/pipelines.html#mq) 上对应内容，具体案例请查看 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 修复部分 `typo` 问题。
+
+<hr/>
+
 ## AyugeSpiderTools 3.0.1 (2023-05-17)
 
 这是一个 `major` 版本更新，含有 `bug` 修复、代码优化等。

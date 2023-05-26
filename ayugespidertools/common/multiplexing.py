@@ -3,7 +3,6 @@ import configparser
 import json
 import os
 import random
-import re
 from typing import Any, List, Union
 
 import cv2
@@ -12,7 +11,7 @@ import pymysql
 from scrapy.settings import Settings
 from twisted.internet.defer import Deferred
 
-from ayugespidertools.common.typevars import MysqlConfig
+from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 from ayugespidertools.items import MongoDataItem, MysqlDataItem, ScrapyItem
 
@@ -109,6 +108,27 @@ class ReuseOperation(object):
             "bucket": config_parser.get("ali_oss", "bucket", fallback=None),
             "doc": config_parser.get("ali_oss", "doc", fallback=None),
         }
+        # mq 配置
+        inner_settings["MQ_CONFIG"] = {
+            "host": config_parser.get("mq", "host", fallback=None),
+            "port": config_parser.getint("mq", "port", fallback=5672),
+            "username": config_parser.get("mq", "username", fallback="guest"),
+            "password": config_parser.get("mq", "password", fallback="guest"),
+            "virtualhost": config_parser.get("mq", "virtualhost", fallback="/"),
+            "queue": config_parser.get("mq", "queue", fallback=None),
+            "durable": config_parser.getboolean("mq", "durable", fallback=True),
+            "exclusive": config_parser.getboolean("mq", "exclusive", fallback=False),
+            "auto_delete": config_parser.getboolean(
+                "mq", "auto_delete", fallback=False
+            ),
+            "exchange": config_parser.get("mq", "exchange", fallback=None),
+            "routing_key": config_parser.get("mq", "routing_key", fallback=None),
+            "content_type": config_parser.getint(
+                "mq", "content_type", fallback="text/plain"
+            ),
+            "delivery_mode": config_parser.getint("mq", "delivery_mode", fallback=1),
+            "mandatory": config_parser.getboolean("mq", "mandatory", fallback=True),
+        }
         return inner_settings
 
     @staticmethod
@@ -139,21 +159,6 @@ class ReuseOperation(object):
             1). 是否符合 namedtuple 类型
         """
         return isinstance(x, tuple) and hasattr(x, "_fields")
-
-    @staticmethod
-    def get_file_name_by_url(file_url: str) -> str:
-        """
-        根据文件链接取出文件的名称
-        Args:
-            file_url: 文件链接
-
-        Returns:
-            1). 文件名称
-        """
-        pattern = re.compile(r""".*/(.*?)\..*?""")
-        if file_name_list := pattern.findall(file_url):
-            return file_name_list[0]
-        return ""
 
     @staticmethod
     def get_files_from_path(path: str) -> list:
@@ -292,7 +297,7 @@ class ReuseOperation(object):
         return {k: dict_conf[k] for k in dict_conf if k not in key_list}
 
     @classmethod
-    def create_database(cls, mysql_conf: MysqlConfig) -> None:
+    def create_database(cls, mysql_conf: MysqlConf) -> None:
         """
         创建数据库
         由于这是在连接数据库，报数据库不存在错误时的场景，则需要新建(不指定数据库)连接创建好所需数据库即可

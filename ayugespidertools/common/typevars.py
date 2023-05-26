@@ -10,10 +10,11 @@ __all__ = [
     "TableTemplate",
     "TableEnumTypeVar",
     "AlterItem",
-    "MysqlConfig",
-    "MongoDBConfig",
-    "AiohttpConfig",
+    "MysqlConf",
+    "MongoDBConf",
+    "AiohttpConf",
     "AiohttpRequestArgs",
+    "MQConf",
 ]
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
@@ -44,7 +45,7 @@ class TableEnum(Enum):
     )
 
 
-class MysqlConfig(NamedTuple):
+class MysqlConf(NamedTuple):
     host: str
     port: int
     user: str
@@ -53,7 +54,7 @@ class MysqlConfig(NamedTuple):
     charset: Optional[str] = "utf8mb4"
 
 
-class MongoDBConfig(NamedTuple):
+class MongoDBConf(NamedTuple):
     host: str
     port: int
     user: str
@@ -62,7 +63,7 @@ class MongoDBConfig(NamedTuple):
     authsource: Optional[str] = None
 
 
-class AiohttpConfig(NamedTuple):
+class AiohttpConf(NamedTuple):
     sleep: int
     proxy: str
     proxy_auth: str
@@ -91,3 +92,20 @@ class AiohttpRequestArgs:
     proxy: Union[str, None] = field(default=None)
     proxy_auth: Union[str, None] = field(default=None)
     proxy_headers: Union[dict, None] = field(default=None)
+
+
+class MQConf(NamedTuple):
+    host: str
+    port: int
+    username: str
+    password: str
+    virtualhost: Optional[str] = "/"
+    queue: Optional[str] = None
+    durable: Optional[bool] = True
+    exclusive: Optional[bool] = False
+    auto_delete: Optional[bool] = False
+    exchange: Optional[str] = None
+    routing_key: Optional[str] = None
+    content_type: Optional[str] = "text/plain"
+    delivery_mode: Optional[int] = 1
+    mandatory: Optional[bool] = True
