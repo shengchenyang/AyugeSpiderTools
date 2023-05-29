@@ -13,7 +13,7 @@ from itemadapter import ItemAdapter
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import MysqlConfig
+from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 from ayugespidertools.formatdata import DataHandle
 
@@ -209,7 +209,7 @@ class ToolsForAyu(object):
         return ""
 
     @staticmethod
-    def get_collate_by_charset(mysql_conf: MysqlConfig) -> str:
+    def get_collate_by_charset(mysql_conf: MysqlConf) -> str:
         """
         根据 mysql 的 charset 获取对应默认的 collate
         Args:

@@ -69,7 +69,7 @@ custom_settings = {
 
 ### 2.2. 异步存储
 
-#### 2.2.1。 twisted 实现
+#### 2.2.1. twisted 实现
 
 ```python
 # 依赖 AyuTwistedMongoPipeline
@@ -80,3 +80,41 @@ custom_settings = {
 ```python
 # 依赖 AsyncMongoPipeline
 ```
+
+## 3. 消息推送服务
+
+### 3.1. mq
+
+> 此场景下给出的是以 `pika` 实现的 `RabbitMQ` 的示例
+
+需要激活 `DOWNLOADER_MIDDLEWARES` 对应的配置，然后在 `.conf` 中配置 `mq` 相关配置。
+
+需要的配置如下：
+
+```ini
+[mq]
+host=***
+port=5672
+username=***
+password=***
+virtualhost=***
+queue=***
+exchange=***
+routing_key=***
+
+# 一般只需配置以上参数即可，因为会有一些默认值，如果不需更改则不用配置，比如以下为非必须参数及其默认值：
+durable=True
+exclusive=False
+auto_delete=False
+content_type="text/plain"
+delivery_mode=1
+mandatory=True
+```
+
+`spider` 中的 `custom_settings` 所需依赖：
+
+```python
+# 依赖 AyuMQPipeline
+```
+
+然后在 `spider` 中 `yield` 你所需结构的 `item` 即可（类型为 `dict`）。

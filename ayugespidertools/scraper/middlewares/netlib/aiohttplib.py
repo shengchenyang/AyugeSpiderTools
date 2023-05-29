@@ -9,7 +9,7 @@ from scrapy.utils.python import global_object_name
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import AiohttpConfig, AiohttpRequestArgs
+from ayugespidertools.common.typevars import AiohttpConf, AiohttpRequestArgs
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.config import logger
 
@@ -84,7 +84,7 @@ class AiohttpDownloaderMiddleware(object):
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
         if local_aiohttp_conf := settings.get("LOCAL_AIOHTTP_CONFIG", {}):
             # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
-            _aiohttp_conf = AiohttpConfig(
+            _aiohttp_conf = AiohttpConf(
                 timeout=local_aiohttp_conf.get("timeout"),
                 sleep=local_aiohttp_conf.get("sleep"),
                 proxy=local_aiohttp_conf.get("proxy"),

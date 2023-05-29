@@ -51,7 +51,8 @@ class AyuFtyMongoPipeline(MongoDbBase):
         # 用于输出日志
         if all([self.conn, self.db]):
             spider.slog.info(
-                f"已连接至 host: {spider.mongodb_conf.host}, database: {spider.mongodb_conf.database} 的 MongoDB 目标数据库"
+                f"已连接至 host: {spider.mongodb_conf.host}, "
+                f"database: {spider.mongodb_conf.database} 的 MongoDB 目标数据库"
             )
 
     def close_spider(self, spider):

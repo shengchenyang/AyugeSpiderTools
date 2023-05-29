@@ -9,7 +9,7 @@ from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import AlterItem, MysqlConfig, TableEnumTypeVar
+from ayugespidertools.common.typevars import AlterItem, MysqlConf, TableEnumTypeVar
 from ayugespidertools.common.utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
@@ -48,7 +48,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.record_log_to_mysql = record_log_to_mysql
         # 排序规则，用于创建数据库时使用
         self.collate = None
-        self.mysql_conf: Optional[MysqlConfig] = None
+        self.mysql_conf: Optional[MysqlConf] = None
         self.conn = None
         self.slog = None
         self.cursor = None

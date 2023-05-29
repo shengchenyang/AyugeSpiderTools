@@ -73,6 +73,6 @@ clean:
 	-$(RM) $(call path, coverage.xml)
 	-$(RMDIR) $(call path, .tox)
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
-	-$(RMDIR) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.crt)
-	-$(RMDIR) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.key)
+	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.crt)
+	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.key)
 	pip uninstall -y ayugespidertools

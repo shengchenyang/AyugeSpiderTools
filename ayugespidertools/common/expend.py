@@ -5,7 +5,7 @@ from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import MysqlConfig
+from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -25,7 +25,7 @@ class MysqlPipeEnhanceMixin(object):
     )
     def _connect(
         self,
-        mysql_conf: MysqlConfig,
+        mysql_conf: MysqlConf,
     ) -> pymysql.connections.Connection:
         """
         链接数据库操作：
