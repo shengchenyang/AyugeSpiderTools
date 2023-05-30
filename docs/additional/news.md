@@ -1,6 +1,6 @@
 # Release notes
 
-## AyugeSpiderTools 3.1.0 (2023-05-29)
+## AyugeSpiderTools 3.1.1 (2023-05-30)
 
 ### Deprecation removals
 
