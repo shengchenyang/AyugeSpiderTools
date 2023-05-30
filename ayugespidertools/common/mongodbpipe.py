@@ -19,24 +19,6 @@ class AbstractClass(ABC):
     用于处理 mongodb pipeline 存储的模板方法类
     """
 
-    def _get_collection_name(self, table: str, collection_prefix: str = "") -> str:
-        """
-        获取集合名称
-        Args:
-            table: item 中的 table 字段
-            collection_prefix: 集合前缀
-
-        Returns:
-            full_collection_name: 完整的集合名称
-        """
-        assert isinstance(table, str), "item 中 table 字段不是 str，或未传入 table 参数"
-        full_collection_name = f"""{collection_prefix}{table}"""
-
-        assert (
-            " " not in full_collection_name
-        ), "集合名不能含空格，请检查 MONGODB_COLLECTION_PREFIX 参数和 item 中的 table 参数"
-        return full_collection_name
-
     def _get_insert_data(
         self,
         item_dict: Union[ItemAdapter, dict],
@@ -64,28 +46,21 @@ class AbstractClass(ABC):
         self,
         item_dict: Union[ItemAdapter, dict],
         db: Param.PymongoDataBase,
-        collection_prefix: str = "",
     ) -> None:
         """
         模板方法，用于处理 mongodb pipeline 存储的模板方法类
         Args:
             item_dict: item ItemAdapter 或 dict 格式数据
             db: mongodb 数据库连接
-            collection_prefix: 集合前缀
 
         Returns:
             None
         """
         insert_data = self._get_insert_data(item_dict)
-        # 真实的集合名称为：集合前缀名 + 集合名称
-        collection_name = self._get_collection_name(
-            table=item_dict["_table"],
-            collection_prefix=collection_prefix,
-        )
         self._data_storage_logic(
             db=db,
             item_dict=item_dict,
-            collection_name=collection_name,
+            collection_name=item_dict["_table"],
             insert_data=insert_data,
         )
 
@@ -185,18 +160,12 @@ class AsyncioAsynchronous(AbstractClass):
         self,
         item_dict: Union[ItemAdapter, dict],
         db: Param.PymongoDataBase,
-        collection_prefix: str = "",
     ) -> None:
         insert_data = self._get_insert_data(item_dict)
-        # 真实的集合名称为：集合前缀名 + 集合名称
-        collection_name = self._get_collection_name(
-            table=item_dict["_table"],
-            collection_prefix=collection_prefix,
-        )
         await self._data_storage_logic(
             db=db,
             item_dict=item_dict,
-            collection_name=collection_name,
+            collection_name=item_dict["_table"],
             insert_data=insert_data,
         )
 
@@ -205,11 +174,8 @@ def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: Union[ItemAdapter, dict],
     db: Param.PymongoDataBase,
-    collection_prefix: str = "",
 ) -> None:
     """
     mongodb pipeline 存储的通用调用方法
     """
-    abstract_class.process_item_template(
-        item_dict=item_dict, db=db, collection_prefix=collection_prefix
-    )
+    abstract_class.process_item_template(item_dict=item_dict, db=db)

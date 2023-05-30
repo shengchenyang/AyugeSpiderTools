@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class DataHandle(object):
+class DataHandle:
     """数据处理相关方法"""
 
     @staticmethod

@@ -111,7 +111,6 @@ class AbstractClass(ABC):
         collate: str,
         database: str,
         table: str,
-        table_prefix: str,
         table_enum: Type[TableEnumTypeVar],
         note_dic: dict,
     ) -> None:
@@ -125,7 +124,6 @@ class AbstractClass(ABC):
             collate: mysql table collate
             database: 数据库
             table: 数据表
-            table_prefix: 数据表前缀
             table_enum: 数据表枚举类
             note_dic: 当前表字段注释
 
@@ -141,7 +139,6 @@ class AbstractClass(ABC):
         elif "1146" in err_msg:
             table_name, table_notes, demand_code = self.deal_1146_error(
                 err_msg=err_msg,
-                table_prefix=table_prefix,
                 table_enum=table_enum,
             )
             self._create_table(
@@ -205,14 +202,12 @@ class AbstractClass(ABC):
     def deal_1146_error(
         self,
         err_msg: str,
-        table_prefix: str,
         table_enum: Type[TableEnumTypeVar],
     ) -> (str, str, str):
         """
         解决 1146, u"Table '(.*?)' doesn't exist"
         Args:
             err_msg: 报错内容
-            table_prefix: 数据表前缀
             table_enum: 数据表的枚举信息
 
         Returns:
@@ -227,7 +222,7 @@ class AbstractClass(ABC):
         # 写入表枚举
         if table_enum:
             for _, member in table_enum.__members__.items():
-                table_name = f'{table_prefix}{member.value.get("value", "")}'
+                table_name = member.value.get("value", "")
                 table_notes = member.value.get("notes", "")
                 demand_code = member.value.get("demand_code", "")
                 if table_name == table:
@@ -378,7 +373,6 @@ def deal_mysql_err(
     collate: str,
     database: str,
     table: str,
-    table_prefix: str,
     table_enum: Type[TableEnumTypeVar],
     note_dic: dict,
     conn: Optional[Param.PymysqlConnect] = None,
@@ -391,7 +385,6 @@ def deal_mysql_err(
         collate,
         database,
         table,
-        table_prefix,
         table_enum,
         note_dic,
     )

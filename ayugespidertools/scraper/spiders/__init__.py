@@ -5,10 +5,14 @@ from scrapy.spiders import Spider
 from sqlalchemy import create_engine
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.spiderdbconf import (
+from ayugespidertools.common.spiderconf import (
+    DynamicProxyCreator,
+    ExclusiveProxyCreator,
+    KafkaConfCreator,
     MongoDBConfCreator,
+    MQConfCreator,
     MysqlConfCreator,
-    get_spider_db_conf,
+    get_spider_conf,
 )
 from ayugespidertools.config import logger
 
@@ -159,16 +163,13 @@ class AyuSpider(Spider):
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
         spider.stats = crawler.stats
-
         # 先输出下相关日志，用于调试时查看
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
 
         _consul_conf = ReuseOperation.get_consul_conf(settings=crawler.settings)
-        # 1).先配置 Mysql 的相关信息，如果存在 Mysql 配置，则把 mysql_conf 添加到 spider 上
-        if mysql_conf := get_spider_db_conf(
-            MysqlConfCreator().create_product(
-                settings=crawler.settings, consul_conf=_consul_conf
-            )
+        # 以下将 .conf 中或 consul 中对应的配置信息，赋值给 spider 对象，方便后续使用
+        if mysql_conf := get_spider_conf(
+            MysqlConfCreator().create_product(crawler.settings, _consul_conf)
         ):
             spider.slog.info("项目中配置了 mysql_conf 信息")
             spider.mysql_conf = mysql_conf
@@ -181,12 +182,35 @@ class AyuSpider(Spider):
                 )
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
-        # 2).配置 MongoDB 的相关信息，如果存在 MongoDB 配置，则把 mongodb_conf 添加到 spider 上
-        if mongodb_conf := get_spider_db_conf(
-            MongoDBConfCreator().create_product(
-                settings=crawler.settings, consul_conf=_consul_conf
-            )
+        if mongodb_conf := get_spider_conf(
+            MongoDBConfCreator().create_product(crawler.settings, _consul_conf)
         ):
             spider.slog.info("项目中配置了 mongodb_conf 信息")
             spider.mongodb_conf = mongodb_conf
+
+        if rabbitmq_conf := get_spider_conf(
+            MQConfCreator().create_product(crawler.settings, _consul_conf)
+        ):
+            spider.slog.info("项目中配置了 rabbitmq_conf 信息")
+            spider.rabbitmq_conf = rabbitmq_conf
+
+        if kafka_conf := get_spider_conf(
+            KafkaConfCreator().create_product(crawler.settings, _consul_conf)
+        ):
+            spider.slog.info("项目中配置了 kafka_conf 信息")
+            spider.kafka_conf = kafka_conf
+
+        # 动态代理
+        if dynamicproxy_conf := get_spider_conf(
+            DynamicProxyCreator().create_product(crawler.settings, _consul_conf)
+        ):
+            spider.slog.info("项目中配置了 dynamicproxy_conf 信息")
+            spider.dynamicproxy_conf = dynamicproxy_conf
+
+        # 独享代理
+        if exclusiveproxy_conf := get_spider_conf(
+            ExclusiveProxyCreator().create_product(crawler.settings, _consul_conf)
+        ):
+            spider.slog.info("项目中配置了 exclusiveproxy_conf 信息")
+            spider.exclusiveproxy_conf = exclusiveproxy_conf
         return spider

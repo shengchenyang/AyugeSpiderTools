@@ -19,8 +19,6 @@ class $classname(AyuCrawlSpider):
     custom_settings = {
         # scrapy 日志等级配置
         "LOG_LEVEL": "DEBUG",
-        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
-        "MYSQL_TABLE_PREFIX": "demo_crawl_",
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,

@@ -11,7 +11,7 @@ __all__ = [
 ]
 
 
-class Picture(object):
+class Picture:
     """
     对验证码图片的一些操作
     """

@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-class AiohttpDownloaderMiddleware(object):
+class AiohttpDownloaderMiddleware:
     """
     Downloader middleware handling the requests with aiohttp
     """
@@ -82,7 +82,7 @@ class AiohttpDownloaderMiddleware(object):
         """
         settings = crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
-        if local_aiohttp_conf := settings.get("LOCAL_AIOHTTP_CONFIG", {}):
+        if local_aiohttp_conf := settings.get("AIOHTTP_CONFIG", {}):
             # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
             _aiohttp_conf = AiohttpConf(
                 timeout=local_aiohttp_conf.get("timeout"),
@@ -113,7 +113,6 @@ class AiohttpDownloaderMiddleware(object):
             cls.verify_ssl = _aiohttp_conf.verify_ssl
             cls.limit_per_host = _aiohttp_conf.limit_per_host
             cls.priority_adjust = settings.getint("RETRY_PRIORITY_ADJUST")
-
         return cls()
 
     async def _request_by_aiohttp(

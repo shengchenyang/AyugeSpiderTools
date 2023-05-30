@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-class ReuseOperation(object):
+class ReuseOperation:
     """
     用于存放经常复用的一些操作
     """
@@ -52,18 +52,16 @@ class ReuseOperation(object):
         config_parser = configparser.ConfigParser()
         config_parser.read(f"{vit_dir}/.conf", encoding="utf-8")
         # Mysql 数据库配置
-        inner_settings["LOCAL_MYSQL_CONFIG"] = {
+        inner_settings["MYSQL_CONFIG"] = {
             "host": config_parser.get("mysql", "host", fallback=None),
             "port": config_parser.getint("mysql", "port", fallback=3306),
             "user": config_parser.get("mysql", "user", fallback="root"),
             "password": config_parser.get("mysql", "password", fallback=None),
             "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
             "database": config_parser.get("mysql", "database", fallback=None),
-            # 数据库 engin 采用的驱动，可不填此参数
-            "driver": "mysqlconnector",
         }
         # MongoDB 数据库配置
-        inner_settings["LOCAL_MONGODB_CONFIG"] = {
+        inner_settings["MONGODB_CONFIG"] = {
             "host": config_parser.get("mongodb", "host", fallback=None),
             "port": config_parser.getint("mongodb", "port", fallback=27017),
             "authsource": config_parser.get("mongodb", "authsource", fallback="admin"),
@@ -115,6 +113,8 @@ class ReuseOperation(object):
             "username": config_parser.get("mq", "username", fallback="guest"),
             "password": config_parser.get("mq", "password", fallback="guest"),
             "virtualhost": config_parser.get("mq", "virtualhost", fallback="/"),
+            "heartbeat": config_parser.getint("mq", "heartbeat", fallback=0),
+            "socket_timeout": config_parser.getint("mq", "socket_timeout", fallback=1),
             "queue": config_parser.get("mq", "queue", fallback=None),
             "durable": config_parser.getboolean("mq", "durable", fallback=True),
             "exclusive": config_parser.getboolean("mq", "exclusive", fallback=False),
@@ -128,6 +128,14 @@ class ReuseOperation(object):
             ),
             "delivery_mode": config_parser.getint("mq", "delivery_mode", fallback=1),
             "mandatory": config_parser.getboolean("mq", "mandatory", fallback=True),
+        }
+        # kafka 配置
+        inner_settings["KAFKA_CONFIG"] = {
+            "bootstrap_servers": config_parser.get(
+                "kafka", "bootstrap_servers", fallback="127.0.0.1:9092"
+            ),
+            "topic": config_parser.get("kafka", "topic", fallback=None),
+            "key": config_parser.get("kafka", "key", fallback=None),
         }
         return inner_settings
 
@@ -217,7 +225,6 @@ class ReuseOperation(object):
         else:
             # 0 表示采用黑白的方式读取图片
             tp_cv = cv2.imread(tp, 0)
-
         return bg_cv, tp_cv
 
     @staticmethod

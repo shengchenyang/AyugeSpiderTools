@@ -7,9 +7,6 @@ from ayugespidertools.scraper.middlewares.netlib.aiohttplib import (
     AiohttpAsyncDownloaderMiddleware,
     AiohttpDownloaderMiddleware,
 )
-from ayugespidertools.scraper.middlewares.netlib.requestslib import (
-    RequestsDownloaderMiddleware,
-)
 from ayugespidertools.scraper.middlewares.proxy.dynamic import (
     AbuDynamicProxyDownloaderMiddleware,
     DynamicProxyDownloaderMiddleware,
@@ -23,7 +20,6 @@ from ayugespidertools.scraper.middlewares.proxy.private import (
 
 __all__ = [
     "RandomRequestUaMiddleware",
-    "RequestsDownloaderMiddleware",
     "AiohttpAsyncDownloaderMiddleware",
     "AiohttpDownloaderMiddleware",
     "DynamicProxyDownloaderMiddleware",

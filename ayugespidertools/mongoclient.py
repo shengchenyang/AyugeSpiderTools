@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 
-class MongoDbBase(object):
+class MongoDbBase:
     """
     mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）
     """

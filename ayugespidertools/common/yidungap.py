@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class YiDunGetGap(object):
+class YiDunGetGap:
     """
     易盾获取滑块缺口距离的相关方法，也可能适配于其它平台
     """

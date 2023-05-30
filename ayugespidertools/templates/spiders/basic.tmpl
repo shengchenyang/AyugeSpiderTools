@@ -34,10 +34,6 @@ class $classname(AyuSpider):
         "RECORD_LOG_TO_MYSQL": False,
         # 以 loguru 来管理日志，本库会在 settings 中生成规则示例，可自行修改。也可不配置
         "LOGURU_CONFIG": logger,
-        # Mysql 数据表的前缀名称，用于标记属于哪个项目，可不配置
-        "MYSQL_TABLE_PREFIX": "demo_basic_",
-        # MongoDB 集合的前缀名称，用于标记属于哪个项目，可不配置
-        "MONGODB_COLLECTION_PREFIX": "demo_basic_",
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -108,7 +104,7 @@ class $classname(AyuSpider):
 
             # 数据入库逻辑，你可以使用 mysql_engine 来去重或自定义规则
             try:
-                save_table = f'{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}'
+                save_table = TableEnum.article_list_table.value["value"]
                 sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
                 df = pandas.read_sql(sql, self.mysql_engine)
 

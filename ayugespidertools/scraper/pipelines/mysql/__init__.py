@@ -29,7 +29,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def __init__(
         self,
-        table_prefix: str,
         table_enum: Type[TableEnumTypeVar],
         env: str,
         record_log_to_mysql: Optional[bool] = False,
@@ -37,12 +36,10 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         """
         初始化 Mysql 链接所需要的信息
         Args:
-            table_prefix: 数据库表前缀
             table_enum: 数据表的枚举信息
             env: 当前程序部署环境名
             record_log_to_mysql: 是否需要记录程序采集的基本信息到 Mysql 中
         """
-        self.table_prefix = table_prefix
         self.table_enum = table_enum
         self.env = env
         self.record_log_to_mysql = record_log_to_mysql
@@ -57,8 +54,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            # 数据库表前缀
-            table_prefix=crawler.settings.get("MYSQL_TABLE_PREFIX", ""),
             # 数据库表枚举是否开启
             table_enum=crawler.settings.get("DATA_ENUM"),
             # 获取部署的环境
@@ -75,24 +70,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
-
-    def get_table_name(self, table: str) -> str:
-        """
-        组合完整的数据库表
-        Args:
-            table: 数据表的后缀
-
-        Returns:
-            1). 拼接成完整的数据表的值
-        """
-        assert isinstance(table, str), "item 中 table 字段不是 str，或未传入 table 参数"
-        full_table_name = f"{self.table_prefix}{table}"
-
-        # 最终的数据表名不能含有空格
-        assert (
-            " " not in full_table_name
-        ), "数据表名不能含空格，请检查 MYSQL_TABLE_PREFIX 参数和 item 中的 table 参数"
-        return full_table_name
 
     def get_new_item(self, item_dict: Dict[str, Any]) -> AlterItem:
         """
@@ -129,7 +106,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         if item_dict["_item_mode"] == "Mysql":
             self.insert_item(
                 alter_item=self.get_new_item(item_dict),
-                table=self.get_table_name(item_dict["_table"]),
+                table=item_dict["_table"],
             )
         return item
 
@@ -166,7 +143,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 collate=self.collate,
                 database=self.mysql_conf.database,
                 table=table,
-                table_prefix=self.table_prefix,
                 table_enum=self.table_enum,
                 note_dic=note_dic,
             )

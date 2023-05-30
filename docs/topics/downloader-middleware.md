@@ -89,26 +89,9 @@ index=1
 
 注：`index` 为在有多个独享代理时取的代理对应的索引值。
 
-## 3. 发送请求库改为 requests
+## 3. 发送请求方式改为 aiohttp
 
 ### 3.1. 使用方法
-
-激活 `DOWNLOADER_MIDDLEWARES` 中的对应配置。
-
-```python
-custom_settings = {
-    "DOWNLOADER_MIDDLEWARES": {
-        # 替换 scrapy Request 请求为 requests 的中间件
-        "ayugespidertools.middlewares.RequestsDownloaderMiddleware": 401,
-    },
-}
-```
-
-然后在 `spdier` 中正常 `yield scrapy.Request` 即可。
-
-## 4. 发送请求方式改为 aiohttp
-
-### 4.1. 使用方法
 
 激活 `DOWNLOADER_MIDDLEWARES` 中的对应配置。
 
@@ -120,7 +103,7 @@ custom_settings = {
         "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
     },
     # scrapy Request 替换为 aiohttp 的配置示例
-    "LOCAL_AIOHTTP_CONFIG": {
+    "AIOHTTP_CONFIG": {
         "timeout": 2,
         "proxy": "http://127.0.0.1:7890",
         "sleep": 1,

@@ -7,7 +7,7 @@ __all__ = [
 SqlModeStr = Literal["and", "or"]
 
 
-class AboutSql(object):
+class AboutSql:
     """
     sql 相关处理: sql 语句的管理方法，
     这里的 sql 拼接只能做到最简单的逻辑，如果需要灵活或稍复杂的情况，请参考 directsql, python-sql, pypika

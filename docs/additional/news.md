@@ -1,12 +1,43 @@
 # Release notes
 
-## AyugeSpiderTools 3.1.1 (2023-05-30)
+## AyugeSpiderTools 3.2.0 (2023-06-07)
+
+### Deprecation removals
+
+- 去除数据表前缀和集合前缀的鸡肋功能：
+  - 删除了 `MYSQL_TABLE_PREFIX` 参数。
+  - 删除了 `MONGODB_COLLECTION_PREFIX` 参数。
+- 删除其它的鸡肋功能：
+  - 移除 `runjs` 方便运行 `js` 方法的鸡肋封装。
+  - 移除 `rpa` 管理自动化程序的方法。
+- 删除了使用 `requests` 作为 `scrapy` 请求库的功能，推荐使用本库中 `aiohttp` 的方式。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 添加 `kafka` 推送的示例，具体内容及示例请查看 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/topics/pipelines.html#mq) 上对应内容，具体案例请查看 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 增加 `RabbitMQ` 中 `heartbeat` 和 `socket_timeout` 参数可自定义的功能。
+- 整理依赖文件。
+
+<hr/>
+
+## AyugeSpiderTools 3.1.0 (2023-05-30)
 
 ### Deprecation removals
 
 - 无。
 
-### Deprecations 
+### Deprecations
 
 - 无。
 
@@ -32,7 +63,7 @@
 
 - 删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
 
-### Deprecations 
+### Deprecations
 
 - 无。
 
@@ -62,7 +93,7 @@
 
 - `tox` 去除 `windows` 平台的测试场景。
 
-### Deprecations 
+### Deprecations
 
 - 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
 
@@ -88,7 +119,7 @@
 
 - 无
 
-### Deprecations 
+### Deprecations
 
 - 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
 
@@ -138,7 +169,7 @@
 - 一些使用方法更改：
   - 使用 `AiohttpRequest` 构造请求时，由之前的 `meta` 中的 `aiohttp_args` 配置参数，改为由 `args` 的新增参数取代，其参数类型同样为 `dict`，也可以为 `AiohttpRequestArgs` 类型，更容易输入。
 
-### Deprecations 
+### Deprecations
 
 - 下一大版本将删除 `ayugespidertools` 的 `cli` 名称 -> 改为 `ayuge` 来管理。
 
@@ -165,7 +196,7 @@
 
 - 无
 
-### Deprecations 
+### Deprecations
 
 - 无
 

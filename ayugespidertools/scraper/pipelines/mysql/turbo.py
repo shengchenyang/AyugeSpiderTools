@@ -22,8 +22,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     def from_crawler(cls, crawler):
         pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
-            # 数据库表前缀
-            table_prefix=crawler.settings.get("MYSQL_TABLE_PREFIX", ""),
             # 数据库表枚举是否开启
             table_enum=crawler.settings.get("DATA_ENUM"),
             # 获取部署的环境

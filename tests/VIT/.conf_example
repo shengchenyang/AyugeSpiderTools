@@ -28,6 +28,11 @@ queue=***
 exchange=***
 routing_key=***
 
+[kafka]
+bootstrap_servers=127.0.0.1:9092
+topic=***
+key=***
+
 [consul]
 token=
 url=http://host:port/v1/kv/...?dc=dc1

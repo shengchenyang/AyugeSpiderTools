@@ -64,7 +64,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def db_insert(self, cursor, item):
         alter_item = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
-        table = super(AyuTwistedMysqlPipeline, self).get_table_name(item["_table"])
+        table = item["_table"]
 
         if not (new_item := alter_item.new_item):
             return
@@ -86,7 +86,6 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                 collate=self.collate,
                 database=self.mysql_conf.database,
                 table=table,
-                table_prefix=self.table_prefix,
                 table_enum=self.table_enum,
                 note_dic=note_dic,
             )

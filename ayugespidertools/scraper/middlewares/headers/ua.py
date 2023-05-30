@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class RandomRequestUaMiddleware(object):
+class RandomRequestUaMiddleware:
     """
     随机请求头中间件
     """

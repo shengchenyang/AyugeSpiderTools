@@ -87,9 +87,17 @@ custom_settings = {
 
 > 此场景下给出的是以 `pika` 实现的 `RabbitMQ` 的示例
 
-需要激活 `DOWNLOADER_MIDDLEWARES` 对应的配置，然后在 `.conf` 中配置 `mq` 相关配置。
+需要激活 `ITEM_PIPELINES` 对应的配置，然后在 `.conf` 中配置 `mq` 相关配置。
 
-需要的配置如下：
+`spider` 中的 `custom_settings` 所需配置如下：
+
+```python
+"ITEM_PIPELINES": {
+    "ayugespidertools.pipelines.AyuMQPipeline": 300,
+},
+```
+
+`.conf` 中的所需配置如下：
 
 ```ini
 [mq]
@@ -111,10 +119,29 @@ delivery_mode=1
 mandatory=True
 ```
 
-`spider` 中的 `custom_settings` 所需依赖：
+然后在 `spider` 中 `yield` 你所需结构的 `item` 即可（类型为 `dict`）。
+
+### 3.2. kafka
+
+> 此场景给出的是以 `kafka-python` 实现的 `kafka` 推送示例
+
+需要激活 `ITEM_PIPELINES` 对应的配置，然后在 `.conf` 中配置 `mq` 相关配置。
+
+`spider` 中的 `custom_settings` 所需配置如下：
 
 ```python
-# 依赖 AyuMQPipeline
+"ITEM_PIPELINES": {
+    "ayugespidertools.pipelines.KafkaPipeline": 300,
+},
+```
+
+`.conf` 中的所需配置如下：
+
+```ini
+[kafka]
+bootstrap_servers=127.0.0.1:9092 #若多个用逗号分隔
+topic=***
+key=***
 ```
 
 然后在 `spider` 中 `yield` 你所需结构的 `item` 即可（类型为 `dict`）。

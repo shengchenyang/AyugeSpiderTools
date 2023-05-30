@@ -105,10 +105,6 @@ class DemoOneSpider(AyuSpider):
         'LOG_LEVEL': 'DEBUG',
         # 以 loguru 来管理日志，本库会在 settings 中生成规则示例，可自行修改。也可不配置
         'LOGURU_CONFIG': logger,
-        # Mysql数据表的前缀名称，用于标记属于哪个项目，可不配置
-        'MYSQL_TABLE_PREFIX': "demo_basic_",
-        # MongoDB 集合的前缀名称，用于标记属于哪个项目，可不配置
-        'MONGODB_COLLECTION_PREFIX': "demo_basic_",
         'ITEM_PIPELINES': {
             # 激活此项则数据会存储至 Mysql
             'ayugespidertools.pipelines.AyuFtyMysqlPipeline': 300,

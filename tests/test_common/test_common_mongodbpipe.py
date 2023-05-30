@@ -34,7 +34,6 @@ class TestMongoDBPipe:
             Synchronize(),
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
-            collection_prefix="",
         )
 
         num = (
@@ -55,7 +54,6 @@ class TestMongoDBPipe:
             Synchronize(),
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
-            collection_prefix="",
         )
 
         num = (
@@ -81,7 +79,6 @@ class TestMongoDBPipe:
             Synchronize(),
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
-            collection_prefix="",
         )
 
         num = (
@@ -114,7 +111,6 @@ class TestMongoDBPipe:
             Synchronize(),
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
-            collection_prefix="",
         )
 
         num = (

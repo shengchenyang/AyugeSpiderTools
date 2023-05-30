@@ -6,30 +6,19 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
 
 
-class DynamicProxyDownloaderMiddleware(object):
+class DynamicProxyDownloaderMiddleware:
     """
     动态隧道代理中间件
     """
 
-    def __init__(self, settings):
-        """
-        从 scrapy 配置中取出动态隧道代理的信息
-        """
-        dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
-        # 查看动态隧道代理配置是否符合要求
-        is_match = ReuseOperation.is_dict_meet_min_limit(
-            dict_conf=dynamic_proxy_conf,
-            key_list=["proxy", "username", "password"],
-        )
-        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
-
-        self.proxy_url = dynamic_proxy_conf["proxy"]
-        self.username = dynamic_proxy_conf["username"]
-        self.password = dynamic_proxy_conf["password"]
+    def __init__(self):
+        self.proxy_url = None
+        self.username = None
+        self.password = None
 
     @classmethod
     def from_crawler(cls, crawler):
-        s = cls(crawler.settings)
+        s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
@@ -59,8 +48,12 @@ class DynamicProxyDownloaderMiddleware(object):
             f"动态隧道代理中间件: DynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
         )
 
+        self.proxy_url = spider.dynamicproxy_conf.proxy
+        self.username = spider.dynamicproxy_conf.username
+        self.password = spider.dynamicproxy_conf.password
 
-class AbuDynamicProxyDownloaderMiddleware(object):
+
+class AbuDynamicProxyDownloaderMiddleware:
     """
     阿布云动态代理 - 隧道验证方式（其实和快代理的写法一致）
     """

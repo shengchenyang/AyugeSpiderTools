@@ -12,28 +12,9 @@ class AyuFtyMongoPipeline(MongoDbBase):
     MongoDB 存储场景的 scrapy pipeline 扩展
     """
 
-    def __init__(
-        self,
-        collection_prefix: str = "",
-    ) -> None:
-        """
-        初始化
-        Args:
-            mongodb_conf: mongDB 的连接配置
-            collection_prefix: mongDB 存储集合的前缀，默认为空字符
-        """
-        assert isinstance(collection_prefix, str), "mongoDB 所要存储的集合前缀名称需要是 str 格式！"
-
-        self.collection_prefix = collection_prefix or ""
-        # conn 和 db 为父类的属性，用于存储连接信息
+    def __init__(self):
         self.conn = None
         self.db = None
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            collection_prefix=crawler.settings.get("MONGODB_COLLECTION_PREFIX", ""),
-        )
 
     def open_spider(self, spider):
         assert hasattr(
@@ -78,6 +59,5 @@ class AyuFtyMongoPipeline(MongoDbBase):
                 Synchronize(),
                 item_dict=item_dict,
                 db=self.db,
-                collection_prefix=self.collection_prefix,
             )
         return item

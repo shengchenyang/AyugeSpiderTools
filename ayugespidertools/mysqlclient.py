@@ -9,7 +9,7 @@ __all__ = [
 SearchTypeStr = Literal["all", "one"]
 
 
-class MysqlOrm(object):
+class MysqlOrm:
     """数据库的简单使用，结合 SqlFormat 方法使用（临时使用）"""
 
     def __init__(self, pymsql_connect_conf: dict):

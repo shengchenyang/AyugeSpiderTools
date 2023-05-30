@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class EncryptOperation(object):
+class EncryptOperation:
     """
     普通加密方法
     """

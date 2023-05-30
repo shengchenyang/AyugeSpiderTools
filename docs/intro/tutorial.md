@@ -81,10 +81,6 @@ class DemoEightSpider(AyuSpider):
     custom_settings = {
         # 是否开启记录项目相关运行统计信息
         "RECORD_LOG_TO_MYSQL": False,
-        # 数据表的前缀名称，用于标记属于哪个项目，也可以不用添加
-        "MYSQL_TABLE_PREFIX": "demo8_",
-        # 数据表的前缀名称，用于标记属于哪个项目（也可不配置此参数，按需配置）
-        "MONGODB_COLLECTION_PREFIX": "demo8_",
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,

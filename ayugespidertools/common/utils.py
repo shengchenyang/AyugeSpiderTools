@@ -22,10 +22,17 @@ __all__ = [
 ]
 
 ConsulFormatStr = Literal["json", "hcl", "yaml", "xml"]
-ConsulConfNameStr = Literal["mongodb", "mysql"]
+ConsulConfNameStr = Literal[
+    "mongodb",
+    "mysql",
+    "rabbitmq",
+    "kafka",
+    "dynamicproxy",
+    "exclusiveproxy",
+]
 
 
-class ToolsForAyu(object):
+class ToolsForAyu:
     """
     这里用于存放框架所依赖的方法
     """

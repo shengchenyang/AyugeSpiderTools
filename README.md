@@ -90,8 +90,7 @@ scrapy crawl <spider_name>
 
 # 将 `Scrapy` 的 `Request`，`FormRequest` 替换为其它工具实现的场景
 - 以上为使用 scrapy Request 的场景
-+ 7).demo_seven: scrapy Request 替换为 requests 请求的场景(一般情况下不推荐使用，同步库
-+ 会拖慢 scrapy 速度，可用于测试场景)
+- 7).demo_seven: scrapy Request 替换为 requests 请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
 
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
 
@@ -109,7 +108,8 @@ scrapy crawl <spider_name>
 -16).demo_item_loader_two: 展示本库使用 itemLoader 特性的示例，此示例已删除，可查看上个 demo_item_loader 中的示例，目前已经可以很方便的使用 Item Loaders 功能了
 
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
-+18).demo_mq: 数据存入 rabbitmq 的模板示例，通过 pika 库实现
++18).demo_mq: 数据存入 rabbitmq 的模板示例
++19).demo_kafka: 数据存入 rabbitmq 的模板示例
 ```
 
 注：具体内容及时效性请以 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中描述为准。
@@ -172,7 +172,7 @@ scrapy crawl <spider_name>
   - [x] 代理中间件（独享代理、动态隧道代理）
   - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
   - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求
-    - [x] `requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率
+    - [x] ~~`requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率~~（已移除此功能，更推荐 `aiohttp` 的方式）
     - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
   - [x] `Mysql` 存储的场景下适配
     - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
@@ -180,7 +180,7 @@ scrapy crawl <spider_name>
   - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
     - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
     - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
-  - [ ] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
+  - [x] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
 - [x] 常用开发场景
   - [x] `sql` 语句拼接，只是简单场景，后续优化。已给出优化方向，参考库等信息。
   - [x] `mongoDB` 语句拼接

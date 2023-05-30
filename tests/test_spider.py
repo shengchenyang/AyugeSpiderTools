@@ -120,7 +120,7 @@ class TestSpider:
         }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {"LOCAL_MYSQL_CONFIG": local_mysql_conf}
+        project_settings = {"MYSQL_CONFIG": local_mysql_conf}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
@@ -168,7 +168,7 @@ class TestSpider:
         }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {"LOCAL_MONGODB_CONFIG": local_mongodb_conf}
+        project_settings = {"MONGODB_CONFIG": local_mongodb_conf}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)

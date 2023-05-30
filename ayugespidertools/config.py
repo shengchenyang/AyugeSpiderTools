@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from environs import Env
 from loguru import logger
 
 __all__ = [
@@ -9,11 +8,7 @@ __all__ = [
 ]
 
 
-env = Env()
-env.read_env()
-
-
-class NormalConfig(object):
+class NormalConfig:
     """
     用于存放此项目的通用配置
     """

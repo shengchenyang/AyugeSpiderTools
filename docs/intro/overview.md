@@ -77,8 +77,6 @@ class DemoOneSpider(AyuSpider):
         "RECORD_LOG_TO_MYSQL": True,
         # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
         "LOGURU_CONFIG": logger,
-        # Mysql数据表的前缀名称，用于标记属于哪个项目，也可以不用配置
-        "MYSQL_TABLE_PREFIX": "demo1_",
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -156,7 +154,7 @@ class DemoOneSpider(AyuSpider):
             # yield ArticleInfoItem
 
             # 数据入库逻辑 -> 测试 mysql_engine 的去重功能，你可以自行实现。mysql_engine 也已经给你了
-            save_table = f'{self.custom_settings.get("MYSQL_TABLE_PREFIX", "")}{TableEnum.article_list_table.value["value"]}'
+            save_table = TableEnum.article_list_table.value["value"]
             sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
             yield ToolsForAyu.filter_data_before_yield(
                 sql=sql,

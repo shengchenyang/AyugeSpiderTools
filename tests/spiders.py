@@ -48,7 +48,7 @@ class RecordLogToMysqlSpider(SimpleSpider):
             # 随机请求头
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
-        "LOCAL_MYSQL_CONFIG": {
+        "MYSQL_CONFIG": {
             "host": PYMYSQL_CONFIG["host"],
             "port": PYMYSQL_CONFIG["port"],
             "user": PYMYSQL_CONFIG["user"],
@@ -86,7 +86,7 @@ class MyAyuCrawlSpider(AyuCrawlSpider):
         self.logger.info(f"book_name: {book_name}")
 
 
-class Operations(object):
+class Operations:
     """
     项目依赖方法
     """
@@ -131,7 +131,7 @@ class DemoAiohttpSpider(AyuSpider):
             "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
         },
         # scrapy Request 替换为 aiohttp 的配置示例
-        "LOCAL_AIOHTTP_CONFIG": {
+        "AIOHTTP_CONFIG": {
             "timeout": 30,
             # "proxy": "http://127.0.0.1:7890",
             "sleep": 0,

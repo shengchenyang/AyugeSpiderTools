@@ -5,7 +5,7 @@ import os
 import sys
 
 import pkg_resources
-from scrapy.commands import ScrapyCommand, ScrapyHelpFormatter
+from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import CrawlerProcess
 from scrapy.exceptions import UsageError
 from scrapy.utils.misc import walk_modules
@@ -25,7 +25,7 @@ class ScrapyArgumentParser(argparse.ArgumentParser):
 
 
 def _iter_command_classes(module_name):
-    # TODO: add `name` attribute to commands and and merge this function with
+    # TODO: add `name` attribute to commands and merge this function with
     # scrapy.utils.spider.iter_spider_classes
     for module in walk_modules(module_name):
         for obj in vars(module).values():
@@ -33,7 +33,7 @@ def _iter_command_classes(module_name):
                 inspect.isclass(obj)
                 and issubclass(obj, ScrapyCommand)
                 and obj.__module__ == module.__name__
-                and not obj == ScrapyCommand
+                and obj not in (ScrapyCommand, BaseRunSpiderCommand)
             ):
                 yield obj
 
@@ -77,9 +77,9 @@ def _pop_command_name(argv):
 
 
 def _print_header(settings, inproject):
-    version = AyuCommand().run(args=None, opts=None)
+    version = AyuCommand()._version()
     if inproject:
-        print(f"AyugeSpiderTools {version} - project: {settings['BOT_NAME']}\n")
+        print(f"AyugeSpiderTools {version} - active project: {settings['BOT_NAME']}\n")
     else:
         print(f"AyugeSpiderTools {version} - no active project\n")
 

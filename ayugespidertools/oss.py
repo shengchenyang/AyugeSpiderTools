@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class AliOssBase(object):
+class AliOssBase:
     """
     阿里云 Oss 对象存储 python sdk 示例
     其 GitHub 官方文档地址：

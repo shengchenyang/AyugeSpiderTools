@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-class MysqlPipeEnhanceMixin(object):
+class MysqlPipeEnhanceMixin:
     """
     用于扩展 pipelines 中的功能，作为 Mixin 使用，不要对其实例化和单独使用等
     """

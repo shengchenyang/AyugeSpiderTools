@@ -36,6 +36,5 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
                 TwistedAsynchronous(),
                 item_dict=item_dict,
                 db=self.db,
-                collection_prefix=self.collection_prefix,
             )
             reactor.callFromThread(out.callback, item_dict)

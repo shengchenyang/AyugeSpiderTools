@@ -15,6 +15,9 @@ __all__ = [
     "AiohttpConf",
     "AiohttpRequestArgs",
     "MQConf",
+    "KafkaConf",
+    "DynamicProxyConf",
+    "ExclusiveProxyConf",
 ]
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
@@ -51,7 +54,7 @@ class MysqlConf(NamedTuple):
     user: str
     password: str
     database: Optional[str] = None
-    charset: Optional[str] = "utf8mb4"
+    charset: str = "utf8mb4"
 
 
 class MongoDBConf(NamedTuple):
@@ -99,13 +102,34 @@ class MQConf(NamedTuple):
     port: int
     username: str
     password: str
-    virtualhost: Optional[str] = "/"
+    virtualhost: str = "/"
+    heartbeat: int = 0
+    socket_timeout: int = 1
     queue: Optional[str] = None
-    durable: Optional[bool] = True
-    exclusive: Optional[bool] = False
-    auto_delete: Optional[bool] = False
+    durable: bool = True
+    exclusive: bool = False
+    auto_delete: bool = False
     exchange: Optional[str] = None
     routing_key: Optional[str] = None
-    content_type: Optional[str] = "text/plain"
-    delivery_mode: Optional[int] = 1
-    mandatory: Optional[bool] = True
+    content_type: str = "text/plain"
+    delivery_mode: int = 1
+    mandatory: bool = True
+
+
+class DynamicProxyConf(NamedTuple):
+    proxy: str
+    username: str
+    password: str
+
+
+class ExclusiveProxyConf(NamedTuple):
+    proxy: str
+    username: str
+    password: str
+    index: int
+
+
+class KafkaConf(NamedTuple):
+    bootstrap_servers: list
+    topic: str
+    key: str

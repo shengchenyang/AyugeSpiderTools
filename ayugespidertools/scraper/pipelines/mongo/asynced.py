@@ -7,25 +7,10 @@ from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
 
 
-class AsyncMongoPipeline(object):
+class AsyncMongoPipeline:
     """
     通过 motor 实现异步写入 MongoDB 的存储管道
     """
-
-    def __init__(
-        self,
-        collection_prefix: str = "",
-    ) -> None:
-        assert isinstance(collection_prefix, str), "mongoDB 所要存储的集合前缀名称需要是 str 格式！"
-
-        self.collection_prefix = collection_prefix or ""
-        self.mongo_uri = None
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-            collection_prefix=crawler.settings.get("MONGODB_COLLECTION_PREFIX", ""),
-        )
 
     def open_spider(self, spider):
         assert hasattr(
@@ -54,7 +39,6 @@ class AsyncMongoPipeline(object):
                 AsyncioAsynchronous().process_item_template(
                     item_dict=item_dict,
                     db=self.db,
-                    collection_prefix=self.collection_prefix,
                 )
             )
         return item
