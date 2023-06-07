@@ -85,6 +85,9 @@ class KafkaProducerClient:
 
 
 class AyuKafkaPipeline:
+    def __init__(self):
+        self.kp = None
+
     def open_spider(self, spider):
         # 如果有多个 kafka 服务地址，用逗号分隔，会在此处拆分为列表
         _bts = spider.kafka_conf.bootstrap_servers

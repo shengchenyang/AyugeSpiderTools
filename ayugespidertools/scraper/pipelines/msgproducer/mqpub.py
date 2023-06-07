@@ -13,6 +13,9 @@ class AyuMQPipeline:
     消息队列发布场景的 scrapy pipeline 扩展 - pika mq
     """
 
+    def __init__(self):
+        self.channel = None
+
     def _dict_to_bytes(self, item: dict) -> bytes:
         item_json_str = json.dumps(item)
         return bytes(item_json_str, encoding="utf-8")
