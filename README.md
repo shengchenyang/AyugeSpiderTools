@@ -14,7 +14,7 @@
 
 ## 前言
 
-在使用 `Python` `Scrapy` 库开发爬虫时，免不了会重复的修改和编写 `settings.py`，`middlewares.py`，`pipelines.py`，`item.py` 和一些通用方法或脚本，但其实各个项目中的这些文件内容大致相同，那为何不把他们统一整理在一起呢。虽说可以使用 `scrapy` 的模板功能，但还是无法适配所有的开发场景。
+在使用 `Python` `Scrapy` 库开发爬虫时，免不了会重复的修改和编写 `settings.py`，`item.py`，`middlewares.py`，`pipelines.py` 和一些通用方法或脚本，但其实各个项目中的这些文件内容大致相同，那为何不把他们统一整理在一起呢。虽说可以使用 `scrapy` 的模板功能，但还是无法适配所有的开发场景。
 
 刚开始我也只是想把它用来适配 `Mysql` 存储的场景，可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发在通用场景下几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
 
@@ -109,7 +109,7 @@ scrapy crawl <spider_name>
 
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 +18).demo_mq: 数据存入 rabbitmq 的模板示例
-+19).demo_kafka: 数据存入 rabbitmq 的模板示例
++19).demo_kafka: 数据存入 kafka 的模板示例
 ```
 
 注：具体内容及时效性请以 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中描述为准。

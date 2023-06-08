@@ -61,7 +61,7 @@
 
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 +18).demo_mq: 数据存入 rabbitmq 的模板示例
-+19).demo_kafka: 数据存入 rabbitmq 的模板示例
++19).demo_kafka: 数据存入 kafka 的模板示例
 ```
 
 基本查看查看以上 `spider` 即可了解使用方法，但有些示例还是不够详细，对以上内容进行补充。
