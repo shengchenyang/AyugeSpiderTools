@@ -171,7 +171,7 @@ class AyuSpider(Spider):
         if mysql_conf := get_spider_conf(
             MysqlConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 mysql_conf 信息")
+            spider.slog.debug("项目中配置了 mysql_conf 信息")
             spider.mysql_conf = mysql_conf
             if cls.mysql_engine_enabled:
                 mysql_url = (
@@ -185,32 +185,32 @@ class AyuSpider(Spider):
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 mongodb_conf 信息")
+            spider.slog.debug("项目中配置了 mongodb_conf 信息")
             spider.mongodb_conf = mongodb_conf
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 rabbitmq_conf 信息")
+            spider.slog.debug("项目中配置了 rabbitmq_conf 信息")
             spider.rabbitmq_conf = rabbitmq_conf
 
         if kafka_conf := get_spider_conf(
             KafkaConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 kafka_conf 信息")
+            spider.slog.debug("项目中配置了 kafka_conf 信息")
             spider.kafka_conf = kafka_conf
 
         # 动态代理
         if dynamicproxy_conf := get_spider_conf(
             DynamicProxyCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 dynamicproxy_conf 信息")
+            spider.slog.debug("项目中配置了 dynamicproxy_conf 信息")
             spider.dynamicproxy_conf = dynamicproxy_conf
 
         # 独享代理
         if exclusiveproxy_conf := get_spider_conf(
             ExclusiveProxyCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.info("项目中配置了 exclusiveproxy_conf 信息")
+            spider.slog.debug("项目中配置了 exclusiveproxy_conf 信息")
             spider.exclusiveproxy_conf = exclusiveproxy_conf
         return spider

@@ -2,21 +2,19 @@ from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
 from scrapy.loader import ItemLoader
 
-from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem, ScrapyItem
+from ayugespidertools.items import AyuItem, DataItem, ScrapyItem
 
 
-def test_items_MysqlDataItem():
-    mdi = MysqlDataItem(_table="table")
+def test_items_AyuItem():
+    mdi = AyuItem(_table="table")
     mdi.add_field("field1", "value1")
     mdi.add_field("field2", "value2")
     mdi._table = "table1"
-    mdi._item_mode = "Mysql"
     mdi["field3"] = DataItem(key_value="field3_key", notes="key值")
     assert all(
         [
-            type(mdi) == MysqlDataItem,
+            type(mdi) == AyuItem,
             mdi._table == "table1",
-            mdi._item_mode == "Mysql",
             mdi.fields == ["field1", "field2", "field3"],
         ]
     )
@@ -32,7 +30,6 @@ def test_items_MysqlDataItem():
                 "field2": "value2",
                 "field3": DataItem(key_value="field3_key", notes="key值"),
                 "_table": "table1",
-                "_item_mode": "Mysql",
             },
         ],
     )
@@ -47,7 +44,7 @@ def test_items_MysqlDataItem():
     )
 
     # 另一种赋值方式
-    mdi_sec = MysqlDataItem(
+    mdi_sec = AyuItem(
         _table="table_one",
         field1="value1",
         field2="value2",
@@ -56,20 +53,19 @@ def test_items_MysqlDataItem():
     mdi_sec_dict = mdi_sec.asdict()
     assert all(
         [
-            type(mdi_sec) == MysqlDataItem,
+            type(mdi_sec) == AyuItem,
             mdi_sec_dict
             == {
                 "_table": "table_one",
                 "field1": "value1",
                 "field2": "value2",
                 "field3": DataItem(key_value="field3_key", notes="key值"),
-                "_item_mode": "Mysql",
             },
         ]
     )
 
     # 以下是 item loaders 的使用
-    test_item = MysqlDataItem(
+    test_item = AyuItem(
         _table="table1",
         book_name=None,
     )
@@ -83,16 +79,14 @@ def test_items_MysqlDataItem():
             ItemAdapter.is_item(item),
             dict(item)
             == {
-                "_item_mode": "Mysql",
                 "_table": "table1",
                 "book_name": "book_name_data22",
             },
         ]
     )
 
-
-def test_items_MongoDataItem():
-    mdi = MongoDataItem(
+    # 以下是包含 _mongo_update_rule 的情况
+    mdi = AyuItem(
         _table="table_third",
         _mongo_update_rule={"title": "title_data"},
         field1="value1",
@@ -107,7 +101,6 @@ def test_items_MongoDataItem():
                 "_table": "table_third",
                 "_mongo_update_rule": {"title": "title_data"},
                 "field1": "value1",
-                "_item_mode": "MongoDB",
             },
         ]
     )
@@ -121,7 +114,7 @@ def test_items_MongoDataItem():
     )
 
     # 以下是 item loaders 的使用
-    test_item = MongoDataItem(
+    test_item = AyuItem(
         _table="table1",
         _mongo_update_rule={"title": "title_data"},
         book_name=None,
@@ -138,7 +131,6 @@ def test_items_MongoDataItem():
             ItemAdapter.is_item(item),
             dict(item)
             == {
-                "_item_mode": "MongoDB",
                 "_mongo_update_rule": {"title": "title_data"},
                 "_table": "table1",
                 "book_name": "book_name_data22",

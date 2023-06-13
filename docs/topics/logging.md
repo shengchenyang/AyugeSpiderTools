@@ -18,7 +18,7 @@ LOG_FILE = f"{LOG_DIR}/DemoSpider.log"
 ```python
 # 本库只会持久化记录 error 级别的日志，但在调试时也可以方便地查看（包括其它等级的）控制台日志
 logger.add(
-    env.str("LOG_ERROR_FILE", f"{LOG_DIR}/error.log"),
+    f"{LOG_DIR}/error.log",
     level="ERROR",
     rotation="1 week",
     retention="7 days",

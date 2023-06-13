@@ -27,7 +27,7 @@ def test_get_items_except_keys():
         "item_mode": "Mysql",
     }
     res = ReuseOperation.get_items_except_keys(
-        dict_conf=dict_conf, key_list=["table", "item_mode"]
+        dict_conf=dict_conf, keys=["table", "item_mode"]
     )
     print("res:", res)
     assert list(res.keys()) == ["alldata"]

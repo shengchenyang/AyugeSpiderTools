@@ -1,3 +1,4 @@
+from ayugespidertools.scraper.pipelines.download.file import FilesDownloadPipeline
 from ayugespidertools.scraper.pipelines.mongo.asynced import AsyncMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.twisted import AyuTwistedMongoPipeline
@@ -18,4 +19,5 @@ __all__ = [
     "AyuTwistedMongoPipeline",
     "AyuMQPipeline",
     "AyuKafkaPipeline",
+    "FilesDownloadPipeline",
 ]

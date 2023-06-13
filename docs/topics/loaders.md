@@ -36,7 +36,7 @@ Product.fields["add_field1"] = scrapy.Field()
 ```python
 from scrapy.loader import ItemLoader
 from myproject.items import Product
-from ayugespidertools.items import MongoDataItem, MysqlDataItem
+from ayugespidertools.items import AyuItem
 
 
 # 这是 scrapy 中的实现示例：
@@ -53,7 +53,7 @@ def parse(self, response):
 # 这是本库中的实现示例：
 def parse(self, response):
     # 先定义所需字段
-    my_product = MysqlDataItem(
+    my_product = AyuItem(
         book_name=None,
         book_href=None,
         book_intro=None,

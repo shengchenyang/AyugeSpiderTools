@@ -14,9 +14,6 @@ from ayugespidertools.scraper.middlewares.proxy.dynamic import (
 from ayugespidertools.scraper.middlewares.proxy.exclusive import (
     ExclusiveProxyDownloaderMiddleware,
 )
-from ayugespidertools.scraper.middlewares.proxy.private import (
-    PrivateProxyDownloaderMiddleware,
-)
 
 __all__ = [
     "RandomRequestUaMiddleware",
@@ -25,5 +22,4 @@ __all__ = [
     "DynamicProxyDownloaderMiddleware",
     "AbuDynamicProxyDownloaderMiddleware",
     "ExclusiveProxyDownloaderMiddleware",
-    "PrivateProxyDownloaderMiddleware",
 ]

@@ -33,7 +33,7 @@ class AbstractClass(ABC):
         """
         insert_data = ReuseOperation.get_items_except_keys(
             dict_conf=item_dict,
-            key_list=["_table", "_item_mode", "_mongo_update_rule"],
+            keys=["_table", "_item_mode", "_mongo_update_rule"],
         )
         judge_item = next(iter(insert_data.values()))
         # 是 namedtuple 类型

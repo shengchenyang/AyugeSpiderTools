@@ -51,8 +51,6 @@ pip install ayugespidertools -i https://pypi.org/simple
 对以上 `GIF` 中的步骤进行解释：
 
 ```shell
-# 注：ayugespidertools 的 cli 已剔除，现只能使用 ayuge。
-
 # 查看库版本
 ayuge version
 
@@ -110,6 +108,7 @@ scrapy crawl <spider_name>
 +17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 +18).demo_mq: 数据存入 rabbitmq 的模板示例
 +19).demo_kafka: 数据存入 kafka 的模板示例
++20).demo_file: 下载图片等文件到本地的模板示例
 ```
 
 注：具体内容及时效性请以 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中描述为准。

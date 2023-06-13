@@ -52,7 +52,7 @@ DemoSpider/
 
 ```python
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem
+from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 
@@ -135,7 +135,7 @@ class DemoEightSpider(AyuSpider):
                 json_data=curr_data, query="nickName"
             )
 
-            ArticleMysqlItem = MysqlDataItem(
+            ArticleItem = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
@@ -143,19 +143,7 @@ class DemoEightSpider(AyuSpider):
                 nick_name=DataItem(nick_name, "文章作者昵称"),
                 _table=TableEnum.article_list_table.value["value"],
             )
-            yield ArticleMysqlItem
-
-            ArticleMongoItem = MongoDataItem(
-                article_detail_url=article_detail_url,
-                article_title=article_title,
-                comment_count=comment_count,
-                favor_count=favor_count,
-                nick_name=nick_name,
-                _table=TableEnum.article_list_table.value["value"],
-                # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
-                _mongo_update_rule={"article_detail_url": article_detail_url},
-            )
-            yield ArticleMongoItem
+            yield ArticleItem
 ```
 
 如您所见，我们的 `Spider` 子类化`AyugeSpider.AyuSpider` 并定义了一些属性和方法：

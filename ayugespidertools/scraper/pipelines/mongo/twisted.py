@@ -30,11 +30,9 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
 
     def db_insert(self, item, out):
         item_dict = ReuseOperation.item_to_dict(item)
-        # 先查看存储场景是否匹配
-        if item_dict["_item_mode"] == "MongoDB":
-            mongodb_pipe(
-                TwistedAsynchronous(),
-                item_dict=item_dict,
-                db=self.db,
-            )
-            reactor.callFromThread(out.callback, item_dict)
+        mongodb_pipe(
+            TwistedAsynchronous(),
+            item_dict=item_dict,
+            db=self.db,
+        )
+        reactor.callFromThread(out.callback, item_dict)

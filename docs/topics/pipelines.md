@@ -145,3 +145,38 @@ key=***
 ```
 
 然后在 `spider` 中 `yield` 你所需结构的 `item` 即可（类型为 `dict`）。
+
+## 4. 文件下载
+
+需要激活 `ITEM_PIPELINES` 对应的配置，然后在项目中配置相关参数。
+
+`spider` 中的 `custom_settings` 所需配置如下：
+
+```python
+"ITEM_PIPELINES": {
+    "ayugespidertools.pipelines.FilesDownloadPipeline": 300,
+    # 以下 AyuFtyMysqlPipeline 非必须，但只激活 FilesDownloadPipeline 时只会下载文件，但是
+    # 并不会将信息与网页中的标题、描述等信息绑定，激活 AyuFtyMysqlPipeline 之类的选项后，可以自行
+    # 添加其它可以描述文件的详细字段并存储对应场景的数据库中。
+    "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 301,
+},
+```
+
+`spider` 等其它项目配置中的所需详细设置示例如下：
+
+```ini
+from DemoSpider.settings import DOC_DIR
+
+...
+
+custom_settings = {
+    "ITEM_PIPELINES": {
+        "ayugespidertools.pipelines.FilesDownloadPipeline": 300,
+        "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 301,
+    },
+    # 下载文件保存路径，不配置则默认为项目设置中的 DOC_DIR（需要确认此文件夹是否存在）
+    "FILES_STORE": DOC_DIR,
+}
+```
+
+具体示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中的 `demo_file` 查看。

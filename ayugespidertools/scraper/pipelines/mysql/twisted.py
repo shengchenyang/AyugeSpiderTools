@@ -56,10 +56,8 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        # 先查看存储场景是否匹配
-        if item_dict["_item_mode"] == "Mysql":
-            query = self.dbpool.runInteraction(self.db_insert, item_dict)
-            query.addErrback(self.handle_error, item)
+        query = self.dbpool.runInteraction(self.db_insert, item_dict)
+        query.addErrback(self.handle_error, item)
         return item
 
     def db_insert(self, cursor, item):
@@ -97,5 +95,4 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         self.slog.error(f"插入数据失败:{failure}, item: {item}")
 
     def close_spider(self, spider):
-        # 这里新建数据库链接，是为了正常继承父类的脚本运行统计的方法（需要 self 的 mysql 连接对象存在）
         super(AyuTwistedMysqlPipeline, self).close_spider(spider)

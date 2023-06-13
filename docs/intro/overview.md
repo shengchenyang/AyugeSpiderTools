@@ -42,7 +42,7 @@ ayuge genspider <spider_name> <example.com>
 import json
 
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem, MysqlDataItem
+from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 from scrapy.http.response.text import TextResponse
@@ -128,7 +128,7 @@ class DemoOneSpider(AyuSpider):
             )
 
             # 数据存储方式 1，需要添加注释时的写法
-            ArticleInfoItem = MysqlDataItem(
+            ArticleInfoItem = AyuItem(
                 # 这里也可以写为 article_detail_url = DataItem(article_detail_url)，但没有注释
                 # 功能了，那不如使用下面的数据存储方式 2
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
@@ -141,7 +141,7 @@ class DemoOneSpider(AyuSpider):
 
             # 数据存储方式 2，若不需要注释，也可以这样写，但不要两种风格混用
             """
-            ArticleInfoItem = MysqlDataItem(
+            ArticleInfoItem = AyuItem(
                 article_detail_url=article_detail_url,
                 article_title=article_title,
                 comment_count=comment_count,

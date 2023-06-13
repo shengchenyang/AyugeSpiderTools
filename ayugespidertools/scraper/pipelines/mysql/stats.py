@@ -14,7 +14,7 @@ class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
     Mysql 存储且记录脚本运行状态的简单示例
     """
 
-    # TODO: 此方法暂用于测试
+    # Note: 此方法暂用于测试
     def __init__(self, env):
         self.env = env
         self.slog = None

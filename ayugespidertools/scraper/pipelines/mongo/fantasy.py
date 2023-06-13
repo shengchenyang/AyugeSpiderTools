@@ -53,11 +53,9 @@ class AyuFtyMongoPipeline(MongoDbBase):
             item: scrapy item
         """
         item_dict = ReuseOperation.item_to_dict(item)
-        # 先查看存储场景是否匹配
-        if item_dict["_item_mode"] == "MongoDB":
-            mongodb_pipe(
-                Synchronize(),
-                item_dict=item_dict,
-                db=self.db,
-            )
+        mongodb_pipe(
+            Synchronize(),
+            item_dict=item_dict,
+            db=self.db,
+        )
         return item

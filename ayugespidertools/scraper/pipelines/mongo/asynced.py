@@ -34,11 +34,10 @@ class AsyncMongoPipeline:
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        if item_dict["_item_mode"] == "MongoDB":
-            await asyncio.shield(
-                AsyncioAsynchronous().process_item_template(
-                    item_dict=item_dict,
-                    db=self.db,
-                )
+        await asyncio.shield(
+            AsyncioAsynchronous().process_item_template(
+                item_dict=item_dict,
+                db=self.db,
             )
+        )
         return item

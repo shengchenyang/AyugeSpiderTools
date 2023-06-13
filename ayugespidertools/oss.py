@@ -111,7 +111,9 @@ class AliOssBase:
         return True, input_file_name
 
     def enumer_file_by_pre(
-        self, prefix: str, count_by_type: Union[Param.Str_Lstr, Param.NoneType] = None
+        self,
+        prefix: str,
+        count_by_type: Union[Param.Str_Lstr, Param.NoneType, list] = None,
     ) -> list:
         """
         列举 prefix 文件夹下的所有的 count_by_type 类型的文件元素

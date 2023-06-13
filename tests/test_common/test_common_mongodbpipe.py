@@ -2,7 +2,7 @@ import pytest
 
 from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.items import DataItem, MongoDataItem
+from ayugespidertools.items import AyuItem, DataItem
 from tests.conftest import mongodb_database, test_table
 
 
@@ -24,8 +24,8 @@ class TestMongoDBPipe:
         }
 
     @pytest.mark.usefixtures("mongodb_conn")
-    def test_MongoDBPipe_with_MongoDataItem(self, mongodb_conn):
-        item_normal = MongoDataItem(
+    def test_MongoDBPipe_with_AyuItem(self, mongodb_conn):
+        item_normal = AyuItem(
             **self._article_info,
             _table=test_table,
         )
@@ -43,7 +43,7 @@ class TestMongoDBPipe:
         )
         assert num >= 1
 
-        item_with_mongo_update_rule = MongoDataItem(
+        item_with_mongo_update_rule = AyuItem(
             **self._article_info,
             _table=test_table,
             _mongo_update_rule={"article_detail_url": "_article_detail_url"},

@@ -8,12 +8,13 @@ from typing import Any, List, Union
 import cv2
 import numpy as np
 import pymysql
+from itemadapter import ItemAdapter
 from scrapy.settings import Settings
 from twisted.internet.defer import Deferred
 
 from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
-from ayugespidertools.items import MongoDataItem, MysqlDataItem, ScrapyItem
+from ayugespidertools.items import AyuItem, ScrapyItem
 
 __all__ = [
     "ReuseOperation",
@@ -141,8 +142,8 @@ class ReuseOperation:
 
     @staticmethod
     def item_to_dict(
-        item: Union[MysqlDataItem, MongoDataItem, ScrapyItem, dict]
-    ) -> dict:
+        item: Union[AyuItem, ScrapyItem, dict]
+    ) -> Union[ItemAdapter, dict]:
         """
         将 item 转换为 dict 类型
         将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
@@ -152,9 +153,7 @@ class ReuseOperation:
         Returns:
             1). dict 类型的 item
         """
-        if isinstance(item, (MongoDataItem, MysqlDataItem)):
-            return item.asdict()
-        return dict(item)
+        return item.asdict() if isinstance(item, AyuItem) else ItemAdapter(item)
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
@@ -176,7 +175,7 @@ class ReuseOperation:
             path: 需要判断的文件夹路径
 
         Returns:
-            file_list: path 文件夹下的文件列表
+            1). path 文件夹下的文件列表
         """
         return [f.path for f in os.scandir(path) if f.is_file()]
 
@@ -272,36 +271,36 @@ class ReuseOperation:
     def get_items_by_keys(
         cls,
         dict_conf: dict,
-        key_list: List[str],
+        keys: List[str],
     ) -> dict:
         """
-        获取 dict_conf 中的含有 key_list 的 key 的字段
+        获取 dict_conf 中的含有 keys 的 key 的字段
         Args:
             dict_conf: 需要处理的参数
-            key_list: 需要取的 key 值列表
+            keys: 需要取的 key 值列表
 
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
         # 参数先要满足最小限定，然后再取出限定的参数值；否则返回空字典
         return (
-            {k: dict_conf[k] for k in key_list}
-            if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=key_list)
+            {k: dict_conf[k] for k in keys}
+            if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=keys)
             else {}
         )
 
     @classmethod
-    def get_items_except_keys(cls, dict_conf, key_list: List[str]) -> dict:
+    def get_items_except_keys(cls, dict_conf, keys: List[str]) -> dict:
         """
-        获取 dict_conf 中的不含有 key_list 的 key 的字段
+        获取 dict_conf 中的不含有 keys 的 key 的字段
         Args:
             dict_conf: 需要处理的参数
-            key_list: 需要排除的 key 值列表
+            keys: 需要排除的 key 值列表
 
         Returns:
-            1). dict_conf 排除 key_list 中的键值后的值
+            1). dict_conf 排除 keys 中的键值后的值
         """
-        return {k: dict_conf[k] for k in dict_conf if k not in key_list}
+        return {k: dict_conf[k] for k in dict_conf if k not in keys}
 
     @classmethod
     def create_database(cls, mysql_conf: MysqlConf) -> None:
@@ -388,7 +387,7 @@ class ReuseOperation:
         """
         consul_conf_dict = settings.get("CONSUL_CONFIG", {})
         return cls.get_items_by_keys(
-            dict_conf=consul_conf_dict, key_list=["token", "url", "format"]
+            dict_conf=consul_conf_dict, keys=["token", "url", "format"]
         )
 
     @classmethod

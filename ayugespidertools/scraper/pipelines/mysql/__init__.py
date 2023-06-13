@@ -84,7 +84,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         notes_dic = {}
 
         insert_data = ReuseOperation.get_items_except_keys(
-            dict_conf=item_dict, key_list=["_item_mode", "_table"]
+            dict_conf=item_dict, keys=["_item_mode", "_mongo_update_rule", "_table"]
         )
         judge_item = next(iter(insert_data.values()))
         # 是 namedtuple 类型
@@ -102,12 +102,10 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        # 先查看存储场景是否匹配
-        if item_dict["_item_mode"] == "Mysql":
-            self.insert_item(
-                alter_item=self.get_new_item(item_dict),
-                table=item_dict["_table"],
-            )
+        self.insert_item(
+            alter_item=self.get_new_item(item_dict),
+            table=item_dict["_table"],
+        )
         return item
 
     def insert_item(self, alter_item: AlterItem, table: str):

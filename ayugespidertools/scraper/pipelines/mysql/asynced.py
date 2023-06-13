@@ -41,18 +41,15 @@ class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        if item_dict["_item_mode"] == "Mysql":
-            async with self.db.cursor() as cursor:
-                async with self.lock:
-                    alter_item = super(AsyncNormalMysqlPipeline, self).get_new_item(
-                        item_dict
-                    )
-                    new_item = alter_item.new_item
-                    sql = self._get_sql_by_item(
-                        table=item_dict["_table"], item=new_item
-                    )
-                    await cursor.execute(sql, tuple(new_item.values()) * 2)
-                    await self.db.commit()
+        async with self.db.cursor() as cursor:
+            async with self.lock:
+                alter_item = super(AsyncNormalMysqlPipeline, self).get_new_item(
+                    item_dict
+                )
+                new_item = alter_item.new_item
+                sql = self._get_sql_by_item(table=item_dict["_table"], item=new_item)
+                await cursor.execute(sql, tuple(new_item.values()) * 2)
+                await self.db.commit()
         return item
 
     async def _close_spider(self):
@@ -94,18 +91,15 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        if item_dict["_item_mode"] == "Mysql":
-            async with self.pool.acquire() as conn:
-                async with conn.cursor() as cursor:
-                    alter_item = super(AsyncMysqlPipeline, self).get_new_item(item_dict)
-                    new_item = alter_item.new_item
-                    sql = self._get_sql_by_item(
-                        table=item_dict["_table"],
-                        item=new_item,
-                    )
-                    await asyncio.shield(
-                        cursor.execute(sql, tuple(new_item.values()) * 2)
-                    )
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                alter_item = super(AsyncMysqlPipeline, self).get_new_item(item_dict)
+                new_item = alter_item.new_item
+                sql = self._get_sql_by_item(
+                    table=item_dict["_table"],
+                    item=new_item,
+                )
+                await asyncio.shield(cursor.execute(sql, tuple(new_item.values()) * 2))
         return item
 
     async def _close_spider(self):

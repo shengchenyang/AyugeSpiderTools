@@ -8,7 +8,6 @@ import hcl2
 import pandas
 import requests
 import yaml
-from itemadapter import ItemAdapter
 
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -242,24 +241,6 @@ class ToolsForAyu:
             collate is not None
         ), f"数据库配置出现未知 charset：{mysql_conf.charset}，若抛错请查看或手动创建所需数据表！"
         return collate
-
-    @staticmethod
-    def convert_items_to_dict(item) -> ItemAdapter:
-        """
-        数据容器对象的包装器，提供了一个通用接口以统一的方式处理不同类型的对象，而不管它们的底层实现如何。
-        目前支持的类型有：
-            1. scrapy.item.Item
-            2. dict
-            3. dataclass 基础类
-            4. attrs 基础类
-            5. pydantic 基础类
-        Args:
-            item: 需要转换的项目，请查看支持类型
-
-        Returns:
-            1). 转换的 ItemAdapter 结果，可以通过  obj["params"] 或 obj.get("params") 来取值
-        """
-        return ItemAdapter(item)
 
     @staticmethod
     def first_not_none(data_lst: List[Any]) -> Any:

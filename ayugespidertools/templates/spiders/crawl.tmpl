@@ -2,7 +2,7 @@ import scrapy
 from scrapy.spiders import Rule
 from $project_name.settings import logger
 from scrapy.linkextractors import LinkExtractor
-from ayugespidertools.items import MysqlDataItem
+from ayugespidertools.items import AyuItem
 from $project_name.common.DataEnum import TableEnum
 from ayugespidertools.spiders import AyuCrawlSpider
 
@@ -40,7 +40,7 @@ class $classname(AyuCrawlSpider):
         book_name = "".join(book_name_list).strip()
         self.slog.debug(f"book_name: {book_name}")
 
-        NovelInfoItem = MysqlDataItem(
+        NovelInfoItem = AyuItem(
             book_name=book_name,
             _table=TableEnum.article_list_table.value["value"],
         )

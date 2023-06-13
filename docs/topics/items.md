@@ -11,12 +11,12 @@
 
 > 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
 
-本库将所有需要存储的字段直接在对应的 `Item` (`MysqlDataItem` 或 `MongoDataItem`) 中赋值即可，其中下划线开头的参数为必须参数，需要自定义（但 IDE 会提示参数的，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
+本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中下划线开头的参数为必须参数，需要自定义（但 IDE 会提示参数的，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
 
 ```python
 def parse(self, response):
 	# 存储到 Mysql 场景时需要的 Item 构建示例
-    ArticleMysqlItem = MysqlDataItem(
+    ArticleMysqlItem = AyuItem(
         article_detail_url=DataItem(article_detail_url, "文章详情链接"),
         article_title=DataItem(article_title, "文章标题"),
         comment_count=DataItem(comment_count, "文章评论数量"),
@@ -25,7 +25,7 @@ def parse(self, response):
         _table=TableEnum.article_list_table.value["value"],
     )
     # 存储到 MongoDB 场景时需要的 Item 构建示例
-    ArticleMongoItem = MongoDataItem(
+    ArticleMongoItem = AyuItem(
         article_detail_url=article_detail_url,
         article_title=article_title,
         comment_count=comment_count,
@@ -38,12 +38,13 @@ def parse(self, response):
 ```
 
 以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 即为存储至库中字段，`value` 为存储内容。
+其实，以上可以只赋值一次 `AyuItem` ，然后在 `ITEM_PIPELINES` 中激活对应的 `pipelines` 即可，这里是为了方便展示功能。
 
 当然，目前也支持动态赋值，但是我不推荐使用，直接按照上个方式即可：
 
 ```python
  def parse(self, response):
-    mdi = MysqlDataItem(_table="table0")
+    mdi = AyuItem(_table="table0")
     mdi.add_field("add_field1", "value1")
     mdi.add_field("add_field2", DataItem(key_value="value2"))
     mdi.add_field("add_field3", DataItem(key_value="value3", notes="add_field3值"))
@@ -62,7 +63,7 @@ item = mdi.asitem()
 
 ## 使用示例
 
-> 只需要在 `yield item` 时，按需提前导入 `MysqlDataItem`， `MongoDataItem`，将所有的存储字段和场景补充字段全部添加完整即可。
+> 只需要在 `yield item` 时，按需提前导入 `AyuItem`，将所有的存储字段和场景补充字段全部添加完整即可。
 
 以本库模板中的 `basic.tmpl` 为例：
 
@@ -74,7 +75,7 @@ from DemoSpider.settings import logger
 from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem, MongoDataItem, MysqlDataItem
+from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 
@@ -162,28 +163,43 @@ class DemoOneSpider(AyuSpider):
             nick_name = ToolsForAyu.extract_with_json(
                 json_data=curr_data,
                 query="nickName")
-
-            ArticleMysqlItem = MysqlDataItem(
+            
+            ArticleInfoItem = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
                 _table=TableEnum.article_list_table.value["value"],
-            )
-            yield ArticleMysqlItem
-
-            ArticleMongoItem = MongoDataItem(
-                article_detail_url=article_detail_url,
-                article_title=article_title,
-                comment_count=comment_count,
-                favor_count=favor_count,
-                nick_name=nick_name,
-                _table=TableEnum.article_list_table.value["value"],
-                # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
+                # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
-            yield ArticleMongoItem
+            self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
+
+            # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
+            # 此时更适合：
+            #    1.mysql 添加唯一索引去重（本库会根据 on duplicate key update 更新），
+            #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
+            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
+            # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
+            try:
+                save_table = TableEnum.article_list_table.value["value"]
+                sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
+                df = pandas.read_sql(sql, self.mysql_engine)
+
+                # 如果为空，说明此数据不存在于数据库，则新增
+                if df.empty:
+                    yield ArticleInfoItem
+
+                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
+                else:
+                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
+
+            except Exception as e:
+                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
+                    yield ArticleInfoItem
+                else:
+                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。
@@ -191,29 +207,29 @@ class DemoOneSpider(AyuSpider):
 
 **对以上 `Item` 相关信息解释：**
 
-- 先导入所需 `Item`
-  - `mysql` 场景导入 `MysqlDataItem`
-  - `mongo` 场景导入 `MongoDataItem`
+- 先导入所需 `Item`: `AyuItem`
 - 构建对应场景的 `Item`
-  - `MysqlDataItem` 构建 `Mysql` 存储场景
-  - `MongoDataItem` 构建 `MongoDB` 存储场景
+  - `Mysql` 存储场景需要配置 `_table` 参数
+  - `MongoDB` 存储场景可能会需要 `_mongo_update_rule` 来设置去重的更新条件
 - 最后 `yield` 对应 `item` 即可
 
 ## yield item
 
-> 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即 `ScrapyClassicItem`)，还有就是本库推荐的 `MysqlDataItem` 和 `MongoDataItem` 的形式。
+> 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即 `ScrapyClassicItem`)，还有就是本库推荐的 `AyuItem` 的形式。
 
 这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
 
-| item 字段              | 类型                      | 注释                                                         |
-| ---------------------- | ------------------------- | ------------------------------------------------------------ |
-| **自定义字段**         | DataItem，Any             | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
-| **_table**             | str                       | 存储至数据表或集合的名称                                     |
-| **_item_mode**         | str("Mysql" 或 "MongoDB") | 存储类型场景，不用设置此值，有默认参数。而且赋值错误时 IDE 也会提示。 |
-| **_mongo_update-rule** | dict                      | `MongoDB item` 场景下的查重规则                              |
+| item 字段              | 类型          | 注释                                                         |
+| ---------------------- | ------------- | ------------------------------------------------------------ |
+| **自定义字段**         | DataItem，Any | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
+| **_table**             | str           | 存储至数据表或集合的名称。                                   |
+| **_mongo_update-rule** | dict          | `MongoDB item` 场景下的查重规则。                            |
+| **file_url**           | DataItem，Any | `FilesDownloadPipeline` 文件下载场景时需要的下载链接参数。   |
+| **file_format**        | DataItem，Any | `FilesDownloadPipeline` 文件下载场景时需要的下载文件格式参数。 |
 
 注，对以上表格中内容进行扩充解释：
 
+- `file_url`，`file_format` 的字段只有在使用文件下载的场景时才需要设置，且对应的保存名称也会以 `_filename` 的新增字段添加到 `AyuItem` 中。
 - 自定义字段使用示例请在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/intro/tutorial.html) 中查看。
 
 ## 自定义 Item 字段和实现 Item Loaders

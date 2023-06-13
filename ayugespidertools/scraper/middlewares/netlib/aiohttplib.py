@@ -4,6 +4,7 @@ from typing import Optional, Union
 import aiohttp
 import scrapy
 from aiohttp.connector import BaseConnector
+from itemadapter import ItemAdapter
 from scrapy.http import HtmlResponse
 from scrapy.utils.python import global_object_name
 
@@ -41,29 +42,30 @@ class AiohttpDownloaderMiddleware:
             spider: scrapy spider
 
         Returns:
-            retryreq: 重试的 request 对象
+            retry_req: 重试的 request 对象
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
         if retries <= self.retry_times:
-            logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
-            retryreq = request.copy()
-            retryreq.meta["retry_times"] = retries
-            retryreq.dont_filter = True
-            # 优先级逐级降低，以防堆积
-            retryreq.priority = request.priority + self.priority_adjust
+            return self._retry_with_limit(request, retries, reason, stats)
 
-            if isinstance(reason, Exception):
-                reason = global_object_name(reason.__class__)
+        stats.inc_value("retry/max_reached")
+        logger.error(f"Gave up retrying {request} (failed {retries} times): {reason}")
 
-            stats.inc_value("retry/count")
-            stats.inc_value(f"retry/reason_count/{reason}")
-            return retryreq
-        else:
-            stats.inc_value("retry/max_reached")
-            logger.error(
-                f"Gave up retrying {request} (failed {retries} times): {reason}"
-            )
+    def _retry_with_limit(self, request, retries, reason, stats):
+        logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
+        retry_req = request.copy()
+        retry_req.meta["retry_times"] = retries
+        retry_req.dont_filter = True
+        # 优先级逐级降低，以防堆积
+        retry_req.priority = request.priority + self.priority_adjust
+
+        if isinstance(reason, Exception):
+            reason = global_object_name(reason.__class__)
+
+        stats.inc_value("retry/count")
+        stats.inc_value(f"retry/reason_count/{reason}")
+        return retry_req
 
     def _get_args(self, key: str):
         """
@@ -220,7 +222,7 @@ class AiohttpDownloaderMiddleware:
         elif self.timeout is not None:
             _timeout_obj = aiohttp.ClientTimeout(total=self.timeout)
 
-        aio_request_args = ToolsForAyu.convert_items_to_dict(item=aiohttp_req_args)
+        aio_request_args = ItemAdapter(aiohttp_req_args)
         status_code, html_content = await self._request_by_aiohttp(
             timeout=_timeout_obj,
             aio_request_args=aio_request_args,

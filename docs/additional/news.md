@@ -1,5 +1,33 @@
 # Release notes
 
+## AyugeSpiderTools 3.3.0 (2023-06-21)
+
+### Deprecation removals
+
+- 优化了 `Item` 体验，升级为 `AyuItem`，使用更方便，但注意与旧版本写法并不兼容：
+  - 删除了 `MysqlDataItem` 实现。
+  - 删除了 `MongoDataItem` 实现。
+  - 增加了 `AyuItem` 参数以方便开发和简化 `pipelines` 结构，新示例请查看 `DemoSpider` 项目或 `readthedocs` 文档对应内容。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 添加文件下载的示例，具体内容及示例请查看 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/topics/pipelines.html#mq) 上对应内容，具体案例请查看 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的 `demo_file` 项目。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 升级依赖库中 `numpy` 和 `loguru` 版本，避免其漏洞警告提示。 
+- 更新对应的模板生成示例，简化一些不常用的配置即注释等。
+
+<hr/>
+
 ## AyugeSpiderTools 3.2.0 (2023-06-07)
 
 ### Deprecation removals
