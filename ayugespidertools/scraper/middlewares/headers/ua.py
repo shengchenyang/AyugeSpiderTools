@@ -32,7 +32,7 @@ class RandomRequestUaMiddleware:
         return s
 
     def spider_opened(self, spider):
-        # 带权重的 ua 列表，将比较常用的 ua 标识的权重设置高一点。这里是根据 fake_useragent 库中的打印信息来规划权重的。
+        # 带权重的 ua 列表，这里是根据 fake_useragent 库中的打印信息来规划权重的。
         ua_arr = [
             {"explorer": "opera", "weight": 16},
             {"explorer": "safari", "weight": 32},
@@ -46,5 +46,4 @@ class RandomRequestUaMiddleware:
 
     def process_request(self, request, spider):
         # 根据权重来获取随机请求头 ua 信息
-        if curr_ua := self.get_random_ua_by_weight():
-            request.headers.setdefault(b"User-Agent", curr_ua)
+        request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())

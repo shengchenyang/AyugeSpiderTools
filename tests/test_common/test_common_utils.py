@@ -1,8 +1,12 @@
 import json
 
+from scrapy.http.request import Request
+from scrapy.http.response.text import TextResponse
+
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.common.utils import ToolsForAyu
-from tests import CONSUL_CONFIG
+from tests import CONSUL_CONFIG, tests_dir
 
 json_data_example = {
     "code": "0",
@@ -51,6 +55,10 @@ json_data_example = {
     "status": True,
 }
 
+with open(f"{tests_dir}/docs/txt/baidu_pagesource.html", "r", encoding="utf-8") as f:
+    body = f.read()
+_response = TextResponse(url="https://top.baidu.com", body=body, encoding="utf-8")
+
 
 def test_get_kvs_detail_by_consul():
     res = ToolsForAyu.get_kvs_detail_by_consul(
@@ -71,7 +79,54 @@ def test_get_conf_by_consul():
 
 
 def test_extract_with_css():
-    pass
+    content_type = ToolsForAyu.extract_with_css(
+        response=_response,
+        query="div.side-title_1wfo5.c-theme-color::text",
+    )
+    assert content_type == "热搜榜"
+    title_lst = ToolsForAyu.extract_with_css(
+        response=_response,
+        query="div.c-single-text-ellipsis::text",
+        get_all=True,
+    )
+    assert len(title_lst) == 31
+    no_div_element = ToolsForAyu.extract_with_css(
+        response=_response,
+        query="div.no-this-div::text",
+    )
+    assert no_div_element == ""
+    no_div_element_lst = ToolsForAyu.extract_with_css(
+        response=_response,
+        query="div.no-this-div::text",
+        get_all=True,
+    )
+    assert no_div_element_lst == []
+
+
+def test_extract_with_xpath():
+    content_type = ToolsForAyu.extract_with_xpath(
+        response=_response,
+        query="//div[@class='side-title_1wfo5 c-theme-color']/text()",
+    )
+    print("content_type:", content_type)
+    assert content_type == "热搜榜"
+    title_lst = ToolsForAyu.extract_with_xpath(
+        response=_response,
+        query="//div[@class='c-single-text-ellipsis']/text()",
+        get_all=True,
+    )
+    assert len(title_lst) == 31
+    no_div_element = ToolsForAyu.extract_with_xpath(
+        response=_response,
+        query="//div[@class='no-this-div']/text()",
+    )
+    assert no_div_element == ""
+    no_div_element_lst = ToolsForAyu.extract_with_xpath(
+        response=_response,
+        query="//div[@class='no-this-div']/text()",
+        get_all=True,
+    )
+    assert no_div_element_lst == []
 
 
 def test_extract_with_json():
@@ -126,3 +181,39 @@ def test_extract_with_json_rules():
     except Exception as e:
         # 'int' object has no attribute 'get'
         print("err2", e)
+
+
+def test_get_collate_by_charset():
+    charset_collate_map = {
+        "utf8mb4": "utf8mb4_general_ci",
+        "utf8": "utf8_general_ci",
+        "gbk": "gbk_chinese_ci",
+        "latin1": "latin1_swedish_ci",
+        "utf16": "utf16_general_ci",
+        "utf16le": "utf16le_general_ci",
+        "cp1251": "cp1251_general_ci",
+        "euckr": "euckr_korean_ci",
+        "greek": "greek_general_ci",
+    }
+    # sourcery skip: no-loop-in-tests
+    for charset, collate in charset_collate_map.items():
+        _mysql_c = MysqlConf(host="", port=0, user="", password="", charset=charset)
+        assert ToolsForAyu.get_collate_by_charset(mysql_conf=_mysql_c) == collate
+
+
+def test_first_not_none():
+    data_lst = [None, "", False, "data"]
+    res = ToolsForAyu.first_not_none(data_lst)
+    assert res == ""
+
+
+def test_get_dict_form_scrapy_req_headers():
+    _headers = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+    scrapy_headers = Request(url="https://www.baidu.com", headers=_headers).headers
+    res = ToolsForAyu.get_dict_form_scrapy_req_headers(scrapy_headers=scrapy_headers)
+    assert res == _headers
