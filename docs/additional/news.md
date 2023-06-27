@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.3.1 (2023-06-29)
+
+### Deprecation removals
+
+- 无。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 优化 `item` 使用体验，完善功能及对应文档内容，具体请查看 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/topics/items.html) `item` 部分。
+
+<hr/>
+
 ## AyugeSpiderTools 3.3.0 (2023-06-21)
 
 ### Deprecation removals

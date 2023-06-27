@@ -11,7 +11,7 @@
 
 > 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
 
-本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中下划线开头的参数为必须参数，需要自定义（但 IDE 会提示参数的，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
+本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，需要自定义（但 IDE 有参数提示，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
 
 ```python
 def parse(self, response):
@@ -35,12 +35,13 @@ def parse(self, response):
         # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
+
+# 其实，以上可以只赋值一次 AyuItem ，然后在 ITEM_PIPELINES 中激活对应的 pipelines 即可，这里是为了方便展示功能。
 ```
 
 以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 即为存储至库中字段，`value` 为存储内容。
-其实，以上可以只赋值一次 `AyuItem` ，然后在 `ITEM_PIPELINES` 中激活对应的 `pipelines` 即可，这里是为了方便展示功能。
 
-当然，目前也支持动态赋值，但是我不推荐使用，直接按照上个方式即可：
+当然，目前也支持动态赋值，但我还是推荐直接创建好 `AyuItem` ，方便管理：
 
 ```python
  def parse(self, response):
@@ -55,23 +56,80 @@ def parse(self, response):
 另外，本库的 `item` 提供类型转换，以方便后续的各种使用场景：
 
 ```python
-# 将本库 Item 转为 dict 的方法
+# 将本库 AyuItem 转为 dict 的方法
 item_dict = mdi.asdict()
-# 将本库 Item 转为 scrapy Item 的方法
+# 将本库 AyuItem 转为 scrapy Item 的方法
 item = mdi.asitem()
+```
+
+## AyuItem 使用详解
+
+> 详细介绍 `AyuItem` 支持的使用方法：
+
+创建 `AyuItem` 实例：
+
+```python
+item = AyuItem(_table="ta")
+```
+
+获取字段：
+
+```python
+>>> item._table
+'ta'
+>>> item["_table"]
+'ta'
+>>> 
+>>> # 注意：以上两种风格都可以。
+```
+
+添加 / 修改字段（不存在则创建，存在则修改）：
+
+```python
+>>> item._table = "tab"
+>>> item["title"] = "tit"
+>>>
+>>> # 也可通过 add_field 添加字段，但不能重复添加相同字段
+>>> item.add_field("num", 10)
+>>>
+>>> [ item._table, item["title"], item["num"] ]
+['tab', 'tit', 10]
+>>>
+>>> 注：以上几种风格可以任选一个自己喜欢的。
+```
+
+类型转换：
+
+```python
+>>> # 内置转为 dict 和 scrapy Item 的方法
+>>>
+>>> item.asdict()
+{'title': 'tit', '_table': 'tab', 'num': 10}
+>>>
+>>> type(item.asitem())
+<class 'ayugespidertools.items.ScrapyItem'>
+```
+
+删除字段：
+
+```python
+>>> # 删除字段：
+>>>
+>>> del item["title"]
+>>> item
+{'_table': 'tab', 'num': 10}
 ```
 
 ## 使用示例
 
 > 只需要在 `yield item` 时，按需提前导入 `AyuItem`，将所有的存储字段和场景补充字段全部添加完整即可。
 
-以本库模板中的 `basic.tmpl` 为例：
+`AyuItem` 在 `spider` 中常用的基础使用方法示例，以本库模板中的 `basic.tmpl` 为例来作解释：
 
 ```python
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 import pandas
-from DemoSpider.settings import logger
 from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.utils import ToolsForAyu
@@ -96,16 +154,9 @@ class DemoOneSpider(AyuSpider):
     name = 'demo_one'
     allowed_domains = ['csdn.net']
     start_urls = ['https://www.csdn.net/']
-
     # 数据库表的枚举信息
     custom_table_enum = TableEnum
-    # 初始化配置的类型
-    settings_type = 'debug'
     custom_settings = {
-        # scrapy 日志等级配置
-        'LOG_LEVEL': 'DEBUG',
-        # 以 loguru 来管理日志，本库会在 settings 中生成规则示例，可自行修改。也可不配置
-        'LOGURU_CONFIG': logger,
         'ITEM_PIPELINES': {
             # 激活此项则数据会存储至 Mysql
             'ayugespidertools.pipelines.AyuFtyMysqlPipeline': 300,

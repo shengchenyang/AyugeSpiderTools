@@ -1,21 +1,37 @@
+import pytest
 from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
 from scrapy.loader import ItemLoader
 
+from ayugespidertools.common.typevars import EmptyKeyError, FieldAlreadyExistsError
 from ayugespidertools.items import AyuItem, DataItem, ScrapyItem
+
+cur_item = AyuItem(
+    title="t",
+    _table="table",
+)
 
 
 def test_items_AyuItem():
-    mdi = AyuItem(_table="table")
+    mdi = AyuItem(_table="turbo")
     mdi.add_field("field1", "value1")
     mdi.add_field("field2", "value2")
-    mdi._table = "table1"
+    # 目前 add_field 不允许重复添加和设置相同字段
+    with pytest.raises(FieldAlreadyExistsError):
+        mdi.add_field("_table", "table1")
+
+    assert mdi._table == "turbo"
+    assert mdi["field1"] == "value1"
+    mdi._table = "table"
+    # 这里会创建 name 字段
+    mdi.name = "ayuge"
+
     mdi["field3"] = DataItem(key_value="field3_key", notes="key值")
     assert all(
         [
             type(mdi) == AyuItem,
-            mdi._table == "table1",
-            mdi.fields == ["field1", "field2", "field3"],
+            mdi._table == "table",
+            mdi.fields() == {"_table", "field1", "field2", "name", "field3"},
         ]
     )
 
@@ -29,11 +45,23 @@ def test_items_AyuItem():
                 "field1": "value1",
                 "field2": "value2",
                 "field3": DataItem(key_value="field3_key", notes="key值"),
-                "_table": "table1",
+                "_table": "table",
+                "name": "ayuge",
             },
         ],
     )
 
+    # 测试删除字段
+    del mdi.name
+    with pytest.raises(AttributeError):
+        _ = mdi.name
+    with pytest.raises(AttributeError):
+        del mdi.no_this_field
+    with pytest.raises(KeyError):
+        del mdi["no_this_field"]
+    assert mdi.fields() == {"_table", "field1", "field2", "field3"}
+
+    mdi.name = "ayuge"
     mdi_item = mdi.asitem()
     assert all(
         [
@@ -45,7 +73,7 @@ def test_items_AyuItem():
 
     # 另一种赋值方式
     mdi_sec = AyuItem(
-        _table="table_one",
+        _table="table",
         field1="value1",
         field2="value2",
         field3=DataItem(key_value="field3_key", notes="key值"),
@@ -56,7 +84,7 @@ def test_items_AyuItem():
             type(mdi_sec) == AyuItem,
             mdi_sec_dict
             == {
-                "_table": "table_one",
+                "_table": "table",
                 "field1": "value1",
                 "field2": "value2",
                 "field3": DataItem(key_value="field3_key", notes="key值"),
@@ -66,7 +94,7 @@ def test_items_AyuItem():
 
     # 以下是 item loaders 的使用
     test_item = AyuItem(
-        _table="table1",
+        _table="table",
         book_name=None,
     )
     mine_item = ItemLoader(item=test_item.asitem(), selector=None)
@@ -79,7 +107,7 @@ def test_items_AyuItem():
             ItemAdapter.is_item(item),
             dict(item)
             == {
-                "_table": "table1",
+                "_table": "table",
                 "book_name": "book_name_data22",
             },
         ]
@@ -87,7 +115,7 @@ def test_items_AyuItem():
 
     # 以下是包含 _mongo_update_rule 的情况
     mdi = AyuItem(
-        _table="table_third",
+        _table="table",
         _mongo_update_rule={"title": "title_data"},
         field1="value1",
     )
@@ -98,7 +126,7 @@ def test_items_AyuItem():
             type(mdi_dict) == dict,
             mdi_dict
             == {
-                "_table": "table_third",
+                "_table": "table",
                 "_mongo_update_rule": {"title": "title_data"},
                 "field1": "value1",
             },
@@ -115,7 +143,7 @@ def test_items_AyuItem():
 
     # 以下是 item loaders 的使用
     test_item = AyuItem(
-        _table="table1",
+        _table="table",
         _mongo_update_rule={"title": "title_data"},
         book_name=None,
     )
@@ -132,8 +160,21 @@ def test_items_AyuItem():
             dict(item)
             == {
                 "_mongo_update_rule": {"title": "title_data"},
-                "_table": "table1",
+                "_table": "table",
                 "book_name": "book_name_data22",
             },
         ]
     )
+
+
+def test_empty_key_error():
+    with pytest.raises(EmptyKeyError):
+        cur_item.add_field(None, "title")
+
+    with pytest.raises(EmptyKeyError):
+        cur_item.add_field("", "title")
+
+
+def test_field_already_exists_error():
+    with pytest.raises(FieldAlreadyExistsError):
+        cur_item.add_field("title", "title")
