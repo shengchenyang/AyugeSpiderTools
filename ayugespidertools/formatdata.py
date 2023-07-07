@@ -1,7 +1,7 @@
 import datetime
 import re
 import time
-from typing import Optional
+from typing import Optional, Union
 from urllib.parse import urljoin
 
 import html2text
@@ -159,19 +159,18 @@ class DataHandle:
         return int(stamp)
 
     @staticmethod
-    def timestamp_to_normal(timestamp_data: int) -> str:
+    def timestamp_to_normal(timestamp: Union[int, str]) -> str:
         """
         将时间戳转为正常时间 xxxx-xx-xx xx:xx:xx 的格式
         Args:
-            timestamp_data: 需要处理的时间格式
+            timestamp: 需要处理的时间格式
 
         Returns:
             1). 转换后的时间结果
         """
-        if len(str(timestamp_data)) > 10:
-            timestamp_data = int(str(timestamp_data[:-3]))
-
-        time_array = time.localtime(timestamp_data)
+        _timestamp = str(timestamp) if isinstance(timestamp, int) else timestamp
+        timestamp_normal = int(_timestamp[:10])
+        time_array = time.localtime(timestamp_normal)
         return time.strftime("%Y-%m-%d %H:%M:%S", time_array)
 
     @staticmethod
