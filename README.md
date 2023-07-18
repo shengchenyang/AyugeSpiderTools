@@ -16,7 +16,7 @@
 
 在使用 `Python` `Scrapy` 库开发爬虫时，免不了会重复的修改和编写 `settings.py`，`item.py`，`middlewares.py`，`pipelines.py` 和一些通用方法或脚本，但其实各个项目中的这些文件内容大致相同，那为何不把他们统一整理在一起呢。虽说可以使用 `scrapy` 的模板功能，但还是无法适配所有的开发场景。
 
-刚开始我也只是想把它用来适配 `Mysql` 存储的场景，可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发在通用场景下几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
+刚开始我也只是想把它用来适配 `Mysql` 存储的场景，使其可以自动创建相关数据库，数据表，字段注释，自动添加新添加的字段，和自动修复常见（字段编码，`Data too long`，存储字段不存在等等）的存储问题。后来不断优化和添加各种场景，使得爬虫开发在通用场景下几乎只用在意 `spider` 脚本的解析规则和 `VIT` 下的 `.conf` 配置即可，脱离无意义的重复操作。
 
 至于此库做了哪些功能，只要你熟悉 `python` 语法和 `scrapy` 库，再结合 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中的应用示例，你可以很快上手。具体的内容和注意事项也可以在 [AyugeSpiderTools readthedocs 文档](https://ayugespidertools.readthedocs.io/en/latest/) 中查看。
 
@@ -166,7 +166,7 @@ scrapy crawl <spider_name>
 
 - [x] `scrapy` 的扩展功能场景
   - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
-  - [x] 自定义模板，在 `ayugespidertools startproject <projname>` 和 `ayugespidertools genspider <spidername>` 时生成适合本库的模板文件
+  - [x] 自定义模板，在 `ayuge startproject <projname>` 和 `ayuge genspider <spidername>` 时生成适合本库的模板文件
   - [x] ~~增加根据 `nacos` 来获取配置的功能~~ -> 改为增加根据 `consul` 来获取配置的功能
   - [x] 代理中间件（独享代理、动态隧道代理）
   - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
