@@ -14,9 +14,7 @@ __all__ = [
 
 
 class FilesDownloadPipeline:
-    """
-    文件下载的 scrapy pipeline 扩展
-    """
+    """文件下载的 scrapy pipeline 扩展"""
 
     _type = "normal"
 

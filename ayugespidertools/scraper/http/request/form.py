@@ -11,9 +11,7 @@ __all__ = [
 
 
 class AiohttpFormRequest(AiohttpRequest, FormRequest):
-    """
-    使用 aiohttp 发送 FormRequest 请求
-    """
+    """使用 aiohttp 发送 FormRequest 请求"""
 
     def __init__(
         self,

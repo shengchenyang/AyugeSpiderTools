@@ -10,9 +10,7 @@ __all__ = [
 
 
 class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
-    """
-    使用 twisted 的 adbapi 实现 mongoDB 存储场景下的异步操作
-    """
+    """使用 twisted 的 adbapi 实现 mongoDB 存储场景下的异步操作"""
 
     def __init__(self, *args, **kwargs):
         super(AyuTwistedMongoPipeline, self).__init__(*args, **kwargs)

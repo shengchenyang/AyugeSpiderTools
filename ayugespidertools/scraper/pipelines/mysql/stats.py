@@ -10,9 +10,7 @@ __all__ = [
 
 
 class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
-    """
-    Mysql 存储且记录脚本运行状态的简单示例
-    """
+    """Mysql 存储且记录脚本运行状态的简单示例"""
 
     # Note: 此方法暂用于测试
     def __init__(self, env):
@@ -37,14 +35,11 @@ class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
         self.cursor = self.conn.cursor()
 
     def insert(self, data_item, table):
-        """
-        插入数据
+        """插入数据
+
         Args:
             data_item: scrapy item
             table: 存储至 mysql 的表名
-
-        Returns:
-            None
         """
         data = dataclasses.asdict(data_item)
         sql = self._get_sql_by_item(table=table, item=data)

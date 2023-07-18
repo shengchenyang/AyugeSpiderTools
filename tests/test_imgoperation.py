@@ -24,9 +24,7 @@ def test_identify_gap():
 
 
 def test_get_data_urls_by_img():
-    """
-    根据图片参数生成 Data URLs 格式数据
-    """
+    """根据图片参数生成 Data URLs 格式数据"""
     # 参数为图片全路径时
     data_urls1 = Picture.get_data_urls_by_img(
         mediatype="png", data=f"{tests_dir}/docs/image/1.png"

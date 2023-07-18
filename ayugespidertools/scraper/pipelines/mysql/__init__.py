@@ -23,9 +23,7 @@ __all__ = [
 
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
-    """
-    Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例
-    """
+    """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
     def __init__(
         self,
@@ -33,8 +31,8 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         env: str,
         record_log_to_mysql: Optional[bool] = False,
     ) -> None:
-        """
-        初始化 Mysql 链接所需要的信息
+        """初始化 Mysql 链接所需要的信息
+
         Args:
             table_enum: 数据表的枚举信息
             env: 当前程序部署环境名
@@ -72,8 +70,8 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.cursor = self.conn.cursor()
 
     def get_new_item(self, item_dict: Dict[str, Any]) -> AlterItem:
-        """
-        重新整合 item
+        """重新整合 item
+
         Args:
             item_dict: dict 类型的 item
 
@@ -109,14 +107,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         return item
 
     def insert_item(self, alter_item: AlterItem, table: str):
-        """
-        通用插入数据，将 item 数据存入 Mysql 中，item 中的 key 需要跟 Mysql 数据中的字段名称一致
+        """通用插入数据，将 item 数据存入 Mysql 中，item 中的 key 需要跟 Mysql 数据中的字段名称一致
+
         Args:
             alter_item: 经过转变后的 item
             table: 数据库表名
-
-        Returns:
-            None
         """
         if not (new_item := alter_item.new_item):
             return
@@ -167,15 +162,12 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     def table_collection_statistics(
         self, spider_name: str, database: str, crawl_time: datetime.date
     ):
-        """
-        统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
+        """统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
+
         Args:
             spider_name: 爬虫脚本名称
             database: 数据库，保存程序采集记录保存的数据库
             crawl_time: 采集时间，程序运行时间
-
-        Returns:
-            None
         """
         sql = f"""
         select concat(
@@ -204,14 +196,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     def insert_table_statistics(
         self, data: dict, table: str = "table_collection_statistics"
     ):
-        """
-        插入统计数据到表中
+        """插入统计数据到表中
+
         Args:
             data: 需要统计的入库信息
             table: 存储表的名称
-
-        Returns:
-            None
         """
         create_table_sql = f"""
         CREATE TABLE IF NOT EXISTS `{table}` (
@@ -237,14 +226,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     def insert_script_statistics(
         self, data: dict, table: str = "script_collection_statistics"
     ):
-        """
-        存储运行脚本的统计信息
+        """存储运行脚本的统计信息
+
         Args:
             data: 需要插入的 log 信息
             table: 存储表的名称
-
-        Returns:
-            None
         """
         self.cursor.execute(
             f"""
@@ -273,14 +259,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self._log_record(sql=sql, data=tuple(data.values()) * 2)
 
     def _log_record(self, sql: str, data: Tuple) -> None:
-        """
-        执行日志记录的 sql 语句
+        """执行日志记录的 sql 语句
+
         Args:
             sql: sql 语句
             data: sql 语句中的参数
-
-        Returns:
-            None
         """
         try:
             if self.cursor.execute(sql, data):

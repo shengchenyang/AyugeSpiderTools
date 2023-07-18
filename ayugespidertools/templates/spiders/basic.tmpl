@@ -35,9 +35,7 @@ class $classname(AyuSpider):
     mysql_engine_enabled = True
 
     def start_requests(self):
-        """
-        get 请求首页，获取项目列表数据
-        """
+        """get 请求首页，获取项目列表数据"""
         yield Request(
             url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
             callback=self.parse_first,

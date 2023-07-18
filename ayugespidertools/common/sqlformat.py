@@ -8,8 +8,7 @@ SqlModeStr = Literal["and", "or"]
 
 
 class AboutSql:
-    """
-    sql 相关处理: sql 语句的管理方法，
+    """sql 相关处理: sql 语句的管理方法，
     这里的 sql 拼接只能做到最简单的逻辑，如果需要灵活或稍复杂的情况，请参考 directsql, python-sql, pypika
     或 pymilk 等第三方类似功能库的实现方法，以后会再优化此场景
     """
@@ -23,8 +22,8 @@ class AboutSql:
         order_by: Optional[str] = None,
         limit: Union[bool, int] = False,
     ) -> (str, tuple):
-        """
-        根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句（适用于简单情况）
+        """根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句（适用于简单情况）
+
         Args:
             db_table: 需要查询的表名称
             key: 需要查询的关键字段
@@ -56,8 +55,8 @@ class AboutSql:
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> (str, tuple):
-        """
-        根据一些参数来生成供 pymysql 之类的库中使用的 sql 插入语句
+        """根据一些参数来生成供 pymysql 之类的库中使用的 sql 插入语句
+
         Args:
             db_table: 需要插入的表名称
             data: 需要插入的关键字段，key: 数据表字段；value: 需插入的参数名
@@ -75,8 +74,8 @@ class AboutSql:
     def update_generate(
         db_table: str, data: dict, rule: Dict[str, Any], base: SqlModeStr = "and"
     ) -> (str, tuple):
-        """
-        根据一些参数来生成供 pymysql 之类的库中使用的 sql 更新语句
+        """根据一些参数来生成供 pymysql 之类的库中使用的 sql 更新语句
+
         Args:
             db_table: 需要插入的表名称
             data: 需要更新的 key 和 value 值

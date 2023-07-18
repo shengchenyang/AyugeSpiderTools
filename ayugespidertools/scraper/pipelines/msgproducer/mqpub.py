@@ -9,9 +9,7 @@ __all__ = [
 
 
 class AyuMQPipeline:
-    """
-    消息队列发布场景的 scrapy pipeline 扩展 - pika mq
-    """
+    """消息队列发布场景的 scrapy pipeline 扩展 - pika mq"""
 
     def __init__(self):
         self.channel = None

@@ -39,9 +39,7 @@ class TableTemplate(TypedDict):
 
 @unique
 class TableEnum(Enum):
-    """
-    数据库表枚举信息示例，用于限制存储信息类的字段及值不允许重复和修改
-    """
+    """数据库表枚举信息示例，用于限制存储信息类的字段及值不允许重复和修改"""
 
     demo_table = TableTemplate(
         value="表名(eg: demo)",

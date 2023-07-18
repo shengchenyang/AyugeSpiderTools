@@ -26,9 +26,7 @@ class ScrapyItem(Item):
 
 
 class DataItem(NamedTuple):
-    """
-    用于描述 item 中字段
-    """
+    """用于描述 item 中字段"""
 
     key_value: Any
     notes: str = ""
@@ -39,9 +37,7 @@ AllDataType = Dict[str, Union[DataItem, Dict[str, Any], Any]]
 
 
 class ScrapyClassicItem(Item):
-    """
-    scrapy 经典 item 示例
-    """
+    """scrapy 经典 item 示例"""
 
     # 用于存放所有字段信息
     alldata: AllDataType = Field()
@@ -60,16 +56,12 @@ class ItemMeta(ABCMeta):
             key: Union[str, Any],
             value: Any = None,
         ) -> None:
-            """
-            动态添加字段方法
+            """动态添加字段方法
 
             Args:
                 self: self
                 key: 需要添加的字段名，这里类型为 str，为了消除 ide 的警告才加上了 Any
                 value: 需要添加的字段对应的值
-
-            Returns:
-                None
             """
             if not key:
                 raise EmptyKeyError()
@@ -81,9 +73,7 @@ class ItemMeta(ABCMeta):
         def _asdict(
             self,
         ) -> Dict[str, Any]:
-            """
-            将 AyuItem 转换为 dict
-            """
+            """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
             _item_dict = {key: getattr(self, key) for key in self._AyuItem__fields}
             return _item_dict
@@ -92,8 +82,7 @@ class ItemMeta(ABCMeta):
             self: Any,
             assignment: bool = True,
         ) -> ScrapyItem:
-            """
-            将 AyuItem 转换为 ScrapyItem
+            """将 AyuItem 转换为 ScrapyItem
 
             Args:
                 assignment: 是否将 AyuItem 中的值赋值给 ScrapyItem，默认为 True
@@ -116,8 +105,7 @@ class ItemMeta(ABCMeta):
 
 @dataclass
 class AyuItem(metaclass=ItemMeta):
-    """
-    用于创建和动态添加 item 字段，以及提供转换为 dict 和 ScrapyItem 的方法。
+    """用于创建和动态添加 item 字段，以及提供转换为 dict 和 ScrapyItem 的方法。
 
     Attributes:
         _table: 数据库表名。
@@ -160,8 +148,7 @@ class AyuItem(metaclass=ItemMeta):
         _mongo_update_rule: Dict[str, Any] = None,
         **kwargs,
     ):
-        """
-        初始化 AyuItem 实例
+        """初始化 AyuItem 实例
 
         Args:
             _table: 数据库表名。

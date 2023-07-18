@@ -37,9 +37,7 @@ SpiderConf = TypeVar(
 class Product(ABC):
     @abstractmethod
     def get_conn_conf(self) -> Union[SpiderConf, None]:
-        """
-        获取各个工具链接配置信息
-        """
+        """获取各个工具链接配置信息"""
         pass
 
 

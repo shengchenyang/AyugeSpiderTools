@@ -13,9 +13,7 @@ __all__ = [
 
 
 class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
-    """
-    通过 aiomysql 实现异步写入 Mysql 数据库的普通版本
-    """
+    """通过 aiomysql 实现异步写入 Mysql 数据库的普通版本"""
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
@@ -61,9 +59,7 @@ class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
 
 
 class AsyncMysqlPipeline(AyuMysqlPipeline):
-    """
-    通过 aiomysql 实现异步写入 Mysql 数据库的连接池版本
-    """
+    """通过 aiomysql 实现异步写入 Mysql 数据库的连接池版本"""
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"

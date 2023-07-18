@@ -21,9 +21,7 @@ __all__ = [
 
 
 class AiohttpDownloaderMiddleware:
-    """
-    Downloader middleware handling the requests with aiohttp
-    """
+    """Downloader middleware handling the requests with aiohttp"""
 
     def __init__(self):
         self.aiohttp_args = None
@@ -34,15 +32,15 @@ class AiohttpDownloaderMiddleware:
         reason: int,
         spider: scrapy.Spider,
     ) -> Union[scrapy.Request, None]:
-        """
-        重试请求
+        """重试请求
+
         Args:
             request: scrapy request
             reason: reason
             spider: scrapy spider
 
         Returns:
-            retry_req: 重试的 request 对象
+            Union[scrapy.Request, None]: 重试的 request 对象
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -68,9 +66,7 @@ class AiohttpDownloaderMiddleware:
         return retry_req
 
     def _get_args(self, key: str):
-        """
-        根据优先级依次获取不为 None 的请求参数
-        """
+        """根据优先级依次获取不为 None 的请求参数"""
         data_lst = [
             self.aiohttp_args.get(key),
             getattr(self, key),
@@ -79,9 +75,7 @@ class AiohttpDownloaderMiddleware:
 
     @classmethod
     def from_crawler(cls, crawler):
-        """
-        初始化 middleware
-        """
+        """初始化 middleware"""
         settings = crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
         if local_aiohttp_conf := settings.get("AIOHTTP_CONFIG", {}):
@@ -123,9 +117,8 @@ class AiohttpDownloaderMiddleware:
         timeout: Optional[aiohttp.ClientTimeout] = None,
         connector: Optional[BaseConnector] = None,
     ) -> (int, str):
-        """
-        使用 aiohttp 来请求
-        ps: 后续考虑是否需要使用 aiohttp.ClientSession 来处理 cookies
+        """使用 aiohttp 来请求
+
         Args:
             aio_request_args: 普通的 aiohttp 请求参数
             timeout: aiohttp.ClientSession 的 timeout 参数
@@ -147,9 +140,7 @@ class AiohttpDownloaderMiddleware:
             return 504, ""
 
     async def _process_request(self, request, spider):
-        """
-        使用 aiohttp 来 process spider
-        """
+        """使用 aiohttp 来 process spider"""
         aiohttp_options = request.meta.get("aiohttp")
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
@@ -248,8 +239,8 @@ class AiohttpDownloaderMiddleware:
         )
 
     def process_request(self, request, spider):
-        """
-        使用 aiohttp 来 process request
+        """使用 aiohttp 来 process request
+
         Args:
             request: AiohttpRequest 对象
             spider: scrapy spider
@@ -263,9 +254,7 @@ class AiohttpDownloaderMiddleware:
         pass
 
     def spider_closed(self):
-        """
-        当 spider closed 时调用
-        """
+        """当 spider closed 时调用"""
         return ReuseOperation.as_deferred(self._spider_closed())
 
 

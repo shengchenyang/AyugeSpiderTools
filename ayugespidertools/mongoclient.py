@@ -9,9 +9,7 @@ __all__ = [
 
 
 class MongoDbBase:
-    """
-    mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）
-    """
+    """mongodb 数据库的相关操作（此功能暂时为残废状态，请参考 pymilk 库中的实现）"""
 
     def __init__(
         self,
@@ -23,8 +21,8 @@ class MongoDbBase:
         database: str = None,
         connect_style: str = None,
     ) -> None:
-        """
-        初始化 mongo 连接句柄
+        """初始化 mongo 连接句柄
+
         Args:
             user: 用户名
             password: 用户对应的密码
@@ -66,16 +64,16 @@ class MongoDbBase:
             self.db = self.init_db(database)
 
     def get_state(self):
-        """
-        获取 mongoDB 链接状态
+        """获取 mongoDB 链接状态
+
         Returns:
             1). bool: 链接是否正常
         """
         return all([self.conn is not None, self.db is not None])
 
     def init_db(self, database: str):
-        """
-        指定链接的数据库为 database
+        """指定链接的数据库为 database
+
         Args:
             database: 链接的目标数据库
 
@@ -85,8 +83,8 @@ class MongoDbBase:
         return self.conn[database]
 
     def insert_one(self, collection: str, data: dict) -> str:
-        """
-        插入一条数据
+        """插入一条数据
+
         Args:
             collection: 集合名称
             data: 插入的数据
@@ -100,8 +98,8 @@ class MongoDbBase:
         return ""
 
     def insert_many(self, collection: str, data: List[Dict]):
-        """
-        批量插入
+        """批量插入
+
         Args:
             collection: 集合名称
             data: 插入的数据数组
@@ -115,8 +113,8 @@ class MongoDbBase:
         return ""
 
     def update(self, collection, data):
-        """
-        更新
+        """更新
+
         Args:
             collection: 集合名称
             data: 更新的数据，{key:[old_data,new_data]}
@@ -138,8 +136,8 @@ class MongoDbBase:
         return 0
 
     def find(self, collection, condition, column: Optional[dict] = None):
-        """
-        查询
+        """查询
+
         Args:
             collection: 集合名称
             condition: 查询条件
@@ -175,8 +173,8 @@ class MongoDbBase:
         )
 
     def update_super(self, collection: str, select_dict: dict, set_dict: dict):
-        """
-        更新
+        """更新
+
         Args:
             collection: 需要更新的集合
             select_dict: 更新的条件
@@ -215,8 +213,8 @@ class MongoDbBase:
         return {"_id": _id, "md5": md5}
 
     def upload(self, file_name, _id, content_type, collection, file_data):
-        """
-        上传文件
+        """上传文件
+
         Args:
             file_name: 上传至 mongoDB 的 GridFS 存储桶里的文件名
             _id: 唯一 id，雪花 id，用来标识此上传任务和图片的唯一

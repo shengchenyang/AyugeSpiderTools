@@ -22,26 +22,24 @@ __all__ = [
 
 
 class ReuseOperation:
-    """
-    用于存放经常复用的一些操作
-    """
+    """用于存放经常复用的一些操作"""
 
     @staticmethod
     def as_deferred(f):
-        """
-        transform a Twisted Deferred to an Asyncio Future
+        """transform a Twisted Deferred to an Asyncio Future
+
         Args:
             f: async function
 
         Returns:
-            1).Deferred
+            1). Deferred
         """
         return Deferred.fromFuture(asyncio.ensure_future(f))
 
     @staticmethod
     def get_conf_by_settings(vit_dir: str, inner_settings: Settings) -> Settings:
-        """
-        通过 settings 获取所需配置，并将其添加到 inner_settings 中
+        """通过 settings 获取所需配置，并将其添加到 inner_settings 中
+
         Args:
             vit_dir: 配置文件所在的目录
             inner_settings: scrapy 的 inner_settings
@@ -144,9 +142,9 @@ class ReuseOperation:
     def item_to_dict(
         item: Union[AyuItem, ScrapyItem, dict]
     ) -> Union[ItemAdapter, dict]:
-        """
-        将 item 转换为 dict 类型
+        """将 item 转换为 dict 类型；
         将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
+
         Args:
             item: spider 中的 yield 的 item
 
@@ -157,8 +155,8 @@ class ReuseOperation:
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
-        """
-        判断 x 是否为 namedtuple 类型
+        """判断 x 是否为 namedtuple 类型
+
         Args:
             x: 需要判断的参数
 
@@ -169,8 +167,8 @@ class ReuseOperation:
 
     @staticmethod
     def get_files_from_path(path: str) -> list:
-        """
-        获取 path 文件夹下的所有文件，而且输出以 path 为根目录的相对路径
+        """获取 path 文件夹下的所有文件，并输出以 path 为根目录的相对路径
+
         Args:
             path: 需要判断的文件夹路径
 
@@ -181,8 +179,8 @@ class ReuseOperation:
 
     @staticmethod
     def get_bytes_by_file(file_path: str) -> bytes:
-        """
-        获取媒体文件的 bytes 内容
+        """获取媒体文件的 bytes 内容
+
         Args:
             file_path: 对应文件的路径
 
@@ -198,8 +196,8 @@ class ReuseOperation:
         bg: Union[bytes, str],
         tp: Union[bytes, str],
     ) -> (np.ndarray, np.ndarray):
-        """
-        用 opencv 读取图片数据
+        """用 opencv 读取图片数据
+
         Args:
             bg: 背景图片信息
             tp: 滑块图
@@ -228,8 +226,8 @@ class ReuseOperation:
 
     @staticmethod
     def random_weight(weight_data: list):
-        """
-        带权重的随机取值，即在带权重的列表数据中根据权重随机取一个值
+        """带权重的随机取值，即在带权重的列表数据中根据权重随机取一个值
+
         Args:
             weight_data: 带权重的列表信息，示例：
                 [{'username': 'xxxx', 'password': '******', 'weight': 8}, ...]
@@ -253,8 +251,8 @@ class ReuseOperation:
 
     @classmethod
     def is_dict_meet_min_limit(cls, dict_conf: dict, key_list: List[str]) -> bool:
-        """
-        判断 dict_conf 是否满足 key_list 中的 key 值限定
+        """判断 dict_conf 是否满足 key_list 中的 key 值限定
+
         Args:
             dict_conf: 需要判断的参数
             key_list: dict_conf 中需要包含的 key 值列表，示例为：['proxy', 'username', 'password']
@@ -273,8 +271,8 @@ class ReuseOperation:
         dict_conf: dict,
         keys: List[str],
     ) -> dict:
-        """
-        获取 dict_conf 中的含有 keys 的 key 的字段
+        """获取 dict_conf 中的含有 keys 的 key 的字段
+
         Args:
             dict_conf: 需要处理的参数
             keys: 需要取的 key 值列表
@@ -291,8 +289,8 @@ class ReuseOperation:
 
     @classmethod
     def get_items_except_keys(cls, dict_conf, keys: List[str]) -> dict:
-        """
-        获取 dict_conf 中的不含有 keys 的 key 的字段
+        """获取 dict_conf 中的不含有 keys 的 key 的字段
+
         Args:
             dict_conf: 需要处理的参数
             keys: 需要排除的 key 值列表
@@ -304,14 +302,11 @@ class ReuseOperation:
 
     @classmethod
     def create_database(cls, mysql_conf: MysqlConf) -> None:
-        """
-        创建数据库
-        由于这是在连接数据库，报数据库不存在错误时的场景，则需要新建(不指定数据库)连接创建好所需数据库即可
+        """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
+        新建(不指定数据库)连接创建好所需数据库即可
+
         Args:
             mysql_conf: pymysql 的数据库连接配置
-
-        Returns:
-            None
         """
         conn = pymysql.connect(
             user=mysql_conf.user,
@@ -331,8 +326,8 @@ class ReuseOperation:
 
     @classmethod
     def dict_keys_to_lower(cls, deal_dict: dict) -> dict:
-        """
-        将 dict 中 str 类型的 key 值变成小写
+        """将 dict 中 str 类型的 key 值变成小写
+
         Args:
             deal_dict: 需要处理的 dict
 
@@ -354,8 +349,8 @@ class ReuseOperation:
 
     @classmethod
     def dict_keys_to_upper(cls, deal_dict: dict) -> dict:
-        """
-        将 dict 中 str 类型的 key 值变成大写
+        """将 dict 中 str 类型的 key 值变成大写
+
         Args:
             deal_dict: 需要处理的 dict
 
@@ -377,13 +372,13 @@ class ReuseOperation:
 
     @classmethod
     def get_consul_conf(cls, settings: Settings) -> dict:
-        """
-        获取项目中的 consul 配置，且要根据项目整体情况来取出满足最少要求的 consul 配置
+        """获取项目中的 consul 配置，且要根据项目整体情况来取出满足最少要求的 consul 配置
+
         Args:
             settings: scrapy 的 settings 信息
 
         Returns:
-            consul_conf_dict_min: 满足要求的最少要求的 consul 配置
+            1). 满足最少要求的 consul 配置
         """
         consul_conf_dict = settings.get("CONSUL_CONFIG", {})
         return cls.get_items_by_keys(
@@ -392,13 +387,13 @@ class ReuseOperation:
 
     @classmethod
     def judge_str_is_json(cls, judge_str: str) -> bool:
-        """
-        判断字符串是否为 json 格式
+        """判断字符串是否为 json 格式
+
         Args:
             judge_str: 需要判断的字符串
 
         Returns:
-            1）.是否为 json 格式
+            1). 是否为 json 格式
         """
         if not isinstance(judge_str, str):
             return False
@@ -412,8 +407,8 @@ class ReuseOperation:
 
     @staticmethod
     def get_ck_dict_from_headers(headers_ck_str: str) -> dict:
-        """
-        从 headers 中的 ck str 格式转化为 dict 格式
+        """从 headers 中的 ck str 格式转化为 dict 格式
+
         Args:
             headers_ck_str: request headers ck 的 str 格式
 
@@ -429,8 +424,8 @@ class ReuseOperation:
 
     @staticmethod
     def get_req_dict_from_scrapy(req_body_data_str: str) -> dict:
-        """
-        将 scrapy 请求中的 body 对象转为 dict 格式
+        """将 scrapy 请求中的 body 对象转为 dict 格式
+
         Args:
             req_body_data_str: scrapy 中的 body 参数
 
@@ -443,26 +438,26 @@ class ReuseOperation:
 
     @staticmethod
     def get_array_dimension(array: Union[frozenset, list, set, tuple]) -> int:
-        """
-        获取 array 的维度
+        """获取 array 的维度
+
         Args:
             array: 数组
 
         Returns:
-            1).层级数
+            1). 层级数
         """
         # 其实直接返回 len(array) 即可
         return len(np.array(array).shape)
 
     @classmethod
     def get_array_depth(cls, array: list) -> int:
-        """
-        获取 array 的最大层级，深度
+        """获取 array 的最大层级，深度
+
         Args:
             array: 数组
 
         Returns:
-            1).最大层级，深度
+            1). 最大层级，深度
         """
 
         """1 + max(map(depthCount,x)) if x and isinstance(x,list) else 0"""

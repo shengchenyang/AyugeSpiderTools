@@ -9,9 +9,7 @@ __all__ = [
 
 
 class ExclusiveProxyDownloaderMiddleware:
-    """
-    独享代理中间件
-    """
+    """独享代理中间件"""
 
     def __init__(self):
         self.proxy_url = None

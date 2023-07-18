@@ -8,7 +8,7 @@
 # 日志管理
 LOG_FILE = f"{LOG_DIR}/DemoSpider.log"
 
-# 配置中 DemoSpider 是与 ayugespidertools startproject <project_name> 中的项目名称对应的
+# 配置中 DemoSpider 是与 ayuge startproject <project_name> 中的项目名称对应的
 ```
 
 ## slog 日志

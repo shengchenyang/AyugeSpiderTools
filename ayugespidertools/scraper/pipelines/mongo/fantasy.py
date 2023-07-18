@@ -8,9 +8,7 @@ __all__ = [
 
 
 class AyuFtyMongoPipeline(MongoDbBase):
-    """
-    MongoDB 存储场景的 scrapy pipeline 扩展
-    """
+    """MongoDB 存储场景的 scrapy pipeline 扩展"""
 
     def __init__(self):
         self.conn = None
@@ -41,10 +39,10 @@ class AyuFtyMongoPipeline(MongoDbBase):
             self.conn.close()
 
     def process_item(self, item, spider):
-        """
-        mongoDB 存储的方法，item["mongo_update_rule"] 用于存储查询条件，如果查询数据存在的话就更新，不存在的话就插入；
-        如果没有 mongo_update_rule 则每次都新增
-        此场景不需要像 Mysql 一样依赖备注来生成字段注释
+        """mongoDB 存储的方法，item["mongo_update_rule"] 用于存储查询条件，如果查询数据存在的话就更新，不存在
+        的话就插入；如果没有 mongo_update_rule 字段则每次都新增。
+        另外，此场景不需要像 Mysql 一样依赖备注来生成字段注释
+
         Args:
             item: scrapy item
             spider: scrapy spider

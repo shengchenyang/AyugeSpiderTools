@@ -39,26 +39,20 @@ class TestCrawl(TestCase):
 
     @defer.inlineCallbacks
     def test_from_crawler_record_log_to_mysql(self):
-        """
-        测试从爬虫 AyugeSpider(即 spider) 中记录日志到 mysql 的方法
-        """
+        """测试从爬虫 AyugeSpider(即 spider) 中记录日志到 mysql 的方法"""
         log, _, stats = yield self._run_spider(RecordLogToMysqlSpider)
         # 此测试会经过 test_table_exists 检测目标数据表是否已存在
         self.assertIn("Got response 200", str(log))
 
     @defer.inlineCallbacks
     def test_My_AyuCrawlSpider(self):
-        """
-        测试 AyuCrawlSpider，对应 scrapy 的 CrawlSpider
-        """
+        """测试 AyuCrawlSpider，对应 scrapy 的 CrawlSpider"""
         log, _, stats = yield self._run_spider(MyAyuCrawlSpider)
         self.assertIn("book_name: ", str(log))
 
     @defer.inlineCallbacks
     def test_DemoAiohttpSpider(self):
-        """
-        测试 DemoAiohttpSpider 的 aiohttp 下载器功能
-        """
+        """测试 DemoAiohttpSpider 的 aiohttp 下载器功能"""
         log, _, stats = yield self._run_spider(DemoAiohttpSpider)
         self.assertIn("get meta_data: ", str(log))
         self.assertIn("post first meta_data: ", str(log))
@@ -66,8 +60,7 @@ class TestCrawl(TestCase):
 
 
 def test_table_exists(mysql_db_cursor):
-    """
-    检测目标数据表是否已存在，这是 test_from_crawler_record_log_to_mysql 测试的结果判断。
+    """检测目标数据表是否已存在，这是 test_from_crawler_record_log_to_mysql 测试的结果判断。
     用于查看脚本运行情况统计是否正常建表入库。
     """
     sql_front = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = "

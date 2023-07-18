@@ -12,10 +12,8 @@ __all__ = [
 
 
 class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
-    """
-    使用 twisted 的 adbapi 实现 Mysql 存储场景下的异步操作
-    注意：
-        1. 推荐先用 AyuFtyMysqlPipeline 使用稳定后，再迁移至此管道
+    """使用 twisted 的 adbapi 实现 Mysql 存储场景下的异步操作
+    注意：推荐先用 AyuFtyMysqlPipeline 使用稳定后，再迁移至此管道
     """
 
     def __init__(self, *args, **kwargs):

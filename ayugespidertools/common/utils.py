@@ -32,9 +32,7 @@ ConsulConfNameStr = Literal[
 
 
 class ToolsForAyu:
-    """
-    这里用于存放框架所依赖的方法
-    """
+    """这里用于存放框架所依赖的方法"""
 
     @classmethod
     def get_kvs_detail_by_consul(
@@ -42,14 +40,14 @@ class ToolsForAyu:
         url: str,
         token: Optional[str] = None,
     ) -> str:
-        """
-        获取 consul 的 key_values 的详细信息
+        """获取 consul 的 key_values 的详细信息
+
         Args:
             token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
             url: 当前 consul 所需配置的 url
 
         Returns:
-            conf_value: consul 的 group 下 key_values 的详细信息
+            1). consul 的 group 下 key_values 的详细信息
         """
         url_params = urlparse(url).query
 
@@ -83,8 +81,8 @@ class ToolsForAyu:
         format: ConsulFormatStr = "json",
         token: Optional[str] = None,
     ) -> dict:
-        """
-        获取 consul 中的 mysql 配置信息
+        """获取 consul 中的 mysql 配置信息
+
         Args:
             conf_name: 需要获取的配置，本选项只有 "MYSQL" 和 "MONGODB"。
             token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
@@ -123,8 +121,8 @@ class ToolsForAyu:
     def extract_with_css(
         cls, response, query: str, get_all: bool = False, return_selector: bool = False
     ):
-        """
-        使用 scrapy 的 css 提取信息
+        """使用 scrapy 的 css 提取信息
+
         Args:
             response: scrapy response 或者是 selector 对象
             query: css 提取的规则
@@ -132,7 +130,7 @@ class ToolsForAyu:
             return_selector: 是否返回选择器对象
 
         Returns:
-            1).提取的内容
+            1). 提取的内容
         """
         if return_selector:
             return response.css(query)
@@ -146,8 +144,8 @@ class ToolsForAyu:
     def extract_with_xpath(
         cls, response, query: str, get_all: bool = False, return_selector: bool = False
     ):
-        """
-        使用 scrapy 的 xpath 提取信息
+        """使用 scrapy 的 xpath 提取信息
+
         Args:
             response: scrapy response 或者是 selector 对象
             query: css 提取的规则
@@ -155,7 +153,7 @@ class ToolsForAyu:
             return_selector: 是否返回选择器对象
 
         Returns:
-            1).提取的内容
+            1). 提取的内容
         """
         if return_selector:
             return response.xpath(query)
@@ -167,14 +165,14 @@ class ToolsForAyu:
     @classmethod
     @DataHandle.simple_deal_for_extract
     def extract_with_json(cls, json_data: dict, query: Union[str, List[str]]):
-        """
-        scrapy 中提取 json 数据遇到的情况
+        """scrapy 中提取 json 数据遇到的情况
+
         Args:
             json_data: scrapy response 响应内容中的 json 格式数据
             query: json 提取的规则
 
         Returns:
-            1).提取的内容
+            1). 提取的内容
         """
         # 如果输入的提取规则参数的格式为字符；或者参数格式是个列表，但是只含有一个元素的情况时
         if any(
@@ -196,14 +194,14 @@ class ToolsForAyu:
     def extract_with_json_rules(
         cls, json_data: dict, query_rules: List[Param.Str_Lstr]
     ):
-        """
-        当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
+        """当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
+
         Args:
             json_data: scrapy response 响应内容中的 json 格式数据
             query_rules: json 提取的规则列表
 
         Returns:
-            1).提取的内容
+            1). 提取的内容
         """
         # 先判断层级，最多为 2 层
         depth_num = ReuseOperation.get_array_depth(query_rules)
@@ -216,8 +214,8 @@ class ToolsForAyu:
 
     @staticmethod
     def get_collate_by_charset(mysql_conf: MysqlConf) -> str:
-        """
-        根据 mysql 的 charset 获取对应默认的 collate
+        """根据 mysql 的 charset 获取对应默认的 collate
+
         Args:
             mysql_conf: mysql 连接配置
 
@@ -244,8 +242,8 @@ class ToolsForAyu:
 
     @staticmethod
     def first_not_none(data_lst: List[Any]) -> Any:
-        """
-        获取列表中第一个不为 None 的值
+        """获取列表中第一个不为 None 的值
+
         Args:
             data_lst: 数据列表
 
@@ -257,13 +255,13 @@ class ToolsForAyu:
 
     @staticmethod
     def get_dict_form_scrapy_req_headers(scrapy_headers) -> dict:
-        """
-        根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
+        """根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
+
         Args:
             scrapy_headers: scrapy 的 request headers 内容
 
         Returns:
-            req_headers: 转化 dict 后的 headers 内容
+            1). 转化 dict 后的 headers 内容
         """
         return {
             str(b_key, encoding="utf-8"): str(b_value_list[0], encoding="utf-8")
@@ -276,8 +274,8 @@ class ToolsForAyu:
         mysql_engine,
         item: Param.ScrapyItems,
     ) -> Param.ScrapyItems:
-        """
-        数据入库前查询是否已存在，已存在则跳过
+        """数据入库前查询是否已存在，已存在则跳过
+
         Args:
             sql: 判断的 sql
             mysql_engine: sqlalchemy 的 create_engine 句柄

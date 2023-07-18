@@ -103,9 +103,7 @@ class TestSpider:
         assert str(record).strip() == slog_info
 
     def test_from_crawler_get_mysql_conf(self):
-        """
-        测试从爬虫 AyugeSpider(即 spider) 中获取 mysql 配置的方法
-        """
+        """测试从爬虫 AyugeSpider(即 spider) 中获取 mysql 配置的方法"""
         # 测试本地 mysql 配置
         local_mysql_conf = {
             "host": PYMYSQL_CONFIG["host"],
@@ -151,9 +149,7 @@ class TestSpider:
         assert spider.mysql_conf._asdict() == true_mysql_conf
 
     def test_from_crawler_get_mongodb_conf(self):
-        """
-        测试从爬虫 AyugeSpider(即 spider) 中获取 mongodb 配置的方法
-        """
+        """测试从爬虫 AyugeSpider(即 spider) 中获取 mongodb 配置的方法"""
         # 测试本地 mongodb 配置
         local_mongodb_conf = {
             "host": MONGODB_CONFIG["host"],

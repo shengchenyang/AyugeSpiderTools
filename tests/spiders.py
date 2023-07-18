@@ -87,14 +87,12 @@ class MyAyuCrawlSpider(AyuCrawlSpider):
 
 
 class Operations:
-    """
-    项目依赖方法
-    """
+    """项目依赖方法"""
 
     @staticmethod
     def parse_response_data(response_data: str, mark: str):
-        """
-        解析测试请求中的内容，并打印基本信息
+        """解析测试请求中的内容，并打印基本信息
+
         Args:
             response_data: 请求响应内容
             mark: 请求标识
@@ -140,9 +138,7 @@ class DemoAiohttpSpider(AyuSpider):
     }
 
     def start_requests(self):
-        """
-        get 请求首页，获取项目列表数据
-        """
+        """get 请求首页，获取项目列表数据"""
         # 测试 GET 请求示例一
         yield AiohttpRequest(
             url="http://httpbin.org/get?get_args=1",

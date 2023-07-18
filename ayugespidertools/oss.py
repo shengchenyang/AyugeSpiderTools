@@ -16,8 +16,7 @@ __all__ = [
 
 
 class AliOssBase:
-    """
-    阿里云 Oss 对象存储 python sdk 示例
+    """阿里云 Oss 对象存储 python sdk 示例
     其 GitHub 官方文档地址：
         https://github.com/aliyun/aliyun-oss-python-sdk?spm=5176.8465980.tools.dpython-github.572b1450ON6Z9R
     阿里云官方 oss sdk 文档地址：
@@ -32,10 +31,10 @@ class AliOssBase:
         bucket: str,
         doc: str,
     ) -> None:
-        """
-        初始化 auth，bucket 等信息
+        """初始化 auth，bucket 等信息
         注：阿里云账号 AccessKey 拥有所有 API 的访问权限，风险很高；
-            强烈建议您创建并使用 RAM 用户进行 API 访问或日常运维，请登录 RAM 控制台创建 RAM 用户
+        强烈建议您创建并使用 RAM 用户进行 API 访问或日常运维，请登录 RAM 控制台创建 RAM 用户
+
         Args:
             access_key_id: 阿里云账号 AccessKey
             access_key_secret: 阿里云账号 AccessKey 对应的秘钥
@@ -52,13 +51,10 @@ class AliOssBase:
         self.headers = {"Connection": "close"}
 
     def delete_oss(self, del_logo_url: str):
-        """
-        删除单个文件: 以下代码用于删除 bucket 中的 del_logo_url 所对应的文件
+        """删除单个文件: 以下代码用于删除 bucket 中的 del_logo_url 所对应的文件
+
         Args:
             del_logo_url: 需要参数的阿里云链接全路径 url
-
-        Returns:
-            None
         """
         try:
             self.bucket.delete_object(
@@ -79,8 +75,8 @@ class AliOssBase:
         file_format: str,
         file_name_md5: bool = False,
     ) -> (bool, str):
-        """
-        上传单个文件的 bytes 内容
+        """上传单个文件的 bytes 内容
+
         Args:
             put_bytes_or_url: 需要上传的文件 bytes 内容或链接
             file_name: 需要上传的文件的名称
@@ -115,8 +111,8 @@ class AliOssBase:
         prefix: str,
         count_by_type: Union[Param.Str_Lstr, Param.NoneType, list] = None,
     ) -> list:
-        """
-        列举 prefix 文件夹下的所有的 count_by_type 类型的文件元素
+        """列举 prefix 文件夹下的所有的 count_by_type 类型的文件元素
+
         Args:
             prefix: 文件夹目录
             count_by_type: 统计的依据，计数文件夹中的此类型的元素

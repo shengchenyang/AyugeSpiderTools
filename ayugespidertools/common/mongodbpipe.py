@@ -15,16 +15,14 @@ __all__ = [
 
 
 class AbstractClass(ABC):
-    """
-    用于处理 mongodb pipeline 存储的模板方法类
-    """
+    """用于处理 mongodb pipeline 存储的模板方法类"""
 
     def _get_insert_data(
         self,
         item_dict: Union[ItemAdapter, dict],
     ) -> dict:
-        """
-        获取要插入的数据，将 item 中的存储数据提取出来
+        """获取要插入的数据，将 item 中的存储数据提取出来
+
         Args:
             item_dict: item ItemAdapter 或者 dict 格式数据，可像字典一样操作
 
@@ -47,8 +45,8 @@ class AbstractClass(ABC):
         item_dict: Union[ItemAdapter, dict],
         db: Param.PymongoDataBase,
     ) -> None:
-        """
-        模板方法，用于处理 mongodb pipeline 存储的模板方法类
+        """模板方法，用于处理 mongodb pipeline 存储的模板方法类
+
         Args:
             item_dict: item ItemAdapter 或 dict 格式数据
             db: mongodb 数据库连接
@@ -74,8 +72,8 @@ class AbstractClass(ABC):
         *args,
         **kwargs,
     ) -> None:
-        """
-        数据存储逻辑，需要子类实现
+        """数据存储逻辑，需要子类实现
+
         Args:
             db: mongodb 数据库连接
             item_dict: item ItemAdapter 或 dict 格式数据
@@ -91,9 +89,7 @@ class AbstractClass(ABC):
 
 
 class Synchronize(AbstractClass):
-    """
-    pipeline 同步执行 mongodb 存储的场景
-    """
+    """pipeline 同步执行 mongodb 存储的场景"""
 
     def _data_storage_logic(
         self,
@@ -114,9 +110,7 @@ class Synchronize(AbstractClass):
 
 
 class TwistedAsynchronous(AbstractClass):
-    """
-    pipeline twisted 异步执行 mongodb 存储的场景
-    """
+    """pipeline twisted 异步执行 mongodb 存储的场景"""
 
     def _data_storage_logic(
         self,
@@ -136,9 +130,7 @@ class TwistedAsynchronous(AbstractClass):
 
 
 class AsyncioAsynchronous(AbstractClass):
-    """
-    pipeline asyncio 异步执行 mongodb 存储的场景 - 使用 motor 实现
-    """
+    """pipeline asyncio 异步执行 mongodb 存储的场景 - 使用 motor 实现"""
 
     async def _data_storage_logic(
         self,
@@ -175,7 +167,5 @@ def mongodb_pipe(
     item_dict: Union[ItemAdapter, dict],
     db: Param.PymongoDataBase,
 ) -> None:
-    """
-    mongodb pipeline 存储的通用调用方法
-    """
+    """mongodb pipeline 存储的通用调用方法"""
     abstract_class.process_item_template(item_dict=item_dict, db=db)

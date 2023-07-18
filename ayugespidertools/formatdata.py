@@ -17,8 +17,8 @@ class DataHandle:
 
     @staticmethod
     def get_full_url(domain_name: str, deal_url: str) -> str:
-        """
-        根据域名 domain_name 拼接 deal_url 来获得完整链接
+        """根据域名 domain_name 拼接 deal_url 来获得完整链接
+
         Args:
             domain_name: 域名链接
             deal_url: 需要拼接的 url
@@ -29,9 +29,9 @@ class DataHandle:
         return urljoin(domain_name, deal_url)
 
     @staticmethod
-    def click_point_deal(decimal: float, decimal_places=2) -> float:
-        """
-        将小数 decimal 保留小数点后 decimal_places 位，结果四舍五入
+    def click_point_deal(decimal: float, decimal_places: int = 2) -> float:
+        """将小数 decimal 保留小数点后 decimal_places 位，结果四舍五入
+
         Args:
             decimal: 需要处理的小数
             decimal_places: 需要保留的小数点位数
@@ -45,8 +45,8 @@ class DataHandle:
 
     @staticmethod
     def judge_utc_time(local_time: str) -> bool:
-        """
-        判断 local_time 是否为 utc 格式的时间
+        """判断 local_time 是否为 utc 格式的时间
+
         Args:
             local_time: 需要判断的时间参数，比如：Thu Jul 21 17:59:44 2022 或 Fri, 22 Jul 2022 01:43:06 +0800 等等
 
@@ -68,8 +68,8 @@ class DataHandle:
         specific_date_conn: str = " ",
         hms_conn: str = ":",
     ) -> str:
-        """
-        将需要格式化的数据用 date_style 标识来拼接起来，如果 date_is_full 为 True 时，则需要补齐"时分秒"位
+        """将需要格式化的数据用 date_style 标识来拼接起来，如果 date_is_full 为 True 时，则需要补齐"时分秒"位
+
         Args:
             date_style: 将格式化符拼接时需要的标识，比如：-
             date_is_full: 是否需要完整的时间格式化（即是否需要补齐"时分秒"单位）
@@ -93,8 +93,8 @@ class DataHandle:
 
     @staticmethod
     def _time_format(date_str) -> str:
-        """
-        判断时间是什么格式的，比如：xxxx-xx-xx 或 xxxx.xx.xx
+        """判断时间是什么格式的，比如：xxxx-xx-xx 或 xxxx.xx.xx
+
         Args:
             date_str: 需要判断格式的时间
 
@@ -120,8 +120,8 @@ class DataHandle:
         specific_date_conn: str = " ",
         hms_conn: str = ":",
     ) -> int:
-        """
-        将网页正常时间转为时间戳
+        """将网页正常时间转为时间戳
+
         Args:
             normal_time: 需要转换的时间
             _format_t: 时间格式化符，默认不填。除非在英文时间的参数出错时可指定 _format_t 的值
@@ -160,8 +160,8 @@ class DataHandle:
 
     @staticmethod
     def timestamp_to_normal(timestamp: Union[int, str]) -> str:
-        """
-        将时间戳转为正常时间 xxxx-xx-xx xx:xx:xx 的格式
+        """将时间戳转为正常时间 xxxx-xx-xx xx:xx:xx 的格式
+
         Args:
             timestamp: 需要处理的时间格式
 
@@ -175,9 +175,7 @@ class DataHandle:
 
     @staticmethod
     def remove_all_tags(func):
-        """
-        去除所有标签
-        """
+        """去除所有标签"""
 
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
@@ -188,9 +186,7 @@ class DataHandle:
 
     @staticmethod
     def normal_display(func):
-        """
-        去除掉网页的注释(将网页中的特殊字符的源码改成正常显示)
-        """
+        """去除掉网页的注释(将网页中的特殊字符的源码改成正常显示)"""
 
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
@@ -201,9 +197,7 @@ class DataHandle:
 
     @staticmethod
     def simple_deal_for_extract(func):
-        """
-        将 xpath, css 或 json 提取的数据做简单处理；提取的数据若非数组数据，则统一返回字符类型
-        """
+        """将 xpath, css 或 json 提取的数据做简单处理；提取的数据若非数组数据，则统一返回字符类型"""
 
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
@@ -219,14 +213,14 @@ class DataHandle:
     def _extract_table_rule(
         cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
     ):
-        """
-        根据 html2text 来处理 html 中的 table 表格内容
+        """根据 html2text 来处理 html 中的 table 表格内容
+
         Args:
             html_txt: 网页内容
             h_obj: html2text 对象句柄
 
         Returns:
-            1).转换后的结果
+            1). 转换后的结果
         """
         if not h_obj:
             h_obj = html2text.HTML2Text()
@@ -241,16 +235,15 @@ class DataHandle:
     def extract_html_to_md(
         cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
     ) -> str:
-        """
-        将 html 内容转化为 markdown 内容
-
+        """将 html 内容转化为 markdown 内容
         更多、更详细的配置参数请查看文档内容: https://github.com/Alir3z4/html2text/blob/master/html2text/cli.py
+
         Args:
             html_txt: 网页内容（一般是带标签的内容）
             h_obj: html2text 对象句柄
 
         Returns:
-            1).转换后的结果
+            1). 转换后的结果
         """
         if not h_obj:
             h_obj = html2text.HTML2Text()

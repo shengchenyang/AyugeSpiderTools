@@ -10,9 +10,7 @@ __all__ = [
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
-    """
-    Mysql 存储场景的 scrapy pipeline 扩展，使用 dbutils.pooled_db 实现
-    """
+    """Mysql 存储场景的 scrapy pipeline 扩展，使用 dbutils.pooled_db 实现"""
 
     def __init__(self, pool_db_conf, *args, **kwargs):
         super(AyuTurboMysqlPipeline, self).__init__(*args, **kwargs)

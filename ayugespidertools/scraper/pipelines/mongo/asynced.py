@@ -8,9 +8,7 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 
 
 class AsyncMongoPipeline:
-    """
-    通过 motor 实现异步写入 MongoDB 的存储管道
-    """
+    """通过 motor 实现异步写入 MongoDB 的存储管道"""
 
     def open_spider(self, spider):
         assert hasattr(

@@ -13,14 +13,12 @@ __all__ = [
 
 
 class EncryptOperation:
-    """
-    普通加密方法
-    """
+    """普通加密方法"""
 
     @classmethod
     def md5(cls, encrypt_data: str) -> str:
-        """
-        md5 处理方法
+        """md5 处理方法
+
         Args:
             encrypt_data: 需要 md5 处理的参数
 
@@ -35,8 +33,8 @@ class EncryptOperation:
     def base64_encode(
         cls, encode_data: Union[bytes, str], url_safe: bool = False
     ) -> str:
-        """
-        base64 编码
+        """base64 编码
+
         Args:
             encode_data: 需要 base64 编码的参数
             url_safe: 标准的 Base64 编码后可能出现字符 + 和 /，在 url 中就不能直接作为参数。是否要处理此情况
@@ -52,8 +50,8 @@ class EncryptOperation:
 
     @classmethod
     def base64_decode(cls, decode_data: str, url_safe: bool = False) -> str:
-        """
-        base64 解码
+        """base64 解码
+
         Args:
             decode_data: 需要 base64 解码的参数
             url_safe: 标准的 Base64 编码后可能出现字符 + 和 /，在 url 中就不能直接作为参数。是否要处理此情况
@@ -67,8 +65,8 @@ class EncryptOperation:
 
     @staticmethod
     def rsa_encrypt(rsa_public_key: str, encode_data: str) -> str:
-        """
-        rsa encode example
+        """rsa encode example
+
         Args:
             rsa_public_key: rsa publickey
             encode_data: rsa encode data
@@ -88,8 +86,8 @@ class EncryptOperation:
 
     @staticmethod
     def mm3_hash128_encode(encode_data: str) -> str:
-        """
-        MurmurHash3 非加密哈希之 hash128
+        """MurmurHash3 非加密哈希之 hash128
+
         Args:
             encode_data: 需要 mmh3 hash128 的参数
 
@@ -102,8 +100,8 @@ class EncryptOperation:
 
     @staticmethod
     def uni_to_chr(uni: str) -> str:
-        """
-        将 Unicode 码位表示的字符串转换正常的字符，用于获取字体映射时使用
+        """将 Unicode 码位表示的字符串转换正常的字符，用于获取字体映射时使用
+
         Args:
             uni: 需要转换的 unicode 字符串，
                 如：006A，但它可能是非标准的，可能需要去掉前面的 0x 或 uni。

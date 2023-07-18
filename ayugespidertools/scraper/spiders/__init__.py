@@ -22,9 +22,7 @@ __all__ = [
 
 
 class MySqlEngineClass:
-    """
-    mysql 链接句柄单例模式
-    """
+    """mysql 链接句柄单例模式"""
 
     _instance_lock = threading.Lock()
 
@@ -43,9 +41,7 @@ class MySqlEngineClass:
 
 
 class AyuSpider(Spider):
-    """
-    用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等
-    """
+    """用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等"""
 
     # 自定义 common 设置
     custom_common_settings = {
@@ -102,9 +98,7 @@ class AyuSpider(Spider):
     mysql_engine_enabled = False
 
     def parse(self, response, **kwargs):
-        """
-        实现所继承类的 abstract 方法 parse
-        """
+        """实现所继承类的 abstract 方法 parse"""
         super(AyuSpider, self).parse(response, **kwargs)
 
     def __init__(self, *args, **kwargs):
@@ -113,9 +107,8 @@ class AyuSpider(Spider):
 
     @property
     def slog(self):
-        """
-        本库的日志管理模块，使用 loguru 来管理日志
-        注：
+        """本库的日志管理模块，使用 loguru 来管理日志
+        注意：
             1. 本库不是通过适配器模式或 mixin 等方法对 scrapy logger 重写或扩展，而是
         新增一个 slog 的日志管理方法，目前感觉这样最适合；
             2. 本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。

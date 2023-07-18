@@ -10,9 +10,7 @@ __all__ = [
 
 
 class RandomRequestUaMiddleware:
-    """
-    随机请求头中间件
-    """
+    """随机请求头中间件"""
 
     def __init__(self):
         self.explorer_types = None

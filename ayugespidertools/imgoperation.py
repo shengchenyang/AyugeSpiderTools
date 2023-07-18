@@ -12,19 +12,17 @@ __all__ = [
 
 
 class Picture:
-    """
-    对验证码图片的一些操作
-    """
+    """对验证码图片的一些操作"""
 
     @classmethod
     def convert_index_to_offset(cls, index):
-        """
-        获取每张小图的偏移量
+        """获取每张小图的偏移量
+
         Args:
             index: 当前小块图片
 
         Returns:
-            当前小图在空白图片的坐标
+            1). 当前小图在空白图片的坐标
         """
 
         # 代码注释
@@ -46,8 +44,8 @@ class Picture:
 
     @classmethod
     def convert_css_to_offset(cls, off):
-        """
-        获取每张小图的坐标，供抠图时使用
+        """获取每张小图的坐标，供抠图时使用
+
         Args:
             off: 根据 css backgound-position 中获取的每张小图的坐标
 
@@ -61,14 +59,11 @@ class Picture:
 
     @classmethod
     def recombine_captcha(cls, offset_list: list, img_path: str):
-        """
-        图片重组: 完美世界网站的图片重组方法
+        """图片重组: 完美世界网站的图片重组方法
+
         Args:
             offset_list: 坐标列表
             img_path: 图片保存路径
-
-        Returns:
-            None
         """
         # 新建空白图片
         captcha = Image.new("RGB", (13 * 20, 60 * 2 - 4))
@@ -94,8 +89,8 @@ class Picture:
 
     @classmethod
     def reset_pic(cls, slide_data):
-        """
-        完美世界滑块验证码重组方法，具体位置根据 background-position 搜索定位
+        """完美世界滑块验证码重组方法，具体位置根据 background-position 搜索定位
+
         Args:
             slide_data: 完美滑块重组所需的数组
 
@@ -119,8 +114,8 @@ class Picture:
 
     @classmethod
     def find_pic(cls, target, template):
-        """
-        找出图像中最佳匹配位置
+        """找出图像中最佳匹配位置
+
         Args:
             target: 目标（背景图）
             template: 模板（需要找到的图）
@@ -140,8 +135,8 @@ class Picture:
     def identify_gap(
         cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None
     ) -> int:
-        """
-        通过背景图片和缺口图片识别出滑块距离
+        """通过背景图片和缺口图片识别出滑块距离
+
         Args:
             bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
             tp: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
@@ -184,12 +179,10 @@ class Picture:
 
     @classmethod
     def get_data_urls_by_img(cls, mediatype: str, data: Union[bytes, str]) -> str:
-        """
-        根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
+        """根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
         Data URLs 格式示例:
             data:image/png;base64,iVB...
             data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E
-
         关于 Data URLs 更多的描述，其参考文档: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
 
         Args:

@@ -14,9 +14,7 @@ __all__ = [
 
 
 class AbstractClass(ABC):
-    """
-    用于处理 mysql 异常的模板方法类
-    """
+    """用于处理 mysql 异常的模板方法类"""
 
     def _create_table(
         self,
@@ -27,8 +25,8 @@ class AbstractClass(ABC):
         table_notes: str = "",
         demand_code: str = "",
     ) -> None:
-        """
-        创建数据库表
+        """创建数据库表
+
         Args:
             cursor: mysql connect cursor，参数选择有：
                 1). 类型为 pymysql.cursors.Cursor，在同步 pipelines 中使用；
@@ -40,9 +38,6 @@ class AbstractClass(ABC):
             collate: collate
             table_notes: 创建表的注释
             demand_code: 创建表的需求对应的 code 值，用于和需求中的任务对应
-
-        Returns:
-            None
         """
         # 用于表格 comment 的参数生成(即 table_notes 参数)
         if demand_code != "":
@@ -72,8 +67,8 @@ class AbstractClass(ABC):
         table: str,
         column: str,
     ) -> str:
-        """
-        获取数据字段存储类型
+        """获取数据字段存储类型
+
         Args:
             cursor: mysql connect cursor
             database: 数据库名
@@ -114,8 +109,8 @@ class AbstractClass(ABC):
         table_enum: Type[TableEnumTypeVar],
         note_dic: dict,
     ) -> None:
-        """
-        模板方法，用于处理 mysql 存储场景的异常
+        """模板方法，用于处理 mysql 存储场景的异常
+
         Args:
             err_msg: pipeline 存储时报错内容
             conn: mysql conn
@@ -126,9 +121,6 @@ class AbstractClass(ABC):
             table: 数据表
             table_enum: 数据表枚举类
             note_dic: 当前表字段注释
-
-        Returns:
-            None
         """
         if "1054" in err_msg:
             sql, possible_err = self.deal_1054_error(
@@ -175,8 +167,8 @@ class AbstractClass(ABC):
             logger.error(f"ERROR: {err_msg}")
 
     def deal_1054_error(self, err_msg: str, table: str, note_dic: dict) -> (str, str):
-        """
-        解决 1054, u"Unknown column 'id' in 'field list'"
+        """解决 1054, u"Unknown column 'xx' in 'field list'"
+
         Args:
             err_msg: 报错内容
             table: 数据表名
@@ -204,8 +196,8 @@ class AbstractClass(ABC):
         err_msg: str,
         table_enum: Type[TableEnumTypeVar],
     ) -> (str, str, str):
-        """
-        解决 1146, u"Table '(.*?)' doesn't exist"
+        """解决 1146, u"Table 'xx' doesn't exist"
+
         Args:
             err_msg: 报错内容
             table_enum: 数据表的枚举信息
@@ -241,8 +233,8 @@ class AbstractClass(ABC):
         table: str,
         note_dic: dict,
     ) -> (str, str):
-        """
-        解决 1406, u"Data too long for ..."
+        """解决 1406, u"Data too long for 'xx' at ..."
+
         Args:
             err_msg: 报错内容
             conn: mysql conn
@@ -253,7 +245,7 @@ class AbstractClass(ABC):
 
         Returns:
             1). sql: 修改字段类型的 sql
-            1). possible_err: 执行此 sql 可能会报错的信息
+            2). 执行此 sql 可能会报错的信息
         """
         if "Data too long for" in err_msg:
             colum_pattern = re.compile(r"Data too long for column '(.*?)' at")
@@ -278,8 +270,8 @@ class AbstractClass(ABC):
         table: str,
         note_dic: dict,
     ) -> (str, str):
-        """
-        解决 1265, u"Data truncated for column ..."
+        """解决 1265, u"Data truncated for column 'xx' at ..."
+
         Args:
             err_msg: 报错内容
             cursor: mysql connect cursor
@@ -288,7 +280,8 @@ class AbstractClass(ABC):
             note_dic: 当前表字段的注释
 
         Returns:
-            None
+            1). sql: 修改字段类型的 sql
+            2). 执行此 sql 可能会报错的信息
         """
         if "Data truncated for column" in err_msg:
             colum_pattern = re.compile(r"Data truncated for column '(.*?)' at")
@@ -307,22 +300,12 @@ class AbstractClass(ABC):
 
     @abstractmethod
     def _exec_sql(self, *args, **kwargs) -> None:
-        """
-        子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景
-        Args:
-            *args: None
-            **kwargs: None
-
-        Returns:
-            None
-        """
+        """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
         pass
 
 
 class Synchronize(AbstractClass):
-    """
-    pipeline 同步执行 sql 的场景
-    """
+    """pipeline 同步执行 sql 的场景"""
 
     def _exec_sql(
         self,
@@ -344,9 +327,7 @@ class Synchronize(AbstractClass):
 
 
 class TwistedAsynchronous(AbstractClass):
-    """
-    pipeline twisted 异步执行 sql 的场景
-    """
+    """pipeline twisted 异步执行 sql 的场景"""
 
     def _exec_sql(
         self,

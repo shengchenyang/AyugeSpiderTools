@@ -10,14 +10,12 @@ __all__ = [
 
 
 class YiDunGetGap:
-    """
-    易盾获取滑块缺口距离的相关方法，也可能适配于其它平台
-    """
+    """易盾获取滑块缺口距离的相关方法，也可能适配于其它平台"""
 
     @classmethod
     def clear_white(cls, img):
-        """
-        清除图片的空白区域，这里主要清除滑块的空白
+        """清除图片的空白区域，这里主要清除滑块的空白
+
         Args:
             img: 待处理的图片
 
@@ -46,8 +44,8 @@ class YiDunGetGap:
 
     @classmethod
     def template_match(cls, tpl, target, out: str = None) -> int:
-        """
-        模板匹配找出滑块缺口的距离
+        """模板匹配找出滑块缺口的距离
+
         Args:
             tpl: 缺口图片
             target: 背景图片
@@ -77,8 +75,8 @@ class YiDunGetGap:
 
     @classmethod
     def image_edge_detection(cls, img):
-        """
-        图像边缘检测处理，识别图片边缘
+        """图像边缘检测处理，识别图片边缘
+
         Args:
             img: 需要处理的图片，用于边缘检测使用
 
@@ -89,15 +87,15 @@ class YiDunGetGap:
 
     @classmethod
     def discern(cls, slide, bg, out: str = None):
-        """
-        识别滑块缺口方法
+        """识别滑块缺口方法
+
         Args:
             slide: 滑块图，可以是全路径图片，也可以是图片的 bytes 数据
             bg: 带缺口的背景图，可以是全路径图片，也可以是图片的 bytes 数据
             out: 绘制图展示的存储地址，参数格式为图片的全路径
 
         Returns:
-            x: 滑块缺口横坐标
+            1): 滑块缺口横坐标
         """
         # 先用 opencv 读取图片数据
         slide_cv, bg_cv = ReuseOperation.read_image_data(slide, bg)

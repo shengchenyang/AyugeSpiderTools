@@ -14,8 +14,8 @@ __all__ = [
 
 class KafkaProducerClient:
     def __init__(self, bootstrap_servers: list) -> None:
-        """
-        kafka 生产者
+        """kafka 生产者
+
         Args:
             bootstrap_servers: kafka 服务地址
         """
@@ -31,17 +31,14 @@ class KafkaProducerClient:
         value: dict,
         key: Optional[str] = None,
     ) -> None:
-        """
-        发送数据
+        """发送数据
+
         Args:
             topic: kafka topic
             value: message value. Must be type bytes, or be
                 serializable to bytes via configured value_serializer. If value
                 is None, key is required and message acts as a 'delete'.
             key: kafka key
-
-        Returns:
-            None
         """
         # Asynchronous by default
         future = (
@@ -67,15 +64,11 @@ class KafkaProducerClient:
             logger.error(f"save error, topic: {topic}, value: {value}, key: {key}")
 
     def on_send_success(self, *args, **kwargs):
-        """
-        发送成功回调函数，暂不做任何处理或提示
-        """
+        """发送成功回调函数，暂不做任何处理或提示"""
         return
 
     def on_send_error(self, data, key):
-        """
-        发送失败回调函数，只日志记录
-        """
+        """发送失败回调函数，只日志记录"""
         logger.error(f"send error, data: {data}, key: {key}")
         return
 

@@ -14,9 +14,7 @@ __all__ = [
 
 
 class MysqlPipeEnhanceMixin:
-    """
-    用于扩展 pipelines 中的功能，作为 Mixin 使用，不要对其实例化和单独使用等
-    """
+    """扩展 pipelines 的功能，作为 Mixin 使用，不要对其实例化或单独使用"""
 
     @retry(
         stop_max_attempt_number=Param.retry_num,
@@ -27,10 +25,10 @@ class MysqlPipeEnhanceMixin:
         self,
         mysql_conf: MysqlConf,
     ) -> pymysql.connections.Connection:
-        """
-        链接数据库操作：
+        """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
+
         Args:
             mysql_conf: pymysql 链接所需的参数
 
@@ -65,8 +63,8 @@ class MysqlPipeEnhanceMixin:
         )
 
     def _get_sql_by_item(self, table: str, item: dict) -> str:
-        """
-        根据处理后的 item 生成 sql 插入语句
+        """根据处理后的 item 生成 sql 插入语句
+
         Args:
             table: 数据库表名
             item: 处理后的 item
@@ -80,8 +78,8 @@ class MysqlPipeEnhanceMixin:
         return f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
 
     def _get_log_by_spider(self, spider, crawl_time):
-        """
-        获取 spider 的运行日志情况
+        """获取 spider 的运行日志情况
+
         Args:
             spider: scrapy spider
             crawl_time: 爬取时间

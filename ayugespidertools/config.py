@@ -9,9 +9,7 @@ __all__ = [
 
 
 class NormalConfig:
-    """
-    用于存放此项目的通用配置
-    """
+    """用于存放此项目的通用配置"""
 
     # 项目根目录及其它所需目录
     CONFIG_DIR = Path(__file__).parent
