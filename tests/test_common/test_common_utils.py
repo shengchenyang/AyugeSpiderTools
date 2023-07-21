@@ -5,7 +5,7 @@ from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import MysqlConf
-from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.common.utils import BezierTrajectory, ToolsForAyu
 from tests import CONSUL_CONFIG, tests_dir
 
 json_data_example = {
@@ -217,3 +217,19 @@ def test_get_dict_form_scrapy_req_headers():
     scrapy_headers = Request(url="https://www.baidu.com", headers=_headers).headers
     res = ToolsForAyu.get_dict_form_scrapy_req_headers(scrapy_headers=scrapy_headers)
     assert res == _headers
+
+
+def test_bezier_track():
+    a = BezierTrajectory()
+    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, le=4, type=2)
+    # print("最终的轨迹为：", res)
+    track = res["trackArray"]
+    print(track)
+    x_lst = []
+    y_lst = []
+    for i in res["trackArray"]:
+        print(i)
+        x_lst.append(i[0])
+        y_lst.append(i[1])
+    print("x_lst:", x_lst)
+    print("y_lst:", y_lst)

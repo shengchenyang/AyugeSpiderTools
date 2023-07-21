@@ -1,10 +1,13 @@
 import copy
 import json
+import math
+import random
 import xml.etree.ElementTree as ET
 from typing import Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
 import hcl2
+import numpy as np
 import pandas
 import requests
 import yaml
@@ -18,6 +21,7 @@ from ayugespidertools.formatdata import DataHandle
 
 __all__ = [
     "ToolsForAyu",
+    "BezierTrajectory",
 ]
 
 ConsulFormatStr = Literal["json", "hcl", "yaml", "xml"]
@@ -297,3 +301,208 @@ class ToolsForAyu:
                 return item
             else:
                 raise ValueError(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
+
+
+class BezierTrajectory:
+    """贝塞尔曲线轨迹生成器"""
+
+    def _generate_control_points(self, track: list):
+        """计算贝塞尔曲线的控制点"""
+        track_len = len(track)
+
+        def calculate_bezier_point(x):
+            t = (x - track[0][0]) / (track[-1][0] - track[0][0])
+            y = np.array([0, 0], dtype=np.float64)
+            for s in range(len(track)):
+                y += track[s] * (
+                    (
+                        math.factorial(track_len - 1)
+                        / (math.factorial(s) * math.factorial(track_len - 1 - s))
+                    )
+                    * math.pow(t, s)
+                    * math.pow((1 - t), track_len - 1 - s)
+                )
+            return y[1]
+
+        return calculate_bezier_point
+
+    def _type(self, type, x, length):
+        numbers = []
+        pin = (x[1] - x[0]) / length
+        if type == 0:
+            for i in range(length):
+                numbers.append(i * pin)
+            if pin >= 0:
+                numbers = numbers[::-1]
+        elif type == 1:
+            for i in range(length):
+                numbers.append(1 * ((i * pin) ** 2))
+            numbers = numbers[::-1]
+        elif type == 2:
+            for i in range(length):
+                numbers.append(1 * ((i * pin - x[1]) ** 2))
+
+        elif type == 3:
+            track = [
+                np.array([0, 0]),
+                np.array([(x[1] - x[0]) * 0.8, (x[1] - x[0]) * 0.6]),
+                np.array([x[1] - x[0], 0]),
+            ]
+            fun = self._generate_control_points(track)
+            numbers = [0]
+            for i in range(1, length):
+                numbers.append(fun(i * pin) + numbers[-1])
+            if pin >= 0:
+                numbers = numbers[::-1]
+        numbers = np.abs(np.array(numbers) - max(numbers))
+        normal_numbers = (
+            (numbers - numbers[numbers.argmin()])
+            / (numbers[numbers.argmax()] - numbers[numbers.argmin()])
+        ) * (x[1] - x[0]) + x[0]
+        normal_numbers[0] = x[0]
+        normal_numbers[-1] = x[1]
+        return normal_numbers
+
+    def simulation(self, start, end, order=1, deviation=0, bias=0.5):
+        """模拟贝塞尔曲线的绘制过程
+
+        Args:
+            start: 开始点的坐标
+            end: 结束点的坐标
+            order: 几阶贝塞尔曲线，越大越复杂
+            deviation: 轨迹上下波动的范围
+            bias: 波动范围的分布位置
+
+        Returns:
+            1). 返回一个字典 equation 对应该曲线的方程，P 对应贝塞尔曲线的影响点
+        """
+        start = np.array(start)
+        end = np.array(end)
+        shake_num = []
+        if order != 1:
+            e = (1 - bias) / (order - 1)
+            shake_num = [[bias + e * i, bias + e * (i + 1)] for i in range(order - 1)]
+
+        track_lst = [start]
+
+        t = random.choice([-1, 1])
+        w = 0
+        for i in shake_num:
+            px1 = start[0] + (end[0] - start[0]) * (
+                random.random() * (i[1] - i[0]) + (i[0])
+            )
+            p = np.array(
+                [px1, self._generate_control_points([start, end])(px1) + t * deviation]
+            )
+            track_lst.append(p)
+            w += 1
+            if w >= 2:
+                w = 0
+                t = -1 * t
+
+        track_lst.append(end)
+        return {
+            "equation": self._generate_control_points(track_lst),
+            "P": np.array(track_lst),
+        }
+
+    def gen_track(
+        self,
+        start: Union[np.ndarray, list],
+        end: Union[np.ndarray, list],
+        num: int,
+        order: int = 1,
+        deviation: int = 0,
+        bias=0.5,
+        type=0,
+        shake_num=0,
+        yhh=10,
+    ):
+        """生成轨迹数组
+
+        Args:
+            start: 开始点的坐标
+            end: 结束点的坐标
+            num: 返回的数组的轨迹点的数量
+            order: 几阶贝塞尔曲线，越大越复杂
+            deviation: 轨迹上下波动的范围
+            bias: 波动范围的分布位置
+            type: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
+            shake_num: 在终点来回摆动的次数
+            yhh: 在终点来回摆动的范围
+
+        Returns:
+            1). 返回一个字典 trackArray 对应轨迹数组，P 对应贝塞尔曲线的影响点
+        """
+        s = []
+        fun = self.simulation(start, end, order, deviation, bias)
+        w = fun["P"]
+        fun = fun["equation"]
+        if shake_num != 0:
+            track_number = round(num * 0.2 / (shake_num + 1))
+            num -= num * (shake_num + 1)
+
+            x_track_array = self._type(type, [start[0], end[0]], num)
+            for i in x_track_array:
+                s.append([i, fun(i)])
+            dq = yhh / shake_num
+            kg = 0
+            ends = np.copy(end)
+            for i in range(shake_num):
+                if kg == 0:
+                    d = np.array(
+                        [
+                            end[0] + (yhh - dq * i),
+                            ((end[1] - start[1]) / (end[0] - start[0]))
+                            * (end[0] + (yhh - dq * i))
+                            + (
+                                end[1]
+                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
+                            ),
+                        ]
+                    )
+                    kg = 1
+                else:
+                    d = np.array(
+                        [
+                            end[0] - (yhh - dq * i),
+                            ((end[1] - start[1]) / (end[0] - start[0]))
+                            * (end[0] - (yhh - dq * i))
+                            + (
+                                end[1]
+                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
+                            ),
+                        ]
+                    )
+                    kg = 0
+                y = self.gen_track(
+                    ends,
+                    d,
+                    track_number,
+                    order=2,
+                    deviation=0,
+                    bias=0.5,
+                    type=0,
+                    shake_num=0,
+                    yhh=10,
+                )
+                s += list(y["trackArray"])
+                ends = d
+            y = self.gen_track(
+                ends,
+                end,
+                track_number,
+                order=2,
+                deviation=0,
+                bias=0.5,
+                type=0,
+                shake_num=0,
+                yhh=10,
+            )
+            s += list(y["trackArray"])
+
+        else:
+            x_track_array = self._type(type, [start[0], end[0]], num)
+            for i in x_track_array:
+                s.append([i, fun(i)])
+        return {"trackArray": np.array(s), "P": w}
