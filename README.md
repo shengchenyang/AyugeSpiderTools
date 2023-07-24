@@ -76,12 +76,12 @@ scrapy crawl <spider_name>
 项目中查看，也可以在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中查看教程。 目前已适配以下场景：
 
 ```diff
-数据存入 Mysql 的场景：
+# 数据存入 Mysql 的场景：
 + 1).demo_one: 配置根据本地 settings 的 LOCAL_MYSQL_CONFIG 中取值
 + 3).demo_three: 配置根据 consul 的应用管理中心中取值
 + 5).demo_five: 异步存入 Mysql 的场景
 
-数据存入 MongoDB 的场景：
+# 数据存入 MongoDB 的场景：
 + 2).demo_two: 配置根据本地 settings 的 LOCAL_MONGODB_CONFIG 中取值
 + 4).demo_four: 配置根据 consul 的应用管理中心中取值
 + 6).demo_six: 异步存入 MongoDB 的场景
