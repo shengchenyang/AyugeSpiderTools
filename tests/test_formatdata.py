@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ayugespidertools.formatdata import DataHandle
 from tests import tests_dir
 
@@ -60,8 +62,8 @@ def test_remove_tags():
 
 
 def test_extract_html_to_md():
-    with open(f"{tests_dir}/docs/txt/doc_with_table.html", "r", encoding="utf-8") as f:
-        html_txt = f.read()
+    _html_file = Path(tests_dir, "docs/txt/doc_with_table.html")
+    html_txt = _html_file.read_text(encoding="utf-8")
     res = DataHandle.extract_html_to_md(html_txt=html_txt)
     print(res)
     assert res is not None

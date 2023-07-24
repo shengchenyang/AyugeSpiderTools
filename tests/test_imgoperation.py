@@ -1,4 +1,5 @@
-from ayugespidertools.common.multiplexing import ReuseOperation
+from pathlib import Path
+
 from ayugespidertools.imgoperation import Picture
 from tests import tests_dir
 
@@ -12,10 +13,8 @@ def test_identify_gap():
     assert gap_distance in list(range(205, 218))
 
     # 参数为图片 bytes 的情况
-    with open(f"{tests_dir}/docs/image/1.png", "rb") as f:
-        target_bytes = f.read()
-    with open(f"{tests_dir}/docs/image/2.jpg", "rb") as f:
-        template_bytes = f.read()
+    target_bytes = Path(tests_dir, "docs/image/1.png").read_bytes()
+    template_bytes = Path(tests_dir, "docs/image/2.jpg").read_bytes()
     gap_distance = Picture.identify_gap(
         template_bytes, target_bytes, f"{tests_dir}/docs/image/33.png"
     )
@@ -32,9 +31,7 @@ def test_get_data_urls_by_img():
     print("data_urls1:", data_urls1)
 
     # 参数为图片 bytes
-    img_bytes = ReuseOperation.get_bytes_by_file(
-        file_path=f"{tests_dir}/docs/image/1.png"
-    )
+    img_bytes = Path(tests_dir, "docs/image/1.png").read_bytes()
     data_urls2 = Picture.get_data_urls_by_img(mediatype="png", data=img_bytes)
     print("data_urls2:", data_urls2)
     assert data_urls1 is not None, data_urls2 is not None

@@ -178,20 +178,6 @@ class ReuseOperation:
         return [f.path for f in os.scandir(path) if f.is_file()]
 
     @staticmethod
-    def get_bytes_by_file(file_path: str) -> bytes:
-        """获取媒体文件的 bytes 内容
-
-        Args:
-            file_path: 对应文件的路径
-
-        Returns:
-            file_bytes: file_path 对应文件的 bytes 内容
-        """
-        with open(file_path, "rb") as f:
-            file_bytes = f.read()
-        return file_bytes
-
-    @staticmethod
     def read_image_data(
         bg: Union[bytes, str],
         tp: Union[bytes, str],

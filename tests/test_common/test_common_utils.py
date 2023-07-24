@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from scrapy.http.request import Request
 from scrapy.http.response.text import TextResponse
@@ -55,8 +56,7 @@ json_data_example = {
     "status": True,
 }
 
-with open(f"{tests_dir}/docs/txt/baidu_pagesource.html", "r", encoding="utf-8") as f:
-    body = f.read()
+body = Path(tests_dir, "docs/txt/baidu_pagesource.html").read_text(encoding="utf-8")
 _response = TextResponse(url="https://top.baidu.com", body=body, encoding="utf-8")
 
 
@@ -220,8 +220,9 @@ def test_get_dict_form_scrapy_req_headers():
 
 
 def test_bezier_track():
+    """测试贝塞尔曲线生成轨迹方法"""
     a = BezierTrajectory()
-    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, le=4, type=2)
+    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
     # print("最终的轨迹为：", res)
     track = res["trackArray"]
     print(track)

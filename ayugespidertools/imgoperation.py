@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, Union
 
 import cv2
@@ -200,7 +201,7 @@ class Picture:
         ], "图片转 Data URLs 的参数 data 需要是全路径 str 或 bytes 数据"
 
         if isinstance(data, str):
-            data_bytes = ReuseOperation.get_bytes_by_file(file_path=data)
+            data_bytes = Path(data).read_bytes()
             data_base64_encoded = EncryptOperation.base64_encode(encode_data=data_bytes)
 
         else:

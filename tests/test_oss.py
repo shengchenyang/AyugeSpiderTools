@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from ayugespidertools.oss import AliOssBase
@@ -14,10 +16,7 @@ OSS_CONFIG = {
 @pytest.mark.skip()
 def test_put_oss():
     ali_oss = AliOssBase(**OSS_CONFIG)
-    # 连接 ali oss
-    with open("docs/image/1.png", "rb") as f:
-        file_bytes = f.read()
-
+    file_bytes = Path("docs/image/1.png").read_bytes()
     put_status, file_name = ali_oss.put_oss(
         put_bytes_or_url=file_bytes, file_name="1", file_format="png"
     )

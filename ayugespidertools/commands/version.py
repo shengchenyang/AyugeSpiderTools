@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import toml
 from scrapy.commands.version import Command
 
@@ -9,12 +11,9 @@ class AyuCommand(Command):
         return "Print AyugeSpiderTools version"
 
     def _version(self) -> str:
-        with open(
-            f"{NormalConfig.ROOT_DIR}/pyproject.toml", "r", encoding="utf-8"
-        ) as f:
-            config = toml.load(f)
-
-        return config["tool"]["poetry"]["version"]
+        toml_file = Path(NormalConfig.ROOT_DIR, "pyproject.toml")
+        conf = toml.load(toml_file)
+        return conf["tool"]["poetry"]["version"]
 
     def run(self, args, opts):
         print(f"AyugeSpiderTools {self._version()}")

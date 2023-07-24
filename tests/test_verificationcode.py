@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ayugespidertools import verificationcode
 from tests import tests_dir
 
@@ -8,11 +10,8 @@ def test_match_img_get_distance():
         f"{tests_dir}/docs/image/new_template.png",
     )
     print(f"滑块缺口位置1: {distance_res}")
-
-    with open(f"{tests_dir}/docs/image/new_target.jpg", "rb") as f:
-        target_bytes = f.read()
-    with open(f"{tests_dir}/docs/image/new_template.png", "rb") as f:
-        template_bytes = f.read()
+    target_bytes = Path(tests_dir, "docs/image/new_target.jpg").read_bytes()
+    template_bytes = Path(tests_dir, "docs/image/new_template.png").read_bytes()
     distance_res = verificationcode.match_img_get_distance(target_bytes, template_bytes)
     print(f"滑块缺口位置2： {distance_res}")
     assert distance_res in list(range(195, 210))
@@ -47,10 +46,8 @@ def test_get_yidun_gap():
     assert tracks == 214
 
     # 参数为图片 bytes 的情况
-    with open(f"{tests_dir}/docs/image/1.png", "rb") as f:
-        target_bytes = f.read()
-    with open(f"{tests_dir}/docs/image/2.jpg", "rb") as f:
-        template_bytes = f.read()
+    target_bytes = Path(tests_dir, "docs/image/1.png").read_bytes()
+    template_bytes = Path(tests_dir, "docs/image/2.jpg").read_bytes()
     tracks = verificationcode.get_yidun_gap(
         target_bytes, template_bytes, f"{tests_dir}/docs/image/33.png"
     )

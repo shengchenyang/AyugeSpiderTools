@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from ayugespidertools.common.sqlformat import AboutSql
@@ -23,16 +25,14 @@ def mysql_first_step(mysql_db_cursor):
         """
     )
 
-    # 如果没有数据，就先插入示例数据
     mysql_db_cursor.execute(f"SELECT COUNT(*) AS cnt FROM {test_table}")
     num = mysql_db_cursor.fetchone()[0]
 
+    # 如果没有数据，就先插入示例数据
     if num <= 0:
-        with open(
-            f"{tests_sqlfiledir}/_test_article_info_table.sql", "r", encoding="utf-8"
-        ) as f:
-            lines = f.readlines()
-            for line in lines:
+        sql_file = Path(tests_sqlfiledir, "_test_article_info_table.sql")
+        with sql_file.open("r", encoding="utf-8") as f:
+            for line in f:
                 if line.startswith("INSERT INTO"):
                     mysql_db_cursor.execute(line.strip())
 

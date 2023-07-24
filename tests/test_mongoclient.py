@@ -1,5 +1,6 @@
 import json
 import uuid
+from pathlib import Path
 
 import pytest
 
@@ -37,10 +38,8 @@ add_data_list = [
 @pytest.fixture(scope="module")
 def mongodb_first_step(mongodb_conn):
     # 前提准备，先创建需要的数据库集合的测试数据
-    with open(
-        f"{tests_dir}/docs/json/_test_article_info_table.json", "r", encoding="utf-8"
-    ) as f:
-        mongodb_data = json.load(f)
+    _mongo_file = Path(tests_dir, "docs/json/_test_article_info_table.json")
+    mongodb_data = json.loads(_mongo_file.read_text(encoding="utf-8"))
     save_data = mongodb_data["RECORDS"]
     mongodb_conn[mongodb_database][test_table].drop()
     mongodb_conn[mongodb_database][test_table].insert_many(save_data)
