@@ -221,7 +221,7 @@ def test_get_dict_form_scrapy_req_headers():
 
 def test_bezier_track():
     a = BezierTrajectory()
-    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, le=4, type=2)
+    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
     # print("最终的轨迹为：", res)
     track = res["trackArray"]
     print(track)

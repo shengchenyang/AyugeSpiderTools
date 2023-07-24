@@ -17,9 +17,9 @@
 
 **简体中文** | [English](./README_en.md)
 
-> 一句话介绍：用于扩展 Scrapy 功能来解放双手。
-
 ## 概述
+
+> 一句话介绍：用于扩展 Scrapy 功能来解放双手。
 
 在使用 `Scrapy` 开发爬虫时，免不了会重复地编写 `settings`，`items`，`middlewares`，`pipelines`
 和一些通用方法，但各项目中的这些内容都大致相同，那为何不把它们统一整理在一起呢？我也想扩展一些功能，比如当 `spider`
