@@ -3,6 +3,7 @@ import json
 import math
 import random
 import xml.etree.ElementTree as ET
+from functools import lru_cache
 from typing import Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
@@ -39,6 +40,7 @@ class ToolsForAyu:
     """这里用于存放框架所依赖的方法"""
 
     @classmethod
+    @lru_cache(maxsize=16)
     def get_kvs_detail_by_consul(
         cls,
         url: str,
