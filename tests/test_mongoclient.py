@@ -143,18 +143,15 @@ def test_find():
 
 def test_upload():
     """测试 mongoDB 上传图片方法"""
-    import requests
-
     mongodb = MongoDbBase(**mongodb_ori)
-    r = requests.get(url="https://static.jzmbti.com/ceshi/qn/1002.png")
-    content_type = dict(r.headers)["Content-Type"]
-    print("图片的类型 content_type 为:", content_type)
+    png_bytes = Path(tests_dir, "docs/image/mongo_upload.png").read_bytes()
+
     # 返回上传后的 ID 及图片链接
     mongo_upload_id, image_id = mongodb.upload(
         file_name="test2.jpg",
         _id="121212121213",
-        content_type=content_type,
+        content_type="image/png",
         collection="fs",
-        file_data=r.content,
+        file_data=png_bytes,
     )
     assert mongo_upload_id is not None, image_id is not None

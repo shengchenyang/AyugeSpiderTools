@@ -1,5 +1,31 @@
 # Release notes
 
+## AyugeSpiderTools 3.3.2 (2023-07-26)
+
+### Deprecation removals
+
+- 无。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 增加贝塞尔曲线生成轨迹的示例方法。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 将项目中有关文件的操作统一改为 `pathlib` 的方式。
+- 根据 `consul` 获取配置的方式添加缓存处理，不用每次运行都多次调用同样参数来获取配置。减少请求次数，提高运行效率。
+- 更新 `README.md` 内容，增加对应英文版本。
+
+<hr/>
+
 ## AyugeSpiderTools 3.3.1 (2023-06-29)
 
 ### Deprecation removals
