@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.3.3 (2023-08-03)
+
+### Deprecation removals
+
+- 无。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 修复解析 `yaml` 格式数据依赖缺失的问题。（[issue 9](https://github.com/shengchenyang/AyugeSpiderTools/issues/9)）
+
+### Code optimizations
+
+- 本库中解决 `Mysql` 的 `Unknown column 'xx' in 'field list'` 部分代码变动，比如不再根据 `item` 字段是`crawl_time` 类型格式来给其默认字段格式 `DATE`，因为用户可能只是存储字段是这个名称，意义并不同，或者它存的是个时间戳等情况。这样需要考虑的问题太复杂了，且具有隐患，不如优先解决字段缺失问题，后续按需再手动调整表字段类型。
+
+<hr/>
+
 ## AyugeSpiderTools 3.3.2 (2023-07-26)
 
 ### Deprecation removals

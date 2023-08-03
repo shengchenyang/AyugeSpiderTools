@@ -183,12 +183,7 @@ class AbstractClass(ABC):
         colum = text[0]
         notes = note_dic[colum]
 
-        if colum == "url":
-            sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` TEXT(500) NULL COMMENT '{notes}';"
-        elif colum in {"create_time", "crawl_time", "update_time"}:
-            sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` DATE NULL DEFAULT NULL COMMENT '{notes}';"
-        else:
-            sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(190) NULL DEFAULT '' COMMENT '{notes}';"
+        sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(190) NULL DEFAULT '' COMMENT '{notes}';"
         return sql, f"1054: 添加字段 {colum} 已存在"
 
     def deal_1146_error(

@@ -332,8 +332,7 @@ class BezierTrajectory:
         numbers = []
         pin = (x[1] - x[0]) / length
         if type == 0:
-            for i in range(length):
-                numbers.append(i * pin)
+            numbers.extend(i * pin for i in range(length))
             if pin >= 0:
                 numbers = numbers[::-1]
         elif type == 1:
@@ -352,8 +351,7 @@ class BezierTrajectory:
             ]
             fun = self._generate_control_points(track)
             numbers = [0]
-            for i in range(1, length):
-                numbers.append(fun(i * pin) + numbers[-1])
+            numbers.extend(fun(i * pin) + numbers[-1] for i in range(1, length))
             if pin >= 0:
                 numbers = numbers[::-1]
         numbers = np.abs(np.array(numbers) - max(numbers))
@@ -445,8 +443,7 @@ class BezierTrajectory:
             num -= num * (shake_num + 1)
 
             x_track_array = self._type(type, [start[0], end[0]], num)
-            for i in x_track_array:
-                s.append([i, fun(i)])
+            s.extend([i, fun(i)] for i in x_track_array)
             dq = yhh / shake_num
             kg = 0
             ends = np.copy(end)
@@ -505,6 +502,5 @@ class BezierTrajectory:
 
         else:
             x_track_array = self._type(type, [start[0], end[0]], num)
-            for i in x_track_array:
-                s.append([i, fun(i)])
+            s.extend([i, fun(i)] for i in x_track_array)
         return {"trackArray": np.array(s), "P": w}
