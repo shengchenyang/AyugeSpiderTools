@@ -16,7 +16,6 @@ from ayugespidertools.config import logger
 
 __all__ = [
     "AiohttpDownloaderMiddleware",
-    "AiohttpAsyncDownloaderMiddleware",
 ]
 
 
@@ -81,7 +80,7 @@ class AiohttpDownloaderMiddleware:
         if local_aiohttp_conf := settings.get("AIOHTTP_CONFIG", {}):
             # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
             _aiohttp_conf = AiohttpConf(
-                timeout=local_aiohttp_conf.get("timeout"),
+                timeout=settings.get("DOWNLOAD_TIMEOUT"),
                 sleep=local_aiohttp_conf.get("sleep"),
                 proxy=local_aiohttp_conf.get("proxy"),
                 proxy_auth=local_aiohttp_conf.get("proxy_auth"),
@@ -93,11 +92,11 @@ class AiohttpDownloaderMiddleware:
                 ssl=local_aiohttp_conf.get("ssl"),
                 verify_ssl=local_aiohttp_conf.get("verify_ssl"),
                 limit_per_host=local_aiohttp_conf.get("limit_per_host"),
+                allow_redirects=local_aiohttp_conf.get("allow_redirects"),
             )
 
             # 初始化所需要的参数信息，用于构建 aiohttp 请求信息
             # cls.retry_http_codes = set(int(x) for x in settings.getlist('RETRY_HTTP_CODES'))
-            # cls.proxy = settings.get('PROXY')
             cls.timeout = _aiohttp_conf.timeout
             cls.proxy = _aiohttp_conf.proxy
             cls.proxy_auth = _aiohttp_conf.proxy_auth
@@ -108,6 +107,7 @@ class AiohttpDownloaderMiddleware:
             cls.ssl = _aiohttp_conf.ssl
             cls.verify_ssl = _aiohttp_conf.verify_ssl
             cls.limit_per_host = _aiohttp_conf.limit_per_host
+            cls.allow_redirects = _aiohttp_conf.allow_redirects
             cls.priority_adjust = settings.getint("RETRY_PRIORITY_ADJUST")
         return cls()
 
@@ -189,12 +189,17 @@ class AiohttpDownloaderMiddleware:
                 aiohttp_req_args.data = req_data_dict
 
         # 设置 proxy
-        if _proxy := self._get_args(key="proxy"):
+        if _proxy := self._get_args("proxy"):
             aiohttp_req_args.proxy = _proxy
-        if _proxy_auth := self._get_args(key="proxy_auth"):
+        if _proxy_auth := self._get_args("proxy_auth"):
             aiohttp_req_args.proxy_auth = _proxy_auth
-        if _proxy_headers := self._get_args(key="proxy_headers"):
+        if _proxy_headers := self._get_args("proxy_headers"):
             aiohttp_req_args.proxy_headers = _proxy_headers
+
+        # 设置 allow_redirects
+        _allow_redirects = self._get_args("allow_redirects")
+        if _allow_redirects is not None:
+            aiohttp_req_args.allow_redirects = _allow_redirects
 
         # 设置 cookies，优先从 AiohttpRequest 中的 cookies 参数中取值，没有时再从 headers 中取值
         _ck_args = self.aiohttp_args.get("cookies")
@@ -221,7 +226,7 @@ class AiohttpDownloaderMiddleware:
         )
 
         # 请求间隔设置
-        _sleep = self._get_args(key="sleep")
+        _sleep = self._get_args("sleep")
         await asyncio.sleep(_sleep)
 
         if all([status_code == 504, not html_content]):
@@ -238,28 +243,5 @@ class AiohttpDownloaderMiddleware:
             request=request,
         )
 
-    def process_request(self, request, spider):
-        """使用 aiohttp 来 process request
-
-        Args:
-            request: AiohttpRequest 对象
-            spider: scrapy spider
-
-        Returns:
-            1). Deferred
-        """
-        return ReuseOperation.as_deferred(self._process_request(request, spider))
-
-    async def _spider_closed(self):
-        pass
-
-    def spider_closed(self):
-        """当 spider closed 时调用"""
-        return ReuseOperation.as_deferred(self._spider_closed())
-
-
-class AiohttpAsyncDownloaderMiddleware(AiohttpDownloaderMiddleware):
-    """aiohttp 协程的另一种实现方法，简化 process_request 方法"""
-
     async def process_request(self, request, spider):
-        await super()._process_request(request, spider)
+        await self._process_request(request, spider)

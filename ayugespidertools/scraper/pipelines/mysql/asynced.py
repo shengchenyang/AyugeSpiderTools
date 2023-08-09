@@ -1,6 +1,7 @@
 import asyncio
 
 import aiomysql
+from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.utils import ToolsForAyu
@@ -21,7 +22,7 @@ class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=spider.mysql_conf)
-        return ReuseOperation.as_deferred(self._open_spider(spider))
+        return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider):
         self.loop = asyncio.get_event_loop()
@@ -55,7 +56,7 @@ class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
 
     def close_spider(self, spider):
         self.db.close()
-        return ReuseOperation.as_deferred(self._close_spider())
+        return deferred_from_coro(self._close_spider())
 
 
 class AsyncMysqlPipeline(AyuMysqlPipeline):
@@ -67,7 +68,7 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=spider.mysql_conf)
-        return ReuseOperation.as_deferred(self._open_spider(spider))
+        return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider):
         self.pool = await aiomysql.create_pool(
@@ -79,9 +80,7 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
             charset=self.mysql_conf.charset,
             cursorclass=aiomysql.DictCursor,
             autocommit=True,
-            # 连接池最大连接数
             maxsize=10,
-            # 连接池最小连接数
             minsize=1,
         )
 
@@ -103,4 +102,4 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
         await self.pool.wait_closed()
 
     def close_spider(self, spider):
-        return ReuseOperation.as_deferred(self._close_spider())
+        return deferred_from_coro(self._close_spider())

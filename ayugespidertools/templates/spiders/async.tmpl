@@ -19,9 +19,6 @@ class $classname(AyuSpider):
     name = "$name"
     allowed_domains = ["$domain"]
     start_urls = ["http://$domain/"]
-
-    # 初始化配置的类型
-    settings_type = "debug"
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }

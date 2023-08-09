@@ -24,7 +24,7 @@ class VersionTest(ProcessTest, unittest.TestCase):
         _, out, _ = yield self.execute([])
         self.assertEqual(
             out.strip().decode(encoding),
-            "Scrapy 2.9.0",
+            "Scrapy 2.10.0",
         )
 
     @defer.inlineCallbacks

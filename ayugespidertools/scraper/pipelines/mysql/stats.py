@@ -1,5 +1,4 @@
 import dataclasses
-import datetime
 
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines import AyuMysqlPipeline
@@ -9,22 +8,9 @@ __all__ = [
 ]
 
 
+# Note: 此方法暂用于测试
 class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
     """Mysql 存储且记录脚本运行状态的简单示例"""
-
-    # Note: 此方法暂用于测试
-    def __init__(self, env):
-        self.env = env
-        self.slog = None
-        self.conn = None
-        self.cursor = None
-        self.collate = None
-        self.mysql_conf = None
-        self.crawl_time = datetime.date.today()
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(env=crawler.settings.get("ENV", ""))
 
     def open_spider(self, spider):
         self.slog = spider.slog

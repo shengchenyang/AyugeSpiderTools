@@ -23,6 +23,7 @@ class $classname(AyuSpider):
     allowed_domains = ["$domain"]
     start_urls = ["http://$domain/"]
     custom_table_enum = TableEnum
+    mysql_engine_enabled = True
     custom_settings = {
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -32,7 +33,6 @@ class $classname(AyuSpider):
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
     }
-    mysql_engine_enabled = True
 
     def start_requests(self):
         """get 请求首页，获取项目列表数据"""

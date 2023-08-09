@@ -2,6 +2,7 @@ import asyncio
 import urllib.parse
 
 import motor.motor_asyncio
+from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -21,7 +22,7 @@ class AsyncMongoPipeline:
             f"@{spider.mongodb_conf.host}:{spider.mongodb_conf.port}/"
             f"?authSource={spider.mongodb_conf.authsource}&authMechanism=SCRAM-SHA-1",
         )
-        return ReuseOperation.as_deferred(self._open_spider(spider))
+        return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider):
         self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_uri)

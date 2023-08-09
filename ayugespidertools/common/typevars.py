@@ -77,6 +77,7 @@ class AiohttpConf(NamedTuple):
     verify_ssl: bool
     limit_per_host: int
     timeout: int
+    allow_redirects: bool
 
 
 class AlterItem(NamedTuple):

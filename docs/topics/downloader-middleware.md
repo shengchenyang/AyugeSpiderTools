@@ -104,10 +104,15 @@ custom_settings = {
     },
     # scrapy Request 替换为 aiohttp 的配置示例
     "AIOHTTP_CONFIG": {
-        "timeout": 2,
         "proxy": "http://127.0.0.1:7890",
         "sleep": 1,
+        # 同时连接的总数
+        "limit": 100,
+        # 同时连接到一台主机的数量
+        "limit_per_host": 0,
         "retry_times": 3,
+        "verify_ssl": False,
+        "allow_redirects": False,
     },
 }
 ```

@@ -7,6 +7,7 @@ __all__ = [
 ]
 
 
+# noinspection PyMissingConstructor
 class AyuFtyMongoPipeline(MongoDbBase):
     """MongoDB 存储场景的 scrapy pipeline 扩展"""
 

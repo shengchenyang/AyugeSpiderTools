@@ -26,13 +26,13 @@ class ReuseOperation:
 
     @staticmethod
     def as_deferred(f):
-        """transform a Twisted Deferred to an Asyncio Future
+        """transform a Twisted Deffered to an Asyncio Future
 
         Args:
             f: async function
 
         Returns:
-            1). Deferred
+            1). Future
         """
         return Deferred.fromFuture(asyncio.ensure_future(f))
 
