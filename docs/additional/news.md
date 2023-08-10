@@ -1,5 +1,31 @@
 # Release notes
 
+## AyugeSpiderTools 3.4.0 (2023-08-10)
+
+### Deprecation removals
+
+- 无。
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- `aiohttp` 超时参数由 `AIOHTTP_CONFIG` 中的 `timeout` 获取改为直接从 `DOWNLOAD_TIMEOUT` 中获取。解决在 `aiohttp` 超时参数值大于 `DOWNLOAD_TIMEOUT` 时，与程序整体超时设置冲突，考虑程序的整体性，而不去根据 `aiohttp` 的超时设置来更新项目的整体设置。
+
+### Code optimizations
+
+- `aiohttp` 添加 `allow_redirects` 配置参数 ，优化对应文档示例。
+- 更新 `scrapy` 依赖版本为 `2.10.0`。
+- 解决部分 `typo` 及注解问题。
+
+<hr/>
+
 ## AyugeSpiderTools 3.3.3 (2023-08-03)
 
 ### Deprecation removals

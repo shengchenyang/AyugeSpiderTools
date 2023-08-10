@@ -20,13 +20,9 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     def from_crawler(cls, crawler):
         pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
-            # 数据库表枚举是否开启
             table_enum=crawler.settings.get("DATA_ENUM"),
-            # 获取部署的环境
             env=crawler.settings.get("ENV"),
-            # 当 record_log_to_mysql 为 True 时，会记录运行情况
             record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
-            # 数据库连接池配置
             pool_db_conf=pool_db_conf,
         )
 
@@ -35,7 +31,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         if not self.pool_db_conf:
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
             self.pool_db_conf = {
-                # 连接池允许的最大连接数
                 "maxconnections": 5,
                 # 连接池中空闲连接的最大数量。默认 0，即无最大数量限制
                 "maxcached": 0,

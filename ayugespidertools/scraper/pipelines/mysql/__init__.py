@@ -52,9 +52,8 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            # 数据库表枚举是否开启
+            # 数据库表枚举
             table_enum=crawler.settings.get("DATA_ENUM"),
-            # 获取部署的环境
             env=crawler.settings.get("ENV"),
             # 当 record_log_to_mysql 为 True 时，会记录运行情况
             record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
@@ -107,7 +106,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         return item
 
     def insert_item(self, alter_item: AlterItem, table: str):
-        """通用插入数据，将 item 数据存入 Mysql 中，item 中的 key 需要跟 Mysql 数据中的字段名称一致
+        """通用插入数据
 
         Args:
             alter_item: 经过转变后的 item
@@ -142,7 +141,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
             return self.insert_item(alter_item, table)
 
     def close_spider(self, spider):
-        # 是否记录程序采集的基本信息到 Mysql 中，只有打开 record_log_to_mysql 配置才会收集和存储相关的统计信息
+        # 是否记录程序采集的基本信息到 Mysql 中，打开 record_log_to_mysql 配置才会存储统计信息
         if self.record_log_to_mysql:
             log_info = self._get_log_by_spider(
                 spider=spider, crawl_time=self.crawl_time

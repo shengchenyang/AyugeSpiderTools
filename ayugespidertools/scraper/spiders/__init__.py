@@ -80,7 +80,6 @@ class AyuSpider(Spider):
     SPIDER_TIME = time.strftime("%Y-%m-%d", time.localtime())
     # 是否启用 Debug 参数，默认激活 custom_common_settings
     settings_type = "common"
-    # 脚本信息
     project_content = ""
     custom_table_enum = None
     mysql_engine_enabled = False
@@ -161,30 +160,25 @@ class AyuSpider(Spider):
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 mongodb_conf 信息")
             spider.mongodb_conf = mongodb_conf
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 rabbitmq_conf 信息")
             spider.rabbitmq_conf = rabbitmq_conf
 
         if kafka_conf := get_spider_conf(
             KafkaConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 kafka_conf 信息")
             spider.kafka_conf = kafka_conf
 
         if dynamicproxy_conf := get_spider_conf(
             DynamicProxyCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 dynamicproxy_conf 信息")
             spider.dynamicproxy_conf = dynamicproxy_conf
 
         if exclusiveproxy_conf := get_spider_conf(
             ExclusiveProxyCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 exclusiveproxy_conf 信息")
             spider.exclusiveproxy_conf = exclusiveproxy_conf
         return spider

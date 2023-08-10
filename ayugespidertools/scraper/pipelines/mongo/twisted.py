@@ -12,13 +12,6 @@ __all__ = [
 class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
     """使用 twisted 的 adbapi 实现 mongoDB 存储场景下的异步操作"""
 
-    def __init__(self):
-        super(AyuTwistedMongoPipeline, self).__init__()
-
-    def spider_closed(self, spider):
-        if self.conn:
-            self.conn.close()
-
     @defer.inlineCallbacks
     def process_item(self, item, spider):
         out = defer.Deferred()

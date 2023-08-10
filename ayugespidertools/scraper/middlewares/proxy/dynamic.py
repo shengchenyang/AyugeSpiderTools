@@ -55,11 +55,6 @@ class AbuDynamicProxyDownloaderMiddleware:
     """阿布云动态代理 - 隧道验证方式（其实和快代理的写法一致）"""
 
     def __init__(self, settings):
-        """从 scrapy 配置中取出动态隧道代理的信息
-
-        Args:
-            settings: scrapy 配置信息
-        """
         dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(

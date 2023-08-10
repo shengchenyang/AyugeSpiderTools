@@ -114,6 +114,8 @@ custom_settings = {
         "verify_ssl": False,
         "allow_redirects": False,
     },
+    # aiohttp 的超时时间也用这个配置，统一管理且不允许修改
+    "DOWNLOAD_TIMEOUT": 25,
 }
 ```
 

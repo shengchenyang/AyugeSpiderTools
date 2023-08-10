@@ -49,7 +49,7 @@ class FilesDownloadPipeline:
 
         request = scrapy.Request(file_url, callback=NO_CALLBACK)
         response = await maybe_deferred_to_future(
-            spider.crawler.engine.download(request, spider)
+            spider.crawler.engine.download(request)
         )
 
         if response.status != 200:

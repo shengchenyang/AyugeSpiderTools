@@ -91,6 +91,3 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def handle_error(self, failure, item):
         self.slog.error(f"插入数据失败:{failure}, item: {item}")
-
-    def close_spider(self, spider):
-        super(AyuTwistedMysqlPipeline, self).close_spider(spider)

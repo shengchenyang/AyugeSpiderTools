@@ -77,7 +77,7 @@ class DataHandle:
             hms_conn: 时分秒拼接的方式
 
         Returns:
-            1).最终的格式化拼接结果，比如：%Y-%m-%d %H-%M-%S
+            1). 最终的格式化拼接结果，比如：%Y-%m-%d %H-%M-%S
         """
         # 年月日
         _y_m_d = ["%Y", "%m", "%d"]
@@ -99,7 +99,7 @@ class DataHandle:
             date_str: 需要判断格式的时间
 
         Returns:
-            1): 时间格式的标识，比如：-，若没有就返回空字符
+            1). 时间格式的标识，比如：-，若没有就返回空字符
         """
         format_styles = ["-", ".", "/", "年"]
         return next(

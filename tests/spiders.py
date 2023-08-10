@@ -123,18 +123,22 @@ class DemoAiohttpSpider(AyuSpider):
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
         "DOWNLOADER_MIDDLEWARES": {
-            # 随机请求头
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
-            # 将 scrapy Request 替换为 aiohttp 方式
             "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
         },
         # scrapy Request 替换为 aiohttp 的配置示例
         "AIOHTTP_CONFIG": {
-            "timeout": 30,
             # "proxy": "http://127.0.0.1:7890",
             "sleep": 0,
+            # 同时连接的总数
+            "limit": 100,
+            # 同时连接到一台主机的数量
+            "limit_per_host": 0,
             "retry_times": 3,
+            "verify_ssl": False,
+            "allow_redirects": False,
         },
+        "DOWNLOAD_TIMEOUT": 35,
     }
 
     def start_requests(self):

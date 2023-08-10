@@ -2,7 +2,6 @@ import asyncio
 import urllib.parse
 
 import motor.motor_asyncio
-from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -10,6 +9,11 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 
 class AsyncMongoPipeline:
     """通过 motor 实现异步写入 MongoDB 的存储管道"""
+
+    def __init__(self):
+        self.mongo_uri = None
+        self.client = None
+        self.db = None
 
     def open_spider(self, spider):
         assert hasattr(
@@ -22,14 +26,8 @@ class AsyncMongoPipeline:
             f"@{spider.mongodb_conf.host}:{spider.mongodb_conf.port}/"
             f"?authSource={spider.mongodb_conf.authsource}&authMechanism=SCRAM-SHA-1",
         )
-        return deferred_from_coro(self._open_spider(spider))
-
-    async def _open_spider(self, spider):
         self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_uri)
         self.db = self.client[spider.mongodb_conf.database]
-
-    async def close_spider(self, spider):
-        self.client.close()
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
@@ -40,3 +38,6 @@ class AsyncMongoPipeline:
             )
         )
         return item
+
+    def close_spider(self, spider):
+        self.client.close()

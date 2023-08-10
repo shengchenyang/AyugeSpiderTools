@@ -27,7 +27,7 @@ class AbstractClass(ABC):
             item_dict: item ItemAdapter 或者 dict 格式数据，可像字典一样操作
 
         Returns:
-            None
+            insert_data: 返回 dict 格式的存储数据
         """
         insert_data = ReuseOperation.get_items_except_keys(
             dict_conf=item_dict,
@@ -50,9 +50,6 @@ class AbstractClass(ABC):
         Args:
             item_dict: item ItemAdapter 或 dict 格式数据
             db: mongodb 数据库连接
-
-        Returns:
-            None
         """
         insert_data = self._get_insert_data(item_dict)
         self._data_storage_logic(
@@ -81,9 +78,6 @@ class AbstractClass(ABC):
             insert_data: 要插入的数据
             *args: 可变参数
             **kwargs:关键字参数
-
-        Returns:
-            None
         """
         pass
 

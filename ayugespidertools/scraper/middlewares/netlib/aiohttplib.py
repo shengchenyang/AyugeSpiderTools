@@ -74,7 +74,6 @@ class AiohttpDownloaderMiddleware:
 
     @classmethod
     def from_crawler(cls, crawler):
-        """初始化 middleware"""
         settings = crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
         if local_aiohttp_conf := settings.get("AIOHTTP_CONFIG", {}):
@@ -139,12 +138,12 @@ class AiohttpDownloaderMiddleware:
         except aiohttp.ClientTimeout:
             return 504, ""
 
-    async def _process_request(self, request, spider):
-        """使用 aiohttp 来 process spider"""
+    async def process_request(self, request, spider):
         aiohttp_options = request.meta.get("aiohttp")
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
-        # 根据 LOCAL_AIOHTTP_CONFIG 中设置 aiohttp 请求参数，这里的参数全局生效，不会在 meta 中更新
+        # 根据 LOCAL_AIOHTTP_CONFIG 中设置 aiohttp 请求参数
+        # 这些参数全局生效，不会在 meta 中更新
         _connector = aiohttp.TCPConnector(
             ssl=self.ssl,
             limit=self.limit,
@@ -242,6 +241,3 @@ class AiohttpDownloaderMiddleware:
             encoding="utf-8",
             request=request,
         )
-
-    async def process_request(self, request, spider):
-        await self._process_request(request, spider)

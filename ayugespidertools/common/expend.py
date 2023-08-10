@@ -14,7 +14,7 @@ __all__ = [
 
 
 class MysqlPipeEnhanceMixin:
-    """扩展 pipelines 的功能，作为 Mixin 使用，不要对其实例化或单独使用"""
+    """扩展 pipelines 的功能"""
 
     @retry(
         stop_max_attempt_number=Param.retry_num,
@@ -33,7 +33,7 @@ class MysqlPipeEnhanceMixin:
             mysql_conf: pymysql 链接所需的参数
 
         Returns:
-            1).pymysql.connections.Connection, 链接句柄
+            1). pymysql.connections.Connection, 链接句柄
         """
         try:
             conn = pymysql.connect(
@@ -52,7 +52,7 @@ class MysqlPipeEnhanceMixin:
         else:
             # 连接没有问题就直接返回连接对象
             return conn
-        # 出现数据库不存在问题后，在创建数据库 create_database 后，再次返回连接对象
+        # 出现数据库不存在问题后，在创建数据库后，再次返回连接对象
         return pymysql.connect(
             user=mysql_conf.user,
             password=mysql_conf.password,
@@ -126,27 +126,16 @@ class MysqlPipeEnhanceMixin:
 
         log_info = {
             "database": mysql_conf.database,
-            # 脚本名称
             "spider_name": spider.name,
-            # uid
             "uid": f"{mysql_conf.database}|{spider.name}",
-            # 请求次数统计
             "request_counts": text.get("downloader_request_count", 0),
-            # 接收次数统计
             "received_count": text.get("response_received_count", 0),
-            # 采集数据量
             "item_counts": text.get("item_scraped_count", 0),
-            # info 数据统计
             "info_count": text.get("log_count_INFO", 0),
-            # 警告数据统计
             "warning_count": text.get("log_count_WARNING", 0),
-            # 错误数据统计
             "error_count": text.get("log_count_ERROR", 0),
-            # 开始时间
             "start_time": text.get("start_time"),
-            # 结束时间
             "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            # 花费时间
             "spend_minutes": round(
                 (
                     datetime.datetime.now()
