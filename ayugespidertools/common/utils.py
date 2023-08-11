@@ -19,6 +19,7 @@ from ayugespidertools.common.params import Param
 from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 from ayugespidertools.formatdata import DataHandle
+from ayugespidertools.items import AyuItem
 
 __all__ = [
     "ToolsForAyu",
@@ -278,8 +279,8 @@ class ToolsForAyu:
     def filter_data_before_yield(
         sql: str,
         mysql_engine,
-        item: Param.ScrapyItems,
-    ) -> Param.ScrapyItems:
+        item: AyuItem,
+    ) -> AyuItem:
         """数据入库前查询是否已存在，已存在则跳过
 
         Args:

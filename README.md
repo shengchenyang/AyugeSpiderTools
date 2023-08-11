@@ -129,7 +129,7 @@ scrapy crawl <spider_name>
 > 具体内容请以 [poetry 官方文档](https://python-poetry.org/docs/) 为准。
 
 据[你可能在意的事](#你可能在意的事)可知，你可以 `clone`
-源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板等），修改完成后 `poetry  build`
+源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板等），修改完成后 `poetry build`
 或 `make build` 即可打包使用。
 
 比如你可能需要更新依赖库中 `pymongo` 为新版本 `x.x.x`，那只需 `poetry install`

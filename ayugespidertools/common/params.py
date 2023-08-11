@@ -7,8 +7,6 @@ import pymongo
 import pymysql
 from itemadapter import ItemAdapter
 
-from ayugespidertools.items import AyuItem, ScrapyClassicItem
-
 __all__ = [
     "Param",
 ]
@@ -28,8 +26,6 @@ class Param:
     PymysqlCursor = TypeVar("PymysqlCursor", bound="pymysql.cursors.Cursor")
     PymysqlDictCursor = TypeVar("PymysqlDictCursor", bound="pymysql.cursors.DictCursor")
     ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
-    # 此框架中 Item 的类型种类
-    ScrapyItems = TypeVar("ScrapyItems", AyuItem, ScrapyClassicItem)
 
     # 基本的请求头
     base_headers = {

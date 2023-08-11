@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Literal, NamedTuple, Optional, TypeVar, Union
 
 import scrapy
-from scrapy.item import Field, Item
+from scrapy.item import Item
 
 from ayugespidertools.common.typevars import EmptyKeyError, FieldAlreadyExistsError
 
@@ -16,7 +16,6 @@ AyuItemTypeVar = TypeVar("AyuItemTypeVar", bound="AyuItem")
 __all__ = [
     "DataItem",
     "ScrapyItem",
-    "ScrapyClassicItem",
     "AyuItem",
 ]
 
@@ -34,17 +33,6 @@ class DataItem(NamedTuple):
 
 # item 中 alldata 的类型
 AllDataType = Dict[str, Union[DataItem, Dict[str, Any], Any]]
-
-
-class ScrapyClassicItem(Item):
-    """scrapy 经典 item 示例"""
-
-    # 用于存放所有字段信息
-    alldata: AllDataType = Field()
-    # 用于存放存储的表名
-    _table: str = Field()
-    # 用于介绍存储场景
-    _item_mode: ItemModeStr = Field()
 
 
 class ItemMeta(ABCMeta):

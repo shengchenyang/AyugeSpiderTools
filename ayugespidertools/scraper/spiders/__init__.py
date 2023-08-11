@@ -146,7 +146,6 @@ class AyuSpider(Spider):
         if mysql_conf := get_spider_conf(
             MysqlConfCreator().create_product(crawler.settings, _consul_conf)
         ):
-            spider.slog.debug("项目中配置了 mysql_conf 信息")
             spider.mysql_conf = mysql_conf
             if cls.mysql_engine_enabled:
                 mysql_url = (

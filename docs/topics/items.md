@@ -266,7 +266,7 @@ class DemoOneSpider(AyuSpider):
 
 ## yield item
 
-> 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即 `ScrapyClassicItem`)，还有就是本库推荐的 `AyuItem` 的形式。
+> 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即本库中的 `ScrapyItem`)，还有就是本库推荐的 `AyuItem` 的形式。
 
 这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
 
