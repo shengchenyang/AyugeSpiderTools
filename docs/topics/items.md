@@ -15,7 +15,7 @@
 
 ```python
 def parse(self, response):
-	# 存储到 Mysql 场景时需要的 Item 构建示例
+    # 存储到 Mysql 场景时需要的 Item 构建示例
     ArticleMysqlItem = AyuItem(
         article_detail_url=DataItem(article_detail_url, "文章详情链接"),
         article_title=DataItem(article_title, "文章标题"),
@@ -24,6 +24,7 @@ def parse(self, response):
         nick_name=DataItem(nick_name, "文章作者昵称"),
         _table=TableEnum.article_list_table.value["value"],
     )
+    
     # 存储到 MongoDB 场景时需要的 Item 构建示例
     ArticleMongoItem = AyuItem(
         article_detail_url=article_detail_url,
@@ -74,7 +75,7 @@ item = AyuItem(_table="ta")
 
 获取字段：
 
-```python
+```shell
 >>> item._table
 'ta'
 >>> item["_table"]
@@ -85,7 +86,7 @@ item = AyuItem(_table="ta")
 
 添加 / 修改字段（不存在则创建，存在则修改）：
 
-```python
+```shell
 >>> item._table = "tab"
 >>> item["title"] = "tit"
 >>>
@@ -100,7 +101,7 @@ item = AyuItem(_table="ta")
 
 类型转换：
 
-```python
+```shell
 >>> # 内置转为 dict 和 scrapy Item 的方法
 >>>
 >>> item.asdict()
@@ -112,7 +113,7 @@ item = AyuItem(_table="ta")
 
 删除字段：
 
-```python
+```shell
 >>> # 删除字段：
 >>>
 >>> del item["title"]
@@ -145,32 +146,31 @@ from DemoSpider.items import TableEnum
 # collection_content: 采集内容介绍
 # create_time: xxxx-xx-xx
 # explain:
-# demand_code_prefix = ''
+# demand_code_prefix = ""
 ####################################################################################################
 """
 
 
 class DemoOneSpider(AyuSpider):
-    name = 'demo_one'
-    allowed_domains = ['csdn.net']
-    start_urls = ['https://www.csdn.net/']
+    name = "demo_one"
+    allowed_domains = ["csdn.net"]
+    start_urls = ["https://www.csdn.net/"]
     # 数据库表的枚举信息
     custom_table_enum = TableEnum
-    custom_settings = {
-        'ITEM_PIPELINES': {
-            # 激活此项则数据会存储至 Mysql
-            'ayugespidertools.pipelines.AyuFtyMysqlPipeline': 300,
-            # 激活此项则数据会存储至 MongoDB
-            'ayugespidertools.pipelines.AyuFtyMongoPipeline': 301,
-        },
-        'DOWNLOADER_MIDDLEWARES': {
-            # 随机请求头
-            'ayugespidertools.middlewares.RandomRequestUaMiddleware': 400,
-        },
-    }
-
     # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
     mysql_engine_enabled = True
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            # 激活此项则数据会存储至 Mysql
+            "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
+            # 激活此项则数据会存储至 MongoDB
+            "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
+        },
+        "DOWNLOADER_MIDDLEWARES": {
+            # 随机请求头
+            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
+        },
+    }
 
     def start_requests(self):
         """
@@ -180,7 +180,7 @@ class DemoOneSpider(AyuSpider):
             url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
             callback=self.parse_first,
             headers={
-                'referer': 'https://blog.csdn.net/rank/list',
+                "referer": "https://blog.csdn.net/rank/list",
             },
             cb_kwargs={
                 "curr_site": "csdn",

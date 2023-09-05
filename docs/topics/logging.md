@@ -70,8 +70,8 @@ import ayugespidertools
 
 class MySpider(ayugespidertools.AyuSpider):
 
-    name = 'myspider'
-    start_urls = ['https://scrapy.org']
+    name = "myspider"
+    start_urls = ["https://scrapy.org"]
 
     def parse(self, response):
         # 此条（error 级别以下的）日志默认下只会在控制台输出

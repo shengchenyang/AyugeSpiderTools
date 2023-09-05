@@ -121,8 +121,7 @@ scrapy crawl <spider_name>
 1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，比如移除对你无用模块、修改库名等，你可以自行修改后 `build`。
 2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy`
    项目及其它组件。
-3. **当然，你也可以选择给此项目做出贡献，比如增加或优化某些功能等，但在此之前请提相关的 `ISSUES`
-   经确认后再开发和提交 `PULL REQUESTS`，以免不太符合本库场景或已废弃等原因造成你的贡献浪费，那就太可惜了！**
+3. 如果你想对此项目做出贡献，请参考[pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
 
 ## 构建你的专属库
 

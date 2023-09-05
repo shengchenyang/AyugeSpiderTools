@@ -65,14 +65,15 @@ class DemoOneSpider(AyuSpider):
     name = "demo_one"
     allowed_domains = ["blog.csdn.net"]
     start_urls = ["https://blog.csdn.net/"]
-
     # 数据库表的枚举信息，当前项目所依赖的表信息，一般用于存储数据时使用
     custom_table_enum = TableEnum
     # 初始化配置的类型，初始化设置（不需要直接不用配置）
-    settings_type = 'debug'
+    settings_type = "debug"
+    # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
+    mysql_engine_enabled = True
     custom_settings = {
         # scrapy 日志等级
-        'LOG_LEVEL': 'DEBUG',
+        "LOG_LEVEL": "DEBUG",
         # 是否开启记录项目相关运行统计信息。不配置默认为 False
         "RECORD_LOG_TO_MYSQL": True,
         # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
@@ -86,9 +87,6 @@ class DemoOneSpider(AyuSpider):
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
         },
     }
-
-    # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-    mysql_engine_enabled = True
 
     def start_requests(self):
         """

@@ -132,10 +132,7 @@ provided. Please fill in the required content for testing, then:
 2. This library mainly promotes the functionality of the scrapy extension (i.e. the enhanced version of the custom
    template). In theory, using this library should not affect your scrapy project and other components.
 
-3. Of course, you can also choose to contribute to this project, such as adding or optimizing certain features. However,
-   before doing so, please submit relevant ISSUES for confirmation and then develop and submit PULL REQUESTS. This is to
-   avoid wasting your contributions due to reasons such as not being suitable for this library or having been
-   deprecated. That would be a shame!
+3. If you want to contribute to this project, please refer to the [example](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html) pull request.
 
 ## Build Your Own Library
 

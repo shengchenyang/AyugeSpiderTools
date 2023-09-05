@@ -118,9 +118,13 @@ Getting help
    :hidden:
 
    diy/myself
+   additional/contribute
 
 :doc:`diy/myself`
     如何将本库构建成为你的专属库。
+
+:doc:`additional/contribute`
+    贡献。
 
 补充说明
 ==================================

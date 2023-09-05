@@ -42,11 +42,11 @@ from ayugespidertools.items import AyuItem
 # 这是 scrapy 中的实现示例：
 def parse(self, response):
     l = ItemLoader(item=Product(), response=response)
-    l.add_xpath('name', '//div[@class="product_name"]')
-    l.add_xpath('name', '//div[@class="product_title"]')
-    l.add_xpath('price', '//p[@id="price"]')
-    l.add_css('stock', 'p#stock')
-    l.add_value('last_updated', 'today') # you can also use literal values
+    l.add_xpath("name", '//div[@class="product_name"]')
+    l.add_xpath("name", '//div[@class="product_title"]')
+    l.add_xpath("price", '//p[@id="price"]')
+    l.add_css("stock", "p#stock")
+    l.add_value("last_updated", "today") # you can also use literal values
     yield l.load_item()
 
 
@@ -64,7 +64,7 @@ def parse(self, response):
     mine_item.default_output_processor = TakeFirst()
     mine_item.add_value("book_name", book_name)
     mine_item.add_xpath("book_href", '//div[@class="product_title"]')
-    mine_item.add_css("book_intro", 'p#stock')
+    mine_item.add_css("book_intro", "p#stock")
     item = mine_item.load_item()
     yield item
 ```
