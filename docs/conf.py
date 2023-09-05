@@ -53,7 +53,7 @@ html_context = {
     "display_github": True,
     "github_user": "shengchenyang",
     "github_repo": "AyugeSpiderTools",
-    "github_version": "main/docs/",
+    "github_version": "master/docs/",
 }
 
 html_theme = "sphinx_rtd_theme"
