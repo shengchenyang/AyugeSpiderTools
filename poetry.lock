@@ -2623,13 +2623,13 @@ reference = "aliyun"
 
 [[package]]
 name = "scrapy"
-version = "2.10.0"
+version = "2.10.1"
 description = "A high-level Web Crawling and Web Scraping framework"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Scrapy-2.10.0-py2.py3-none-any.whl", hash = "sha256:e6a44469eb4846a44f6c573f7d4110afbf8f4ed87775c22b4b04110924581d13"},
-    {file = "Scrapy-2.10.0.tar.gz", hash = "sha256:4e16a33fc8c03a58bdf4e8d4bdca1f867354eac69ccf573658c7ff34fa0cae39"},
+    {file = "Scrapy-2.10.1-py2.py3-none-any.whl", hash = "sha256:0b2f99d297f32112ae7979f50b9942a5f55b09b821f1c3afb0bed950f6a1f5a7"},
+    {file = "Scrapy-2.10.1.tar.gz", hash = "sha256:91d67875fbb537607b07e31363445718a3532b544e6e2b4baf8a042b21a1d10f"},
 ]
 
 [package.dependencies]
@@ -2648,7 +2648,7 @@ queuelib = ">=1.4.2"
 service-identity = ">=18.1.0"
 setuptools = "*"
 tldextract = "*"
-Twisted = ">=18.9.0"
+Twisted = ">=18.9.0,<23.8.0"
 w3lib = ">=1.17.0"
 "zope.interface" = ">=5.1.0"
 
@@ -3532,4 +3532,4 @@ reference = "aliyun"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "2ae504824bc553fd1d4dab5f083aabd649e2df56c7507973d9607a95f48e9b6d"
+content-hash = "2f43571b01760ab2a4e4fdfe5b4cdff9ff1e332e1bc95108e23b16efbbc9bd77"

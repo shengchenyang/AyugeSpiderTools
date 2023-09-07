@@ -1,5 +1,17 @@
 # Release notes
 
+## AyugeSpiderTools 3.4.1 (2023-09-07)
+
+### Bug fixes
+
+- 解决 `Twisted` 版本更新到 `23.8.0` 不兼容的问题。([issue 10](https://github.com/shengchenyang/AyugeSpiderTools/issues/10))
+
+### Code optimizations
+
+- `scrapy` 依赖版本更新为 `2.10.1`。
+
+<hr/>
+
 ## AyugeSpiderTools 3.4.0 (2023-08-10)
 
 ### Deprecation removals
