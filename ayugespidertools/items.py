@@ -126,14 +126,14 @@ class AyuItem(metaclass=ItemMeta):
         {'_table': 'tab', 'num': 10}
     """
 
-    _table: str = None
-    _mongo_update_rule: Dict[str, Any] = None
+    _table: Optional[str] = None
+    _mongo_update_rule: Optional[Dict[str, Any]] = None
     __fields: Optional[set] = None
 
     def __init__(
         self,
         _table: str,
-        _mongo_update_rule: Dict[str, Any] = None,
+        _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
         """初始化 AyuItem 实例

@@ -4,7 +4,7 @@ import math
 import random
 import xml.etree.ElementTree as ET
 from functools import lru_cache
-from typing import Any, List, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
 import hcl2
@@ -16,15 +16,17 @@ import yaml
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 from ayugespidertools.formatdata import DataHandle
-from ayugespidertools.items import AyuItem
 
 __all__ = [
     "ToolsForAyu",
     "BezierTrajectory",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import MysqlConf, Str_Lstr
+    from ayugespidertools.items import AyuItem
 
 ConsulFormatStr = Literal["json", "hcl", "yaml", "xml"]
 ConsulConfNameStr = Literal[
@@ -198,9 +200,7 @@ class ToolsForAyu:
         return json_data
 
     @classmethod
-    def extract_with_json_rules(
-        cls, json_data: dict, query_rules: List[Param.Str_Lstr]
-    ):
+    def extract_with_json_rules(cls, json_data: dict, query_rules: List["Str_Lstr"]):
         """当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
 
         Args:
@@ -220,7 +220,7 @@ class ToolsForAyu:
         return ""
 
     @staticmethod
-    def get_collate_by_charset(mysql_conf: MysqlConf) -> str:
+    def get_collate_by_charset(mysql_conf: "MysqlConf") -> str:
         """根据 mysql 的 charset 获取对应默认的 collate
 
         Args:
@@ -279,8 +279,8 @@ class ToolsForAyu:
     def filter_data_before_yield(
         sql: str,
         mysql_engine,
-        item: AyuItem,
-    ) -> AyuItem:
+        item: "AyuItem",
+    ):
         """数据入库前查询是否已存在，已存在则跳过
 
         Args:
@@ -435,7 +435,7 @@ class BezierTrajectory:
         Returns:
             1). 返回一个字典 trackArray 对应轨迹数组，P 对应贝塞尔曲线的影响点
         """
-        s = []
+        s: list = []
         fun = self.simulation(start, end, order, deviation, bias)
         w = fun["P"]
         fun = fun["equation"]

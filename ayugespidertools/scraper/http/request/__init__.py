@@ -23,7 +23,7 @@ class AiohttpRequest(Request):
         body: Optional[Union[bytes, str]] = None,
         cookies: Optional[Union[dict, List[dict]]] = None,
         meta: Optional[dict] = None,
-        args: Union[AiohttpRequestArgs, dict] = None,
+        args: Optional[Union[AiohttpRequestArgs, dict]] = None,
         **kwargs,
     ) -> None:
         # 用 meta 缓存 scrapy meta 的参数

@@ -1,13 +1,15 @@
-from typing import Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from scrapy import FormRequest
 
-from ayugespidertools.common.typevars import AiohttpRequestArgs
 from ayugespidertools.scraper.http.request import AiohttpRequest
 
 __all__ = [
     "AiohttpFormRequest",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import AiohttpRequestArgs
 
 
 class AiohttpFormRequest(AiohttpRequest, FormRequest):
@@ -20,7 +22,7 @@ class AiohttpFormRequest(AiohttpRequest, FormRequest):
         method=None,
         formdata=None,
         body=None,
-        args: Union[AiohttpRequestArgs, dict] = None,
+        args: Optional[Union["AiohttpRequestArgs", dict]] = None,
         **kwargs
     ):
         # First init FormRequest to get url, body and method

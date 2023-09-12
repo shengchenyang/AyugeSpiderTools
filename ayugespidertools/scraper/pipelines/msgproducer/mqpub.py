@@ -1,7 +1,6 @@
 import json
 
 import pika
-import pika.exceptions
 
 __all__ = [
     "AyuMQPipeline",

@@ -1,8 +1,7 @@
 import re
 from abc import ABC, abstractmethod
-from typing import Optional, Type, Union
+from typing import TYPE_CHECKING, Optional, Type, TypeVar, Union
 
-from ayugespidertools.common.params import Param
 from ayugespidertools.common.typevars import TableEnumTypeVar
 from ayugespidertools.config import logger
 
@@ -12,13 +11,21 @@ __all__ = [
     "deal_mysql_err",
 ]
 
+if TYPE_CHECKING:
+    from pymysql.connections import Connection
+    from pymysql.cursors import Cursor, DictCursor
+
+PymysqlCursor = TypeVar("PymysqlCursor", bound="Cursor")
+PymysqlConnect = TypeVar("PymysqlConnect", bound="Connection")
+PymysqlDictCursor = TypeVar("PymysqlDictCursor", bound="DictCursor")
+
 
 class AbstractClass(ABC):
     """用于处理 mysql 异常的模板方法类"""
 
     def _create_table(
         self,
-        cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+        cursor: Union[PymysqlCursor, PymysqlDictCursor],
         table_name: str,
         charset: str,
         collate: str,
@@ -62,7 +69,7 @@ class AbstractClass(ABC):
 
     def _get_column_type(
         self,
-        cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+        cursor: Union[PymysqlCursor, PymysqlDictCursor],
         database: str,
         table: str,
         column: str,
@@ -100,8 +107,8 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: Param.PymysqlConnect,
-        cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+        conn: PymysqlConnect,
+        cursor: Union[PymysqlCursor, PymysqlDictCursor],
         charset: str,
         collate: str,
         database: str,
@@ -223,7 +230,7 @@ class AbstractClass(ABC):
     def deal_1406_error(
         self,
         err_msg: str,
-        cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+        cursor: Union[PymysqlCursor, PymysqlDictCursor],
         database: str,
         table: str,
         note_dic: dict,
@@ -260,7 +267,7 @@ class AbstractClass(ABC):
     def deal_1265_error(
         self,
         err_msg: str,
-        cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+        cursor: Union[PymysqlCursor, PymysqlDictCursor],
         database: str,
         table: str,
         note_dic: dict,
@@ -304,8 +311,8 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: Param.PymysqlConnect,
-        cursor: Param.PymysqlCursor,
+        conn: PymysqlConnect,
+        cursor: PymysqlCursor,
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -326,7 +333,7 @@ class TwistedAsynchronous(AbstractClass):
 
     def _exec_sql(
         self,
-        cursor: Param.PymysqlDictCursor,
+        cursor: PymysqlDictCursor,
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -344,14 +351,14 @@ class TwistedAsynchronous(AbstractClass):
 def deal_mysql_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: Union[Param.PymysqlCursor, Param.PymysqlDictCursor],
+    cursor: Union[PymysqlCursor, PymysqlDictCursor],
     charset: str,
     collate: str,
     database: str,
     table: str,
     table_enum: Type[TableEnumTypeVar],
     note_dic: dict,
-    conn: Optional[Param.PymysqlConnect] = None,
+    conn: Optional[PymysqlConnect] = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,

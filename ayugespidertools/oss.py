@@ -1,5 +1,5 @@
 import warnings
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import oss2
 import requests
@@ -13,6 +13,9 @@ warnings.filterwarnings("ignore")
 __all__ = [
     "AliOssBase",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import NoneType, Str_Lstr
 
 
 class AliOssBase:
@@ -109,7 +112,7 @@ class AliOssBase:
     def enumer_file_by_pre(
         self,
         prefix: str,
-        count_by_type: Union[Param.Str_Lstr, Param.NoneType, list] = None,
+        count_by_type: Union["Str_Lstr", "NoneType", list] = None,
     ) -> list:
         """列举 prefix 文件夹下的所有的 count_by_type 类型的文件元素
 
@@ -126,7 +129,7 @@ class AliOssBase:
         assert type(count_by_type) in [
             str,
             list,
-            Param.NoneType,
+            "NoneType",
         ], "计数依据的参数类型需要是 str 或 list"
 
         # 如果依据为空，则统计目标目录下的所有文件

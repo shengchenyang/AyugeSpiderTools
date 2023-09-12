@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Union
-
-from scrapy.settings import Settings
+from typing import TYPE_CHECKING, Optional, TypeVar
 
 from ayugespidertools.common.typevars import (
     DynamicProxyConf,
@@ -23,6 +21,9 @@ __all__ = [
     "ExclusiveProxyCreator",
 ]
 
+if TYPE_CHECKING:
+    from scrapy.settings import Settings
+
 SpiderConf = TypeVar(
     "SpiderConf",
     MysqlConf,
@@ -36,7 +37,7 @@ SpiderConf = TypeVar(
 
 class Product(ABC):
     @abstractmethod
-    def get_conn_conf(self) -> Union[SpiderConf, None]:
+    def get_conn_conf(self):
         """获取各个工具链接配置信息"""
         pass
 
@@ -48,11 +49,11 @@ class Creator(ABC):
 
 
 class MysqlConfProduct(Product):
-    def __init__(self, settings: Settings, consul_conf: dict):
+    def __init__(self, settings: "Settings", consul_conf: dict):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[MysqlConf, None]:
+    def get_conn_conf(self):
         # 1). 优先从 consul 中取值
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
@@ -70,7 +71,7 @@ class MongoDBConfProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[MongoDBConf, None]:
+    def get_conn_conf(self):
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
                 conf_name="mongodb", **self._consul_conf
@@ -86,7 +87,7 @@ class MQConfProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[MQConf, None]:
+    def get_conn_conf(self):
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
                 conf_name="rabbitmq", **self._consul_conf
@@ -102,7 +103,7 @@ class KafkaConfProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[KafkaConf, None]:
+    def get_conn_conf(self):
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
                 conf_name="kafka", **self._consul_conf
@@ -118,7 +119,7 @@ class DynamicProxyProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[DynamicProxyConf, None]:
+    def get_conn_conf(self):
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
                 conf_name="dynamicproxy", **self._consul_conf
@@ -134,7 +135,7 @@ class ExclusiveProxyProduct(Product):
         self._settings = settings
         self._consul_conf = consul_conf
 
-    def get_conn_conf(self) -> Union[ExclusiveProxyConf, None]:
+    def get_conn_conf(self):
         if _ := self._settings.get("APP_CONF_MANAGE", False):
             consul_conf = ToolsForAyu.get_conf_by_consul(
                 conf_name="exclusiveproxy", **self._consul_conf
@@ -146,36 +147,36 @@ class ExclusiveProxyProduct(Product):
 
 
 class MysqlConfCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return MysqlConfProduct(settings, consul_conf)
 
 
 class MongoDBConfCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return MongoDBConfProduct(settings, consul_conf)
 
 
 class MQConfCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return MQConfProduct(settings, consul_conf)
 
 
 class KafkaConfCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return KafkaConfProduct(settings, consul_conf)
 
 
 class DynamicProxyCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return DynamicProxyProduct(settings, consul_conf)
 
 
 class ExclusiveProxyCreator(Creator):
-    def create_product(self, settings: Settings, consul_conf: dict) -> Product:
+    def create_product(self, settings: "Settings", consul_conf: dict) -> Product:
         return ExclusiveProxyProduct(settings, consul_conf)
 
 
 def get_spider_conf(
     product: Product,
-) -> Union[SpiderConf, None]:
+) -> Optional[SpiderConf]:
     return product.get_conn_conf()

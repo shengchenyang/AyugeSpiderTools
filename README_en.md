@@ -22,7 +22,7 @@
 > One-sentence introduction: Used to extend Scrapy functionality and free up your hands.
 
 When developing a spider using Scrapy, it is inevitable that one has to repeatedly
-write `settings`, `items`, `middlewares`, `pipelines`, and some common methods. However, these contents in different
+write `settings`, `items`, `middlewares`, `pipeline`, and some common methods. However, these contents in different
 projects are roughly the same. So why not consolidate them together? I also want to extend some functionality, such as
 automatically modifying the corresponding `item` and `pipeline` when adding a field in the spider, without even manually
 modifying the table structure of MySQL. In this case, the template feature of Scrapy is not enough.

@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Union
-
-from itemadapter import ItemAdapter
+from typing import TYPE_CHECKING, TypeVar, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.params import Param
 
 __all__ = [
     "Synchronize",
@@ -13,13 +10,19 @@ __all__ = [
     "mongodb_pipe",
 ]
 
+if TYPE_CHECKING:
+    import pymongo
+    from itemadapter import ItemAdapter
+
+PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
+
 
 class AbstractClass(ABC):
     """用于处理 mongodb pipeline 存储的模板方法类"""
 
     def _get_insert_data(
         self,
-        item_dict: Union[ItemAdapter, dict],
+        item_dict: Union["ItemAdapter", dict],
     ) -> dict:
         """获取要插入的数据，将 item 中的存储数据提取出来
 
@@ -42,8 +45,8 @@ class AbstractClass(ABC):
 
     def process_item_template(
         self,
-        item_dict: Union[ItemAdapter, dict],
-        db: Param.PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
+        db: PymongoDataBase,
     ) -> None:
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
@@ -62,8 +65,8 @@ class AbstractClass(ABC):
     @abstractmethod
     def _data_storage_logic(
         self,
-        db: Param.PymongoDataBase,
-        item_dict: Union[ItemAdapter, dict],
+        db: PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
         *args,
@@ -87,8 +90,8 @@ class Synchronize(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: Param.PymongoDataBase,
-        item_dict: Union[ItemAdapter, dict],
+        db: PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
         *args,
@@ -108,8 +111,8 @@ class TwistedAsynchronous(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: Param.PymongoDataBase,
-        item_dict: Union[ItemAdapter, dict],
+        db: PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
         *args,
@@ -128,8 +131,8 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def _data_storage_logic(
         self,
-        db: Param.PymongoDataBase,
-        item_dict: Union[ItemAdapter, dict],
+        db: PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
         *args,
@@ -144,8 +147,8 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def process_item_template(
         self,
-        item_dict: Union[ItemAdapter, dict],
-        db: Param.PymongoDataBase,
+        item_dict: Union["ItemAdapter", dict],
+        db: PymongoDataBase,
     ) -> None:
         insert_data = self._get_insert_data(item_dict)
         await self._data_storage_logic(
@@ -158,8 +161,8 @@ class AsyncioAsynchronous(AbstractClass):
 
 def mongodb_pipe(
     abstract_class: AbstractClass,
-    item_dict: Union[ItemAdapter, dict],
-    db: Param.PymongoDataBase,
+    item_dict: Union["ItemAdapter", dict],
+    db: PymongoDataBase,
 ) -> None:
     """mongodb pipeline 存储的通用调用方法"""
     abstract_class.process_item_template(item_dict=item_dict, db=db)

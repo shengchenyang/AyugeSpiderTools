@@ -4,28 +4,33 @@
 # such as NoneType = type(None), etc.
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Literal, NamedTuple, Optional, TypedDict, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    List,
+    Literal,
+    NamedTuple,
+    Optional,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
-__all__ = [
-    "TableTemplate",
-    "TableEnumTypeVar",
-    "AlterItem",
-    "MysqlConf",
-    "MongoDBConf",
-    "AiohttpConf",
-    "AiohttpRequestArgs",
-    "MQConf",
-    "KafkaConf",
-    "DynamicProxyConf",
-    "ExclusiveProxyConf",
-    "FieldAlreadyExistsError",
-    "EmptyKeyError",
-]
+if TYPE_CHECKING:
+    from itemadapter import ItemAdapter
+
+NoneType = type(None)
+I_Str = TypeVar("I_Str", int, str)
+B_Str = TypeVar("B_Str", bytes, str)
+I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
+Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
 TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
 
 sentinel: Any = object()
+
+ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
 
 
 class TableTemplate(TypedDict):
@@ -87,7 +92,7 @@ class AlterItem(NamedTuple):
 
 @dataclass
 class AiohttpRequestArgs:
-    url: str = field(default=None)
+    url: Optional[str] = field(default=None)
     headers: Union[dict, None] = field(default=None)
     cookies: Union[dict, None] = field(default=None)
     method: AiohttpRequestMethodStr = field(default="GET")

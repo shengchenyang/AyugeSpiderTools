@@ -1,11 +1,5 @@
 import platform
 import random
-from typing import List, TypeVar
-
-# 用于 type hint，不要删除
-import pymongo
-import pymysql
-from itemadapter import ItemAdapter
 
 __all__ = [
     "Param",
@@ -14,18 +8,6 @@ __all__ = [
 
 class Param:
     """用于存储项目中需要的参数变量设置"""
-
-    NoneType = type(None)
-    # 用于参数的描述
-    I_Str = TypeVar("I_Str", int, str)
-    B_Str = TypeVar("B_Str", bytes, str)
-    I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
-    Str_Lstr = TypeVar("Str_Lstr", str, List[str])
-    PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
-    PymysqlConnect = TypeVar("PymysqlConnect", bound="pymysql.connections.Connection")
-    PymysqlCursor = TypeVar("PymysqlCursor", bound="pymysql.cursors.Cursor")
-    PymysqlDictCursor = TypeVar("PymysqlDictCursor", bound="pymysql.cursors.DictCursor")
-    ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
 
     # 基本的请求头
     base_headers = {

@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Type
 
 import pymysql
 from retrying import retry
@@ -9,7 +9,7 @@ from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import AlterItem, MysqlConf, TableEnumTypeVar
+from ayugespidertools.common.typevars import AlterItem
 from ayugespidertools.common.utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
@@ -21,13 +21,16 @@ __all__ = [
     "AyuMysqlPipeline",
 ]
 
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import MysqlConf, TableEnumTypeVar
+
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
     def __init__(
         self,
-        table_enum: Type[TableEnumTypeVar],
+        table_enum: Type["TableEnumTypeVar"],
         env: str,
         record_log_to_mysql: Optional[bool] = False,
     ) -> None:
@@ -43,7 +46,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.record_log_to_mysql = record_log_to_mysql
         # 排序规则，用于创建数据库时使用
         self.collate = None
-        self.mysql_conf: Optional[MysqlConf] = None
+        self.mysql_conf: Optional["MysqlConf"] = None
         self.conn = None
         self.slog = None
         self.cursor = None

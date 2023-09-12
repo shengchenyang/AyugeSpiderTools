@@ -1,5 +1,6 @@
 import threading
 import time
+from typing import TYPE_CHECKING, Any, Union
 
 from scrapy.spiders import Spider
 from sqlalchemy import create_engine
@@ -19,6 +20,14 @@ from ayugespidertools.config import logger
 __all__ = [
     "AyuSpider",
 ]
+
+if TYPE_CHECKING:
+    import logging
+
+    from scrapy.crawler import Crawler
+    from scrapy.http import Response
+    from scrapy.settings import BaseSettings
+    from typing_extensions import Self
 
 
 class MySqlEngineClass:
@@ -84,16 +93,16 @@ class AyuSpider(Spider):
     custom_table_enum = None
     mysql_engine_enabled = False
 
-    def parse(self, response, **kwargs):
+    def parse(self, response: "Response", **kwargs: Any) -> Any:
         """实现所继承类的 abstract 方法 parse"""
         super(AyuSpider, self).parse(response, **kwargs)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         super(AyuSpider, self).__init__(*args, **kwargs)
         self.mysql_engine = None
 
     @property
-    def slog(self):
+    def slog(self) -> Union["logger", "logging.LoggerAdapter"]:
         """本库的日志管理模块，使用 loguru 来管理日志
         注意：
             1. 本库不是通过适配器模式或 mixin 等方法对 scrapy logger 重写或扩展，而是
@@ -113,7 +122,7 @@ class AyuSpider(Spider):
             return super(AyuSpider, self).logger
 
     @classmethod
-    def update_settings(cls, settings):
+    def update_settings(cls, settings: "BaseSettings") -> None:
         custom_table_enum = getattr(cls, "custom_table_enum", None)
         # 设置类型，用于快速设置某些场景下的通用配置。比如测试 test 和生产 prod 下的通用配置；可不设置，默认为 common
         settings_type = getattr(cls, "settings_type", "common")
@@ -136,7 +145,7 @@ class AyuSpider(Spider):
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
     @classmethod
-    def from_crawler(cls, crawler, *args, **kwargs):
+    def from_crawler(cls, crawler: "Crawler", *args: Any, **kwargs: Any) -> "Self":
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
         spider.stats = crawler.stats
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")

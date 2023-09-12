@@ -1,9 +1,8 @@
 import asyncio
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import aiohttp
 import scrapy
-from aiohttp.connector import BaseConnector
 from itemadapter import ItemAdapter
 from scrapy.http import HtmlResponse
 from scrapy.utils.python import global_object_name
@@ -17,6 +16,9 @@ from ayugespidertools.config import logger
 __all__ = [
     "AiohttpDownloaderMiddleware",
 ]
+
+if TYPE_CHECKING:
+    from aiohttp.connector import BaseConnector
 
 
 class AiohttpDownloaderMiddleware:
@@ -114,7 +116,7 @@ class AiohttpDownloaderMiddleware:
         self,
         aio_request_args: Param.ItemAdapterType,
         timeout: Optional[aiohttp.ClientTimeout] = None,
-        connector: Optional[BaseConnector] = None,
+        connector: Optional["BaseConnector"] = None,
     ) -> (int, str):
         """使用 aiohttp 来请求
 

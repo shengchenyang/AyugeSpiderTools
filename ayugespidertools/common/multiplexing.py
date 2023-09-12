@@ -1,36 +1,34 @@
-import asyncio
 import configparser
 import json
 import os
 import random
-from typing import Any, List, Union
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
 import cv2
 import numpy as np
 import pymysql
 from itemadapter import ItemAdapter
-from scrapy.settings import Settings
-from twisted.internet.defer import Deferred
 
-from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
-from ayugespidertools.items import AyuItem, ScrapyItem
+from ayugespidertools.items import AyuItem
 
 __all__ = [
     "ReuseOperation",
 ]
+
+if TYPE_CHECKING:
+    from scrapy.settings import BaseSettings
+
+    from ayugespidertools.common.typevars import MysqlConf
 
 
 class ReuseOperation:
     """用于存放经常复用的一些操作"""
 
     @staticmethod
-    def as_deferred(f):
-        """transform a Twisted Deferred to an Asyncio Future"""
-        return Deferred.fromFuture(asyncio.ensure_future(f))
-
-    @staticmethod
-    def get_conf_by_settings(vit_dir: str, inner_settings: Settings) -> Settings:
+    def get_conf_by_settings(
+        vit_dir: str, inner_settings: "BaseSettings"
+    ) -> "BaseSettings":
         """通过 settings 获取所需配置，并将其添加到 inner_settings 中
 
         Args:
@@ -123,9 +121,7 @@ class ReuseOperation:
         return inner_settings
 
     @staticmethod
-    def item_to_dict(
-        item: Union[AyuItem, ScrapyItem, dict]
-    ) -> Union[ItemAdapter, dict]:
+    def item_to_dict(item: Union[AyuItem, dict]) -> Union[ItemAdapter, dict]:
         """将 item 转换为 dict 类型；
         将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
 
@@ -165,7 +161,7 @@ class ReuseOperation:
     def read_image_data(
         bg: Union[bytes, str],
         tp: Union[bytes, str],
-    ) -> (np.ndarray, np.ndarray):
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """用 opencv 读取图片数据
 
         Args:
@@ -271,7 +267,7 @@ class ReuseOperation:
         return {k: dict_conf[k] for k in dict_conf if k not in keys}
 
     @classmethod
-    def create_database(cls, mysql_conf: MysqlConf) -> None:
+    def create_database(cls, mysql_conf: "MysqlConf") -> None:
         """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
         新建(不指定数据库)连接创建好所需数据库即可
 
@@ -341,7 +337,7 @@ class ReuseOperation:
         return key_to_upper_dict
 
     @classmethod
-    def get_consul_conf(cls, settings: Settings) -> dict:
+    def get_consul_conf(cls, settings: "BaseSettings") -> dict:
         """获取项目中的 consul 配置，且要根据项目整体情况来取出满足最少要求的 consul 配置
 
         Args:

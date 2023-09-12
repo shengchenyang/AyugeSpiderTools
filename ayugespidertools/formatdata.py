@@ -115,7 +115,7 @@ class DataHandle:
     def normal_to_stamp(
         cls,
         normal_time: str,
-        _format_t: str = None,
+        _format_t: Optional[str] = None,
         date_is_full: bool = True,
         specific_date_conn: str = " ",
         hms_conn: str = ":",

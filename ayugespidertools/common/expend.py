@@ -1,16 +1,19 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import pymysql
 from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.config import logger
 
 __all__ = [
     "MysqlPipeEnhanceMixin",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import MysqlConf
 
 
 class MysqlPipeEnhanceMixin:
@@ -23,7 +26,7 @@ class MysqlPipeEnhanceMixin:
     )
     def _connect(
         self,
-        mysql_conf: MysqlConf,
+        mysql_conf: "MysqlConf",
     ) -> pymysql.connections.Connection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
