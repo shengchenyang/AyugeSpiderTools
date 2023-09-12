@@ -9,6 +9,7 @@ ifeq ($(OS),Windows_NT)
     PIPINSTALL = cmd.exe /C "FOR %%i in (dist\*.whl) DO python -m pip install --no-index --no-deps %%i"
     CLEAN_PYCACHE = for /d /r . %%d in (__pycache__) do @(if exist "%%d" (rd /s /q "%%d"))
     CLEAN_PYTESTCACHE = for /d /r . %%d in (.pytest_cache) do @(if exist "%%d" (rd /s /q "%%d"))
+    CLEAN_MYPYCACHE = for /d /r . %%d in (.mypy_cache) do @(if exist "%%d" (rd /s /q "%%d"))
 else
     UNAME_S := $(shell uname -s 2>/dev/null || echo "unknown")
     ifeq ($(UNAME_S),Linux)
@@ -18,6 +19,7 @@ else
         PIPINSTALL = pip install dist/*.tar.gz
         CLEAN_PYCACHE = find . -type d -name '__pycache__' -print0 | xargs -0 rm -rf
         CLEAN_PYTESTCACHE = find . -type d -name '.pytest_cache' -print0 | xargs -0 rm -rf
+        CLEAN_MYPYCACHE = find . -type d -name '.mypy_cache' -print0 | xargs -0 rm -rf
     endif
     ifeq ($(UNAME_S),Darwin)
         RM = rm -f
@@ -26,6 +28,7 @@ else
         PIPINSTALL = pip install dist/*.tar.gz
         CLEAN_PYCACHE = find . -type d -name '__pycache__' -print0 | xargs -0 rm -rf
         CLEAN_PYTESTCACHE = find . -type d -name '.pytest_cache' -print0 | xargs -0 rm -rf
+        CLEAN_MYPYCACHE = find . -type d -name '.mypy_cache' -print0 | xargs -0 rm -rf
     endif
 endif
 
@@ -65,6 +68,7 @@ path = $(subst /,$(strip $(PATHSEP)),$1)
 clean:
 	-$(CLEAN_PYCACHE)
 	-$(CLEAN_PYTESTCACHE)
+	-$(CLEAN_MYPYCACHE)
 	-$(RMDIR) $(call path, dist)
 	-$(RMDIR) $(call path, docs$(PATHSEP)_build)
 	-$(RMDIR) $(call path, htmlcov)
