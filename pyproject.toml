@@ -62,6 +62,11 @@ mypy = "~1.5.1"
 [[tool.poetry.source]]
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
+priority = "default"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
 
 [tool.pytest.ini_options]
 xfail_strict = true
