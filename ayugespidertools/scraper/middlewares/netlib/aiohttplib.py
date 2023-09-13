@@ -20,6 +20,8 @@ __all__ = [
 if TYPE_CHECKING:
     from aiohttp.connector import BaseConnector
 
+    from ayugespidertools.common.typevars import ItemAdapterType
+
 
 class AiohttpDownloaderMiddleware:
     """Downloader middleware handling the requests with aiohttp"""
@@ -114,7 +116,7 @@ class AiohttpDownloaderMiddleware:
 
     async def _request_by_aiohttp(
         self,
-        aio_request_args: Param.ItemAdapterType,
+        aio_request_args: "ItemAdapterType",
         timeout: Optional[aiohttp.ClientTimeout] = None,
         connector: Optional["BaseConnector"] = None,
     ) -> (int, str):

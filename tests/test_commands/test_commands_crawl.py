@@ -96,11 +96,16 @@ class CrawlCommandTest(CommandTest):
 from ayugespidertools.spiders import AyuSpider
 
 class MySpider(AyuSpider):
-    name = 'myspider'
+    name = "myspider"
+    custom_settings = {
+        "LOGURU_ENABLED": False,
+        "LOG_LEVEL": "DEBUG",
+        "LOG_FILE": None,
+    }
 
     def start_requests(self):
-        self.logger.debug('It works!')
+        self.logger.debug("It works!")
         return []
 """
         log = self.get_log(spider_code)
-        self.assertIn("settings_type 配置: common", log)
+        self.assertIn("[myspider] DEBUG: It works!", log)

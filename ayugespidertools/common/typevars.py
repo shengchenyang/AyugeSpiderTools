@@ -1,7 +1,4 @@
 # Define your TypeVar here
-#
-# However, it is more convenient to put the concise TypeVar in Params.py in the same directory,
-# such as NoneType = type(None), etc.
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import (
