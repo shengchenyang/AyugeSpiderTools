@@ -135,11 +135,11 @@ module = [
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = 'ayugespidertools.items'
+module = "ayugespidertools.items"
 ignore_errors = "True"
 
 [[tool.mypy.overrides]]
-module = 'ayugespidertools.common.typevars'
+module = "ayugespidertools.common.typevars"
 ignore_errors = "True"
 
 [build-system]
