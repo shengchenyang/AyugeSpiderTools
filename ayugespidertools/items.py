@@ -1,23 +1,37 @@
 from abc import ABCMeta
 from dataclasses import dataclass
-from typing import Any, Dict, Literal, NamedTuple, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Literal,
+    NamedTuple,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 import scrapy
 from scrapy.item import Item
 
 from ayugespidertools.common.typevars import EmptyKeyError, FieldAlreadyExistsError
 
+__all__ = [
+    "DataItem",
+    "AyuItem",
+]
+
 ItemModeStr = Literal["Mysql", "MongoDB"]
 # python 3.8 无法优雅地使用 LiteralString，以下用 Literal 代替
 MysqlItemModeStr = Literal["Mysql"]
 MongoDBItemModeStr = Literal["MongoDB"]
-AyuItemTypeVar = TypeVar("AyuItemTypeVar", bound="AyuItem")
 
-__all__ = [
-    "DataItem",
-    "ScrapyItem",
-    "AyuItem",
-]
+if TYPE_CHECKING:
+    from typing_extensions import Self
+
+    # SelfType is equivalent to Self. The following are all to solve the IDE warning.
+    SelfType = TypeVar("SelfType", bound=Any)
+    Str = TypeVar("Str", bound=Union[str, Any])
 
 
 class ScrapyItem(Item):
@@ -31,24 +45,20 @@ class DataItem(NamedTuple):
     notes: str = ""
 
 
-# item 中 alldata 的类型
-AllDataType = Dict[str, Union[DataItem, Dict[str, Any], Any]]
-
-
 class ItemMeta(ABCMeta):
     def __new__(cls, class_name, bases, attrs):
         new_class = super().__new__(cls, class_name, bases, attrs)
 
         def add_field(
-            self: Union[object, AyuItemTypeVar],
-            key: Union[str, Any],
-            value: Any = None,
+            self: "SelfType",
+            key: "Str",
+            value: Optional[Any] = None,
         ) -> None:
             """动态添加字段方法
 
             Args:
                 self: self
-                key: 需要添加的字段名，这里类型为 str，为了消除 ide 的警告才加上了 Any
+                key: 需要添加的字段名
                 value: 需要添加的字段对应的值
             """
             if not key:
@@ -59,7 +69,7 @@ class ItemMeta(ABCMeta):
             self._AyuItem__fields.add(key)
 
         def _asdict(
-            self,
+            self: "Self",
         ) -> Dict[str, Any]:
             """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
@@ -67,7 +77,7 @@ class ItemMeta(ABCMeta):
             return _item_dict
 
         def _asitem(
-            self: Any,
+            self: "SelfType",
             assignment: bool = True,
         ) -> ScrapyItem:
             """将 AyuItem 转换为 ScrapyItem
@@ -131,7 +141,7 @@ class AyuItem(metaclass=ItemMeta):
     __fields: Optional[set] = None
 
     def __init__(
-        self,
+        self: "Self",
         _table: str,
         _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
@@ -177,19 +187,19 @@ class AyuItem(metaclass=ItemMeta):
         super().__delattr__(name)
         self.__fields.discard(name)
 
-    def __str__(self: Any):
+    def __str__(self: "SelfType"):
         # 与下方 __repr__ 一样，不返回 AyuItem(field=data) 的格式
         return f"{self._asdict()}"
 
-    def __repr__(self: Any):
+    def __repr__(self: "SelfType"):
         return f"{self._asdict()}"
 
     def fields(self):
         self.__fields.discard("_AyuItem__fields")
         return self.__fields
 
-    def asdict(self: Any):
+    def asdict(self: "SelfType") -> Dict[str, Any]:
         return self._asdict()
 
-    def asitem(self, assignment: bool = True):
+    def asitem(self: "Self", assignment: bool = True) -> ScrapyItem:
         return self._asitem(assignment)
