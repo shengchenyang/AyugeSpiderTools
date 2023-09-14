@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import (
     TYPE_CHECKING,
-    Any,
     List,
     Literal,
     NamedTuple,
@@ -24,9 +23,6 @@ Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
 TableEnumTypeVar = TypeVar("TableEnumTypeVar", bound="TableEnum")
-
-sentinel: Any = object()
-
 ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
 
 
