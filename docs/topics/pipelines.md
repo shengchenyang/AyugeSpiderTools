@@ -131,7 +131,7 @@ mandatory=True
 
 ```python
 "ITEM_PIPELINES": {
-    "ayugespidertools.pipelines.KafkaPipeline": 300,
+    "ayugespidertools.pipelines.AyuKafkaPipeline": 300,
 },
 ```
 
