@@ -1,5 +1,22 @@
 # Release notes
 
+## AyugeSpiderTools 3.4.2 (2023-09-15)
+
+### Bug fixes
+
+- 修复 `crawl` 模板文件中 `TableEnum` 的导入问题。
+- 修改文档中 `kafka` 推送示例 `typo` 问题。
+
+### Code optimizations
+
+- 优化文件下载本地的逻辑，处理当 `file_url` 不存在时的情况。
+- 优化 `items`，`typevar` 等模块的 `type hint`，并删除无用的类型内容。
+- 设置包源的优先级。
+- 增加测试用例。
+- 添加 `mypy` 工具。
+
+<hr/>
+
 ## AyugeSpiderTools 3.4.1 (2023-09-07)
 
 ### Bug fixes
