@@ -1,15 +1,6 @@
 from abc import ABCMeta
 from dataclasses import dataclass
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    Literal,
-    NamedTuple,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Dict, NamedTuple, Optional, TypeVar, Union
 
 import scrapy
 from scrapy.item import Item
@@ -20,11 +11,6 @@ __all__ = [
     "DataItem",
     "AyuItem",
 ]
-
-ItemModeStr = Literal["Mysql", "MongoDB"]
-# python 3.8 无法优雅地使用 LiteralString，以下用 Literal 代替
-MysqlItemModeStr = Literal["Mysql"]
-MongoDBItemModeStr = Literal["MongoDB"]
 
 if TYPE_CHECKING:
     from typing_extensions import Self
