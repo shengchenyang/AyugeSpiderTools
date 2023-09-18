@@ -18,8 +18,8 @@ class MongoDbBase:
         host: str,
         port: int,
         authsource: str = "admin",
-        database: str = None,
-        connect_style: str = None,
+        database: Optional[str] = None,
+        connect_style: Optional[str] = None,
     ) -> None:
         """初始化 mongo 连接句柄
 

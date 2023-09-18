@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Dict, Literal, Optional, Tuple, Union
 
 __all__ = [
     "AboutSql",
@@ -21,7 +21,7 @@ class AboutSql:
         base: SqlModeStr = "and",
         order_by: Optional[str] = None,
         limit: Union[bool, int] = False,
-    ) -> (str, tuple):
+    ) -> Tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句（适用于简单情况）
 
         Args:
@@ -54,7 +54,7 @@ class AboutSql:
         return select_sql, tuple(rule.values())
 
     @staticmethod
-    def insert_generate(db_table: str, data: dict) -> (str, tuple):
+    def insert_generate(db_table: str, data: dict) -> Tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 插入语句
 
         Args:
@@ -73,7 +73,7 @@ class AboutSql:
     @staticmethod
     def update_generate(
         db_table: str, data: dict, rule: Dict[str, Any], base: SqlModeStr = "and"
-    ) -> (str, tuple):
+    ) -> Tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 更新语句
 
         Args:
