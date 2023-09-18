@@ -13,5 +13,5 @@ exclude =
 
 per-file-ignores =
 # E501: line too long
-    ayugespidertools/common/Params.py:E501
-    tests/test_common/test_common_Utils.py:E501
+    ayugespidertools/common/params.py:E501
+    tests/test_common/test_common_utils.py:E501
