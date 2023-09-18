@@ -11,7 +11,7 @@
 
 > 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
 
-本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，需要自定义（但 IDE 有参数提示，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。 
+本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，需要自定义（但 IDE 有参数提示，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。
 
 ```python
 def parse(self, response):
@@ -24,7 +24,7 @@ def parse(self, response):
         nick_name=DataItem(nick_name, "文章作者昵称"),
         _table=TableEnum.article_list_table.value["value"],
     )
-    
+
     # 存储到 MongoDB 场景时需要的 Item 构建示例
     ArticleMongoItem = AyuItem(
         article_detail_url=article_detail_url,
@@ -37,6 +37,7 @@ def parse(self, response):
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
 
+
 # 其实，以上可以只赋值一次 AyuItem ，然后在 ITEM_PIPELINES 中激活对应的 pipelines 即可，这里是为了方便展示功能。
 ```
 
@@ -45,7 +46,7 @@ def parse(self, response):
 当然，目前也支持动态赋值，但我还是推荐直接创建好 `AyuItem` ，方便管理：
 
 ```python
- def parse(self, response):
+def parse(self, response):
     mdi = AyuItem(_table="table0")
     mdi.add_field("add_field1", "value1")
     mdi.add_field("add_field2", DataItem(key_value="value2"))
@@ -80,7 +81,7 @@ item = AyuItem(_table="ta")
 'ta'
 >>> item["_table"]
 'ta'
->>> 
+>>>
 >>> # 注意：以上两种风格都可以。
 ```
 
@@ -185,7 +186,7 @@ class DemoOneSpider(AyuSpider):
             cb_kwargs={
                 "curr_site": "csdn",
             },
-            dont_filter=True
+            dont_filter=True,
         )
 
     def parse_first(self, response: TextResponse, curr_site: str):
@@ -193,28 +194,30 @@ class DemoOneSpider(AyuSpider):
         self.slog.info(f"当前采集的站点为: {curr_site}")
 
         # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
-        data_list = ToolsForAyu.extract_with_json(json_data=response.json(), query="data")
+        data_list = ToolsForAyu.extract_with_json(
+            json_data=response.json(), query="data"
+        )
         for curr_data in data_list:
             article_detail_url = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleDetailUrl")
+                json_data=curr_data, query="articleDetailUrl"
+            )
 
             article_title = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="articleTitle")
+                json_data=curr_data, query="articleTitle"
+            )
 
             comment_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="commentCount")
+                json_data=curr_data, query="commentCount"
+            )
 
             favor_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="favorCount")
+                json_data=curr_data, query="favorCount"
+            )
 
             nick_name = ToolsForAyu.extract_with_json(
-                json_data=curr_data,
-                query="nickName")
-            
+                json_data=curr_data, query="nickName"
+            )
+
             ArticleInfoItem = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
@@ -235,7 +238,7 @@ class DemoOneSpider(AyuSpider):
             # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
             try:
                 save_table = TableEnum.article_list_table.value["value"]
-                sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
+                sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
                 df = pandas.read_sql(sql, self.mysql_engine)
 
                 # 如果为空，说明此数据不存在于数据库，则新增
@@ -286,4 +289,3 @@ class DemoOneSpider(AyuSpider):
 ## 自定义 Item 字段和实现 Item Loaders
 
 具体请在下一章浏览。
-

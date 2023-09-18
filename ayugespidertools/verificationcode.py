@@ -26,7 +26,7 @@ def match_img_get_distance(target, template):
         loc[1][0]: 滑块位置坐标
     """
     # 先判断传入的参数是 str 图片的全路径信息还是 bytes 类型的图片信息
-    if any([type(target) != str, type(target) == bytes]):
+    if any([not isinstance(target, str), isinstance(target, bytes)]):
         target_buf = np.frombuffer(target, np.uint8)
         template_buf = np.frombuffer(template, np.uint8)
 

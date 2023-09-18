@@ -46,7 +46,8 @@ logger.add(
 
 ```python
 # project_name 为当前所在的 scrapy 项目名称
-from <project_name>.settings import logger
+from project_name.settings import logger
+
 logger.warning("This is a warning")
 ```
 
@@ -69,7 +70,6 @@ import ayugespidertools
 
 
 class MySpider(ayugespidertools.AyuSpider):
-
     name = "myspider"
     start_urls = ["https://scrapy.org"]
 

@@ -13,6 +13,7 @@
 ```python
 import scrapy
 
+
 class Product(scrapy.Item):
     book_name = scrapy.Field()
     book_href = scrapy.Field()
@@ -46,7 +47,7 @@ def parse(self, response):
     l.add_xpath("name", '//div[@class="product_title"]')
     l.add_xpath("price", '//p[@id="price"]')
     l.add_css("stock", "p#stock")
-    l.add_value("last_updated", "today") # you can also use literal values
+    l.add_value("last_updated", "today")  # you can also use literal values
     yield l.load_item()
 
 

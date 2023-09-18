@@ -29,7 +29,7 @@ def test_items_AyuItem():
     mdi["field3"] = DataItem(key_value="field3_key", notes="key值")
     assert all(
         [
-            type(mdi) == AyuItem,
+            isinstance(mdi, AyuItem),
             mdi._table == "table",
             mdi.fields() == {"_table", "field1", "field2", "name", "field3"},
         ]
@@ -38,7 +38,7 @@ def test_items_AyuItem():
     mdi_dict = mdi.asdict()
     assert all(
         [
-            type(mdi_dict) == dict,
+            isinstance(mdi_dict, dict),
             mdi_dict["field1"] == "value1",
             mdi_dict
             == {
@@ -65,7 +65,7 @@ def test_items_AyuItem():
     mdi_item = mdi.asitem()
     assert all(
         [
-            type(mdi_item) == ScrapyItem,
+            isinstance(mdi_item, ScrapyItem),
             ItemAdapter.is_item(mdi_item),
             mdi_item["field1"] == "value1",
         ]
@@ -81,7 +81,7 @@ def test_items_AyuItem():
     mdi_sec_dict = mdi_sec.asdict()
     assert all(
         [
-            type(mdi_sec) == AyuItem,
+            isinstance(mdi_sec, AyuItem),
             mdi_sec_dict
             == {
                 "_table": "table",
@@ -123,7 +123,7 @@ def test_items_AyuItem():
     mdi_dict = mdi.asdict()
     assert all(
         [
-            type(mdi_dict) == dict,
+            isinstance(mdi_dict, dict),
             mdi_dict
             == {
                 "_table": "table",

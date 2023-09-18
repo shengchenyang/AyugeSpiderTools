@@ -94,7 +94,7 @@ custom_settings = {
 ```python
 "ITEM_PIPELINES": {
     "ayugespidertools.pipelines.AyuMQPipeline": 300,
-},
+}
 ```
 
 `.conf` 中的所需配置如下：
@@ -132,7 +132,7 @@ mandatory=True
 ```python
 "ITEM_PIPELINES": {
     "ayugespidertools.pipelines.AyuKafkaPipeline": 300,
-},
+}
 ```
 
 `.conf` 中的所需配置如下：
@@ -159,7 +159,7 @@ key=***
     # 并不会将信息与网页中的标题、描述等信息绑定，激活 AyuFtyMysqlPipeline 之类的选项后，可以自行
     # 添加其它可以描述文件的详细字段并存储对应场景的数据库中。
     "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 301,
-},
+}
 ```
 
 `spider` 等其它项目配置中的所需详细设置示例如下：
