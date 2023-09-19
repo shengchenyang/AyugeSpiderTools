@@ -1,4 +1,4 @@
-.PHONY: start clean build install build_dist test release pytest
+.PHONY: start clean build install build_dist test release pytest check
 
 refresh: clean build install
 
@@ -62,6 +62,8 @@ pytest:
 	poetry install
 	pytest -W ignore::DeprecationWarning
 
+check:
+	pre-commit run --all-files
 
 path = $(subst /,$(strip $(PATHSEP)),$1)
 
