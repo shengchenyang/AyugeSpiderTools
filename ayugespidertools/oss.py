@@ -1,5 +1,5 @@
 import warnings
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Tuple, Union
 
 import oss2
 import requests
@@ -77,7 +77,7 @@ class AliOssBase:
         file_name: str,
         file_format: str,
         file_name_md5: bool = False,
-    ) -> (bool, str):
+    ) -> Tuple[bool, str]:
         """上传单个文件的 bytes 内容
 
         Args:
@@ -141,7 +141,7 @@ class AliOssBase:
         if isinstance(count_by_type, str):
             return [obj.key for obj in obj_list if str(obj.key).endswith(count_by_type)]
 
-        key_list = []
+        key_list: list = []
         for count_by in count_by_type:
             res = [obj.key for obj in obj_list if str(obj.key).endswith(count_by)]
             key_list = key_list + res

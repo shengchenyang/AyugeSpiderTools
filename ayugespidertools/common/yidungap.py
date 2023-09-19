@@ -1,4 +1,5 @@
 import itertools
+from typing import TYPE_CHECKING, Optional, Union
 
 import cv2
 
@@ -7,6 +8,9 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 __all__ = [
     "YiDunGetGap",
 ]
+
+if TYPE_CHECKING:
+    from cv2.typing import MatLike
 
 
 class YiDunGetGap:
@@ -43,7 +47,12 @@ class YiDunGetGap:
         return img[min_x:max_x, min_y:max_y]
 
     @classmethod
-    def template_match(cls, tpl, target, out: str = None) -> int:
+    def template_match(
+        cls,
+        tpl: "MatLike",
+        target: "MatLike",
+        out: Optional[str] = None,
+    ) -> int:
         """模板匹配找出滑块缺口的距离
 
         Args:
@@ -86,7 +95,9 @@ class YiDunGetGap:
         return cv2.Canny(img, 100, 200)
 
     @classmethod
-    def discern(cls, slide, bg, out: str = None):
+    def discern(
+        cls, slide: Union[str, bytes], bg: Union[str, bytes], out: Optional[str] = None
+    ):
         """识别滑块缺口方法
 
         Args:

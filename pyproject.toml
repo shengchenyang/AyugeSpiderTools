@@ -130,7 +130,10 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "yaml",
+    "toml",
     "pymysql",
+    "pymysql.connections",
+    "pymysql.cursors",
     "requests",
 ]
 ignore_missing_imports = true
@@ -141,6 +144,10 @@ ignore_errors = "True"
 
 [[tool.mypy.overrides]]
 module = "ayugespidertools.common.typevars"
+ignore_errors = "True"
+
+[[tool.mypy.overrides]]
+module = "tests.mockserver"
 ignore_errors = "True"
 
 [build-system]

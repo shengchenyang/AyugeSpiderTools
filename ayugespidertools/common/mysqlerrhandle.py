@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Type, TypeVar, Union
 
 from ayugespidertools.common.typevars import TableEnumTypeVar
 from ayugespidertools.config import logger
@@ -73,7 +73,7 @@ class AbstractClass(ABC):
         database: str,
         table: str,
         column: str,
-    ) -> str:
+    ) -> Union[str, None]:
         """获取数据字段存储类型
 
         Args:
@@ -173,7 +173,9 @@ class AbstractClass(ABC):
             # 碰到其他的异常才打印错误日志，已处理的异常不打印
             logger.error(f"ERROR: {err_msg}")
 
-    def deal_1054_error(self, err_msg: str, table: str, note_dic: dict) -> (str, str):
+    def deal_1054_error(
+        self, err_msg: str, table: str, note_dic: dict
+    ) -> Tuple[str, str]:
         """解决 1054, u"Unknown column 'xx' in 'field list'"
 
         Args:
@@ -197,7 +199,7 @@ class AbstractClass(ABC):
         self,
         err_msg: str,
         table_enum: Type[TableEnumTypeVar],
-    ) -> (str, str, str):
+    ) -> Tuple[str, str, str]:
         """解决 1146, u"Table 'xx' doesn't exist"
 
         Args:
@@ -234,12 +236,11 @@ class AbstractClass(ABC):
         database: str,
         table: str,
         note_dic: dict,
-    ) -> (str, str):
+    ) -> Tuple[str, str]:
         """解决 1406, u"Data too long for 'xx' at ..."
 
         Args:
             err_msg: 报错内容
-            conn: mysql conn
             cursor: mysql connect cursor
             database: 数据库名
             table: 数据表名
@@ -271,7 +272,7 @@ class AbstractClass(ABC):
         database: str,
         table: str,
         note_dic: dict,
-    ) -> (str, str):
+    ) -> Tuple[str, str]:
         """解决 1265, u"Data truncated for column 'xx' at ..."
 
         Args:

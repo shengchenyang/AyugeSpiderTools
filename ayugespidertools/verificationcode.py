@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Optional, Union
 
 import cv2
 import numpy as np
@@ -92,10 +93,7 @@ def get_selenium_tracks(distance):
     current = 0
     mid = distance * 3 / 5
     while current < distance:
-        if current < mid:
-            a = 2
-        else:
-            a = -3
+        a = 2 if current < mid else -3
         s = v * t + 0.5 * a * (t**2)
         v = v + a * t
         current += s
@@ -153,7 +151,11 @@ def get_yidun_tracks(distance):
     return xyt
 
 
-def get_yidun_gap(slide_img_path, bg_img_path, out_img_path: str = False) -> int:
+def get_yidun_gap(
+    slide_img_path: Union[str, bytes],
+    bg_img_path: Union[str, bytes],
+    out_img_path: Optional[str] = None,
+) -> int:
     """获取易盾滑块缺口距离
 
     Args:

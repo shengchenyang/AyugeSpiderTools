@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import aiohttp
 import scrapy
@@ -119,7 +119,7 @@ class AiohttpDownloaderMiddleware:
         aio_request_args: "ItemAdapterType",
         timeout: Optional[aiohttp.ClientTimeout] = None,
         connector: Optional["BaseConnector"] = None,
-    ) -> (int, str):
+    ) -> Tuple[int, str]:
         """使用 aiohttp 来请求
 
         Args:

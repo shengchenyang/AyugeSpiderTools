@@ -24,6 +24,7 @@ __all__ = [
 if TYPE_CHECKING:
     import logging
 
+    from loguru import Logger
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.settings import BaseSettings
@@ -102,7 +103,7 @@ class AyuSpider(Spider):
         self.mysql_engine = None
 
     @property
-    def slog(self) -> Union["logger", "logging.LoggerAdapter"]:
+    def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
         """本库的日志管理模块，使用 loguru 来管理日志
         注意：
             1. 本库不是通过适配器模式或 mixin 等方法对 scrapy logger 重写或扩展，而是
