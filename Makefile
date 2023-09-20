@@ -35,6 +35,7 @@ endif
 start:
 	pip install poetry
 	poetry install
+	pre-commit install
 
 build:
 	poetry build
