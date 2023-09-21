@@ -6,7 +6,7 @@ from scrapy.spiders import Rule
 from ayugespidertools import AiohttpFormRequest, AiohttpRequest
 from ayugespidertools.common.typevars import AiohttpRequestArgs
 from ayugespidertools.spiders import AyuCrawlSpider, AyuSpider
-from tests import PYMYSQL_CONFIG
+from tests.conftest import TableEnum
 
 
 class MockServerSpider(AyuSpider):
@@ -39,27 +39,19 @@ class SimpleSpider(MetaSpider):
 
 class RecordLogToMysqlSpider(SimpleSpider):
     name = "record_log_to_mysql"
+    custom_table_enum = TableEnum
     custom_settings = {
         "RECORD_LOG_TO_MYSQL": True,
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
         },
         "DOWNLOADER_MIDDLEWARES": {
-            # 随机请求头
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
-        },
-        "MYSQL_CONFIG": {
-            "host": PYMYSQL_CONFIG["host"],
-            "port": PYMYSQL_CONFIG["port"],
-            "user": PYMYSQL_CONFIG["user"],
-            "password": PYMYSQL_CONFIG["password"],
-            "charset": PYMYSQL_CONFIG["charset"],
-            "database": PYMYSQL_CONFIG["database"],
         },
     }
 
     def parse(self, response):
-        yield {"foo": 42}
+        yield {"_table": TableEnum.article_list_table.value["value"], "data": "demo"}
         self.logger.info(f"Got response {response.status}")
 
 
@@ -116,7 +108,7 @@ class Operations:
         return args, headers, origin, url
 
 
-class DemoAiohttpSpider(AyuSpider):
+class DemoAiohttpSpider(SimpleSpider):
     name = "demo_aiohttp_example"
     allowed_domains = ["httpbin.org"]
     start_urls = ["http://httpbin.org/"]

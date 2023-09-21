@@ -6,6 +6,7 @@ from twisted.internet import defer
 from twisted.trial.unittest import TestCase
 
 from ayugespidertools.scraper.spiders import AyuSpider
+from tests import tests_vitdir
 from tests.conftest import script_coll_table, table_coll_table
 from tests.mockserver import MockServer
 from tests.spiders import DemoAiohttpSpider, MyAyuCrawlSpider, RecordLogToMysqlSpider
@@ -29,7 +30,8 @@ class TestCrawl(TestCase):
         def _on_item_scraped(item):
             items.append(item)
 
-        crawler = get_crawler(spider_cls)
+        project_settings = {"VIT_DIR": tests_vitdir}
+        crawler = get_crawler(spider_cls, project_settings)
         crawler.signals.connect(_on_item_scraped, signals.item_scraped)
         with LogCapture() as log:
             yield crawler.crawl(

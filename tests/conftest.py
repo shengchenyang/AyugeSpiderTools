@@ -1,18 +1,30 @@
 import copy
+from enum import Enum, unique
 
 import pymysql
 import pytest
 from pymongo import MongoClient
 from scrapy.utils.reactor import install_reactor
 
+from ayugespidertools.common.typevars import TableTemplate
 from tests import MONGODB_CONFIG, PYMYSQL_CONFIG
 from tests.docs.keys import generate_keys
 
 test_table = "_test_article_info_table"
 script_coll_table = "script_collection_statistics"
 table_coll_table = "table_collection_statistics"
+article_list_table = "_article_info_list"
 mongodb_database = MONGODB_CONFIG["database"]
 mongodb_ori = copy.deepcopy(MONGODB_CONFIG)
+
+
+@unique
+class TableEnum(Enum):
+    article_list_table = TableTemplate(
+        value=article_list_table,
+        notes="项目列表信息",
+        demand_code="DemoSpider_article_list_table_demand_code",
+    )
 
 
 class ForTestConfig:
@@ -45,6 +57,7 @@ def mysql_db_cursor():
             cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
             cursor.execute(f"DROP TABLE IF EXISTS {script_coll_table}")
             cursor.execute(f"DROP TABLE IF EXISTS {table_coll_table}")
+            cursor.execute(f"DROP TABLE IF EXISTS {article_list_table}")
 
 
 @pytest.fixture(scope="session")
