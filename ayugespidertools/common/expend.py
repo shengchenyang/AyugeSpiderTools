@@ -92,8 +92,9 @@ class MysqlPipeEnhanceMixin:
         """
         mysql_conf = spider.mysql_conf
         text = {}
-        stats = spider.stats.get_stats()
+        stats = spider.crawler.stats.get_stats()
         error_reason = ""
+        _curr_utc_time = datetime.datetime.now(datetime.timezone.utc)
         for k, v in stats.items():
             if isinstance(v, datetime.datetime):
                 text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime(
@@ -140,12 +141,7 @@ class MysqlPipeEnhanceMixin:
             "start_time": text.get("start_time"),
             "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "spend_minutes": round(
-                (
-                    datetime.datetime.now()
-                    - stats.get("start_time")
-                    - datetime.timedelta(hours=8)
-                ).seconds
-                / 60,
+                (_curr_utc_time - stats.get("start_time")).seconds / 60,
                 2,
             ),
             "crawl_time": crawl_time,

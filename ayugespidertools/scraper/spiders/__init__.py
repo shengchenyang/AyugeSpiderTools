@@ -148,7 +148,6 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler: "Crawler", *args: Any, **kwargs: Any) -> "Self":
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
-        spider.stats = crawler.stats
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
 
         _consul_conf = ReuseOperation.get_consul_conf(settings=crawler.settings)
