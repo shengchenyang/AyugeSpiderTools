@@ -141,7 +141,7 @@ class AyuSpider(Spider):
         else:
             logger.warning("请在 settings.py 中配置 VIT_DIR 的路径参数，用于本库运行所需配置 .conf 的读取！")
         # 内置配置 inner_settings 优先级介于 project 和 spider 之间
-        # 即优先级顺序：settings < inner_settings < custom_settings
+        # 即优先级顺序：project_settings < inner_settings < custom_settings
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
