@@ -21,7 +21,6 @@ def test_put_oss():
         put_bytes_or_url=file_bytes, file_name="1", file_format="png"
     )
 
-    print(put_status)
     assert put_status is True
 
 

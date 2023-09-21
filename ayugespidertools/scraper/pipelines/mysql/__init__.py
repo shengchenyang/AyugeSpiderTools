@@ -22,6 +22,8 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from pymysql.connections import Connection
+
     from ayugespidertools.common.typevars import MysqlConf, TableEnumTypeVar
 
 
@@ -47,9 +49,9 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         # 排序规则，用于创建数据库时使用
         self.collate = None
         self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn = None
+        self.conn: Optional["Connection"] = None
         self.slog = None
-        self.cursor = None
+        self.cursor: "Connection.cursor" = None
         self.crawl_time = datetime.date.today()
 
     @classmethod
