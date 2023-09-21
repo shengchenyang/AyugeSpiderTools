@@ -1,5 +1,19 @@
 # Release notes
 
+## AyugeSpiderTools 3.5.0 (2023-09-21)
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- `scrapy` 依赖升级为 `2.11.0`。
+- 统一运行统计的方法，修改运行 `stats` 中有关时间的获取和计算方法。
+- 添加 `pre-commit` 工具和 `CI`，提升 `commit` 和 `pull request` 体验。
+- 更新 `readthedocs` 的新配置。
+- 优化 `test_crawl` 的测试方法。
+
 ## AyugeSpiderTools 3.4.2 (2023-09-15)
 
 ### Bug fixes
