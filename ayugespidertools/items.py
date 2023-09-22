@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, NamedTuple, Optional, TypeVar, Union
+from typing import Any, Dict, NamedTuple, Optional
 
 import scrapy
 from scrapy.item import Item
@@ -11,13 +11,6 @@ __all__ = [
     "DataItem",
     "AyuItem",
 ]
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
-    # SelfType is equivalent to Self. The following are all to solve the IDE warning.
-    SelfType = TypeVar("SelfType", bound=Any)
-    Str = TypeVar("Str", bound=Union[str, Any])
 
 
 class ScrapyItem(Item):
@@ -33,11 +26,9 @@ class DataItem(NamedTuple):
 
 class ItemMeta(ABCMeta):
     def __new__(cls, class_name, bases, attrs):
-        new_class = super().__new__(cls, class_name, bases, attrs)
-
         def add_field(
-            self: "SelfType",
-            key: "Str",
+            self,
+            key: str,
             value: Optional[Any] = None,
         ) -> None:
             """动态添加字段方法
@@ -54,37 +45,38 @@ class ItemMeta(ABCMeta):
             setattr(self, key, value)
             self._AyuItem__fields.add(key)
 
-        def _asdict(
-            self: "Self",
+        def asdict(
+            self,
         ) -> Dict[str, Any]:
             """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
             _item_dict = {key: getattr(self, key) for key in self._AyuItem__fields}
             return _item_dict
 
-        def _asitem(
-            self: "SelfType",
+        def asitem(
+            self,
             assignment: bool = True,
         ) -> ScrapyItem:
             """将 AyuItem 转换为 ScrapyItem
 
             Args:
+                self: self
                 assignment: 是否将 AyuItem 中的值赋值给 ScrapyItem，默认为 True
 
             Returns:
                 new_class: 转换 ScrapyItem 后的实例
             """
             item_temp = ScrapyItem()
-            for k, v in self._asdict().items():
+            for k, v in self.asdict().items():
                 item_temp.fields[k] = scrapy.Field()
                 if assignment:
                     item_temp[k] = v
             return item_temp
 
-        new_class.add_field = add_field
-        new_class._asdict = _asdict
-        new_class._asitem = _asitem
-        return new_class
+        attrs["add_field"] = add_field
+        attrs["asdict"] = asdict
+        attrs["asitem"] = asitem
+        return super().__new__(cls, class_name, bases, attrs)
 
 
 @dataclass
@@ -94,7 +86,6 @@ class AyuItem(metaclass=ItemMeta):
     Attributes:
         _table: 数据库表名。
         _mongo_update_rule: MongoDB 存储场景下可能需要的查重条件，默认为 None。
-        __fields: 为保护字段，用于存放所有字段名，不用理会。
 
     Examples:
         >>> item = AyuItem(
@@ -124,10 +115,9 @@ class AyuItem(metaclass=ItemMeta):
 
     _table: Optional[str] = None
     _mongo_update_rule: Optional[Dict[str, Any]] = None
-    __fields: Optional[set] = None
 
     def __init__(
-        self: "Self",
+        self,
         _table: str,
         _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
@@ -173,19 +163,26 @@ class AyuItem(metaclass=ItemMeta):
         super().__delattr__(name)
         self.__fields.discard(name)
 
-    def __str__(self: "SelfType"):
+    def __str__(self):
         # 与下方 __repr__ 一样，不返回 AyuItem(field=data) 的格式
-        return f"{self._asdict()}"
+        return f"{self.asdict()}"
 
-    def __repr__(self: "SelfType"):
-        return f"{self._asdict()}"
+    def __repr__(self):
+        return f"{self.asdict()}"
 
     def fields(self):
         self.__fields.discard("_AyuItem__fields")
         return self.__fields
 
-    def asdict(self: "SelfType") -> Dict[str, Any]:
-        return self._asdict()
+    def add_field(
+        self,
+        key: str,
+        value: Optional[Any] = None,
+    ) -> None:
+        ...
 
-    def asitem(self: "Self", assignment: bool = True) -> ScrapyItem:
-        return self._asitem(assignment)
+    def asdict(self) -> Dict[str, Any]:
+        ...
+
+    def asitem(self, assignment: bool = True) -> ScrapyItem:
+        ...
