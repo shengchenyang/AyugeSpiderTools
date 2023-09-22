@@ -23,6 +23,7 @@
    pyenv activate venv
    pip install poetry
    poetry install
+   pre-commit install
    ```
 
 4. run a test
