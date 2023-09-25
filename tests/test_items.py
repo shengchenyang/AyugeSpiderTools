@@ -1,3 +1,5 @@
+# NOTE: 虽然目前 AyuItem 支持 item["field"], item.field 两种方式来操作 field，
+# 但还是推荐使用 item["field"] 的方式，更明了。
 import pytest
 from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
@@ -15,59 +17,65 @@ cur_item = AyuItem(
 def test_items_AyuItem():
     mdi = AyuItem(_table="turbo")
     mdi.add_field("field1", "value1")
-    mdi.add_field("field2", "value2")
     # 目前 add_field 不允许重复添加和设置相同字段
     with pytest.raises(FieldAlreadyExistsError):
         mdi.add_field("_table", "table1")
 
-    assert mdi._table == "turbo"
-    assert mdi["field1"] == "value1"
-    mdi._table = "table"
-    # 这里会创建 name 字段
-    mdi.name = "ayuge"
+    # 取值不存在 field 场景
+    with pytest.raises(AttributeError):
+        _ = mdi["field12"]
 
-    mdi["field3"] = DataItem(key_value="field3_key", notes="key值")
     assert all(
         [
-            isinstance(mdi, AyuItem),
-            mdi._table == "table",
-            mdi.fields() == {"_table", "field1", "field2", "name", "field3"},
-        ]
-    )
-
-    mdi_dict = mdi.asdict()
-    assert all(
-        [
-            isinstance(mdi_dict, dict),
-            mdi_dict["field1"] == "value1",
-            mdi_dict
-            == {
-                "field1": "value1",
-                "field2": "value2",
-                "field3": DataItem(key_value="field3_key", notes="key值"),
-                "_table": "table",
-                "name": "ayuge",
-            },
+            mdi["_table"] == "turbo",
+            mdi._table == "turbo",
+            mdi["field1"] == "value1",
+            mdi.field1 == "value1",
         ],
     )
 
-    # 测试删除字段
-    del mdi.name
+    # 修改 / 添加字段场景
+    mdi["_table"] = "table"
+    mdi.name = "ayuge"
+    mdi["field2"] = DataItem(key_value="field2_key", notes="key值")
+    assert all(
+        [
+            mdi["_table"] == "table",
+            mdi._table == "table",
+            mdi["name"] == "ayuge",
+            mdi.name == "ayuge",
+            isinstance(mdi["field2"], DataItem),
+            mdi["field2"].key_value == "field2_key",
+            mdi["field2"].notes == "key值",
+            mdi.fields() == {"_table", "field1", "field2", "name"},
+        ]
+    )
+
+    # 转字典场景
+    mdi_dict = mdi.asdict()
+    assert mdi_dict == {
+        "field1": "value1",
+        "field2": DataItem(key_value="field2_key", notes="key值"),
+        "_table": "table",
+        "name": "ayuge",
+    }
+
+    # 删除字段场景
+    del mdi["name"]
     with pytest.raises(AttributeError):
-        _ = mdi.name
+        _ = mdi["name"]
     with pytest.raises(AttributeError):
         del mdi.no_this_field
     with pytest.raises(KeyError):
         del mdi["no_this_field"]
-    assert mdi.fields() == {"_table", "field1", "field2", "field3"}
+    assert mdi.fields() == {"_table", "field1", "field2"}
 
-    mdi.name = "ayuge"
+    # 转 ScrapyItem 场景
     mdi_item = mdi.asitem()
     assert all(
         [
             isinstance(mdi_item, ScrapyItem),
             ItemAdapter.is_item(mdi_item),
-            mdi_item["field1"] == "value1",
         ]
     )
 
@@ -75,22 +83,14 @@ def test_items_AyuItem():
     mdi_sec = AyuItem(
         _table="table",
         field1="value1",
-        field2="value2",
-        field3=DataItem(key_value="field3_key", notes="key值"),
+        field2=DataItem(key_value="field2_key", notes="key值"),
     )
     mdi_sec_dict = mdi_sec.asdict()
-    assert all(
-        [
-            isinstance(mdi_sec, AyuItem),
-            mdi_sec_dict
-            == {
-                "_table": "table",
-                "field1": "value1",
-                "field2": "value2",
-                "field3": DataItem(key_value="field3_key", notes="key值"),
-            },
-        ]
-    )
+    assert mdi_sec_dict == {
+        "_table": "table",
+        "field1": "value1",
+        "field2": DataItem(key_value="field2_key", notes="key值"),
+    }
 
     # 以下是 item loaders 的使用
     test_item = AyuItem(
