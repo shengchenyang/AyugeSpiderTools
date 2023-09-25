@@ -52,7 +52,7 @@ def parse(self, response):
     mdi.add_field("add_field2", DataItem(key_value="value2"))
     mdi.add_field("add_field3", DataItem(key_value="value3", notes="add_field3值"))
     # _table 修改可通过以下方式，同样不推荐使用
-    mdi._table = "table1"
+    mdi["_table"] = "table1"
 ```
 
 另外，本库的 `item` 提供类型转换，以方便后续的各种使用场景：
@@ -77,27 +77,23 @@ item = AyuItem(_table="ta")
 获取字段：
 
 ```shell
->>> item._table
-'ta'
 >>> item["_table"]
 'ta'
 >>>
->>> # 注意：以上两种风格都可以。
+>>> # 注意：虽然也可以通过 item._table 的形式获取，但是不建议这样，显得不明了。
 ```
 
 添加 / 修改字段（不存在则创建，存在则修改）：
 
 ```shell
->>> item._table = "tab"
+>>> item["_table"] = "tab"
 >>> item["title"] = "tit"
 >>>
 >>> # 也可通过 add_field 添加字段，但不能重复添加相同字段
 >>> item.add_field("num", 10)
 >>>
->>> [ item._table, item["title"], item["num"] ]
+>>> [ item["_table"], item["title"], item["num"] ]
 ['tab', 'tit', 10]
->>>
->>> 注：以上几种风格可以任选一个自己喜欢的。
 ```
 
 类型转换：
