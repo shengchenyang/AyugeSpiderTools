@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from dataclasses import dataclass
+from collections.abc import MutableMapping
 from typing import Any, Dict, NamedTuple, Optional
 
 import scrapy
@@ -79,29 +79,24 @@ class ItemMeta(ABCMeta):
         return super().__new__(cls, class_name, bases, attrs)
 
 
-@dataclass
-class AyuItem(metaclass=ItemMeta):
-    """用于创建和动态添加 item 字段，以及提供转换为 dict 和 ScrapyItem 的方法。
-
-    Attributes:
-        _table: 数据库表名。
-        _mongo_update_rule: MongoDB 存储场景下可能需要的查重条件，默认为 None。
+class AyuItem(MutableMapping, metaclass=ItemMeta):
+    """Used to create AyuItem and add fields dynamically,
+    and provides methods to convert to dict and ScrapyItem.
 
     Examples:
         >>> item = AyuItem(
         ...     _table="ta",
         ... )
-        >>> # 获取字段；.field 和 ["field"] 两种方式
-        >>> [ item._table, item["_table"] ]
-        ['ta', 'ta']
+        >>> # 获取字段；
+        >>> item["_table"]
+        'ta'
         >>>
         >>> # 添加 / 修改字段，不存在则创建，存在则修改：
-        >>> # 同样支持 .field 和 ["field"] 两种方式
-        >>> item._table = "tab"
+        >>> item["_table"] = "tab"
         >>> item["title"] = "tit"
         >>> # 也可通过 add_field 添加字段，但不能重复添加相同字段
         >>> item.add_field("num", 10)
-        >>> [ item._table, item["title"], item["num"] ]
+        >>> [ item["_table"], item["title"], item["num"] ]
         ['tab', 'tit', 10]
         >>> item.asdict()
         {'title': 'tit', '_table': 'tab', 'num': 10}
@@ -113,12 +108,9 @@ class AyuItem(metaclass=ItemMeta):
         {'_table': 'tab', 'num': 10}
     """
 
-    _table: Optional[str] = None
-    _mongo_update_rule: Optional[Dict[str, Any]] = None
-
     def __init__(
         self,
-        _table: str,
+        _table: Optional[str] = None,
         _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
@@ -155,6 +147,11 @@ class AyuItem(metaclass=ItemMeta):
         delattr(self, key)
         self.__fields.discard(key)
 
+    def __getattr__(self, name):
+        if name in self.__fields:
+            raise AttributeError(f"Try to use item[{name!r}] to get field value")
+        raise AttributeError(name)
+
     def __setattr__(self, name, value):
         super().__setattr__(name, value)
         self.__fields.add(name)
@@ -162,6 +159,12 @@ class AyuItem(metaclass=ItemMeta):
     def __delattr__(self, name):
         super().__delattr__(name)
         self.__fields.discard(name)
+
+    def __iter__(self):
+        return iter(self.__fields)
+
+    def __len__(self):
+        return len(self.__fields)
 
     def __str__(self):
         # 与下方 __repr__ 一样，不返回 AyuItem(field=data) 的格式
