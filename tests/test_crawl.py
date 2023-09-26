@@ -9,7 +9,7 @@ from ayugespidertools.scraper.spiders import AyuSpider
 from tests import tests_vitdir
 from tests.conftest import script_coll_table, table_coll_table
 from tests.mockserver import MockServer
-from tests.spiders import DemoAiohttpSpider, MyAyuCrawlSpider, RecordLogToMysqlSpider
+from tests.spiders import DemoAiohttpSpider, RecordLogToMysqlSpider
 
 
 class TestCrawl(TestCase):
@@ -30,7 +30,12 @@ class TestCrawl(TestCase):
         def _on_item_scraped(item):
             items.append(item)
 
-        project_settings = {"VIT_DIR": tests_vitdir}
+        project_settings = {
+            "VIT_DIR": tests_vitdir,
+            "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
+            "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+            "FEED_EXPORT_ENCODING": "utf-8",
+        }
         crawler = get_crawler(spider_cls, project_settings)
         crawler.signals.connect(_on_item_scraped, signals.item_scraped)
         with LogCapture() as log:
@@ -45,12 +50,6 @@ class TestCrawl(TestCase):
         log, _, stats = yield self._run_spider(RecordLogToMysqlSpider)
         # 此测试会经过 test_table_exists 检测目标数据表是否已存在
         self.assertIn("Got response 200", str(log))
-
-    @defer.inlineCallbacks
-    def test_My_AyuCrawlSpider(self):
-        """测试 AyuCrawlSpider，对应 scrapy 的 CrawlSpider"""
-        log, _, stats = yield self._run_spider(MyAyuCrawlSpider)
-        self.assertIn("book_name: ", str(log))
 
     @defer.inlineCallbacks
     def test_DemoAiohttpSpider(self):

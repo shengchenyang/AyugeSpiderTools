@@ -1,11 +1,8 @@
 import json
 
-from scrapy.linkextractors import LinkExtractor
-from scrapy.spiders import Rule
-
 from ayugespidertools import AiohttpFormRequest, AiohttpRequest
 from ayugespidertools.common.typevars import AiohttpRequestArgs
-from ayugespidertools.spiders import AyuCrawlSpider, AyuSpider
+from ayugespidertools.spiders import AyuSpider
 from tests.conftest import TableEnum
 
 
@@ -53,29 +50,6 @@ class RecordLogToMysqlSpider(SimpleSpider):
     def parse(self, response):
         yield {"_table": TableEnum.article_list_table.value["value"], "data": "demo"}
         self.logger.info(f"Got response {response.status}")
-
-
-class MyAyuCrawlSpider(AyuCrawlSpider):
-    name = "My_AyuCrawlSpider"
-    allowed_domains = ["qidian.com"]
-    start_urls = ["https://www.qidian.com/rank/hotsales/"]
-    custom_settings = {
-        "LOG_LEVEL": "DEBUG",
-    }
-
-    rules = (
-        Rule(
-            LinkExtractor(restrict_xpaths="//ul/li/div[@class='book-mid-info']/h2/a"),
-            callback="parse_item",
-        ),
-    )
-
-    def parse_item(self, response):
-        # 获取图书名称 - （获取的是详情页中的图书名称）
-        book_name_list = response.xpath("//h1[@id='bookName']//text()").extract()
-        book_name = "".join(book_name_list).strip()
-
-        self.logger.info(f"book_name: {book_name}")
 
 
 class Operations:

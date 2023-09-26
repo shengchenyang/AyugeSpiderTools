@@ -1,8 +1,9 @@
+import inspect
+import unittest
 import warnings
 from unittest import mock
 
 import loguru
-import pytest
 from scrapy import signals
 from scrapy.http import HtmlResponse, Request
 from scrapy.linkextractors import LinkExtractor
@@ -16,14 +17,14 @@ from tests import CONSUL_CONFIG, MONGODB_CONFIG, PYMYSQL_CONFIG
 from tests.conftest import ForTestConfig
 
 
-class TestSpider:
+class SpiderTest(unittest.TestCase):
     spider_class = AyuSpider
     scrapy_spider_class = Spider
 
-    def setup_method(self):
+    def setUp(self):
         warnings.simplefilter("always")
 
-    def teardown_method(self):
+    def tearDown(self):
         warnings.resetwarnings()
 
     def test_base_spider(self):
@@ -31,17 +32,21 @@ class TestSpider:
         assert spider.name == "example.com"
         assert spider.start_urls == []
 
+    def test_start_requests(self):
+        spider = self.spider_class("example.com")
+        start_requests = spider.start_requests()
+        self.assertTrue(inspect.isgenerator(start_requests))
+        self.assertEqual(list(start_requests), [])
+
     def test_spider_args(self):
         """``__init__`` method arguments are assigned to spider attributes"""
         spider = self.spider_class("example.com", foo="bar")
-        assert spider.foo == "bar"
+        self.assertEqual(spider.foo, "bar")
 
     def test_spider_without_name(self):
         """``__init__`` method arguments are assigned to spider attributes"""
-        with pytest.raises(ValueError):
-            self.spider_class()
-        with pytest.raises(ValueError):
-            self.spider_class(somearg="foo")
+        self.assertRaises(ValueError, self.spider_class)
+        self.assertRaises(ValueError, self.spider_class, somearg="foo")
 
     def test_from_crawler_crawler_and_settings_population(self):
         crawler = get_crawler()
@@ -123,7 +128,7 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        crawler = get_crawler(settings_dict=settings)
+        crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mysql_conf")
         assert spider.mysql_conf._asdict() == true_mysql_conf
@@ -143,7 +148,7 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        crawler = get_crawler(settings_dict=settings)
+        crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mysql_conf")
         assert spider.mysql_conf._asdict() == true_mysql_conf
@@ -169,7 +174,7 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        crawler = get_crawler(settings_dict=settings)
+        crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
         assert spider.mongodb_conf._asdict() == true_mongodb_conf
@@ -189,13 +194,13 @@ class TestSpider:
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
 
-        crawler = get_crawler(settings_dict=settings)
+        crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
         assert spider.mongodb_conf._asdict() == true_mongodb_conf
 
 
-class TestCrawlSpider(TestSpider):
+class TestCrawlSpider(SpiderTest):
     test_body = b"""<html><head><title>Page title<title>
         <body>
         <p><a href="item/12.html">Item 12</a></p>
@@ -214,7 +219,7 @@ class TestCrawlSpider(TestSpider):
             "http://example.org/somepage/index.html", body=self.test_body
         )
 
-        class _CrawlSpider(CrawlSpider):
+        class _CrawlSpider(self.spider_class):
             name = "test"
             allowed_domains = ["example.org"]
             rules = (Rule(),)
@@ -234,7 +239,7 @@ class TestCrawlSpider(TestSpider):
             "http://example.org/somepage/index.html", body=self.test_body
         )
 
-        class _CrawlSpider(CrawlSpider):
+        class _CrawlSpider(self.spider_class):
             name = "test"
             allowed_domains = ["example.org"]
             rules = (Rule(LinkExtractor(), process_links="dummy_process_links"),)
