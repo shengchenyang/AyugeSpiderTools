@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from collections.abc import MutableMapping
+from dataclasses import dataclass
 from typing import Any, Dict, NamedTuple, Optional
 
 import scrapy
@@ -79,6 +80,7 @@ class ItemMeta(ABCMeta):
         return super().__new__(cls, class_name, bases, attrs)
 
 
+@dataclass
 class AyuItem(MutableMapping, metaclass=ItemMeta):
     """Used to create AyuItem and add fields dynamically,
     and provides methods to convert to dict and ScrapyItem.
