@@ -1,5 +1,17 @@
 # Release notes
 
+## AyugeSpiderTools 3.5.1 (2023-09-28)
+
+### Bug fixes
+
+- 修复在 `py 3.11` 及以上版本的 `mongo` 相关场景的报错。([issue 11](https://github.com/shengchenyang/AyugeSpiderTools/issues/11))
+
+### Code optimizations
+
+- 优化 `AyuItem` 实现，增强可读性及用户输入体验，比如 `add_field` 增加 `IDE` 参数提示功能。
+- 更新文档中 `AyuItem` 的使用建议及对应测试。
+- 更新测试文件，比如 `test_crawl` 及 `spider` 相关方法。
+
 ## AyugeSpiderTools 3.5.0 (2023-09-21)
 
 ### Bug fixes
