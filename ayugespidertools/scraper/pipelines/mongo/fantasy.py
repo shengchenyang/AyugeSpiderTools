@@ -1,3 +1,5 @@
+import sys
+
 from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.mongoclient import MongoDbBase
@@ -14,6 +16,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
     def __init__(self):
         self.conn = None
         self.db = None
+        self.sys_ver_low = sys.version_info < (3, 11)
 
     def open_spider(self, spider):
         assert hasattr(
@@ -49,5 +52,6 @@ class AyuFtyMongoPipeline(MongoDbBase):
             Synchronize(),
             item_dict=item_dict,
             db=self.db,
+            sys_ver_low=self.sys_ver_low,
         )
         return item

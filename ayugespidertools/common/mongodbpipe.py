@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     import pymongo
     from itemadapter import ItemAdapter
 
-PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
+    PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
 
 
 class AbstractClass(ABC):
@@ -46,13 +46,15 @@ class AbstractClass(ABC):
     def process_item_template(
         self,
         item_dict: Union["ItemAdapter", dict],
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
+        sys_ver_low: bool = True,
     ) -> None:
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
         Args:
             item_dict: item ItemAdapter 或 dict 格式数据
             db: mongodb 数据库连接
+            sys_ver_low: 是否是 py3.11 以下
         """
         insert_data = self._get_insert_data(item_dict)
         self._data_storage_logic(
@@ -60,15 +62,41 @@ class AbstractClass(ABC):
             item_dict=item_dict,
             collection_name=item_dict["_table"],
             insert_data=insert_data,
+            sys_ver_low=sys_ver_low,
         )
+
+    def _default_storage(
+        self,
+        db: "PymongoDataBase",
+        item_dict: Union["ItemAdapter", dict],
+        collection_name: str,
+        insert_data: dict,
+        sys_ver_low: bool,
+    ):
+        if sys_ver_low:
+            # 如果没有查重字段时，就直接插入数据（不去重）
+            if not item_dict.get("_mongo_update_rule"):
+                db[collection_name].insert(insert_data)
+            else:
+                db[collection_name].update(
+                    item_dict["_mongo_update_rule"], {"$set": insert_data}, True
+                )
+        else:
+            if not item_dict.get("_mongo_update_rule"):
+                db[collection_name].insert_one(insert_data)
+            else:
+                db[collection_name].update_many(
+                    item_dict["_mongo_update_rule"], {"$set": insert_data}, True
+                )
 
     @abstractmethod
     def _data_storage_logic(
         self,
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
         item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
+        sys_ver_low: bool,
         *args,
         **kwargs,
     ) -> None:
@@ -90,20 +118,15 @@ class Synchronize(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
         item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
+        sys_ver_low: bool,
         *args,
         **kwargs,
     ) -> None:
-        # 如果没有查重字段时，就直接插入数据（不去重）
-        if not item_dict.get("_mongo_update_rule"):
-            db[collection_name].insert(insert_data)
-        else:
-            db[collection_name].update(
-                item_dict["_mongo_update_rule"], {"$set": insert_data}, True
-            )
+        self._default_storage(db, item_dict, collection_name, insert_data, sys_ver_low)
 
 
 class TwistedAsynchronous(AbstractClass):
@@ -111,19 +134,15 @@ class TwistedAsynchronous(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
         item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
+        sys_ver_low: bool,
         *args,
         **kwargs,
     ) -> None:
-        if not item_dict.get("_mongo_update_rule"):
-            db[collection_name].insert(insert_data)
-        else:
-            db[collection_name].update(
-                item_dict["_mongo_update_rule"], {"$set": insert_data}, True
-            )
+        self._default_storage(db, item_dict, collection_name, insert_data, sys_ver_low)
 
 
 class AsyncioAsynchronous(AbstractClass):
@@ -131,7 +150,7 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def _data_storage_logic(
         self,
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
         item_dict: Union["ItemAdapter", dict],
         collection_name: str,
         insert_data: dict,
@@ -148,7 +167,8 @@ class AsyncioAsynchronous(AbstractClass):
     async def process_item_template(
         self,
         item_dict: Union["ItemAdapter", dict],
-        db: PymongoDataBase,
+        db: "PymongoDataBase",
+        sys_ver_low: bool = True,
     ) -> None:
         insert_data = self._get_insert_data(item_dict)
         await self._data_storage_logic(
@@ -162,7 +182,8 @@ class AsyncioAsynchronous(AbstractClass):
 def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: Union["ItemAdapter", dict],
-    db: PymongoDataBase,
+    db: "PymongoDataBase",
+    sys_ver_low: bool = True,
 ) -> None:
     """mongodb pipeline 存储的通用调用方法"""
-    abstract_class.process_item_template(item_dict=item_dict, db=db)
+    abstract_class.process_item_template(item_dict, db, sys_ver_low)
