@@ -125,7 +125,7 @@ class AyuSpider(Spider):
     @classmethod
     def update_settings(cls, settings: "BaseSettings") -> None:
         custom_table_enum = getattr(cls, "custom_table_enum", None)
-        # 设置类型，用于快速设置某些场景下的通用配置。比如测试 test 和生产 prod 下的通用配置；可不设置，默认为 common
+        # 设置类型，用于快速设置某些通用配置，若不设置默认为 common
         settings_type = getattr(cls, "settings_type", "common")
         inner_settings = getattr(cls, f"custom_{settings_type}_settings", {})
 
@@ -139,9 +139,7 @@ class AyuSpider(Spider):
             )
 
         else:
-            logger.warning("请在 settings.py 中配置 VIT_DIR 的路径参数，用于本库运行所需配置 .conf 的读取！")
-        # 内置配置 inner_settings 优先级介于 project 和 spider 之间
-        # 即优先级顺序：project_settings < inner_settings < custom_settings
+            logger.warning("请在 settings 中配置 VIT_DIR 参数，用于本库运行所需配置 .conf 的读取！")
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
 

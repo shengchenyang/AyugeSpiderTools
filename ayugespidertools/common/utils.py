@@ -93,8 +93,8 @@ class ToolsForAyu:
         """获取 consul 中的 mysql 配置信息
 
         Args:
-            conf_name: 需要获取的配置，本选项只有 "MYSQL" 和 "MONGODB"。
-            token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
+            conf_name: 需要获取的配置
+            token: consul token
             format: consul 中的配置格式，默认为 json 格式
             url: 当前 consul 所需配置的 url
 

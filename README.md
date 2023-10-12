@@ -77,18 +77,18 @@ scrapy crawl <spider_name>
 
 ```diff
 # 数据存入 Mysql 的场景：
-+ 1).demo_one: 配置根据本地 settings 的 LOCAL_MYSQL_CONFIG 中取值
-+ 3).demo_three: 配置根据 consul 的应用管理中心中取值
++ 1).demo_one: 根据本地 VIT 中的 .conf 取 mysql 配置
++ 3).demo_three: 根据 consul 中取 mysql 配置
 + 5).demo_five: 异步存入 Mysql 的场景
 
 # 数据存入 MongoDB 的场景：
-+ 2).demo_two: 配置根据本地 settings 的 LOCAL_MONGODB_CONFIG 中取值
-+ 4).demo_four: 配置根据 consul 的应用管理中心中取值
++ 2).demo_two: 根据本地 VIT 中的 .conf 取 mongodb 配置
++ 4).demo_four: 根据 consul 中取 mongodb 配置
 + 6).demo_six: 异步存入 MongoDB 的场景
 
-- 7).demo_seven: scrapy Request 替换为 requests 请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
+- 7).demo_seven: 使用 requests 来请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
-+ 9).demo_aiohttp_example: scrapy Request 替换为 aiohttp 请求的场景
++ 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
 + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
 + 11).demo_proxy_one: 快代理动态隧道代理示例

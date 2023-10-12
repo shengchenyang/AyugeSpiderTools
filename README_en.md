@@ -82,18 +82,18 @@ following scenarios are currently supported:
 
 ```diff
 Scenario of storing data in Mysql:
-+ 1).demo_one: The configuration values are retrieved from LOCAL_MYSQL_CONFIG in the local settings.
-+ 3).demo_three: The configuration values are retrieved from the application management center of consul.
++ 1).demo_one: Get mysql configuration based on .conf in local VIT.
++ 3).demo_three: Get the mysql configuration from consul.
 + 5).demo_five: Scenario of asynchronously storing data in MySQL.
 
 Scenario of storing data in MongoDB:
-+ 2).demo_two: The configuration values are retrieved from LOCAL_MONGODB_CONFIG in the local settings.
-+ 4).demo_four: The configuration values are retrieved from the application management center of consul.
++ 2).demo_two: Get mongodb configuration based on .conf in local VIT.
++ 4).demo_four: Get mongodb configuration from consul.
 + 6).demo_six: Scenario of asynchronously storing data in MongoDB.
 
-- 7).demo_seven: Scenario of replacing scrapy requests with requests (this feature has been removed, and using aiohttp is recommended instead)
+- 7).demo_seven: Scenarios using requests to request (this feature has been removed, and using aiohttp is recommended instead)
 + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
-+ 9).demo_aiohttp_example: Scenario of replacing scrapy requests with aiohttp requests.
++ 9).demo_aiohttp_example: Scenarios using aiohttp to request.
 + 10).demo_aiohttp_test: Example of using scrapy aiohttp in a specific project.
 
 + 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".
