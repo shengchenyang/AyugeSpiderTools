@@ -133,8 +133,8 @@ class AyuSpider(Spider):
             inner_settings["DATA_ENUM"] = custom_table_enum
 
         if vit_dir := settings.get("VIT_DIR", None):
-            # 根据 vit_dir 配置，获取对应的 inner_settings 配置
-            inner_settings = ReuseOperation.get_conf_by_settings(
+            # 根据本地配置获取对应的 inner_settings
+            inner_settings = ReuseOperation.fetch_local_conf(
                 vit_dir=vit_dir, inner_settings=inner_settings
             )
 
@@ -148,10 +148,10 @@ class AyuSpider(Spider):
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
         spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
 
-        _consul_conf = ReuseOperation.get_consul_conf(settings=crawler.settings)
-        # 以下将 .conf 中或 consul 中对应的配置信息，赋值给 spider 对象，方便后续使用
+        remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
+        # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
         if mysql_conf := get_spider_conf(
-            MysqlConfCreator().create_product(crawler.settings, _consul_conf)
+            MysqlConfCreator().create_product(crawler.settings, remote_option)
         ):
             spider.mysql_conf = mysql_conf
             if cls.mysql_engine_enabled:
@@ -164,27 +164,27 @@ class AyuSpider(Spider):
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
         if mongodb_conf := get_spider_conf(
-            MongoDBConfCreator().create_product(crawler.settings, _consul_conf)
+            MongoDBConfCreator().create_product(crawler.settings, remote_option)
         ):
             spider.mongodb_conf = mongodb_conf
 
         if rabbitmq_conf := get_spider_conf(
-            MQConfCreator().create_product(crawler.settings, _consul_conf)
+            MQConfCreator().create_product(crawler.settings, remote_option)
         ):
             spider.rabbitmq_conf = rabbitmq_conf
 
         if kafka_conf := get_spider_conf(
-            KafkaConfCreator().create_product(crawler.settings, _consul_conf)
+            KafkaConfCreator().create_product(crawler.settings, remote_option)
         ):
             spider.kafka_conf = kafka_conf
 
         if dynamicproxy_conf := get_spider_conf(
-            DynamicProxyCreator().create_product(crawler.settings, _consul_conf)
+            DynamicProxyCreator().create_product(crawler.settings, remote_option)
         ):
             spider.dynamicproxy_conf = dynamicproxy_conf
 
         if exclusiveproxy_conf := get_spider_conf(
-            ExclusiveProxyCreator().create_product(crawler.settings, _consul_conf)
+            ExclusiveProxyCreator().create_product(crawler.settings, remote_option)
         ):
             spider.exclusiveproxy_conf = exclusiveproxy_conf
         return spider

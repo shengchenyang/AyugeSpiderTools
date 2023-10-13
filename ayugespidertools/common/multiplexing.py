@@ -26,10 +26,10 @@ class ReuseOperation:
     """用于存放经常复用的一些操作"""
 
     @staticmethod
-    def get_conf_by_settings(
+    def fetch_local_conf(
         vit_dir: str, inner_settings: "BaseSettings"
     ) -> "BaseSettings":
-        """通过 settings 获取所需配置，并将其添加到 inner_settings 中
+        """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
 
         Args:
             vit_dir: 配置文件所在的目录
@@ -56,11 +56,20 @@ class ReuseOperation:
             "password": config_parser.get("mongodb", "password", fallback=None),
             "database": config_parser.get("mongodb", "database", fallback=None),
         }
-        inner_settings["CONSUL_CONFIG"] = {
-            "token": config_parser.get("consul", "token", fallback=None),
-            "url": config_parser.get("consul", "url", fallback=None),
-            "format": config_parser.get("consul", "format", fallback="json"),
-        }
+        if "consul" in config_parser:
+            inner_settings["REMOTE_CONFIG"] = {
+                "token": config_parser.get("consul", "token", fallback=None),
+                "url": config_parser.get("consul", "url", fallback=None),
+                "format": config_parser.get("consul", "format", fallback="json"),
+                "remote_type": "consul",
+            }
+        elif "nacos" in config_parser:
+            inner_settings["REMOTE_CONFIG"] = {
+                "token": config_parser.get("nacos", "token", fallback=None),
+                "url": config_parser.get("nacos", "url", fallback=None),
+                "format": config_parser.get("nacos", "format", fallback="json"),
+                "remote_type": "nacos",
+            }
         inner_settings["DYNAMIC_PROXY_CONFIG"] = {
             "proxy": config_parser.get("kdl_dynamic_proxy", "proxy", fallback=None),
             "username": config_parser.get(
@@ -337,18 +346,18 @@ class ReuseOperation:
         return key_to_upper_dict
 
     @classmethod
-    def get_consul_conf(cls, settings: "BaseSettings") -> dict:
-        """获取项目中的 consul 配置，且要根据项目整体情况来取出满足最少要求的 consul 配置
+    def get_remote_option(cls, settings: "BaseSettings") -> dict:
+        """获取项目中 consul 或 nacos 的链接配置
 
         Args:
             settings: scrapy 的 settings 信息
 
         Returns:
-            1). 满足最少要求的 consul 配置
+            1). 满足最少要求的远程配置
         """
-        consul_conf_dict = settings.get("CONSUL_CONFIG", {})
+        consul_conf_dict = settings.get("REMOTE_CONFIG", {})
         return cls.get_items_by_keys(
-            dict_conf=consul_conf_dict, keys=["token", "url", "format"]
+            dict_conf=consul_conf_dict, keys=["token", "url", "format", "remote_type"]
         )
 
     @classmethod

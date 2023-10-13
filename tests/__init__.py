@@ -12,7 +12,6 @@ mysql_conf = config_parser["mysql"]
 mongodb_conf = config_parser["mongodb"]
 oss_conf = config_parser["ali_oss"]
 
-# 测试 Mysql 数据库配置
 PYMYSQL_CONFIG = {
     "host": mysql_conf["host"],
     "port": mysql_conf.getint("port"),
@@ -23,7 +22,6 @@ PYMYSQL_CONFIG = {
     # "cursorclass": pymysql.cursors.Cursor,
 }
 
-# 测试 MongoDB 数据库配置
 MONGODB_CONFIG = {
     "host": mongodb_conf["host"],
     "port": mongodb_conf.getint("port"),
@@ -33,7 +31,6 @@ MONGODB_CONFIG = {
     "database": mongodb_conf["database"],
 }
 
-# 读取 Oss 配置信息，已脱敏，请自行配置后测试
 OSS_CONFIG = {
     "accesskeyid": oss_conf["accesskeyid"],
     "accesskeysecret": oss_conf["accesskeysecret"],
@@ -42,7 +39,6 @@ OSS_CONFIG = {
     "doc": oss_conf["doc"],
 }
 
-# consul 应用管理的连接配置
 CONSUL_CONFIG = {
     "token": config_parser.get("consul", "token", fallback=None),
     "url": config_parser.get("consul", "url", fallback=None),

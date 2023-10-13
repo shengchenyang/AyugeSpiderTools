@@ -60,8 +60,8 @@ body = Path(tests_dir, "docs/txt/baidu_pagesource.html").read_text(encoding="utf
 _response = TextResponse(url="https://top.baidu.com", body=body, encoding="utf-8")
 
 
-def test_get_kvs_detail_by_consul():
-    res = ToolsForAyu.get_kvs_detail_by_consul(
+def test_get_remote_kvs():
+    res = ToolsForAyu.get_remote_kvs(
         url=CONSUL_CONFIG["url"],
     )
     _res = json.loads(res)
@@ -69,8 +69,8 @@ def test_get_kvs_detail_by_consul():
     assert _res_lower.get("mysql") is not None, _res_lower.get("mongodb") is not None
 
 
-def test_get_conf_by_consul():
-    res = ToolsForAyu.get_conf_by_consul(
+def test_fetch_remote_conf():
+    res = ToolsForAyu.fetch_remote_conf(
         conf_name="mysql",
         url=CONSUL_CONFIG["url"],
         format="json",

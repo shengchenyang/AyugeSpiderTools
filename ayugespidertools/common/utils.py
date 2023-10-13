@@ -1,4 +1,3 @@
-import copy
 import json
 import math
 import random
@@ -28,8 +27,9 @@ if TYPE_CHECKING:
     from ayugespidertools.common.typevars import MysqlConf, Str_Lstr
     from ayugespidertools.items import AyuItem
 
-ConsulFormatStr = Literal["json", "hcl", "yaml", "xml"]
-ConsulConfNameStr = Literal[
+RemoteFormatStr = Literal["json", "hcl", "yaml", "xml"]
+RemoteTypeStr = Literal["consul", "nacos"]
+RemoteConfNameStr = Literal[
     "mongodb",
     "mysql",
     "rabbitmq",
@@ -44,28 +44,27 @@ class ToolsForAyu:
 
     @classmethod
     @lru_cache(maxsize=16)
-    def get_kvs_detail_by_consul(
+    def get_remote_kvs(
         cls,
         url: str,
+        remote_type: RemoteTypeStr = "consul",
         token: Optional[str] = None,
     ) -> str:
-        """获取 consul 的 key_values 的详细信息
+        """获取远程配置中的 key_values 信息
 
         Args:
-            token: consul token，最好只要有只读权限的 token 即可，如果未配置，则默认为 None。
-            url: 当前 consul 所需配置的 url
+            url: 获取 kvs 所需的 url
+            remote_type: 配置类型
+            token: consul token or nacos token; nacos 的 token 值直接在 url 中构造即可
 
         Returns:
-            1). consul 的 group 下 key_values 的详细信息
+            1). 远程配置中 key_values 的详细信息
         """
-        url_params = urlparse(url).query
-
-        curr_consul_headers = copy.deepcopy(Param.consul_headers)
-        curr_consul_headers["X-Consul-Token"] = token
+        headers = {"X-Consul-Token": token} if remote_type == "consul" else None
         try:
             r = requests.get(
                 url,
-                headers=curr_consul_headers,
+                headers=headers,
                 verify=False,
                 timeout=(
                     Param.requests_req_timeout,
@@ -76,32 +75,37 @@ class ToolsForAyu:
             requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout,
         ) as e:
-            raise ValueError("请求 consul 超时，请检查 consul 是否正常运行!") from e
-        # 判断是否返回的 raw 原始数据
-        if "raw" in url_params:
-            return r.text
-        return EncryptOperation.base64_decode(decode_data=r.json()[0]["Value"])
+            raise ValueError(f"请求远程配置 {remote_type} api 超时!") from e
+
+        url_params = urlparse(url).query
+        if remote_type == "consul":
+            if "raw" in url_params:
+                return r.text
+            return EncryptOperation.base64_decode(decode_data=r.json()[0]["Value"])
+        return r.text
 
     @classmethod
-    def get_conf_by_consul(
+    def fetch_remote_conf(
         cls,
-        conf_name: ConsulConfNameStr,
+        conf_name: RemoteConfNameStr,
         url: str,
-        format: ConsulFormatStr = "json",
+        format: RemoteFormatStr = "json",
+        remote_type: RemoteTypeStr = "consul",
         token: Optional[str] = None,
     ) -> dict:
-        """获取 consul 中的 mysql 配置信息
+        """获取远程中的项目配置信息
 
         Args:
             conf_name: 需要获取的配置
-            token: consul token
-            format: consul 中的配置格式，默认为 json 格式
-            url: 当前 consul 所需配置的 url
+            token: consul token or nacos token
+            format: 远程配置中的格式，默认为 json 格式
+            remote_type: 配置类型
+            url: 获取远程配置所需的 url
 
         Returns:
-            1). consul 应用配置中心中的 Mysql 配置信息（key 值为小写）
+            1). 远程应用配置中心中的配置信息（key 值为小写）
         """
-        conf_value = cls.get_kvs_detail_by_consul(url, token)
+        conf_value = cls.get_remote_kvs(url, remote_type, token)
         if format == "json":
             conf_data = json.loads(conf_value)
         elif format == "hcl":
@@ -117,12 +121,12 @@ class ToolsForAyu:
                 for sub_child in child:
                     conf_data[child.tag][sub_child.tag] = sub_child.text
         else:
-            raise ValueError("consul 暂不支持该格式的配置")
+            raise ValueError(f"{conf_name} 暂不支持该格式的配置")
 
         conf_data = ReuseOperation.dict_keys_to_lower(conf_data)
         _conf = conf_data.get(conf_name, {})
         if not _conf:
-            logger.info(f"consul 中未设置 {conf_name} 的配置信息")
+            logger.info(f"远程配置(consul or nacos)中未设置 {conf_name}")
         return _conf
 
     @classmethod

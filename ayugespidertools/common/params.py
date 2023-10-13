@@ -65,15 +65,6 @@ class Param:
         "retry_times": 3,
     }
 
-    # 获取 consul 的 api 所需要的请求头信息
-    consul_headers = {
-        # 'Accept': 'application/json, text/javascript, */*; q=0.01',
-        # 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
-        "X-Consul-Token": None,
-        # 'X-Requested-With': 'XMLHttpRequest',
-    }
-
     # 随机请求头列表
     fake_useragent_dict = {
         "chrome": [
