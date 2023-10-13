@@ -61,7 +61,7 @@ cd <project_name>
 
 # 替换(覆盖)为真实的配置 .conf 文件：
 # 这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上你需要的配置即可
-# 不需要的配置设置为空，或者不用理会它，或者删除它也可以，看个人选择
+# 不需要的配置强烈建议删除，保证配置的可维护性
 cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # 生成爬虫脚本
@@ -142,7 +142,9 @@ scrapy crawl <spider_name>
 - [x] `scrapy` 的扩展功能场景
     - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
     - [x] 自定义模板，在 `ayuge startproject <projname>` 和 `ayuge genspider <spidername>` 时生成适合本库的模板文件
-    - [x] ~~增加根据 `nacos` 来获取配置的功能~~ -> 改为增加根据 `consul` 来获取配置的功能
+    - [x] 从远程应用管理服务中获取项目配置
+        - [x] 从 `consul` 获取项目配置
+        - [x] 从 `nacos` 获取项目配置（注意：优先级小于 `consul`）
     - [x] 代理中间件（独享代理、动态隧道代理）
     - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
     - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求

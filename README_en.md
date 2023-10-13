@@ -65,7 +65,7 @@ cd <project_name>
 
 # Replace (or overwrite) with the actual configuration .conf file:
 # This is just for demonstration purposes. Normally, you can simply fill in the required configuration in the .conf file under the VIT path.
-# Unnecessary configuration can be set to empty, ignored, or deleted according to personal preference.
+# It is strongly recommended to delete unnecessary configurations to ensure the maintainability of the configuration.
 cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # Generate spider script
@@ -158,8 +158,9 @@ functionality of Scrapy.**
       for logging and alerts.
     - [x] Custom templates that generate template files suitable for this library when
       using `ayuge startproject <projname>` and `ayuge genspider <spidername>`.
-    - [x] ~~Add the functionality of obtaining configuration based on nacos.~~ -> Change to the functionality of
-      obtaining configuration based on consul.
+    - [x] Get project configuration from remote application management service.
+        - [x] Get project configuration from `consul`.
+        - [x] Get project configuration from `nacos`(Note: Priority is lower than `consul`).
     - [x] Proxy middleware (dedicated proxy, dynamic tunnel proxy).
     - [x] Random User-Agent middleware.
     - [x] Use the following tools to replace scrapy's Request for sending requests:
