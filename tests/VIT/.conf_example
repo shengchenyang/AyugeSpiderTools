@@ -1,5 +1,6 @@
 [notice]
 info=这是 .conf 文件的示例；跑通部分测试文件，可能需要在同目录下配置 .conf 文件！
+about_consul_and_nacos=使用远程配置服务时，优先从 consul 中获取配置信息
 detail=以下为所需的配置信息，具体值请自行添加。
 
 [mysql]
@@ -29,13 +30,17 @@ exchange=***
 routing_key=***
 
 [kafka]
-bootstrap_servers=127.0.0.1:9092
+bootstrap_servers=host:port
 topic=***
 key=***
 
 [consul]
 token=
-url=http://host:port/v1/kv/...?dc=dc1
+url=http://host:port/v1/kv/...?dc=dc1&raw
+format=json
+
+[nacos]
+url=http://host:port/nacos/v1/cs/configs?dataId=***&group=***&tenant=***
 format=json
 
 [wxbot]
