@@ -82,10 +82,20 @@
           "database":"***",
           "authsource":"***"
       },
-      "consul":{
-          "token":"",
-          "url":"http://host:port/v1/kv/...?dc=dc1",
-          "format":"json"
+      "mq":{
+          "host":"***",
+          "port":5672,
+          "username":"***",
+          "password":"***",
+          "virtualhost":"***",
+          "queue":"***",
+          "exchange":"***",
+          "routing_key":"***"
+      },
+      "kafka":{
+          "bootstrap_servers":"127.0.0.1:9092 #若多个用逗号分隔",
+          "topic":"***",
+          "key":"***"
       },
       "kdl_dynamic_proxy":{
           "proxy":"o668.kdltps.com:15818",
