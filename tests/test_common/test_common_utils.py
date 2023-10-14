@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from scrapy.http.request import Request
 from scrapy.http.response.text import TextResponse
 
@@ -108,7 +109,6 @@ def test_extract_with_xpath():
         response=_response,
         query="//div[@class='side-title_1wfo5 c-theme-color']/text()",
     )
-    print("content_type:", content_type)
     assert content_type == "热搜榜"
     title_lst = ToolsForAyu.extract_with_xpath(
         response=_response,
@@ -159,13 +159,11 @@ def test_extract_with_json_rules():
     assert res == "33", isinstance(res, str)
 
     # 参数层级大于 2 时，会报错
-    try:
-        res1 = ToolsForAyu.extract_with_json_rules(
+    with pytest.raises(AssertionError) as _assertion_err:
+        ToolsForAyu.extract_with_json_rules(
             json_data=json_data_example, query_rules=[[["depth_to_big"], "data", "im"]]
         )
-        print("res:", res1)
-    except Exception as e:
-        print("err:", e)
+    assert str(_assertion_err.value) == "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
     res2 = ToolsForAyu.extract_with_json_rules(
         json_data=json_data_example, query_rules=[["data", "yy"], "message"]
@@ -173,14 +171,11 @@ def test_extract_with_json_rules():
     assert res2 == "success"
 
     # 当 json 字段的值为 int, float, str, complex 或 list 等没有 get 方法的时候
-    try:
-        res3 = ToolsForAyu.extract_with_json_rules(
+    with pytest.raises(AttributeError) as _attribute_err:
+        ToolsForAyu.extract_with_json_rules(
             json_data=json_data_example, query_rules=[["data", "im", "cc"], "message"]
         )
-        print("res3:", res3)
-    except Exception as e:
-        # 'int' object has no attribute 'get'
-        print("err2", e)
+    assert str(_attribute_err.value) == "'int' object has no attribute 'get'"
 
 
 def test_get_collate_by_charset():
@@ -223,7 +218,6 @@ def test_bezier_track():
     """测试贝塞尔曲线生成轨迹方法"""
     a = BezierTrajectory()
     res = a.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
-    # print("最终的轨迹为：", res)
     track = res["trackArray"]
     print(track)
     x_lst = []
