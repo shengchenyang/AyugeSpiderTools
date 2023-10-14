@@ -229,8 +229,16 @@ def test_bezier_track():
     x_lst = []
     y_lst = []
     for i in res["trackArray"]:
-        print(i)
         x_lst.append(i[0])
         y_lst.append(i[1])
     print("x_lst:", x_lst)
     print("y_lst:", y_lst)
+    assert all(
+        [
+            len(x_lst) == len(y_lst) == 45,
+            int(x_lst[0]) == 50,
+            int(y_lst[0]) == 268,
+            int(x_lst[-1]) == 367,
+            int(y_lst[-1]) == 485,
+        ]
+    )

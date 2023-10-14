@@ -24,6 +24,8 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from scrapy.http import Response
+
     from ayugespidertools.common.typevars import MysqlConf, Str_Lstr
     from ayugespidertools.items import AyuItem
 
@@ -132,7 +134,11 @@ class ToolsForAyu:
     @classmethod
     @DataHandle.simple_deal_for_extract
     def extract_with_css(
-        cls, response, query: str, get_all: bool = False, return_selector: bool = False
+        cls,
+        response: "Response",
+        query: str,
+        get_all: bool = False,
+        return_selector: bool = False,
     ):
         """使用 scrapy 的 css 提取信息
 
@@ -155,7 +161,11 @@ class ToolsForAyu:
     @classmethod
     @DataHandle.simple_deal_for_extract
     def extract_with_xpath(
-        cls, response, query: str, get_all: bool = False, return_selector: bool = False
+        cls,
+        response: "Response",
+        query: str,
+        get_all: bool = False,
+        return_selector: bool = False,
     ):
         """使用 scrapy 的 xpath 提取信息
 
@@ -311,7 +321,13 @@ class ToolsForAyu:
 
 
 class BezierTrajectory:
-    """贝塞尔曲线轨迹生成器"""
+    """贝塞尔曲线轨迹生成器
+
+    Examples:
+        >>> bt = BezierTrajectory()
+        >>> gen_data = bt.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
+        >>> track = gen_data["trackArray"]
+    """
 
     def _generate_control_points(self, track: list):
         """计算贝塞尔曲线的控制点"""
@@ -422,7 +438,7 @@ class BezierTrajectory:
         type=0,
         shake_num=0,
         yhh=10,
-    ):
+    ) -> dict:
         """生成轨迹数组
 
         Args:
