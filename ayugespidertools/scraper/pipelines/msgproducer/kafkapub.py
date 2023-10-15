@@ -82,6 +82,7 @@ class AyuKafkaPipeline:
         self.kp = None
 
     def open_spider(self, spider):
+        assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
         # 如果有多个 kafka 服务地址，用逗号分隔，会在此处拆分为列表
         _bts = spider.kafka_conf.bootstrap_servers
         bts_lst = _bts.split(",")

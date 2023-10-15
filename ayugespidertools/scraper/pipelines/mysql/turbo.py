@@ -27,6 +27,7 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         )
 
     def open_spider(self, spider):
+        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         if not self.pool_db_conf:
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")

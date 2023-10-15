@@ -16,10 +16,7 @@ class AsyncMongoPipeline:
         self.db = None
 
     def open_spider(self, spider):
-        assert hasattr(
-            spider, "mongodb_conf"
-        ), "未配置 MongoDB 连接信息，请查看 .conf 或 consul 上对应配置信息！"
-
+        assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
         _encoded_pwd = urllib.parse.quote_plus(spider.mongodb_conf.password)
         self.mongo_uri = (
             f"mongodb://{spider.mongodb_conf.user}:{_encoded_pwd}"

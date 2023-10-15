@@ -21,6 +21,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         self.dbpool = None
 
     def open_spider(self, spider):
+        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)

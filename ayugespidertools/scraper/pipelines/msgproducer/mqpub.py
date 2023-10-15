@@ -18,10 +18,7 @@ class AyuMQPipeline:
         return bytes(item_json_str, encoding="utf-8")
 
     def open_spider(self, spider):
-        assert hasattr(
-            spider, "rabbitmq_conf"
-        ), "未配置 RabbitMQ 连接信息，请查看 .conf 或 consul 上对应配置信息！"
-
+        assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
         _mq_conf = spider.rabbitmq_conf
         mq_conn_param = pika.URLParameters(
             f"amqp://{_mq_conf.username}:{_mq_conf.password}"
