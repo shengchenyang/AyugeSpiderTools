@@ -40,22 +40,26 @@ class ReuseOperation:
         """
         config_parser = configparser.ConfigParser()
         config_parser.read(f"{vit_dir}/.conf", encoding="utf-8")
-        inner_settings["MYSQL_CONFIG"] = {
-            "host": config_parser.get("mysql", "host", fallback=None),
-            "port": config_parser.getint("mysql", "port", fallback=3306),
-            "user": config_parser.get("mysql", "user", fallback="root"),
-            "password": config_parser.get("mysql", "password", fallback=None),
-            "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
-            "database": config_parser.get("mysql", "database", fallback=None),
-        }
-        inner_settings["MONGODB_CONFIG"] = {
-            "host": config_parser.get("mongodb", "host", fallback=None),
-            "port": config_parser.getint("mongodb", "port", fallback=27017),
-            "authsource": config_parser.get("mongodb", "authsource", fallback="admin"),
-            "user": config_parser.get("mongodb", "user", fallback="admin"),
-            "password": config_parser.get("mongodb", "password", fallback=None),
-            "database": config_parser.get("mongodb", "database", fallback=None),
-        }
+        if "mysql" in config_parser:
+            inner_settings["MYSQL_CONFIG"] = {
+                "host": config_parser.get("mysql", "host", fallback=None),
+                "port": config_parser.getint("mysql", "port", fallback=3306),
+                "user": config_parser.get("mysql", "user", fallback="root"),
+                "password": config_parser.get("mysql", "password", fallback=None),
+                "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
+                "database": config_parser.get("mysql", "database", fallback=None),
+            }
+        if "mongodb" in config_parser:
+            inner_settings["MONGODB_CONFIG"] = {
+                "host": config_parser.get("mongodb", "host", fallback=None),
+                "port": config_parser.getint("mongodb", "port", fallback=27017),
+                "authsource": config_parser.get(
+                    "mongodb", "authsource", fallback="admin"
+                ),
+                "user": config_parser.get("mongodb", "user", fallback="admin"),
+                "password": config_parser.get("mongodb", "password", fallback=None),
+                "database": config_parser.get("mongodb", "database", fallback=None),
+            }
         if "consul" in config_parser:
             inner_settings["REMOTE_CONFIG"] = {
                 "token": config_parser.get("consul", "token", fallback=None),
@@ -70,63 +74,80 @@ class ReuseOperation:
                 "format": config_parser.get("nacos", "format", fallback="json"),
                 "remote_type": "nacos",
             }
-        inner_settings["DYNAMIC_PROXY_CONFIG"] = {
-            "proxy": config_parser.get("kdl_dynamic_proxy", "proxy", fallback=None),
-            "username": config_parser.get(
-                "kdl_dynamic_proxy", "username", fallback=None
-            ),
-            "password": config_parser.get(
-                "kdl_dynamic_proxy", "password", fallback=None
-            ),
-        }
-        inner_settings["EXCLUSIVE_PROXY_CONFIG"] = {
-            "proxy": config_parser.get("kdl_exclusive_proxy", "proxy", fallback=None),
-            "username": config_parser.get(
-                "kdl_exclusive_proxy", "username", fallback=None
-            ),
-            "password": config_parser.get(
-                "kdl_exclusive_proxy", "password", fallback=None
-            ),
-            "index": config_parser.getint("kdl_exclusive_proxy", "index", fallback=1),
-        }
-        inner_settings["OSS_CONFIG"] = {
-            "accesskeyid": config_parser.get("ali_oss", "accesskeyid", fallback=None),
-            "accesskeysecret": config_parser.get(
-                "ali_oss", "accesskeysecret", fallback=None
-            ),
-            "endpoint": config_parser.get("ali_oss", "endpoint", fallback=None),
-            "bucket": config_parser.get("ali_oss", "bucket", fallback=None),
-            "doc": config_parser.get("ali_oss", "doc", fallback=None),
-        }
-        inner_settings["MQ_CONFIG"] = {
-            "host": config_parser.get("mq", "host", fallback=None),
-            "port": config_parser.getint("mq", "port", fallback=5672),
-            "username": config_parser.get("mq", "username", fallback="guest"),
-            "password": config_parser.get("mq", "password", fallback="guest"),
-            "virtualhost": config_parser.get("mq", "virtualhost", fallback="/"),
-            "heartbeat": config_parser.getint("mq", "heartbeat", fallback=0),
-            "socket_timeout": config_parser.getint("mq", "socket_timeout", fallback=1),
-            "queue": config_parser.get("mq", "queue", fallback=None),
-            "durable": config_parser.getboolean("mq", "durable", fallback=True),
-            "exclusive": config_parser.getboolean("mq", "exclusive", fallback=False),
-            "auto_delete": config_parser.getboolean(
-                "mq", "auto_delete", fallback=False
-            ),
-            "exchange": config_parser.get("mq", "exchange", fallback=None),
-            "routing_key": config_parser.get("mq", "routing_key", fallback=None),
-            "content_type": config_parser.getint(
-                "mq", "content_type", fallback="text/plain"
-            ),
-            "delivery_mode": config_parser.getint("mq", "delivery_mode", fallback=1),
-            "mandatory": config_parser.getboolean("mq", "mandatory", fallback=True),
-        }
-        inner_settings["KAFKA_CONFIG"] = {
-            "bootstrap_servers": config_parser.get(
-                "kafka", "bootstrap_servers", fallback="127.0.0.1:9092"
-            ),
-            "topic": config_parser.get("kafka", "topic", fallback=None),
-            "key": config_parser.get("kafka", "key", fallback=None),
-        }
+        if "kdl_dynamic_proxy" in config_parser:
+            inner_settings["DYNAMIC_PROXY_CONFIG"] = {
+                "proxy": config_parser.get("kdl_dynamic_proxy", "proxy", fallback=None),
+                "username": config_parser.get(
+                    "kdl_dynamic_proxy", "username", fallback=None
+                ),
+                "password": config_parser.get(
+                    "kdl_dynamic_proxy", "password", fallback=None
+                ),
+            }
+        if "kdl_exclusive_proxy" in config_parser:
+            inner_settings["EXCLUSIVE_PROXY_CONFIG"] = {
+                "proxy": config_parser.get(
+                    "kdl_exclusive_proxy", "proxy", fallback=None
+                ),
+                "username": config_parser.get(
+                    "kdl_exclusive_proxy", "username", fallback=None
+                ),
+                "password": config_parser.get(
+                    "kdl_exclusive_proxy", "password", fallback=None
+                ),
+                "index": config_parser.getint(
+                    "kdl_exclusive_proxy", "index", fallback=1
+                ),
+            }
+        if "ali_oss" in config_parser:
+            inner_settings["OSS_CONFIG"] = {
+                "accesskeyid": config_parser.get(
+                    "ali_oss", "accesskeyid", fallback=None
+                ),
+                "accesskeysecret": config_parser.get(
+                    "ali_oss", "accesskeysecret", fallback=None
+                ),
+                "endpoint": config_parser.get("ali_oss", "endpoint", fallback=None),
+                "bucket": config_parser.get("ali_oss", "bucket", fallback=None),
+                "doc": config_parser.get("ali_oss", "doc", fallback=None),
+            }
+        if "mq" in config_parser:
+            inner_settings["MQ_CONFIG"] = {
+                "host": config_parser.get("mq", "host", fallback=None),
+                "port": config_parser.getint("mq", "port", fallback=5672),
+                "username": config_parser.get("mq", "username", fallback="guest"),
+                "password": config_parser.get("mq", "password", fallback="guest"),
+                "virtualhost": config_parser.get("mq", "virtualhost", fallback="/"),
+                "heartbeat": config_parser.getint("mq", "heartbeat", fallback=0),
+                "socket_timeout": config_parser.getint(
+                    "mq", "socket_timeout", fallback=1
+                ),
+                "queue": config_parser.get("mq", "queue", fallback=None),
+                "durable": config_parser.getboolean("mq", "durable", fallback=True),
+                "exclusive": config_parser.getboolean(
+                    "mq", "exclusive", fallback=False
+                ),
+                "auto_delete": config_parser.getboolean(
+                    "mq", "auto_delete", fallback=False
+                ),
+                "exchange": config_parser.get("mq", "exchange", fallback=None),
+                "routing_key": config_parser.get("mq", "routing_key", fallback=None),
+                "content_type": config_parser.getint(
+                    "mq", "content_type", fallback="text/plain"
+                ),
+                "delivery_mode": config_parser.getint(
+                    "mq", "delivery_mode", fallback=1
+                ),
+                "mandatory": config_parser.getboolean("mq", "mandatory", fallback=True),
+            }
+        if "kafka" in config_parser:
+            inner_settings["KAFKA_CONFIG"] = {
+                "bootstrap_servers": config_parser.get(
+                    "kafka", "bootstrap_servers", fallback="127.0.0.1:9092"
+                ),
+                "topic": config_parser.get("kafka", "topic", fallback=None),
+                "key": config_parser.get("kafka", "key", fallback=None),
+            }
         return inner_settings
 
     @staticmethod
