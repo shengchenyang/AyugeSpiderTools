@@ -1,5 +1,22 @@
 # Release notes
 
+## AyugeSpiderTools 3.5.2 (2023-10-17)
+
+### New features
+
+- 添加从 `nacos` 中获取配置的方法，若 `.conf` 中同时存在 `consul` 和 `nacos` 配置则优先使用 `consul`；即优先级 `consul` > `nacos`。
+
+### Bug fixes
+
+- 无
+
+### Code optimizations
+
+- 删除 `.conf` 示例中的无用配置 `wxbot`。
+- 优化从本地 `.conf` 获取配置的逻辑，也提供更清晰明确的报错信息。
+- `tox` 重新添加了 `windows` 场景。
+- 更新 `CI` 工具版本。
+
 ## AyugeSpiderTools 3.5.1 (2023-09-28)
 
 ### Bug fixes
