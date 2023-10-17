@@ -54,6 +54,7 @@ class ProjectTest(unittest.TestCase):
         try:
             timer.start()
             stdout, stderr = p.communicate()
+            stderr = str(stderr)
         finally:
             timer.cancel()
 
@@ -89,6 +90,7 @@ class CrawlCommandTest(CommandTest):
 
     def get_log(self, code, args=()):
         _, _, stderr = self.crawl(code, args=args)
+        stderr = str(stderr)
         return stderr
 
     def test_no_output(self):
