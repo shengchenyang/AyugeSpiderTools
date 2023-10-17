@@ -84,6 +84,7 @@ following scenarios are currently supported:
 Scenario of storing data in Mysql:
 + 1).demo_one: Get mysql configuration based on .conf in local VIT.
 + 3).demo_three: Get the mysql configuration from consul.
++ 21).demo_mysql_nacos: Get the mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
 + 5).demo_five: Scenario of asynchronously storing data in MySQL.
 
 Scenario of storing data in MongoDB:
