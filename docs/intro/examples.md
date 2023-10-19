@@ -33,6 +33,7 @@
 # 数据存入 Mysql 的场景：
 + 1).demo_one: 根据本地 VIT 中的 .conf 取 mysql 配置
 + 3).demo_three: 根据 consul 中取 mysql 配置
++ 21).demo_mysql_nacos: 根据 nacos 中取 mysql 配置(其它从 nacos 中获取配置的场景不再举例)
 + 5).demo_five: 异步存入 Mysql 的场景
 
 # 数据存入 MongoDB 的场景：
