@@ -17,6 +17,8 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from scrapy.settings import BaseSettings
 
     from ayugespidertools.common.typevars import MysqlConf
@@ -27,7 +29,7 @@ class ReuseOperation:
 
     @staticmethod
     def fetch_local_conf(
-        vit_dir: str, inner_settings: "BaseSettings"
+        vit_dir: Union[str, "Path"], inner_settings: "BaseSettings"
     ) -> "BaseSettings":
         """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
 

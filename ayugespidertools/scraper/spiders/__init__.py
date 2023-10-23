@@ -1,5 +1,6 @@
 import threading
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Union
 
 from scrapy.spiders import Spider
@@ -132,14 +133,21 @@ class AyuSpider(Spider):
         if custom_table_enum:
             inner_settings["DATA_ENUM"] = custom_table_enum
 
-        if vit_dir := settings.get("VIT_DIR", None):
-            # 根据本地配置获取对应的 inner_settings
-            inner_settings = ReuseOperation.fetch_local_conf(
-                vit_dir=vit_dir, inner_settings=inner_settings
+        if not (vit_dir := settings.get("VIT_DIR", None)):
+            logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
+            exec_path = Path().resolve()
+            _parts = exec_path.parts[-2:]
+            assert len(_parts) >= 2, "执行脚本的路径可能存在问题！"
+            vit_dir = (
+                exec_path / "VIT"
+                if _parts[0] == _parts[1]
+                else exec_path / settings["BOT_NAME"] / "VIT"
             )
 
-        else:
-            logger.warning("请在 settings 中配置 VIT_DIR 参数，用于本库运行所需配置 .conf 的读取！")
+        # 根据本地配置获取对应的 inner_settings
+        inner_settings = ReuseOperation.fetch_local_conf(
+            vit_dir=vit_dir, inner_settings=inner_settings
+        )
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
