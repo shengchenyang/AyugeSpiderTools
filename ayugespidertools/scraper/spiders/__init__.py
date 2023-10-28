@@ -111,15 +111,11 @@ class AyuSpider(Spider):
         新增一个 slog 的日志管理方法，目前感觉这样最适合；
             2. 本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
         """
-        loguru_conf_tmp = self.crawler.settings.get("LOGURU_CONFIG")
         loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
         assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
 
         if loguru_enabled:
-            # 使用 LOGURU_CONFIG 下的配置，或直接使用统一管理的 logger
-            return loguru_conf_tmp or logger
-
-        # 如果关闭推荐的日志管理，则替换为 scrapy 的日志管理
+            return logger
         else:
             return super(AyuSpider, self).logger
 
