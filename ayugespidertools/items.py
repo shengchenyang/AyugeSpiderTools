@@ -17,9 +17,16 @@ __all__ = [
 class ScrapyItem(Item):
     """scrapy item 的标准方式"""
 
+    ...
+
 
 class DataItem(NamedTuple):
-    """用于描述 item 中字段"""
+    """用于描述 item 中字段
+
+    Attributes:
+        key_value: 参数值
+        notes: 对参数的注释
+    """
 
     key_value: Any
     notes: str = ""
