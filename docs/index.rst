@@ -72,6 +72,7 @@ Getting help
    topics/commands
    topics/items
    topics/loaders
+   topics/settings
 
 :doc:`topics/commands`
     了解用于管理 ``Scrapy`` 项目的命令行工具。
@@ -81,6 +82,9 @@ Getting help
 
 :doc:`topics/loaders`
     用提取的数据填充你的 ``item``。
+
+:doc:`topics/settings`
+    了解如何配置 ``AyugeSpiderTools`` 并查看所有可用设置。
 
 内置服务
 ==================================
