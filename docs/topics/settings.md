@@ -4,8 +4,7 @@
 
 若您还不清楚 `Scrapy` 设置的知识，请跳转至 https://docs.scrapy.org/en/latest 查看教程。
 
-由于 ``，以下内容主要介绍本库在具体场景下的配置示例：
-
+以下内容主要介绍本库在具体场景下的配置示例：
 
 ## VIT_DIR
 
@@ -28,12 +27,6 @@ logger.add(
     enqueue=True,
 )
 ```
-
-## RECORD_LOG_TO_MYSQL
-
-Default: `False`
-
-是否开启记录项目相关运行统计信息。
 
 ## LOGURU_ENABLED
 
