@@ -12,17 +12,14 @@ __all__ = [
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     """Mysql 存储场景的 scrapy pipeline 扩展，使用 dbutils.pooled_db 实现"""
 
-    def __init__(self, pool_db_conf, *args, **kwargs):
-        super(AyuTurboMysqlPipeline, self).__init__(*args, **kwargs)
+    def __init__(self, pool_db_conf):
+        super(AyuTurboMysqlPipeline, self).__init__()
         self.pool_db_conf = pool_db_conf
 
     @classmethod
     def from_crawler(cls, crawler):
         pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
-            table_enum=crawler.settings.get("DATA_ENUM"),
-            env=crawler.settings.get("ENV"),
-            record_log_to_mysql=crawler.settings.get("RECORD_LOG_TO_MYSQL", False),
             pool_db_conf=pool_db_conf,
         )
 

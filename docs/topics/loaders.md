@@ -58,7 +58,7 @@ def parse(self, response):
         book_name=None,
         book_href=None,
         book_intro=None,
-        _table=TableEnum.article_list_table.value["value"],
+        _table="table_name",
     )
     # 然后可根据 asitem 来使用常规的 ItemLoader 功能
     mine_item = ItemLoader(item=my_product.asitem(), selector=None)

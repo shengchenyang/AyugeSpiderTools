@@ -27,7 +27,7 @@ class TestMongoDBPipe:
     def test_MongoDBPipe_with_AyuItem(self, mongodb_conn):
         item_normal = AyuItem(
             **self._article_info,
-            _table=test_table,
+            _table=DataItem(test_table, "文章信息表"),
         )
         item_dict = ReuseOperation.item_to_dict(item_normal)
         mongodb_pipe(
@@ -45,7 +45,7 @@ class TestMongoDBPipe:
 
         item_with_mongo_update_rule = AyuItem(
             **self._article_info,
-            _table=test_table,
+            _table=DataItem(test_table, "文章信息表"),
             _mongo_update_rule={"article_detail_url": "_article_detail_url"},
         )
 
@@ -90,7 +90,6 @@ class TestMongoDBPipe:
 
         item_dict = {
             "_table": test_table,
-            "_item_mode": "MongoDB",
             "_mongo_update_rule": {
                 "article_detail_url": "这条的查重规则应该会新增一条数据_",
             },

@@ -28,14 +28,12 @@ class ReuseOperation:
     """用于存放经常复用的一些操作"""
 
     @staticmethod
-    def fetch_local_conf(
-        vit_dir: Union[str, "Path"], inner_settings: "BaseSettings"
-    ) -> "BaseSettings":
+    def fetch_local_conf(vit_dir: Union[str, "Path"], inner_settings: dict) -> dict:
         """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
 
         Args:
             vit_dir: 配置文件所在的目录
-            inner_settings: scrapy 的 inner_settings
+            inner_settings: inner_settings 配置
 
         Returns:
             inner_settings: 本库所需的配置

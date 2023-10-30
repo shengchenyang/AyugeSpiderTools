@@ -56,32 +56,14 @@ from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 
-from DemoSpider.items import TableEnum
-
-"""
-########################################################################################################################
-# collection_website: CSDN - 专业开发者社区
-# collection_content: 热榜文章排名 Demo 采集示例 - 同时存入 Mysql 和 MongoDB 的场景
-# create_time: 2022-08-22
-# explain: 根据本项目中的 demo_one 脚本修改而得
-# demand_code_prefix = ""
-########################################################################################################################
-"""
-
 
 class DemoEightSpider(AyuSpider):
     name = "demo_eight"
     allowed_domains = ["blog.csdn.net"]
     start_urls = ["https://blog.csdn.net/"]
-    # 数据库表的枚举信息
-    custom_table_enum = TableEnum
-    # 初始化配置的类型(一般不用设置)
-    settings_type = "debug"
-    # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-    mysql_engine_enabled = True
     custom_settings = {
-        # 是否开启记录项目相关运行统计信息
-        "RECORD_LOG_TO_MYSQL": False,
+        # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
+        "MYSQL_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -139,7 +121,7 @@ class DemoEightSpider(AyuSpider):
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=TableEnum.article_list_table.value["value"],
+                _table=DataItem("_article_info_list", "文章信息列表"),
             )
             yield ArticleItem
 ```

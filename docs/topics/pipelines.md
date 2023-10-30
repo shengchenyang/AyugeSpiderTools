@@ -55,7 +55,7 @@ custom_settings = {
 
 ### 1.3. 运行日志记录
 
-> 打开 `RECORD_LOG_TO_MYSQL` 参数会记录 `spider` 的运行情况和所依赖的数据库下（带有 `crawl_time` 字段的）所有表格的当前采集情况统计。
+> 配置 `AyuStatisticsMysqlPipeline` 会记录 `spider` 的运行情况和所依赖的数据库下（带有 `crawl_time` 字段的）所有表格的当前采集情况统计。
 
 ## 2. MongoDB 存储
 

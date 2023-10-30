@@ -1,8 +1,7 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
 
-from ayugespidertools.common.typevars import TableEnumTypeVar
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -30,7 +29,6 @@ class AbstractClass(ABC):
         charset: str,
         collate: str,
         table_notes: str = "",
-        demand_code: str = "",
     ) -> None:
         """创建数据库表
 
@@ -44,12 +42,7 @@ class AbstractClass(ABC):
             charset: charset
             collate: collate
             table_notes: 创建表的注释
-            demand_code: 创建表的需求对应的 code 值，用于和需求中的任务对应
         """
-        # 用于表格 comment 的参数生成(即 table_notes 参数)
-        if demand_code != "":
-            table_notes = f"{demand_code}_{table_notes}"
-
         sql = f"""
         CREATE TABLE IF NOT EXISTS `{table_name}`
         (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`))
@@ -113,7 +106,7 @@ class AbstractClass(ABC):
         collate: str,
         database: str,
         table: str,
-        table_enum: Type[TableEnumTypeVar],
+        table_notes: str,
         note_dic: dict,
     ) -> None:
         """模板方法，用于处理 mysql 存储场景的异常
@@ -126,7 +119,7 @@ class AbstractClass(ABC):
             collate: mysql table collate
             database: 数据库
             table: 数据表
-            table_enum: 数据表枚举类
+            table_notes: 数据表注释
             note_dic: 当前表字段注释
         """
         if "1054" in err_msg:
@@ -136,17 +129,12 @@ class AbstractClass(ABC):
             self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
 
         elif "1146" in err_msg:
-            table_name, table_notes, demand_code = self.deal_1146_error(
-                err_msg=err_msg,
-                table_enum=table_enum,
-            )
             self._create_table(
                 cursor=cursor,
-                table_name=table_name,
+                table_name=table,
                 charset=charset,
                 collate=collate,
                 table_notes=table_notes,
-                demand_code=demand_code,
             )
 
         elif "1406" in err_msg:
@@ -194,40 +182,6 @@ class AbstractClass(ABC):
 
         sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(190) NULL DEFAULT '' COMMENT '{notes}';"
         return sql, f"1054: 添加字段 {colum} 已存在"
-
-    def deal_1146_error(
-        self,
-        err_msg: str,
-        table_enum: Type[TableEnumTypeVar],
-    ) -> Tuple[str, str, str]:
-        """解决 1146, u"Table 'xx' doesn't exist"
-
-        Args:
-            err_msg: 报错内容
-            table_enum: 数据表的枚举信息
-
-        Returns:
-            1). table_name: 数据表名
-            2). table_notes: 数据表注释
-            3). demand_code: 数据表对应的需求 code
-        """
-        table_pattern = re.compile(r"Table '(.*?)' doesn't exist")
-        text = re.findall(table_pattern, err_msg)
-        table = text[0].split(".")[1]
-
-        # 写入表枚举
-        if table_enum:
-            for _, member in table_enum.__members__.items():
-                table_name = member.value.get("value", "")
-                table_notes = member.value.get("notes", "")
-                demand_code = member.value.get("demand_code", "")
-                if table_name == table:
-                    return table_name, table_notes, demand_code
-        else:
-            # 未定义 Tabel_Enum 则建表
-            logger.info("未定义数据库表枚举 Tabel_Enum 参数，进行创表操作")
-        # 1.未定义 Tabel_Enum 和 2.正则未匹配到当前的 table_name 时都以此报错 table 名为准
-        return table, "", ""
 
     def deal_1406_error(
         self,
@@ -357,7 +311,7 @@ def deal_mysql_err(
     collate: str,
     database: str,
     table: str,
-    table_enum: Type[TableEnumTypeVar],
+    table_notes: str,
     note_dic: dict,
     conn: Optional[PymysqlConnect] = None,
 ) -> None:
@@ -369,6 +323,6 @@ def deal_mysql_err(
         collate,
         database,
         table,
-        table_enum,
+        table_notes,
         note_dic,
     )

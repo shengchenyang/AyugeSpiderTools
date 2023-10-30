@@ -54,46 +54,7 @@ class MySqlEngineClass:
 class AyuSpider(Spider):
     """用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等"""
 
-    custom_common_settings = {
-        "ROBOTSTXT_OBEY": False,
-        "TELNETCONSOLE_ENABLED": False,
-        "RETRY_TIMES": 3,
-        "DEPTH_PRIORITY": -1,
-        "ENV": "dev",
-    }
-
-    custom_debug_settings = {
-        "LOG_LEVEL": "DEBUG",
-        "ROBOTSTXT_OBEY": False,
-        "DOWNLOAD_TIMEOUT": 20,
-        "RETRY_TIMES": 3,
-        "REDIRECT_ENABLED": False,
-        "DEPTH_PRIORITY": -1,
-        "ENV": "test",
-        # 数据库表枚举
-        "DATA_ENUM": None,
-        # 是否记录程序的采集情况基本信息到 Mysql 数据库
-        "RECORD_LOG_TO_MYSQL": False,
-    }
-
-    custom_product_settings = {
-        "LOG_LEVEL": "ERROR",
-        "ROBOTSTXT_OBEY": False,
-        "DOWNLOAD_TIMEOUT": 20,
-        "RETRY_TIMES": 3,
-        "REDIRECT_ENABLED": False,
-        "DEPTH_PRIORITY": -1,
-        "ENV": "prod",
-        "DATA_ENUM": None,
-        "RECORD_LOG_TO_MYSQL": False,
-    }
-
-    SPIDER_TIME = time.strftime("%Y-%m-%d", time.localtime())
-    # 是否启用 Debug 参数，默认激活 custom_common_settings
-    settings_type = "common"
-    project_content = ""
-    custom_table_enum = None
-    mysql_engine_enabled = False
+    SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
 
     def parse(self, response: "Response", **kwargs: Any) -> Any:
         """实现所继承类的 abstract 方法 parse"""
@@ -121,13 +82,11 @@ class AyuSpider(Spider):
 
     @classmethod
     def update_settings(cls, settings: "BaseSettings") -> None:
-        custom_table_enum = getattr(cls, "custom_table_enum", None)
-        # 设置类型，用于快速设置某些通用配置，若不设置默认为 common
-        settings_type = getattr(cls, "settings_type", "common")
-        inner_settings = getattr(cls, f"custom_{settings_type}_settings", {})
-
-        if custom_table_enum:
-            inner_settings["DATA_ENUM"] = custom_table_enum
+        _normal_settings = {
+            "ROBOTSTXT_OBEY": False,
+            "TELNETCONSOLE_ENABLED": False,
+            "DEPTH_PRIORITY": -1,
+        }
 
         if not (vit_dir := settings.get("VIT_DIR", None)):
             logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
@@ -142,7 +101,7 @@ class AyuSpider(Spider):
 
         # 根据本地配置获取对应的 inner_settings
         inner_settings = ReuseOperation.fetch_local_conf(
-            vit_dir=vit_dir, inner_settings=inner_settings
+            vit_dir=vit_dir, inner_settings=_normal_settings
         )
         settings.setdict(inner_settings, priority="project")
         settings.setdict(cls.custom_settings or {}, priority="spider")
@@ -150,7 +109,6 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler: "Crawler", *args: Any, **kwargs: Any) -> "Self":
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
-        spider.slog.debug(f"settings_type 配置: {cls.settings_type}")
 
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
         # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
@@ -158,7 +116,7 @@ class AyuSpider(Spider):
             MysqlConfCreator().create_product(crawler.settings, remote_option)
         ):
             spider.mysql_conf = mysql_conf
-            if cls.mysql_engine_enabled:
+            if crawler.settings.get("MYSQL_ENGINE_ENABLED", False):
                 mysql_url = (
                     f"mysql+pymysql://{mysql_conf.user}"
                     f":{mysql_conf.password}@{mysql_conf.host}"

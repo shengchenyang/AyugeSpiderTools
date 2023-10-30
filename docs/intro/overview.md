@@ -47,40 +47,21 @@ from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 from scrapy.http.response.text import TextResponse
 
-from DemoSpider.items import TableEnum
-from DemoSpider.settings import logger
-
-"""
-########################################################################################################################
-# collection_website: CSDN - 专业开发者社区
-# collection_content: 热榜文章排名 Demo 采集示例 - 存入 Mysql (配置根据本地 settings 的 LOCAL_MYSQL_CONFIG 中取值)
-# create_time: 2022-07-30
-# explain:
-# demand_code_prefix = ""
-########################################################################################################################
-"""
-
 
 class DemoOneSpider(AyuSpider):
     name = "demo_one"
     allowed_domains = ["blog.csdn.net"]
     start_urls = ["https://blog.csdn.net/"]
-    # 数据库表的枚举信息，当前项目所依赖的表信息，一般用于存储数据时使用
-    custom_table_enum = TableEnum
-    # 初始化配置的类型，初始化设置（不需要直接不用配置）
-    settings_type = "debug"
-    # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-    mysql_engine_enabled = True
     custom_settings = {
         # scrapy 日志等级
         "LOG_LEVEL": "DEBUG",
-        # 是否开启记录项目相关运行统计信息。不配置默认为 False
-        "RECORD_LOG_TO_MYSQL": True,
-        # 设置 ayugespidertools 库的日志输出为 loguru，可自行配置 logger 规则来管理项目日志。若不配置此项，库日志只会在控制台上打印
-        "LOGURU_CONFIG": logger,
+        # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
+        "MYSQL_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
+            # 开启记录项目相关运行统计信息
+            "ayugespidertools.pipelines.AyuStatisticsMysqlPipeline": 301,
         },
         "DOWNLOADER_MIDDLEWARES": {
             # 随机请求头
@@ -134,7 +115,7 @@ class DemoOneSpider(AyuSpider):
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=TableEnum.article_list_table.value["value"],
+                _table=DataItem("_article_info_list", "文章信息列表"),
             )
 
             # 数据存储方式 2，若不需要注释，也可以这样写，但不要两种风格混用
@@ -145,14 +126,14 @@ class DemoOneSpider(AyuSpider):
                 comment_count=comment_count,
                 favor_count=favor_count,
                 nick_name=nick_name,
-                _table=TableEnum.article_list_table.value["value"],
+                _table="_article_info_list",
             )
             """
             self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
             # yield ArticleInfoItem
 
             # 数据入库逻辑 -> 测试 mysql_engine 的去重功能，你可以自行实现。mysql_engine 也已经给你了
-            save_table = TableEnum.article_list_table.value["value"]
+            save_table = "_article_info_list"
             sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
             yield ToolsForAyu.filter_data_before_yield(
                 sql=sql,

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, TypeVar, Union
+from typing import TYPE_CHECKING, Tuple, TypeVar, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -23,7 +23,7 @@ class AbstractClass(ABC):
     def _get_insert_data(
         self,
         item_dict: Union["ItemAdapter", dict],
-    ) -> dict:
+    ) -> Tuple[dict, str]:
         """获取要插入的数据，将 item 中的存储数据提取出来
 
         Args:
@@ -34,14 +34,16 @@ class AbstractClass(ABC):
         """
         insert_data = ReuseOperation.get_items_except_keys(
             dict_conf=item_dict,
-            keys=["_table", "_item_mode", "_mongo_update_rule"],
+            keys=["_table", "_mongo_update_rule"],
         )
+        table_name = item_dict["_table"]
         judge_item = next(iter(insert_data.values()))
         # 是 namedtuple 类型
         if ReuseOperation.is_namedtuple_instance(judge_item):
             insert_data = {v: insert_data[v].key_value for v in insert_data.keys()}
+            table_name = item_dict["_table"].key_value
         # 是普通的 dict 格式，则直接为 insert_data
-        return insert_data
+        return insert_data, table_name
 
     def process_item_template(
         self,
@@ -56,11 +58,11 @@ class AbstractClass(ABC):
             db: mongodb 数据库连接
             sys_ver_low: 是否是 py3.11 以下
         """
-        insert_data = self._get_insert_data(item_dict)
+        insert_data, table_name = self._get_insert_data(item_dict)
         self._data_storage_logic(
             db=db,
             item_dict=item_dict,
-            collection_name=item_dict["_table"],
+            collection_name=table_name,
             insert_data=insert_data,
             sys_ver_low=sys_ver_low,
         )
@@ -170,11 +172,11 @@ class AsyncioAsynchronous(AbstractClass):
         db: "PymongoDataBase",
         sys_ver_low: bool = True,
     ) -> None:
-        insert_data = self._get_insert_data(item_dict)
+        insert_data, table_name = self._get_insert_data(item_dict)
         await self._data_storage_logic(
             db=db,
             item_dict=item_dict,
-            collection_name=item_dict["_table"],
+            collection_name=table_name,
             insert_data=insert_data,
         )
 

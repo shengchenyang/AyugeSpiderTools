@@ -138,11 +138,12 @@ class SpiderTest(unittest.TestCase):
             "token": CONSUL_CONFIG["token"],
             "url": CONSUL_CONFIG["url"],
             "format": CONSUL_CONFIG["format"],
+            "remote_type": "consul",
         }
         spider_settings = {"APP_CONF_MANAGE": True}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {
-            "CONSUL_CONFIG": CONSUL_CONF,
+            "REMOTE_CONFIG": CONSUL_CONF,
         }
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
@@ -184,11 +185,12 @@ class SpiderTest(unittest.TestCase):
             "token": CONSUL_CONFIG["token"],
             "url": CONSUL_CONFIG["url"],
             "format": CONSUL_CONFIG["format"],
+            "remote_type": "consul",
         }
         spider_settings = {"APP_CONF_MANAGE": True}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
         project_settings = {
-            "CONSUL_CONFIG": CONSUL_CONF,
+            "REMOTE_CONFIG": CONSUL_CONF,
         }
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")

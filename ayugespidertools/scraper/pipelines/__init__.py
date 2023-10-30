@@ -9,17 +9,19 @@ from ayugespidertools.scraper.pipelines.msgproducer.mqpub import AyuMQPipeline
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.asynced import AsyncMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.fantasy import AyuFtyMysqlPipeline
+from ayugespidertools.scraper.pipelines.mysql.stats import AyuStatisticsMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.turbo import AyuTurboMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipeline
 
 __all__ = [
-    "AyuMysqlPipeline",
-    "AyuFtyMysqlPipeline",
-    "AyuTurboMysqlPipeline",
-    "AyuTwistedMysqlPipeline",
-    "AsyncMysqlPipeline",
+    "FilesDownloadPipeline",
     "AyuFtyMongoPipeline",
     "AyuTwistedMongoPipeline",
     "AyuMQPipeline",
-    "FilesDownloadPipeline",
+    "AyuMysqlPipeline",
+    "AsyncMysqlPipeline",
+    "AyuFtyMysqlPipeline",
+    "AyuStatisticsMysqlPipeline",
+    "AyuTurboMysqlPipeline",
+    "AyuTwistedMysqlPipeline",
 ]

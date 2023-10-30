@@ -2,29 +2,17 @@ import pandas
 from scrapy.http import Request
 from $project_name.settings import logger
 from scrapy.http.response.text import TextResponse
-from $project_name.items import TableEnum
 from ayugespidertools.spiders import AyuSpider
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.items import AyuItem, DataItem
-
-"""
-####################################################################################################
-# collection_website: $domain - 采集的目标站点介绍
-# collection_content: 采集内容介绍
-# create_time: xxxx-xx-xx
-# explain:
-# demand_code_prefix = ""
-####################################################################################################
-"""
 
 
 class $classname(AyuSpider):
     name = "$name"
     allowed_domains = ["$domain"]
     start_urls = ["http://$domain/"]
-    custom_table_enum = TableEnum
-    mysql_engine_enabled = True
     custom_settings = {
+        "MYSQL_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
@@ -80,7 +68,7 @@ class $classname(AyuSpider):
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=TableEnum.article_list_table.value["value"],
+                _table=DataItem("_article_info_list", "文章信息列表"),
                 # 可选参数：这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
@@ -93,7 +81,7 @@ class $classname(AyuSpider):
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
             # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
             try:
-                save_table = TableEnum.article_list_table.value["value"]
+                save_table = "_article_info_list"
                 sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
                 df = pandas.read_sql(sql, self.mysql_engine)
 

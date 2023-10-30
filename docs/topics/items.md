@@ -11,7 +11,7 @@
 
 > 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
 
-本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，需要自定义（但 IDE 有参数提示，不用担心效率或用户体验问题），也可以使用 `add_field` 方法动态添加字段。
+本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，也可以使用 `add_field` 方法动态添加字段。
 
 ```python
 def parse(self, response):
@@ -22,7 +22,7 @@ def parse(self, response):
         comment_count=DataItem(comment_count, "文章评论数量"),
         favor_count=DataItem(favor_count, "文章赞成数量"),
         nick_name=DataItem(nick_name, "文章作者昵称"),
-        _table=TableEnum.article_list_table.value["value"],
+        _table=DataItem("_article_info_list", "文章信息列表"),
     )
 
     # 存储到 MongoDB 场景时需要的 Item 构建示例
@@ -32,7 +32,7 @@ def parse(self, response):
         comment_count=comment_count,
         favor_count=favor_count,
         nick_name=nick_name,
-        _table=TableEnum.article_list_table.value["value"],
+        _table="_article_info_list",
         # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
@@ -135,28 +135,14 @@ from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 
-from DemoSpider.items import TableEnum
-
-"""
-####################################################################################################
-# collection_website: csdn.net - 采集的目标站点介绍
-# collection_content: 采集内容介绍
-# create_time: xxxx-xx-xx
-# explain:
-# demand_code_prefix = ""
-####################################################################################################
-"""
-
 
 class DemoOneSpider(AyuSpider):
     name = "demo_one"
     allowed_domains = ["csdn.net"]
     start_urls = ["https://www.csdn.net/"]
-    # 数据库表的枚举信息
-    custom_table_enum = TableEnum
-    # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-    mysql_engine_enabled = True
     custom_settings = {
+        # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
+        "MYSQL_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -220,7 +206,7 @@ class DemoOneSpider(AyuSpider):
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=TableEnum.article_list_table.value["value"],
+                _table=DataItem("_article_info_list", "文章信息列表"),
                 # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
@@ -233,7 +219,7 @@ class DemoOneSpider(AyuSpider):
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
             # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
             try:
-                save_table = TableEnum.article_list_table.value["value"]
+                save_table = "article_detail_url"
                 sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
                 df = pandas.read_sql(sql, self.mysql_engine)
 
@@ -269,13 +255,13 @@ class DemoOneSpider(AyuSpider):
 
 这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
 
-| item 字段              | 类型          | 注释                                                         |
-| ---------------------- | ------------- | ------------------------------------------------------------ |
-| **自定义字段**         | DataItem，Any | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
-| **_table**             | str           | 存储至数据表或集合的名称。                                   |
+| item 字段              | 类型            | 注释                                                         |
+| ---------------------- |---------------| ------------------------------------------------------------ |
+| **自定义字段**         | DataItem，Any  | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
+| **_table**             | DataItem, str | 存储至数据表或集合的名称。                                   |
 | **_mongo_update-rule** | dict          | `MongoDB item` 场景下的查重规则。                            |
-| **file_url**           | DataItem，Any | `FilesDownloadPipeline` 文件下载场景时需要的下载链接参数。   |
-| **file_format**        | DataItem，Any | `FilesDownloadPipeline` 文件下载场景时需要的下载文件格式参数。 |
+| **file_url**           | DataItem，Any  | `FilesDownloadPipeline` 文件下载场景时需要的下载链接参数。   |
+| **file_format**        | DataItem，Any  | `FilesDownloadPipeline` 文件下载场景时需要的下载文件格式参数。 |
 
 注，对以上表格中内容进行扩充解释：
 

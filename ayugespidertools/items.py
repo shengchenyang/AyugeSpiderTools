@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from collections.abc import MutableMapping
 from dataclasses import dataclass
-from typing import Any, Dict, NamedTuple, Optional
+from typing import Any, Dict, NamedTuple, Optional, Union
 
 import scrapy
 from scrapy.item import Item
@@ -119,7 +119,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
 
     def __init__(
         self,
-        _table: Optional[str] = None,
+        _table: Union[DataItem, str],
         _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):

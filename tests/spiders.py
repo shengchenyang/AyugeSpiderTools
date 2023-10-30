@@ -3,7 +3,7 @@ import json
 from ayugespidertools import AiohttpFormRequest, AiohttpRequest
 from ayugespidertools.common.typevars import AiohttpRequestArgs
 from ayugespidertools.spiders import AyuSpider
-from tests.conftest import TableEnum
+from tests.conftest import article_list_table
 
 
 class MockServerSpider(AyuSpider):
@@ -36,11 +36,10 @@ class SimpleSpider(MetaSpider):
 
 class RecordLogToMysqlSpider(SimpleSpider):
     name = "record_log_to_mysql"
-    custom_table_enum = TableEnum
     custom_settings = {
-        "RECORD_LOG_TO_MYSQL": True,
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
+            "ayugespidertools.pipelines.AyuStatisticsMysqlPipeline": 301,
         },
         "DOWNLOADER_MIDDLEWARES": {
             "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
@@ -48,7 +47,7 @@ class RecordLogToMysqlSpider(SimpleSpider):
     }
 
     def parse(self, response):
-        yield {"_table": TableEnum.article_list_table.value["value"], "data": "demo"}
+        yield {"_table": article_list_table, "data": "demo"}
         self.logger.info(f"Got response {response.status}")
 
 
