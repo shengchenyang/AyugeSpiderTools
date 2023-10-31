@@ -62,13 +62,14 @@ class $classname(AyuSpider):
                 json_data=curr_data,
                 query="nickName")
 
+            _save_table = "_article_info_list"
             ArticleInfoItem = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=DataItem("_article_info_list", "文章信息列表"),
+                _table=DataItem(_save_table, "文章信息列表"),
                 # 可选参数：这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
@@ -81,8 +82,7 @@ class $classname(AyuSpider):
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
             # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
             try:
-                save_table = "_article_info_list"
-                sql = f'''select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
+                sql = f'''select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
                 df = pandas.read_sql(sql, self.mysql_engine)
 
                 # 如果为空，说明此数据不存在于数据库，则新增
