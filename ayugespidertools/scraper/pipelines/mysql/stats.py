@@ -1,19 +1,33 @@
 import datetime
-from typing import Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from retrying import retry
 
+from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.params import Param
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.scraper.pipelines import AyuMysqlPipeline
 
 __all__ = [
     "AyuStatisticsMysqlPipeline",
 ]
 
+if TYPE_CHECKING:
+    from pymysql.connections import Connection
 
-class AyuStatisticsMysqlPipeline(AyuMysqlPipeline):
+    from ayugespidertools.common.typevars import MysqlConf
+
+
+class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储且记录脚本运行状态的简单示例"""
+
+    def __init__(self) -> None:
+        # 排序规则，用于创建数据库时使用
+        self.collate = None
+        self.mysql_conf: Optional["MysqlConf"] = None
+        self.conn: Optional["Connection"] = None
+        self.slog = None
+        self.cursor: "Connection.cursor" = None
+        self.crawl_time = datetime.date.today()
 
     def open_spider(self, spider):
         self.slog = spider.slog
