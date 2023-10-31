@@ -1,6 +1,10 @@
 import json
+from typing import Union
 
 import pika
+
+from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.items import AyuItem
 
 __all__ = [
     "AyuMQPipeline",
@@ -13,8 +17,9 @@ class AyuMQPipeline:
     def __init__(self):
         self.channel = None
 
-    def _dict_to_bytes(self, item: dict) -> bytes:
-        item_json_str = json.dumps(item)
+    def _dict_to_bytes(self, item: Union[AyuItem, dict]) -> bytes:
+        item_dict = ReuseOperation.item_to_dict(item)
+        item_json_str = json.dumps(item_dict)
         return bytes(item_json_str, encoding="utf-8")
 
     def open_spider(self, spider):

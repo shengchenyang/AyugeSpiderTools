@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Tuple, TypeVar
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -12,7 +12,6 @@ __all__ = [
 
 if TYPE_CHECKING:
     import pymongo
-    from itemadapter import ItemAdapter
 
     PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
 
@@ -20,14 +19,11 @@ if TYPE_CHECKING:
 class AbstractClass(ABC):
     """用于处理 mongodb pipeline 存储的模板方法类"""
 
-    def _get_insert_data(
-        self,
-        item_dict: Union["ItemAdapter", dict],
-    ) -> Tuple[dict, str]:
+    def _get_insert_data(self, item_dict: dict) -> Tuple[dict, str]:
         """获取要插入的数据，将 item 中的存储数据提取出来
 
         Args:
-            item_dict: item ItemAdapter 或者 dict 格式数据，可像字典一样操作
+            item_dict: item 的 dict 类型
 
         Returns:
             insert_data: 返回 dict 格式的存储数据
@@ -47,14 +43,14 @@ class AbstractClass(ABC):
 
     def process_item_template(
         self,
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         db: "PymongoDataBase",
         sys_ver_low: bool = True,
     ) -> None:
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
         Args:
-            item_dict: item ItemAdapter 或 dict 格式数据
+            item_dict: item 的 dict 类型
             db: mongodb 数据库连接
             sys_ver_low: 是否是 py3.11 以下
         """
@@ -70,7 +66,7 @@ class AbstractClass(ABC):
     def _default_storage(
         self,
         db: "PymongoDataBase",
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         collection_name: str,
         insert_data: dict,
         sys_ver_low: bool,
@@ -95,7 +91,7 @@ class AbstractClass(ABC):
     def _data_storage_logic(
         self,
         db: "PymongoDataBase",
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         collection_name: str,
         insert_data: dict,
         sys_ver_low: bool,
@@ -106,7 +102,7 @@ class AbstractClass(ABC):
 
         Args:
             db: mongodb 数据库连接
-            item_dict: item ItemAdapter 或 dict 格式数据
+            item_dict: item 的 dict 类型
             collection_name: 集合名称
             insert_data: 要插入的数据
             *args: 可变参数
@@ -121,7 +117,7 @@ class Synchronize(AbstractClass):
     def _data_storage_logic(
         self,
         db: "PymongoDataBase",
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         collection_name: str,
         insert_data: dict,
         sys_ver_low: bool,
@@ -137,7 +133,7 @@ class TwistedAsynchronous(AbstractClass):
     def _data_storage_logic(
         self,
         db: "PymongoDataBase",
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         collection_name: str,
         insert_data: dict,
         sys_ver_low: bool,
@@ -153,7 +149,7 @@ class AsyncioAsynchronous(AbstractClass):
     async def _data_storage_logic(
         self,
         db: "PymongoDataBase",
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         collection_name: str,
         insert_data: dict,
         *args,
@@ -168,7 +164,7 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def process_item_template(
         self,
-        item_dict: Union["ItemAdapter", dict],
+        item_dict: dict,
         db: "PymongoDataBase",
         sys_ver_low: bool = True,
     ) -> None:
@@ -183,7 +179,7 @@ class AsyncioAsynchronous(AbstractClass):
 
 def mongodb_pipe(
     abstract_class: AbstractClass,
-    item_dict: Union["ItemAdapter", dict],
+    item_dict: dict,
     db: "PymongoDataBase",
     sys_ver_low: bool = True,
 ) -> None:

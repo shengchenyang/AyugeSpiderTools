@@ -151,7 +151,7 @@ class ReuseOperation:
         return inner_settings
 
     @staticmethod
-    def item_to_dict(item: Union[AyuItem, dict]) -> Union[ItemAdapter, dict]:
+    def item_to_dict(item: Union[AyuItem, dict]) -> dict:
         """将 item 转换为 dict 类型；
         将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
 
@@ -161,7 +161,9 @@ class ReuseOperation:
         Returns:
             1). dict 类型的 item
         """
-        return item.asdict() if isinstance(item, AyuItem) else ItemAdapter(item)
+        return (
+            item.asdict() if isinstance(item, AyuItem) else ItemAdapter(item).asdict()
+        )
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
