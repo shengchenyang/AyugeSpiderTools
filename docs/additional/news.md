@@ -1,5 +1,36 @@
 # Release notes
 
+## AyugeSpiderTools 3.6.0 (2023-10-31)
+
+### Deprecations
+
+- 一些 `api` 变动：
+
+| 更改前                                                       | 更改后                                                       | 受影响的部分          | 备注 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | --------------------- | ---- |
+| 删除 `LOGURU_CONFIG` 配置参数                                | 现只需配置 `LOGURU_ENABLED` 即可                             | `slog` 日志模块       |      |
+| 删除 `spider` 中 `settings_type` 参数                        | 此为过度设计，若需要可自定义配置                             | 项目配置信息          |      |
+| 删除 `spider` 中 `mysql_engine_enabled` 参数                 | 转移到设置中，名称为 `MYSQL_ENGINE_ENABLED`                  | 配置模块，影响较大。  |      |
+| `AyuItem` 中 `_table` 参数类型修改<br>删除 `spider` 中 `custom_table_enum` 参数 | 修改为与普通字段一样的 `DataItem` 或 `str` 类型，删除 `demand_code` 字段。 | `spider`，`Item` 模块 |      |
+| 删除 `RECORD_LOG_TO_MYSQL` 配置参数                          | 改为 `ayugespidertools.pipelines.AyuStatisticsMysqlPipeline` 方式调用。 | 配置模块              |      |
+
+注意：**此变更包含不兼容内容，请修改不兼容部分并调试正常后再投入生产；本项目在有一些不兼容变更时，会发布 `Minor` 及以上的版本包，请做好依赖版本管理。**
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 设置 `VIT_DIR` 默认参数。
+- 去除冗余配置，统一配置风格。将一些过于复杂的模块拆分，便于管理。
+
+<hr>
+
 ## AyugeSpiderTools 3.5.2 (2023-10-17)
 
 ### New features
@@ -17,6 +48,8 @@
 - `tox` 重新添加了 `windows` 场景。
 - 更新 `CI` 工具版本。
 
+<hr>
+
 ## AyugeSpiderTools 3.5.1 (2023-09-28)
 
 ### Bug fixes
@@ -28,6 +61,8 @@
 - 优化 `AyuItem` 实现，增强可读性及用户输入体验，比如 `add_field` 增加 `IDE` 参数提示功能。
 - 更新文档中 `AyuItem` 的使用建议及对应测试。
 - 更新测试文件，比如 `test_crawl` 及 `spider` 相关方法。
+
+<hr>
 
 ## AyugeSpiderTools 3.5.0 (2023-09-21)
 
@@ -42,6 +77,8 @@
 - 添加 `pre-commit` 工具和 `CI`，提升 `commit` 和 `pull request` 体验。
 - 更新 `readthedocs` 的新配置。
 - 优化 `test_crawl` 的测试方法。
+
+<hr>
 
 ## AyugeSpiderTools 3.4.2 (2023-09-15)
 

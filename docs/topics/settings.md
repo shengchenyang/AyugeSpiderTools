@@ -35,6 +35,12 @@ Default: `True`
 是否开启 `loguru` 日志记录功能，开启时 `slog.<Log levels>("This is a log.")`。
 具体的说明请在 [logging](logging.md) 中查看。
 
+## MYSQL_ENGINE_ENABLED
+
+Default: `True`
+
+是否打开 mysql 引擎开关，用于数据入库前更新逻辑判断。用于 `mysql` 存储场景中，以满足使用 `mysql_engine` 来去重等操作。
+
 ## APP_CONF_MANAGE
 
 Default: `False`
