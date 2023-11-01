@@ -102,7 +102,7 @@ Scenario of storing data in MongoDB:
 +13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
 +14).demo_crawl: Example of supporting scrapy CrawlSpider.
 
-# Example of supporting Item "Loaders feature" in this library(Documentation address：https://ayugespidertools.readthedocs.io/en/latest/topics/loaders.html)
+# Example of supporting Item "Loaders feature" in this library
 +15).demo_item_loader: Example of using Item Loaders in this library.
 -16).demo_item_loader_two: This example has been removed. You can refer to the example in the previous demo_item_loader. Currently, it is very convenient to use the Item Loaders feature.
 
