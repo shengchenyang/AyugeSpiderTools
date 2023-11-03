@@ -98,6 +98,7 @@ class AyuSpider(Spider):
                 if _parts[0] == _parts[1]
                 else exec_path / settings["BOT_NAME"] / "VIT"
             )
+            _normal_settings["VIT_DIR"] = vit_dir
 
         # 根据本地配置获取对应的 inner_settings
         inner_settings = ReuseOperation.fetch_local_conf(
