@@ -165,17 +165,15 @@ key=***
 `spider` 等其它项目配置中的所需详细设置示例如下：
 
 ```ini
-from DemoSpider.settings import DOC_DIR
-
-...
+from pathlib import Path
 
 custom_settings = {
     "ITEM_PIPELINES": {
         "ayugespidertools.pipelines.FilesDownloadPipeline": 300,
         "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 301,
     },
-    # 下载文件保存路径，不配置则默认为项目设置中的 DOC_DIR（需要确认此文件夹是否存在）
-    "FILES_STORE": DOC_DIR,
+    # 下载文件保存路径
+    "FILES_STORE": Path(__file__).parent.parent / "docs",
 }
 ```
 
