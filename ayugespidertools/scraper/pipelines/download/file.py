@@ -7,6 +7,7 @@ from scrapy.http.request import NO_CALLBACK
 from scrapy.utils.defer import maybe_deferred_to_future
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.config import logger
 from ayugespidertools.items import DataItem
 
 __all__ = [
@@ -21,16 +22,18 @@ class FilesDownloadPipeline:
 
     _type: DataItemModeStr = "normal"
 
-    def __init__(self, file_path=None, doc_path=None):
-        self.file_path = file_path or doc_path
+    def __init__(self, file_path=None):
+        self.file_path = file_path
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(
-            # 文件保存路径，如果没有设置，则默认保存到 DOC_DIR
-            file_path=crawler.settings.get("FILES_STORE", None),
-            doc_path=crawler.settings.get("DOC_DIR", None),
-        )
+        _file_path = crawler.settings.get("FILES_STORE", None)
+        assert _file_path is not None, "未配置 FILES_STORE 存储路径参数！"
+
+        if not Path.exists(_file_path):
+            logger.warning(f"FILES_STORE: {_file_path} 路径不存在，自动创建所需路径！")
+            Path(_file_path).mkdir(parents=True)
+        return cls(file_path=_file_path)
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
