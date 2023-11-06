@@ -1,5 +1,24 @@
 # Release notes
 
+## AyugeSpiderTools 3.6.1 (2023-11-06)
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 解决 `mq` 推送场景时 `yield AyuItem` 时的错误，现可支持多种格式。
+- 解决 `VIT_DIR` 默认参数未存储至 `settings` 中的问题。
+
+### Code optimizations
+
+- 文件下载场景添加 `FILES_STORE` 路径不存在时的自动创建处理。
+- `settings` 模板删除无关配置。
+- 项目添加 `question issues template`。
+
+<hr>
+
 ## AyugeSpiderTools 3.6.0 (2023-10-31)
 
 ### Deprecations

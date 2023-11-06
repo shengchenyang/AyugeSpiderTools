@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AyugeSpiderTools"
-version = "3.6.0"
+version = "3.6.1"
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手。"
 authors = ["ayuge <ayugesheng@gmail.com>"]
 maintainers = ["ayuge <ayugesheng@gmail.com>"]
