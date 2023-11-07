@@ -24,12 +24,13 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
-VIT_DIR = Path(__file__).parent / "VIT"
+_ = Path(__file__).parent
+VIT_DIR = _ / "VIT"
 
 LOG_LEVEL = "ERROR"
-LOG_FILE = "logs/$project_name.log"
+LOG_FILE = _ / "logs/DemoSpider.log"
 logger.add(
-    "logs/error.log",
+    _ / "logs/error.log",
     level="ERROR",
     rotation="1 week",
     retention="7 days",
