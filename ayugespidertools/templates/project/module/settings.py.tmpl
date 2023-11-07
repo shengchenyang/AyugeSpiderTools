@@ -27,9 +27,9 @@ FEED_EXPORT_ENCODING = "utf-8"
 VIT_DIR = Path(__file__).parent / "VIT"
 
 LOG_LEVEL = "ERROR"
-LOG_FILE = Path(__file__).parent / "logs/$project_name.log"
+LOG_FILE = "logs/$project_name.log"
 logger.add(
-    Path(__file__).parent / "logs/error.log",
+    "logs/error.log",
     level="ERROR",
     rotation="1 week",
     retention="7 days",

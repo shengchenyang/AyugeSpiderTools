@@ -20,7 +20,7 @@ Default: `loguru.logger`
 
 ```
 logger.add(
-    "<LOG_DIR>/error.log",
+    "logs/error.log",
     level="ERROR",
     rotation="1 week",
     retention="7 days",

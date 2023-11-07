@@ -6,7 +6,7 @@
 
 ```python
 # 日志管理
-LOG_FILE = f"{LOG_DIR}/DemoSpider.log"
+LOG_FILE = "logs/DemoSpider.log"
 
 # 配置中 DemoSpider 是与 ayuge startproject <project_name> 中的项目名称对应的
 ```
@@ -18,7 +18,7 @@ LOG_FILE = f"{LOG_DIR}/DemoSpider.log"
 ```python
 # 本库只会持久化记录 error 级别的日志，但在调试时也可以方便地查看（包括其它等级的）控制台日志
 logger.add(
-    f"{LOG_DIR}/error.log",
+    "logs/error.log",
     level="ERROR",
     rotation="1 week",
     retention="7 days",
