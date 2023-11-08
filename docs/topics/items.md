@@ -53,7 +53,11 @@ def parse(self, response):
     mdi.add_field("add_field3", DataItem(key_value="value3", notes="add_field3值"))
     # _table 修改可通过以下方式，同样不推荐使用
     mdi["_table"] = "table1"
+
+
+# 不允许 AyuItem 中字段值的类型（str 和 DataItem）混用，这里是用于示例展示。
 ```
+注：在使用 `AyuItem` 时，其中各字段值（除了 `_mongo_update_rule`）的类型都要统一，比如要么都使用 `str` 类型，要么都使用 `DataItem` 类型。
 
 另外，本库的 `item` 提供类型转换，以方便后续的各种使用场景：
 
