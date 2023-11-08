@@ -46,7 +46,9 @@ class FilesDownloadPipeline:
             file_url = item_dict.get("file_url")
             file_format = item_dict.get("file_format")
 
-        assert file_format, "使用文件下载 pipelines 时，其 item 中 file_format 字段可能未设置！"
+        assert (
+            file_format is not None
+        ), "使用文件下载 pipelines 时，其 item 中 file_format 字段可能未设置！"
 
         if any([not file_url, not file_format]):
             return item
