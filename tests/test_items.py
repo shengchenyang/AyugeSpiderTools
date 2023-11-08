@@ -27,23 +27,19 @@ def test_items_AyuItem():
 
     assert all(
         [
-            mdi["_table"] == "turbo",
-            mdi._table == "turbo",
-            mdi["field1"] == "value1",
-            mdi.field1 == "value1",
+            mdi["_table"] == mdi._table == "turbo",
+            mdi["field1"] == mdi.field1 == "value1",
         ],
     )
 
     # 修改 / 添加字段场景
     mdi["_table"] = "table"
-    mdi.name = "ayuge"
+    mdi["name"] = "ayuge"
     mdi["field2"] = DataItem(key_value="field2_key", notes="key值")
     assert all(
         [
             mdi["_table"] == "table",
-            mdi._table == "table",
             mdi["name"] == "ayuge",
-            mdi.name == "ayuge",
             isinstance(mdi["field2"], DataItem),
             mdi["field2"].key_value == "field2_key",
             mdi["field2"].notes == "key值",
@@ -64,10 +60,10 @@ def test_items_AyuItem():
     del mdi["name"]
     with pytest.raises(AttributeError):
         _ = mdi["name"]
-    with pytest.raises(AttributeError):
-        del mdi.no_this_field
     with pytest.raises(KeyError):
         del mdi["no_this_field"]
+    with pytest.raises(AttributeError):
+        del mdi.no_this_field
     assert mdi.fields() == {"_table", "field1", "field2"}
 
     # 转 ScrapyItem 场景
