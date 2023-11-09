@@ -14,9 +14,9 @@ if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor, DictCursor
 
-PymysqlCursor = TypeVar("PymysqlCursor", bound="Cursor")
-PymysqlConnect = TypeVar("PymysqlConnect", bound="Connection")
-PymysqlDictCursor = TypeVar("PymysqlDictCursor", bound="DictCursor")
+    PymysqlCursorT = TypeVar("PymysqlCursorT", bound=Cursor)
+    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
+    PymysqlDictCursorT = TypeVar("PymysqlDictCursorT", bound=DictCursor)
 
 
 class AbstractClass(ABC):
@@ -24,7 +24,7 @@ class AbstractClass(ABC):
 
     def _create_table(
         self,
-        cursor: Union[PymysqlCursor, PymysqlDictCursor],
+        cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
         table_name: str,
         charset: str,
         collate: str,
@@ -62,7 +62,7 @@ class AbstractClass(ABC):
 
     def _get_column_type(
         self,
-        cursor: Union[PymysqlCursor, PymysqlDictCursor],
+        cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
         database: str,
         table: str,
         column: str,
@@ -100,8 +100,8 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: PymysqlConnect,
-        cursor: Union[PymysqlCursor, PymysqlDictCursor],
+        conn: "PymysqlConnectT",
+        cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
         charset: str,
         collate: str,
         database: str,
@@ -186,7 +186,7 @@ class AbstractClass(ABC):
     def deal_1406_error(
         self,
         err_msg: str,
-        cursor: Union[PymysqlCursor, PymysqlDictCursor],
+        cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
         database: str,
         table: str,
         note_dic: dict,
@@ -222,7 +222,7 @@ class AbstractClass(ABC):
     def deal_1265_error(
         self,
         err_msg: str,
-        cursor: Union[PymysqlCursor, PymysqlDictCursor],
+        cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
         database: str,
         table: str,
         note_dic: dict,
@@ -266,8 +266,8 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: PymysqlConnect,
-        cursor: PymysqlCursor,
+        conn: "PymysqlConnectT",
+        cursor: "PymysqlCursorT",
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -288,7 +288,7 @@ class TwistedAsynchronous(AbstractClass):
 
     def _exec_sql(
         self,
-        cursor: PymysqlDictCursor,
+        cursor: "PymysqlDictCursorT",
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -306,14 +306,14 @@ class TwistedAsynchronous(AbstractClass):
 def deal_mysql_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: Union[PymysqlCursor, PymysqlDictCursor],
+    cursor: Union["PymysqlCursorT", "PymysqlDictCursorT"],
     charset: str,
     collate: str,
     database: str,
     table: str,
     table_notes: str,
     note_dic: dict,
-    conn: Optional[PymysqlConnect] = None,
+    conn: Optional["PymysqlConnectT"] = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,
