@@ -125,7 +125,6 @@ class ToolsForAyu:
         else:
             raise ValueError(f"{conf_name} 暂不支持该格式的配置")
 
-        conf_data = ReuseOperation.dict_keys_to_lower(conf_data)
         _conf = conf_data.get(conf_name, {})
         if not _conf:
             logger.info(f"远程配置 {remote_type} 中未设置 {conf_name}")
