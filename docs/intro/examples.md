@@ -63,7 +63,7 @@
 
 基本查看以上 `spider` 即可了解使用方法，但有些示例还是不够详细，对以上内容进行补充。
 
-- 以上场景有需要 `consul` 上的相关配置的示例，是根据 `.conf` 中的配置并按照小写风格书写，以下为 `json` 格式配置的示例：
+- 以上场景有需要 `consul` 或 `nacos` 上的相关配置的示例，与 `.conf` 中的配置内容一致，以下为 `json` 格式配置的示例：
 
   ```json
   {
@@ -81,7 +81,8 @@
           "user":"***",
           "password":"***",
           "database":"***",
-          "authsource":"***"
+          "authsource":"***",
+          "authMechanism":"SCRAM-SHA-1"
       },
       "mq":{
           "host":"***",
