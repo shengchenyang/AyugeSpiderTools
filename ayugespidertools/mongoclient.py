@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from gridfs import GridFS
 from pymongo import MongoClient
@@ -6,6 +6,9 @@ from pymongo import MongoClient
 __all__ = [
     "MongoDbBase",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import authMechanismStr
 
 
 class MongoDbBase:
@@ -18,6 +21,7 @@ class MongoDbBase:
         host: str,
         port: int,
         authsource: str = "admin",
+        authMechanism: "authMechanismStr" = "SCRAM-SHA-1",
         database: Optional[str] = None,
         connect_style: Optional[str] = None,
     ) -> None:
@@ -28,7 +32,8 @@ class MongoDbBase:
             password: 用户对应的密码
             host: mongoDB 链接需要的 host
             port: mongoDB 链接需要的端口
-            authsource: mongoDB 身份验证需要的数据库名称，默认为 admin
+            authsource: mongoDB 身份验证需要的数据库名称
+            authMechanism: mongoDB 身份验证机制
             database: mongoDB 链接需要的数据库
             connect_style: mongoDB 的链接方式，参数选择有：
                 1). uri: uri 方式；
@@ -38,7 +43,7 @@ class MongoDbBase:
         """
         # uri 方式，默认使用此方式连接
         if any([not connect_style, connect_style in {"uri", "U"}]):
-            uri = f"mongodb://{user}:{password}@{host}:{port}/?authSource={authsource}&authMechanism=SCRAM-SHA-1"
+            uri = f"mongodb://{user}:{password}@{host}:{port}/?authSource={authsource}&authMechanism={authMechanism}"
             self.conn = MongoClient(uri)
 
         elif connect_style in {"key", "K"}:
@@ -48,7 +53,7 @@ class MongoDbBase:
                 username=user,
                 password=password,
                 authSource=authsource,
-                authMechanism="SCRAM-SHA-1",
+                authMechanism=authMechanism,
             )
 
         elif connect_style in {"auth", "A"}:

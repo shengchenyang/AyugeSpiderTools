@@ -13,6 +13,9 @@ Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
 ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
+authMechanismStr = Literal[
+    "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
+]
 
 
 class MysqlConf(NamedTuple):
@@ -31,6 +34,7 @@ class MongoDBConf(NamedTuple):
     password: str
     database: Optional[str] = None
     authsource: Optional[str] = None
+    authMechanism: authMechanismStr = "SCRAM-SHA-1"
 
 
 class AiohttpConf(NamedTuple):

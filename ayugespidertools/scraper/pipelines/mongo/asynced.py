@@ -21,7 +21,8 @@ class AsyncMongoPipeline:
         self.mongo_uri = (
             f"mongodb://{spider.mongodb_conf.user}:{_encoded_pwd}"
             f"@{spider.mongodb_conf.host}:{spider.mongodb_conf.port}/"
-            f"?authSource={spider.mongodb_conf.authsource}&authMechanism=SCRAM-SHA-1",
+            f"?authSource={spider.mongodb_conf.authsource}"
+            f"&authMechanism={spider.mongodb_conf.authMechanism}",
         )
         self.client = motor.motor_asyncio.AsyncIOMotorClient(self.mongo_uri)
         self.db = self.client[spider.mongodb_conf.database]

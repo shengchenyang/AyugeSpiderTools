@@ -27,6 +27,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
             port=spider.mongodb_conf.port,
             database=spider.mongodb_conf.database,
             authsource=spider.mongodb_conf.authsource,
+            authMechanism=spider.mongodb_conf.authMechanism,
         )
 
     def close_spider(self, spider):

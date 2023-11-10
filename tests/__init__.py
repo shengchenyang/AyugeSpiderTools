@@ -28,6 +28,7 @@ MONGODB_CONFIG = {
     "user": mongodb_conf["user"],
     "password": mongodb_conf["password"],
     "authsource": mongodb_conf["authsource"],
+    "authMechanism": mongodb_conf.get("authMechanism", "SCRAM-SHA-1"),
     "database": mongodb_conf["database"],
 }
 

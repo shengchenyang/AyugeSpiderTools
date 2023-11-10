@@ -163,10 +163,8 @@ class SpiderTest(unittest.TestCase):
             "user": MONGODB_CONFIG["user"],
             "password": MONGODB_CONFIG["password"],
             "authsource": MONGODB_CONFIG["authsource"],
+            "authMechanism": MONGODB_CONFIG["authMechanism"],
             "database": MONGODB_CONFIG["database"],
-        }
-        true_mongodb_conf = {
-            key.lower(): value for key, value in local_mongodb_conf.items()
         }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
@@ -178,7 +176,7 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
-        assert spider.mongodb_conf._asdict() == true_mongodb_conf
+        assert spider.mongodb_conf._asdict() == local_mongodb_conf
 
         # 测试应用管理中心 mongodb 配置
         CONSUL_CONF = {
@@ -199,7 +197,7 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
-        assert spider.mongodb_conf._asdict() == true_mongodb_conf
+        assert spider.mongodb_conf._asdict() == local_mongodb_conf
 
 
 class TestCrawlSpider(SpiderTest):

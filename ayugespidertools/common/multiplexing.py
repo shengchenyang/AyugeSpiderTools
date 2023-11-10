@@ -56,6 +56,9 @@ class ReuseOperation:
                 "authsource": config_parser.get(
                     "mongodb", "authsource", fallback="admin"
                 ),
+                "authMechanism": config_parser.get(
+                    "mongodb", "authMechanism", fallback="SCRAM-SHA-1"
+                ),
                 "user": config_parser.get("mongodb", "user", fallback="admin"),
                 "password": config_parser.get("mongodb", "password", fallback=None),
                 "database": config_parser.get("mongodb", "database", fallback=None),
