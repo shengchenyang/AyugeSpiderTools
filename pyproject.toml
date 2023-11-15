@@ -10,7 +10,6 @@ repository = "https://github.com/shengchenyang/AyugeSpiderTools"
 documentation = "https://ayugespidertools.readthedocs.io/en/latest/"
 keywords = ["crawler", "scraping", "twisted", "aiohttp", "asyncio", "scrapy", "aiomysql", "mmh3"]
 homepage = "https://www.ayuge.top/mkdocs-material/"
-include = ["pyproject.toml"]
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
@@ -31,7 +30,6 @@ mmh3 = "^3.0.0"
 pycryptodome = "^3.15.0"
 oss2 = "^2.16.0"
 aiomysql = "^0.1.1"
-toml = "^0.10.2"
 python-hcl2 = "^4.3.0"
 numpy = [
     { version = "~1.24.3", python = "<3.9" },

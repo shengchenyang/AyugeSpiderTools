@@ -10,4 +10,7 @@ __all__ = [
     "AyuItem",
     "AyuSpider",
     "AyuCrawlSpider",
+    "__version__",
 ]
+
+__version__ = "3.6.1"
