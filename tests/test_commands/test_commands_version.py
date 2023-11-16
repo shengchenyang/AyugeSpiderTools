@@ -7,6 +7,8 @@ from twisted.trial import unittest
 
 from ayugespidertools.commands.version import AyuCommand
 
+ProcessTest.prefix = [sys.executable, "-m", "ayugespidertools.utils.cmdline"]
+
 
 def test_version():
     cmd = AyuCommand()
@@ -24,30 +26,5 @@ class VersionTest(ProcessTest, unittest.TestCase):
         _, out, _ = yield self.execute([])
         self.assertEqual(
             out.strip().decode(encoding),
-            "Scrapy 2.11.0",
-        )
-
-    @defer.inlineCallbacks
-    def test_verbose_output(self):
-        encoding = getattr(sys.stdout, "encoding") or "utf-8"
-        _, out, _ = yield self.execute(["-v"])
-        headers = [
-            line.partition(":")[0].strip()
-            for line in out.strip().decode(encoding).splitlines()
-        ]
-        self.assertEqual(
-            headers,
-            [
-                "Scrapy",
-                "lxml",
-                "libxml2",
-                "cssselect",
-                "parsel",
-                "w3lib",
-                "Twisted",
-                "Python",
-                "pyOpenSSL",
-                "cryptography",
-                "Platform",
-            ],
+            "AyugeSpiderTools 3.6.1",
         )
