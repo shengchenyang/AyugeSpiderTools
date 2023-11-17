@@ -11,9 +11,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    import pymongo
+    from pymongo.database import Database
 
-    PymongoDataBase = TypeVar("PymongoDataBase", bound="pymongo.database.Database")
+    PymongoDataBaseT = TypeVar("PymongoDataBaseT", bound=Database)
 
 
 class AbstractClass(ABC):
@@ -44,7 +44,7 @@ class AbstractClass(ABC):
     def process_item_template(
         self,
         item_dict: dict,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         sys_ver_low: bool = True,
     ) -> None:
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
@@ -65,7 +65,7 @@ class AbstractClass(ABC):
 
     def _default_storage(
         self,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -90,7 +90,7 @@ class AbstractClass(ABC):
     @abstractmethod
     def _data_storage_logic(
         self,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -116,7 +116,7 @@ class Synchronize(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -132,7 +132,7 @@ class TwistedAsynchronous(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -148,7 +148,7 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def _data_storage_logic(
         self,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -165,7 +165,7 @@ class AsyncioAsynchronous(AbstractClass):
     async def process_item_template(
         self,
         item_dict: dict,
-        db: "PymongoDataBase",
+        db: "PymongoDataBaseT",
         sys_ver_low: bool = True,
     ) -> None:
         insert_data, table_name = self._get_insert_data(item_dict)
@@ -180,7 +180,7 @@ class AsyncioAsynchronous(AbstractClass):
 def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: dict,
-    db: "PymongoDataBase",
+    db: "PymongoDataBaseT",
     sys_ver_low: bool = True,
 ) -> None:
     """mongodb pipeline 存储的通用调用方法"""

@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
 
 import aiohttp
 import scrapy
@@ -20,7 +20,7 @@ __all__ = [
 if TYPE_CHECKING:
     from aiohttp.connector import BaseConnector
 
-    from ayugespidertools.common.typevars import ItemAdapterType
+ItemAdapterT = TypeVar("ItemAdapterT", bound=ItemAdapter)
 
 
 class AiohttpDownloaderMiddleware:
@@ -116,7 +116,7 @@ class AiohttpDownloaderMiddleware:
 
     async def _request_by_aiohttp(
         self,
-        aio_request_args: "ItemAdapterType",
+        aio_request_args: ItemAdapterT,
         timeout: Optional[aiohttp.ClientTimeout] = None,
         connector: Optional["BaseConnector"] = None,
     ) -> Tuple[int, str]:

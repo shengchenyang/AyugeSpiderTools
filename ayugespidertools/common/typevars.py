@@ -1,9 +1,6 @@
 # Define your TypeVar here
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, Union
-
-if TYPE_CHECKING:
-    from itemadapter import ItemAdapter
+from typing import List, Literal, NamedTuple, Optional, TypeVar, Union
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)
@@ -12,7 +9,6 @@ I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
 Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
 AiohttpRequestMethodStr = Literal["GET", "POST"]
-ItemAdapterType = TypeVar("ItemAdapterType", bound="ItemAdapter")
 authMechanismStr = Literal[
     "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
 ]

@@ -107,8 +107,8 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 self.conn.commit()
 
         except Exception as e:
-            self.slog.warning(f":{e}")
-            self.slog.warning(f"Item:{new_item} Table: {table_name}")
+            self.slog.warning(f"{e}")
+            self.slog.warning(f"Item: {new_item} Table: {table_name}")
             self.conn.rollback()
             deal_mysql_err(
                 Synchronize(),
