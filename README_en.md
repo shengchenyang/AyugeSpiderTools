@@ -25,7 +25,7 @@ When developing a spider using Scrapy, it is inevitable that one has to repeated
 write `settings`, `items`, `middlewares`, `pipeline`, and some common methods. However, these contents in different
 projects are roughly the same. So why not consolidate them together? I also want to extend some functionality, such as
 automatically modifying the corresponding `item` and `pipeline` when adding a field in the spider, without even manually
-modifying the table structure of MySQL. In this case, the template feature of Scrapy is not enough.
+modifying the table structure of MySQL.
 
 The main idea of the project is to allow developers to focus only on writing spider scripts, reducing development and
 maintenance processes. In an ideal state, one only needs to pay attention to the parsing rules of fields in the spider
