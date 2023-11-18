@@ -12,7 +12,7 @@ from scrapy.utils.misc import walk_modules
 from scrapy.utils.project import get_project_settings, inside_project
 from scrapy.utils.python import garbage_collect
 
-from ayugespidertools.commands.version import AyuCommand
+from ayugespidertools import __version__
 
 
 class ScrapyArgumentParser(argparse.ArgumentParser):
@@ -81,11 +81,12 @@ def _pop_command_name(argv):
 
 
 def _print_header(settings, inproject):
-    version = AyuCommand()._version()
     if inproject:
-        print(f"AyugeSpiderTools {version} - active project: {settings['BOT_NAME']}\n")
+        print(
+            f"AyugeSpiderTools {__version__} - active project: {settings['BOT_NAME']}\n"
+        )
     else:
-        print(f"AyugeSpiderTools {version} - no active project\n")
+        print(f"AyugeSpiderTools {__version__} - no active project\n")
 
 
 def _print_commands(settings, inproject):
