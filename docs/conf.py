@@ -22,6 +22,7 @@ author = "shengchenyang"
 try:
     from ayugespidertools.commands.version import AyuCommand
 
+    # TODO: Update the version acquisition method before release, and then submit the code to github.
     release = AyuCommand()._version()
     version = ".".join(tuple(release.split(".")[:2]))
 except (ImportError, AttributeError):
@@ -36,7 +37,6 @@ extensions = [
     "sphinx_markdown_tables",
     "hoverxref.extension",
     "notfound.extension",
-    # "ayugespidertoolsdocs",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
