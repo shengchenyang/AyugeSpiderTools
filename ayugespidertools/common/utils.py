@@ -1,21 +1,18 @@
 import json
 import math
 import random
-import xml.etree.ElementTree as ET
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
-import hcl2
 import numpy as np
-import pandas
 import requests
-import yaml
 
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
 from ayugespidertools.config import logger
+from ayugespidertools.extras.ext import AppConfManageMixin
 from ayugespidertools.formatdata import DataHandle
 
 __all__ = [
@@ -27,7 +24,6 @@ if TYPE_CHECKING:
     from scrapy.http import Response
 
     from ayugespidertools.common.typevars import MysqlConf, Str_Lstr
-    from ayugespidertools.items import AyuItem
 
 RemoteFormatStr = Literal["json", "hcl", "yaml", "xml"]
 RemoteTypeStr = Literal["consul", "nacos"]
@@ -41,7 +37,7 @@ RemoteConfNameStr = Literal[
 ]
 
 
-class ToolsForAyu:
+class ToolsForAyu(AppConfManageMixin):
     """这里用于存放框架所依赖的方法"""
 
     @classmethod
@@ -110,18 +106,12 @@ class ToolsForAyu:
         conf_value = cls.get_remote_kvs(url, remote_type, token)
         if format == "json":
             conf_data = json.loads(conf_value)
-        elif format == "hcl":
-            conf_data = hcl2.loads(conf_value)
-        elif format == "yaml":
-            conf_data = yaml.safe_load(conf_value)
         elif format == "xml":
-            root = ET.fromstring(conf_value)
-            # 将 XML 数据转换成 Python 字典
-            conf_data = {}
-            for child in root:
-                conf_data[child.tag] = {}
-                for sub_child in child:
-                    conf_data[child.tag][sub_child.tag] = sub_child.text
+            conf_data = cls.xml_parser(conf_value)
+        elif format == "yaml":
+            conf_data = cls.yaml_parser(conf_value)
+        elif format == "hcl":
+            conf_data = cls.hcl_parser(conf_value)
         else:
             raise ValueError(f"{conf_name} 暂不支持该格式的配置")
 
@@ -287,36 +277,6 @@ class ToolsForAyu:
             str(b_key, encoding="utf-8"): str(b_value_list[0], encoding="utf-8")
             for b_key, b_value_list in dict(scrapy_headers).items()
         }
-
-    @staticmethod
-    def filter_data_before_yield(
-        sql: str,
-        mysql_engine,
-        item: "AyuItem",
-    ):
-        """数据入库前查询是否已存在，已存在则跳过
-
-        Args:
-            sql: 判断的 sql
-            mysql_engine: sqlalchemy 的 create_engine 句柄
-            item: 当前 scrapy item
-
-        Returns:
-            item: 当前 scrapy item
-        """
-        # 数据入库逻辑
-        try:
-            df = pandas.read_sql(sql, mysql_engine)
-            # 如果为空，说明此数据不存在于数据库，则新增
-            if df.empty:
-                return item
-
-        except Exception as e:
-            # 若数据库或数据表不存在时，直接返回 item 即可，会自动创建所依赖的数据库数据表及字段注释（前提是用户有对应权限，否则还是会报错）
-            if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                return item
-            else:
-                raise ValueError(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
 
 
 class BezierTrajectory:
