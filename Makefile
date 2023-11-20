@@ -53,7 +53,7 @@ release:
 	poetry publish
 
 test:
-	poetry install
+	poetry install -E "all"
 	coverage run -m pytest
 	coverage combine
 	coverage report
@@ -73,6 +73,7 @@ clean:
 	-$(CLEAN_PYTESTCACHE)
 	-$(CLEAN_MYPYCACHE)
 	-$(RMDIR) $(call path, dist)
+	-$(RMDIR) $(call path, file.log)
 	-$(RMDIR) $(call path, docs$(PATHSEP)_build)
 	-$(RMDIR) $(call path, htmlcov)
 	-$(RM) $(call path, .coverage)
@@ -82,4 +83,5 @@ clean:
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.crt)
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.key)
+	poetry install
 	pip uninstall -y ayugespidertools
