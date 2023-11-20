@@ -4,7 +4,6 @@ import time
 from typing import Optional, Union
 from urllib.parse import urljoin
 
-import html2text
 from w3lib.html import remove_tags, replace_entities
 
 __all__ = [
@@ -208,72 +207,3 @@ class DataHandle:
                 return func_res
 
         return inner
-
-    @classmethod
-    def _extract_table_rule(
-        cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
-    ):
-        """根据 html2text 来处理 html 中的 table 表格内容
-
-        Args:
-            html_txt: 网页内容
-            h_obj: html2text 对象句柄
-
-        Returns:
-            1). 转换后的结果
-        """
-        if not h_obj:
-            h_obj = html2text.HTML2Text()
-
-        h_obj.protect_links = True
-        h_obj.body_width = 0
-        h_obj.ignore_links = True
-        h_obj.bypass_tables = False
-        return h_obj.handle(html_txt)
-
-    @classmethod
-    def extract_html_to_md(
-        cls, html_txt: str, h_obj: Optional[html2text.HTML2Text] = None
-    ) -> str:
-        """将 html 内容转化为 markdown 内容
-        更多、更详细的配置参数请查看文档内容: https://github.com/Alir3z4/html2text/blob/master/html2text/cli.py
-
-        Args:
-            html_txt: 网页内容（一般是带标签的内容）
-            h_obj: html2text 对象句柄
-
-        Returns:
-            1). 转换后的结果
-        """
-        if not h_obj:
-            h_obj = html2text.HTML2Text()
-
-        # 以下步骤先处理通用部分，先不处理 table 内容
-        h_obj.body_width = 0
-        # h_obj.protect_links = True
-        h_obj.bypass_tables = True
-        # h_obj.unicode_snob = True
-        h_obj.ignore_links = True
-        content = h_obj.handle(html_txt)
-
-        # 先处理表格 <table> 标签中格式
-        table_pattern = re.compile(r"(<table.*?</table>)", flags=re.S)
-        if table_res_list := table_pattern.findall(content):
-            for table_res in table_res_list:
-                table_deal = cls._extract_table_rule(html_txt=table_res, h_obj=h_obj)
-                # 将 table 转换时去除多余的换行和空白字符等内容
-                table_deal = re.sub(r"\|\s*\n", "| ", table_deal, flags=re.S)
-                table_deal = re.sub(r"\n\s*\|", "| ", table_deal, flags=re.S)
-                table_deal = re.sub(r"\n\s*\n", "\n\n", table_deal, flags=re.S)
-                table_deal = re.sub(r"\r\n", "\n", table_deal, flags=re.S)
-                table_deal = re.sub(r"[\n]{1,}", "\n", table_deal, flags=re.S)
-
-                content = re.sub(
-                    r"(<table.*?</table>)", table_deal + "\n", content, 1, re.S
-                )
-
-        # TODO: 可以添加上通用处理的装饰器
-        # 将三个以上换行改为两个换行
-        content = re.sub(r"[\n]{3,}", "\n\n", content)
-        content = content.strip()
-        return content
