@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ayugespidertools.oss import AliOssBase
+from ayugespidertools.extras.oss import AliOssBase
 
 OSS_CONFIG = {
     "access_key_id": "",
