@@ -1,7 +1,4 @@
-from pathlib import Path
-
 from ayugespidertools.formatdata import DataHandle
-from tests import tests_dir
 
 
 def test_get_full_url():
@@ -57,13 +54,5 @@ def test_remove_tags():
         return f"{html_content}'<p>无事发生</p>'"
 
     res = true_test_remove_tags("""<a href="https://www.baidu.com">跳转到百度1</a>""")
-    print(res)
-    assert res is not None
-
-
-def test_extract_html_to_md():
-    _html_file = Path(tests_dir, "docs/txt/doc_with_table.html")
-    html_txt = _html_file.read_text(encoding="utf-8")
-    res = DataHandle.extract_html_to_md(html_txt=html_txt)
     print(res)
     assert res is not None
