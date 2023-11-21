@@ -129,15 +129,12 @@ item = AyuItem(_table="ta")
 `AyuItem` 在 `spider` 中常用的基础使用方法示例，以本库模板中的 `basic.tmpl` 为例来作解释：
 
 ```python
-#!/usr/bin/env python3
-# -*- coding:utf-8 -*-
-import pandas
-from scrapy.http.response.text import TextResponse
-
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem, AyuItem
+from ayugespidertools.items import AyuItem, DataItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
+from scrapy.http.response.text import TextResponse
+from sqlalchemy import text
 
 
 class DemoOneSpider(AyuSpider):
@@ -204,13 +201,14 @@ class DemoOneSpider(AyuSpider):
                 json_data=curr_data, query="nickName"
             )
 
+            _save_table = "_article_info_list"
             ArticleInfoItem = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
                 favor_count=DataItem(favor_count, "文章赞成数量"),
                 nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=DataItem("_article_info_list", "文章信息列表"),
+                _table=DataItem(_save_table, "文章信息列表"),
                 # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
@@ -223,23 +221,20 @@ class DemoOneSpider(AyuSpider):
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
             # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
             try:
-                save_table = "article_detail_url"
-                sql = f"""select `id` from `{save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
-                df = pandas.read_sql(sql, self.mysql_engine)
-
-                # 如果为空，说明此数据不存在于数据库，则新增
-                if df.empty:
+                _sql = text(
+                    f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+                )
+                result = self.mysql_engine.execute(_sql).fetchone()
+                if not result:
                     yield ArticleInfoItem
-
-                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
                 else:
                     self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
-
             except Exception as e:
+                # 若数据库或数据表不存在时，直接返回 item 即可，会自动创建所依赖的数据库数据表及字段注释（前提是用户有对应权限）
                 if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
                     yield ArticleInfoItem
                 else:
-                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
+                    raise ValueError(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。
