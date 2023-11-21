@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "ayugespidertools"}]
 repository = "https://github.com/shengchenyang/AyugeSpiderTools"
 documentation = "https://ayugespidertools.readthedocs.io/en/latest/"
-keywords = ["crawler", "scraping", "twisted", "aiohttp", "asyncio", "scrapy", "aiomysql", "mmh3"]
+keywords = ["crawler", "scraping", "aiohttp", "asyncio", "scrapy"]
 homepage = "https://www.ayuge.top/mkdocs-material/"
 
 [tool.poetry.dependencies]
