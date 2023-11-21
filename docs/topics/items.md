@@ -233,7 +233,7 @@ class DemoOneSpider(AyuSpider):
 
                 # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
                 else:
-                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
+                    self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
 
             except Exception as e:
                 if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
