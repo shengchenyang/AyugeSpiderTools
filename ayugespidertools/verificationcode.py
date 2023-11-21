@@ -17,7 +17,7 @@ __all__ = [
 
 
 def match_img_get_distance(target, template):
-    """网易易盾（dun163）滑块坐标定位方法，也使用于其它平台滑块验证码的情况
+    """滑块坐标定位方法
 
     Args:
         target: 1) 带缺口的背景图，全路径; 2) 或者是背景图的 bytes 数据
@@ -104,14 +104,13 @@ def get_selenium_tracks(distance):
 
 
 def get_yidun_tracks(distance):
-    """网易易盾轨迹生成方法（不能直接用极验的轨迹生成和其它如（加减速、匀加速或者先加速后减速，甚至划过再划回）简单生成
-    的方法），生成的轨迹数组中首个位移最好要大于等于 3
+    """轨迹生成方法
 
     Args:
         distance: 滑块缺口的距离
 
     Returns:
-        xyt: 网易易盾轨迹数组
+        xyt: 轨迹数组
     """
     t_list = [random.randint(50, 160)]
     x_list = [random.randint(5, 11)]
@@ -156,7 +155,7 @@ def get_yidun_gap(
     bg_img_path: Union[str, bytes],
     out_img_path: Optional[str] = None,
 ) -> int:
-    """获取易盾滑块缺口距离
+    """获取滑块缺口距离
 
     Args:
         slide_img_path: 滑块的图片
@@ -164,7 +163,7 @@ def get_yidun_gap(
         out_img_path: 输出图片
 
     Returns:
-        1). 易盾滑块缺口距离
+        1). 滑块缺口距离
     """
     return YiDunGetGap.discern(slide_img_path, bg_img_path, out_img_path)
 

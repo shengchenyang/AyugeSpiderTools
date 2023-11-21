@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class YiDunGetGap:
-    """易盾获取滑块缺口距离的相关方法，也可能适配于其它平台"""
+    """获取滑块缺口距离的相关方法，也可能适配于其它平台"""
 
     @classmethod
     def clear_white(cls, img):
@@ -24,7 +24,7 @@ class YiDunGetGap:
             img: 待处理的图片
 
         Returns:
-            1). 清楚图片空白区域的图片
+            1). 清除图片空白区域的图片
         """
         rows, cols, channel = img.shape
         min_x = 255

@@ -42,7 +42,7 @@ def test_get_yidun_gap():
         f"{tests_dir}/docs/image/2.jpg",
         f"{tests_dir}/docs/image/3.png",
     )
-    print("易盾滑块缺口距离 1 为：", tracks)
+    print("滑块缺口距离 1 为：", tracks)
     assert tracks == 214
 
     # 参数为图片 bytes 的情况
@@ -51,5 +51,5 @@ def test_get_yidun_gap():
     tracks = verificationcode.get_yidun_gap(
         target_bytes, template_bytes, f"{tests_dir}/docs/image/33.png"
     )
-    print("易盾滑块缺口距离 2 为：", tracks)
+    print("滑块缺口距离 2 为：", tracks)
     assert tracks
