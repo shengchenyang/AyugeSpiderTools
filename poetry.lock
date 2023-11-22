@@ -845,13 +845,13 @@ reference = "aliyun"
 
 [[package]]
 name = "exceptiongroup"
-version = "1.1.3"
+version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.1.3-py3-none-any.whl", hash = "sha256:343280667a4585d195ca1cf9cef84a4e178c4b6cf2274caef9859782b567d5e3"},
-    {file = "exceptiongroup-1.1.3.tar.gz", hash = "sha256:097acd85d473d75af5bb98e41b61ff7fe35efe6675e4f9370ec6ec5126d160e9"},
+    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
+    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
 ]
 
 [package.extras]
@@ -1949,7 +1949,7 @@ reference = "aliyun"
 name = "numpy"
 version = "1.24.4"
 description = "Fundamental package for array computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "numpy-1.24.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c0bfb52d2169d58c1cdb8cc1f16989101639b34c7d3ce60ed70b19c63eba0b64"},
@@ -1991,7 +1991,7 @@ reference = "aliyun"
 name = "numpy"
 version = "1.26.2"
 description = "Fundamental package for array computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "numpy-1.26.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:3703fc9258a4a122d17043e57b35e5ef1c5a5837c3db8be396c82e04c1cf9b0f"},
@@ -2041,7 +2041,7 @@ reference = "aliyun"
 name = "opencv-python"
 version = "4.8.1.78"
 description = "Wrapper package for OpenCV python bindings."
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "opencv-python-4.8.1.78.tar.gz", hash = "sha256:cc7adbbcd1112877a39274106cb2752e04984bc01a031162952e97450d6117f6"},
@@ -2171,7 +2171,7 @@ reference = "aliyun"
 name = "pillow"
 version = "9.5.0"
 description = "Python Imaging Library (Fork)"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "Pillow-9.5.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:ace6ca218308447b9077c14ea4ef381ba0b67ee78d64046b3f19cf4e1139ad16"},
@@ -2253,13 +2253,13 @@ reference = "aliyun"
 
 [[package]]
 name = "platformdirs"
-version = "3.11.0"
+version = "4.0.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-3.11.0-py3-none-any.whl", hash = "sha256:e9d171d00af68be50e9202731309c4e658fd8bc76f55c11c7dd760d023bda68e"},
-    {file = "platformdirs-3.11.0.tar.gz", hash = "sha256:cf8ee52a3afdb965072dcc652433e0c7e3e40cf5ea1477cd4b3b1d2eb75495b3"},
+    {file = "platformdirs-4.0.0-py3-none-any.whl", hash = "sha256:118c954d7e949b35437270383a3f2531e99dd93cf7ce4dc8340d3356d30f173b"},
+    {file = "platformdirs-4.0.0.tar.gz", hash = "sha256:cb633b2bcf10c51af60beb0ab06d2f1d69064b43abf4c185ca6b28865f3f9731"},
 ]
 
 [package.extras]
@@ -2480,13 +2480,13 @@ reference = "aliyun"
 
 [[package]]
 name = "pygments"
-version = "2.17.1"
+version = "2.17.2"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pygments-2.17.1-py3-none-any.whl", hash = "sha256:1b37f1b1e1bff2af52ecaf28cc601e2ef7077000b227a0675da25aef85784bc4"},
-    {file = "pygments-2.17.1.tar.gz", hash = "sha256:e45a0e74bf9c530f564ca81b8952343be986a29f6afe7f5ad95c5f06b7bdf5e8"},
+    {file = "pygments-2.17.2-py3-none-any.whl", hash = "sha256:b27c2826c47d0f3219f29554824c30c5e8945175d888647acd804ddd04af846c"},
+    {file = "pygments-2.17.2.tar.gz", hash = "sha256:da46cec9fd2de5be3a8a784f434e4c4ab670b4ff54d605c4c2717e9d49c4c367"},
 ]
 
 [package.extras]
@@ -3084,13 +3084,13 @@ reference = "aliyun"
 
 [[package]]
 name = "setuptools"
-version = "69.0.0"
+version = "69.0.2"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-69.0.0-py3-none-any.whl", hash = "sha256:eb03b43f23910c5fd0909cb677ad017cd9531f493d27f8b3f5316ff1fb07390e"},
-    {file = "setuptools-69.0.0.tar.gz", hash = "sha256:4c65d4f7891e5b046e9146913b87098144de2ca2128fbc10135b8556a6ddd946"},
+    {file = "setuptools-69.0.2-py3-none-any.whl", hash = "sha256:1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2"},
+    {file = "setuptools-69.0.2.tar.gz", hash = "sha256:735896e78a4742605974de002ac60562d286fa8051a7e2299445e8e8fbb01aa6"},
 ]
 
 [package.extras]
@@ -3691,19 +3691,19 @@ reference = "aliyun"
 
 [[package]]
 name = "virtualenv"
-version = "20.24.6"
+version = "20.24.7"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.24.6-py3-none-any.whl", hash = "sha256:520d056652454c5098a00c0f073611ccbea4c79089331f60bf9d7ba247bb7381"},
-    {file = "virtualenv-20.24.6.tar.gz", hash = "sha256:02ece4f56fbf939dbbc33c0715159951d6bf14aaf5457b092e4548e1382455af"},
+    {file = "virtualenv-20.24.7-py3-none-any.whl", hash = "sha256:a18b3fd0314ca59a2e9f4b556819ed07183b3e9a3702ecfe213f593d44f7b3fd"},
+    {file = "virtualenv-20.24.7.tar.gz", hash = "sha256:69050ffb42419c91f6c1284a7b24e0475d793447e35929b488bf6a0aade39353"},
 ]
 
 [package.dependencies]
 distlib = ">=0.3.7,<1"
 filelock = ">=3.12.2,<4"
-platformdirs = ">=3.9.1,<4"
+platformdirs = ">=3.9.1,<5"
 
 [package.extras]
 docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
@@ -3852,6 +3852,11 @@ files = [
 idna = ">=2.0"
 multidict = ">=4.0"
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
 [[package]]
 name = "zipp"
 version = "3.17.0"
@@ -3931,9 +3936,9 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [extras]
-all = ["mmh3", "oss2", "pycryptodome", "python-hcl2", "pyyaml"]
+all = ["Pillow", "mmh3", "numpy", "numpy", "opencv-python", "oss2", "pycryptodome", "python-hcl2", "pyyaml"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "c01cf57577d51a411a090055e3ad7b4d1bd4be86d991a7752cf27afd503cfd60"
+content-hash = "f335d144547fdb959d19deea73b325e48cc321cbcb7a1f7d47a3c3cfbf6f7ffa"

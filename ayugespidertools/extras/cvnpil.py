@@ -1,7 +1,7 @@
 import itertools
 import math
 import random
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 try:
     import cv2
@@ -32,36 +32,26 @@ class CvnpilKit:
 
     @staticmethod
     def read_image_data(
-        bg: Union[bytes, str],
-        tp: Union[bytes, str],
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """用 opencv 读取图片数据
-
+        img: Union[bytes, str],
+        flags: Optional[int] = cv2.IMREAD_COLOR,
+    ) -> np.ndarray:
+        """
+        用 opencv 读取图片数据
         Args:
-            bg: 背景图片信息
-            tp: 滑块图
+            img: 图片参数，类型需要是路径 str 或 bytes 数据
+            flags: 应用颜色通道类型
 
         Returns:
-            bg_cv: opencv 读取背景图片的数据
-            tp_cv: opencv 读取滑块图片的数据
+            img_cv: opencv 读取背景图片的数据
         """
-        assert type(bg) in [str, bytes], "带缺口的背景图参数需要是全路径图片或 bytes 数据"
-        assert type(tp) in [str, bytes], "滑块图参数需要是全路径图片或 bytes 数据"
-
-        if isinstance(bg, bytes):
-            bg_buf = np.frombuffer(bg, np.uint8)
-            bg_cv = cv2.imdecode(bg_buf, cv2.IMREAD_ANYCOLOR)
+        assert type(img) in [str, bytes], "img 参数需要是路径或 bytes 数据"
+        if isinstance(img, bytes):
+            img_buf = np.frombuffer(img, np.uint8)
+            img_cv = cv2.imdecode(img_buf, cv2.IMREAD_ANYCOLOR)
         else:
             # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
-            bg_cv = cv2.imread(bg)
-
-        if isinstance(tp, bytes):
-            tp_buf = np.frombuffer(tp, np.uint8)
-            tp_cv = cv2.imdecode(tp_buf, cv2.IMREAD_ANYCOLOR)
-        else:
-            # 0 表示采用黑白的方式读取图片
-            tp_cv = cv2.imread(tp, 0)
-        return bg_cv, tp_cv
+            img_cv = cv2.imread(img, flags)
+        return img_cv
 
     @classmethod
     def clear_white(cls, img):
@@ -105,7 +95,7 @@ class CvnpilKit:
         return cv2.Canny(img, 100, 200)
 
     @classmethod
-    def template_match(
+    def _template_match(
         cls,
         tpl: "MatLike",
         target: "MatLike",
@@ -142,7 +132,10 @@ class CvnpilKit:
 
     @classmethod
     def discern(
-        cls, slide: Union[str, bytes], bg: Union[str, bytes], out: Optional[str] = None
+        cls,
+        slide: Union[str, bytes],
+        bg: Union[str, bytes],
+        out: Optional[str] = None,
     ):
         """识别滑块缺口方法
 
@@ -155,7 +148,8 @@ class CvnpilKit:
             1): 滑块缺口横坐标
         """
         # 先用 opencv 读取图片数据
-        slide_cv, bg_cv = CvnpilKit.read_image_data(slide, bg)
+        slide_cv = CvnpilKit.read_image_data(slide)
+        bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
         # 清除图片的空白区域
         img1 = cls.clear_white(slide_cv)
         img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2GRAY)
@@ -166,7 +160,7 @@ class CvnpilKit:
         slide_pic = cv2.cvtColor(slide, cv2.COLOR_GRAY2RGB)
         back_pic = cv2.cvtColor(back, cv2.COLOR_GRAY2RGB)
         # 输出横坐标, 即滑块在图片上的位置
-        return cls.template_match(slide_pic, back_pic, out)
+        return cls._template_match(slide_pic, back_pic, out)
 
     @classmethod
     def match_temp(cls, target, template):
@@ -189,7 +183,10 @@ class CvnpilKit:
 
     @classmethod
     def identify_gap(
-        cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None
+        cls,
+        bg: Union[bytes, str],
+        tp: Union[bytes, str],
+        out: Optional[str] = None,
     ) -> int:
         """通过背景图片和缺口图片识别出滑块距离
 
@@ -202,7 +199,8 @@ class CvnpilKit:
             tl[0]: 滑块缺口距离
         """
         # 先读使用 opencv 读取图片数据
-        bg_cv, tp_cv = CvnpilKit.read_image_data(bg, tp)
+        bg_cv = cls.read_image_data(bg)
+        tp_cv = cls.read_image_data(tp, cv2.IMREAD_GRAYSCALE)
         # 识别图片边缘
         bg_edge = cv2.Canny(bg_cv, 100, 200)
         tp_edge = cv2.Canny(tp_cv, 100, 200)
@@ -240,24 +238,8 @@ class CvnpilKit:
         Returns:
             loc[1][0]: 滑块位置坐标
         """
-        # 先判断传入的参数是 str 图片的全路径信息还是 bytes 类型的图片信息
-        if any([not isinstance(target, str), isinstance(target, bytes)]):
-            target_buf = np.frombuffer(target, np.uint8)
-            template_buf = np.frombuffer(template, np.uint8)
-
-            target_cv = cv2.imdecode(target_buf, cv2.IMREAD_ANYCOLOR)
-            template_cv = cv2.imdecode(template_buf, cv2.IMREAD_ANYCOLOR)
-
-        else:
-            # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
-            target_cv = cv2.imread(target)
-            # 0 表示采用黑白的方式读取图片
-            template_cv = cv2.imread(template, 0)
-
-            # cv2.cvtColor(p1,p2) 是颜色空间转换函数，p1是需要转换的图片，p2是转换成何种格式。
-            # cv2.COLOR_BGR2GRAY 将BGR格式转换成灰度图片，发现转换后并不是通常意义上的黑白图片。
-            # 灰度图片并不是指常规意义上的黑白图片，只用看是不是无符号八位整型（unit8）,单通道即可判断。
-            target_cv = cv2.cvtColor(target_cv, cv2.COLOR_BGR2GRAY)
+        target_cv = CvnpilKit.read_image_data(target, cv2.IMREAD_GRAYSCALE)
+        template_cv = CvnpilKit.read_image_data(template, cv2.IMREAD_GRAYSCALE)
 
         run = 1
         # 这里的返回值根据不同版本的 open-cv 其返回结果会有不同的个数
@@ -265,12 +247,12 @@ class CvnpilKit:
         # 在背景图里面查找滑块图的位置
         res = cv2.matchTemplate(target_cv, template_cv, cv2.TM_CCOEFF_NORMED)
         # 使用二分法查找阈值的精确值
-        L = 0
-        R = 1
+        lft = 0
+        rgt = 1
         loc = None
         while run < 20:
             run += 1
-            threshold = (R + L) / 2
+            threshold = (rgt + lft) / 2
             if threshold < 0:
                 # 逻辑走到这里，则说明出错了，并未找出目标位置
                 return None
@@ -278,12 +260,12 @@ class CvnpilKit:
             # 匹配程度大于百分之 threshold 的坐标 x, y
             loc = np.where(res >= threshold)
             if len(loc[1]) > 1:
-                L += (R - L) / 2
+                rgt += (rgt - lft) / 2
             elif len(loc[1]) == 1:
                 # 找到目标区域起点x坐标为：loc[1][0]
                 break
             elif len(loc[1]) < 1:
-                R -= (R - L) / 2
+                rgt -= (rgt - lft) / 2
         # 返回 x 坐标
         return loc[1][0]
 
