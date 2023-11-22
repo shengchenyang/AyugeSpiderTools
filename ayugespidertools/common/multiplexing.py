@@ -2,10 +2,8 @@ import configparser
 import json
 import os
 import random
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Union
 
-import cv2
-import numpy as np
 import pymysql
 from itemadapter import ItemAdapter
 
@@ -191,39 +189,6 @@ class ReuseOperation:
             1). path 文件夹下的文件列表
         """
         return [f.path for f in os.scandir(path) if f.is_file()]
-
-    @staticmethod
-    def read_image_data(
-        bg: Union[bytes, str],
-        tp: Union[bytes, str],
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """用 opencv 读取图片数据
-
-        Args:
-            bg: 背景图片信息
-            tp: 滑块图
-
-        Returns:
-            bg_cv: opencv 读取背景图片的数据
-            tp_cv: opencv 读取滑块图片的数据
-        """
-        assert type(bg) in [str, bytes], "带缺口的背景图参数需要是全路径图片或 bytes 数据"
-        assert type(tp) in [str, bytes], "滑块图参数需要是全路径图片或 bytes 数据"
-
-        if isinstance(bg, bytes):
-            bg_buf = np.frombuffer(bg, np.uint8)
-            bg_cv = cv2.imdecode(bg_buf, cv2.IMREAD_ANYCOLOR)
-        else:
-            # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
-            bg_cv = cv2.imread(bg)
-
-        if isinstance(tp, bytes):
-            tp_buf = np.frombuffer(tp, np.uint8)
-            tp_cv = cv2.imdecode(tp_buf, cv2.IMREAD_ANYCOLOR)
-        else:
-            # 0 表示采用黑白的方式读取图片
-            tp_cv = cv2.imread(tp, 0)
-        return bg_cv, tp_cv
 
     @staticmethod
     def random_weight(weight_data: list):
@@ -436,19 +401,6 @@ class ReuseOperation:
         return {
             x.split("=", 1)[0]: x.split("=", 1)[1] for x in req_body_data_str.split("&")
         }
-
-    @staticmethod
-    def get_array_dimension(array: Union[frozenset, list, set, tuple]) -> int:
-        """获取 array 的维度
-
-        Args:
-            array: 数组
-
-        Returns:
-            1). 层级数
-        """
-        # 其实直接返回 len(array) 即可
-        return len(np.array(array).shape)
 
     @classmethod
     def get_array_depth(cls, array: list) -> int:

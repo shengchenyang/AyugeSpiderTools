@@ -1,11 +1,9 @@
 import json
-import math
-import random
 from functools import lru_cache
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
-import numpy as np
 import requests
 
 from ayugespidertools.common.encryption import EncryptOperation
@@ -15,10 +13,7 @@ from ayugespidertools.config import logger
 from ayugespidertools.extras.ext import AppConfManageMixin
 from ayugespidertools.formatdata import DataHandle
 
-__all__ = [
-    "ToolsForAyu",
-    "BezierTrajectory",
-]
+__all__ = ["ToolsForAyu"]
 
 if TYPE_CHECKING:
     from scrapy.http import Response
@@ -278,209 +273,32 @@ class ToolsForAyu(AppConfManageMixin):
             for b_key, b_value_list in dict(scrapy_headers).items()
         }
 
-
-class BezierTrajectory:
-    """贝塞尔曲线轨迹生成器
-
-    Examples:
-        >>> bt = BezierTrajectory()
-        >>> gen_data = bt.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
-        >>> track = gen_data["trackArray"]
-    """
-
-    def _generate_control_points(self, track: list):
-        """计算贝塞尔曲线的控制点"""
-        track_len = len(track)
-
-        def calculate_bezier_point(x):
-            t = (x - track[0][0]) / (track[-1][0] - track[0][0])
-            y = np.array([0, 0], dtype=np.float64)
-            for s in range(len(track)):
-                y += track[s] * (
-                    (
-                        math.factorial(track_len - 1)
-                        / (math.factorial(s) * math.factorial(track_len - 1 - s))
-                    )
-                    * math.pow(t, s)
-                    * math.pow((1 - t), track_len - 1 - s)
-                )
-            return y[1]
-
-        return calculate_bezier_point
-
-    def _type(self, type, x, length):
-        numbers = []
-        pin = (x[1] - x[0]) / length
-        if type == 0:
-            numbers.extend(i * pin for i in range(length))
-            if pin >= 0:
-                numbers = numbers[::-1]
-        elif type == 1:
-            for i in range(length):
-                numbers.append(1 * ((i * pin) ** 2))
-            numbers = numbers[::-1]
-        elif type == 2:
-            for i in range(length):
-                numbers.append(1 * ((i * pin - x[1]) ** 2))
-
-        elif type == 3:
-            track = [
-                np.array([0, 0]),
-                np.array([(x[1] - x[0]) * 0.8, (x[1] - x[0]) * 0.6]),
-                np.array([x[1] - x[0], 0]),
-            ]
-            fun = self._generate_control_points(track)
-            numbers = [0]
-            numbers.extend(fun(i * pin) + numbers[-1] for i in range(1, length))
-            if pin >= 0:
-                numbers = numbers[::-1]
-        numbers = np.abs(np.array(numbers) - max(numbers))
-        normal_numbers = (
-            (numbers - numbers[numbers.argmin()])
-            / (numbers[numbers.argmax()] - numbers[numbers.argmin()])
-        ) * (x[1] - x[0]) + x[0]
-        normal_numbers[0] = x[0]
-        normal_numbers[-1] = x[1]
-        return normal_numbers
-
-    def simulation(self, start, end, order=1, deviation=0, bias=0.5):
-        """模拟贝塞尔曲线的绘制过程
+    @classmethod
+    def get_data_urls_by_img(cls, mediatype: str, data: Union[bytes, str]) -> str:
+        """根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
+        Data URLs 格式示例:
+            data:image/png;base64,iVB...
+            data:text/html,%3Ch1%3EHello%2C%20World%21%3C%2Fh1%3E
+        关于 Data URLs 更多的描述，其参考文档: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
 
         Args:
-            start: 开始点的坐标
-            end: 结束点的坐标
-            order: 几阶贝塞尔曲线，越大越复杂
-            deviation: 轨迹上下波动的范围
-            bias: 波动范围的分布位置
+            mediatype: MIME 类型字符串，例如 'image/jpeg' JPEG 图像文件。
+                如果省略，则默认为 text/plain;charset=US-ASCII
+            data: 用于获取其 base64 编码的二进制数据
+                参数格式可以为全路径图片，或 bytes 内容
 
         Returns:
-            1). 返回一个字典 equation 对应该曲线的方程，P 对应贝塞尔曲线的影响点
+            1). Data URLs 格式数据
         """
-        start = np.array(start)
-        end = np.array(end)
-        shake_num = []
-        if order != 1:
-            e = (1 - bias) / (order - 1)
-            shake_num = [[bias + e * i, bias + e * (i + 1)] for i in range(order - 1)]
+        assert type(data) in [
+            str,
+            bytes,
+        ], "图片转 Data URLs 的参数 data 需要是全路径 str 或 bytes 数据"
 
-        track_lst = [start]
-
-        t = random.choice([-1, 1])
-        w = 0
-        for i in shake_num:
-            px1 = start[0] + (end[0] - start[0]) * (
-                random.random() * (i[1] - i[0]) + (i[0])
-            )
-            p = np.array(
-                [px1, self._generate_control_points([start, end])(px1) + t * deviation]
-            )
-            track_lst.append(p)
-            w += 1
-            if w >= 2:
-                w = 0
-                t = -1 * t
-
-        track_lst.append(end)
-        return {
-            "equation": self._generate_control_points(track_lst),
-            "P": np.array(track_lst),
-        }
-
-    def gen_track(
-        self,
-        start: Union[np.ndarray, list],
-        end: Union[np.ndarray, list],
-        num: int,
-        order: int = 1,
-        deviation: int = 0,
-        bias=0.5,
-        type=0,
-        shake_num=0,
-        yhh=10,
-    ) -> dict:
-        """生成轨迹数组
-
-        Args:
-            start: 开始点的坐标
-            end: 结束点的坐标
-            num: 返回的数组的轨迹点的数量
-            order: 几阶贝塞尔曲线，越大越复杂
-            deviation: 轨迹上下波动的范围
-            bias: 波动范围的分布位置
-            type: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
-            shake_num: 在终点来回摆动的次数
-            yhh: 在终点来回摆动的范围
-
-        Returns:
-            1). 返回一个字典 trackArray 对应轨迹数组，P 对应贝塞尔曲线的影响点
-        """
-        s: list = []
-        fun = self.simulation(start, end, order, deviation, bias)
-        w = fun["P"]
-        fun = fun["equation"]
-        if shake_num != 0:
-            track_number = round(num * 0.2 / (shake_num + 1))
-            num -= num * (shake_num + 1)
-
-            x_track_array = self._type(type, [start[0], end[0]], num)
-            s.extend([i, fun(i)] for i in x_track_array)
-            dq = yhh / shake_num
-            kg = 0
-            ends = np.copy(end)
-            for i in range(shake_num):
-                if kg == 0:
-                    d = np.array(
-                        [
-                            end[0] + (yhh - dq * i),
-                            ((end[1] - start[1]) / (end[0] - start[0]))
-                            * (end[0] + (yhh - dq * i))
-                            + (
-                                end[1]
-                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
-                            ),
-                        ]
-                    )
-                    kg = 1
-                else:
-                    d = np.array(
-                        [
-                            end[0] - (yhh - dq * i),
-                            ((end[1] - start[1]) / (end[0] - start[0]))
-                            * (end[0] - (yhh - dq * i))
-                            + (
-                                end[1]
-                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
-                            ),
-                        ]
-                    )
-                    kg = 0
-                y = self.gen_track(
-                    ends,
-                    d,
-                    track_number,
-                    order=2,
-                    deviation=0,
-                    bias=0.5,
-                    type=0,
-                    shake_num=0,
-                    yhh=10,
-                )
-                s += list(y["trackArray"])
-                ends = d
-            y = self.gen_track(
-                ends,
-                end,
-                track_number,
-                order=2,
-                deviation=0,
-                bias=0.5,
-                type=0,
-                shake_num=0,
-                yhh=10,
-            )
-            s += list(y["trackArray"])
+        if isinstance(data, str):
+            data_bytes = Path(data).read_bytes()
+            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data_bytes)
 
         else:
-            x_track_array = self._type(type, [start[0], end[0]], num)
-            s.extend([i, fun(i)] for i in x_track_array)
-        return {"trackArray": np.array(s), "P": w}
+            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data)
+        return f"data:image/{mediatype};base64,{data_base64_encoded}"

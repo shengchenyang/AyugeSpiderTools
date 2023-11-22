@@ -7,7 +7,8 @@ from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import MysqlConf
-from ayugespidertools.common.utils import BezierTrajectory, ToolsForAyu
+from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.extras.cvnpil import BezierTrajectory
 from tests import CONSUL_CONFIG, tests_dir
 
 json_data_example = {

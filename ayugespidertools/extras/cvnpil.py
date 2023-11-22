@@ -1,0 +1,539 @@
+import itertools
+import math
+import random
+from typing import TYPE_CHECKING, Optional, Tuple, Union
+
+try:
+    import cv2
+    import numpy as np
+except ImportError:
+    # pip install ayugespidertools[all]
+    pass
+
+__all__ = ["CvnpilKit", "BezierTrajectory"]
+
+if TYPE_CHECKING:
+    from cv2.typing import MatLike
+
+
+class CvnpilKit:
+    @staticmethod
+    def get_array_dimension(array: Union[frozenset, list, set, tuple]) -> int:
+        """获取 array 的维度
+
+        Args:
+            array: 数组
+
+        Returns:
+            1). 层级数
+        """
+        # 其实直接返回 len(array) 即可
+        return len(np.array(array).shape)
+
+    @staticmethod
+    def read_image_data(
+        bg: Union[bytes, str],
+        tp: Union[bytes, str],
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """用 opencv 读取图片数据
+
+        Args:
+            bg: 背景图片信息
+            tp: 滑块图
+
+        Returns:
+            bg_cv: opencv 读取背景图片的数据
+            tp_cv: opencv 读取滑块图片的数据
+        """
+        assert type(bg) in [str, bytes], "带缺口的背景图参数需要是全路径图片或 bytes 数据"
+        assert type(tp) in [str, bytes], "滑块图参数需要是全路径图片或 bytes 数据"
+
+        if isinstance(bg, bytes):
+            bg_buf = np.frombuffer(bg, np.uint8)
+            bg_cv = cv2.imdecode(bg_buf, cv2.IMREAD_ANYCOLOR)
+        else:
+            # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
+            bg_cv = cv2.imread(bg)
+
+        if isinstance(tp, bytes):
+            tp_buf = np.frombuffer(tp, np.uint8)
+            tp_cv = cv2.imdecode(tp_buf, cv2.IMREAD_ANYCOLOR)
+        else:
+            # 0 表示采用黑白的方式读取图片
+            tp_cv = cv2.imread(tp, 0)
+        return bg_cv, tp_cv
+
+    @classmethod
+    def clear_white(cls, img):
+        """清除图片的空白区域，这里主要清除滑块的空白
+
+        Args:
+            img: 待处理的图片
+
+        Returns:
+            1). 清除图片空白区域的图片
+        """
+        rows, cols, channel = img.shape
+        min_x = 255
+        min_y = 255
+        max_x = 0
+        max_y = 0
+        for x, y in itertools.product(range(1, rows), range(1, cols)):
+            t = set(img[x, y])
+            if len(t) >= 2:
+                if x <= min_x:
+                    min_x = x
+                elif x >= max_x:
+                    max_x = x
+
+                if y <= min_y:
+                    min_y = y
+                elif y >= max_y:
+                    max_y = y
+        return img[min_x:max_x, min_y:max_y]
+
+    @classmethod
+    def image_edge_detection(cls, img):
+        """图像边缘检测处理，识别图片边缘
+
+        Args:
+            img: 需要处理的图片，用于边缘检测使用
+
+        Returns:
+            1). 处理后的图片
+        """
+        return cv2.Canny(img, 100, 200)
+
+    @classmethod
+    def template_match(
+        cls,
+        tpl: "MatLike",
+        target: "MatLike",
+        out: Optional[str] = None,
+    ) -> int:
+        """模板匹配找出滑块缺口的距离
+
+        Args:
+            tpl: 缺口图片
+            target: 背景图片
+            out: 展示图片的存储全路径，会将绘制的图片保存至此
+
+        Returns:
+            tl[0]: 滑块缺口的距离
+        """
+        th, tw = tpl.shape[:2]
+        result = cv2.matchTemplate(target, tpl, cv2.TM_CCOEFF_NORMED)
+        # 寻找矩阵(一维数组当作向量,用Mat定义) 中最小值和最大值的位置
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        tl = max_loc
+
+        # 是否展示标注后的图片
+        if out:
+            br = (tl[0] + tw, tl[1] + th)
+            # 绘制矩形边框，将匹配区域标注出来
+            # target：目标图像
+            # tl：矩形定点
+            # br：矩形的宽高
+            # (0,0,255)：矩形边框颜色
+            # 1：矩形边框大小
+            cv2.rectangle(target, tl, br, (0, 0, 255), 2)
+            cv2.imwrite(out, target)
+        return tl[0]
+
+    @classmethod
+    def discern(
+        cls, slide: Union[str, bytes], bg: Union[str, bytes], out: Optional[str] = None
+    ):
+        """识别滑块缺口方法
+
+        Args:
+            slide: 滑块图，可以是全路径图片，也可以是图片的 bytes 数据
+            bg: 带缺口的背景图，可以是全路径图片，也可以是图片的 bytes 数据
+            out: 绘制图展示的存储地址，参数格式为图片的全路径
+
+        Returns:
+            1): 滑块缺口横坐标
+        """
+        # 先用 opencv 读取图片数据
+        slide_cv, bg_cv = CvnpilKit.read_image_data(slide, bg)
+        # 清除图片的空白区域
+        img1 = cls.clear_white(slide_cv)
+        img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2GRAY)
+        # 图像边缘检测处理
+        slide = cls.image_edge_detection(img1)
+        back = cls.image_edge_detection(bg_cv)
+
+        slide_pic = cv2.cvtColor(slide, cv2.COLOR_GRAY2RGB)
+        back_pic = cv2.cvtColor(back, cv2.COLOR_GRAY2RGB)
+        # 输出横坐标, 即滑块在图片上的位置
+        return cls.template_match(slide_pic, back_pic, out)
+
+    @classmethod
+    def match_temp(cls, target, template):
+        """找出图像中最佳匹配位置
+
+        Args:
+            target: 目标（背景图）
+            template: 模板（需要找到的图）
+
+        Returns:
+            value[2:][0][0]: 返回最佳匹配及对应的坐标
+            value[2:][1][0]: 返回最差匹配及对应的坐标
+        """
+        target_rgb = cv2.imread(target)
+        target_gray = cv2.cvtColor(target_rgb, cv2.COLOR_BGR2GRAY)
+        template_rgb = cv2.imread(template, 0)
+        res = cv2.matchTemplate(target_gray, template_rgb, cv2.TM_CCOEFF_NORMED)
+        value = cv2.minMaxLoc(res)
+        return value[2:][0][0], value[2:][1][0]
+
+    @classmethod
+    def identify_gap(
+        cls, bg: Union[bytes, str], tp: Union[bytes, str], out: Optional[str] = None
+    ) -> int:
+        """通过背景图片和缺口图片识别出滑块距离
+
+        Args:
+            bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
+            tp: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
+            out: 输出图片路径，示例：doc/test.jpg；此参数如果为空，则不输出标记后的图片
+
+        Returns:
+            tl[0]: 滑块缺口距离
+        """
+        # 先读使用 opencv 读取图片数据
+        bg_cv, tp_cv = CvnpilKit.read_image_data(bg, tp)
+        # 识别图片边缘
+        bg_edge = cv2.Canny(bg_cv, 100, 200)
+        tp_edge = cv2.Canny(tp_cv, 100, 200)
+        # 转换图片格式
+        bg_pic = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)
+        tp_pic = cv2.cvtColor(tp_edge, cv2.COLOR_GRAY2RGB)
+        # 缺口匹配
+        res = cv2.matchTemplate(bg_pic, tp_pic, cv2.TM_CCOEFF_NORMED)
+        # 寻找最优匹配
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        # 左上角点的坐标
+        tl = max_loc
+
+        # 是否要输出绘制图像
+        if out:
+            # 绘制方框
+            th, tw = tp_pic.shape[:2]
+            # 右下角点的坐标
+            br = (tl[0] + tw, tl[1] + th)
+            # 绘制矩形
+            cv2.rectangle(bg_cv, tl, br, (0, 0, 255), 2)
+            # 保存在本地
+            cv2.imwrite(out, bg_cv)
+        # 返回缺口的X坐标
+        return tl[0]
+
+    @staticmethod
+    def match_img_get_distance(target, template):
+        """滑块坐标定位方法
+
+        Args:
+            target: 1) 带缺口的背景图，全路径; 2) 或者是背景图的 bytes 数据
+            template: 1） 滑块图，全路径; 2）或者是滑块图的 bytes 数据
+
+        Returns:
+            loc[1][0]: 滑块位置坐标
+        """
+        # 先判断传入的参数是 str 图片的全路径信息还是 bytes 类型的图片信息
+        if any([not isinstance(target, str), isinstance(target, bytes)]):
+            target_buf = np.frombuffer(target, np.uint8)
+            template_buf = np.frombuffer(template, np.uint8)
+
+            target_cv = cv2.imdecode(target_buf, cv2.IMREAD_ANYCOLOR)
+            template_cv = cv2.imdecode(template_buf, cv2.IMREAD_ANYCOLOR)
+
+        else:
+            # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
+            target_cv = cv2.imread(target)
+            # 0 表示采用黑白的方式读取图片
+            template_cv = cv2.imread(template, 0)
+
+            # cv2.cvtColor(p1,p2) 是颜色空间转换函数，p1是需要转换的图片，p2是转换成何种格式。
+            # cv2.COLOR_BGR2GRAY 将BGR格式转换成灰度图片，发现转换后并不是通常意义上的黑白图片。
+            # 灰度图片并不是指常规意义上的黑白图片，只用看是不是无符号八位整型（unit8）,单通道即可判断。
+            target_cv = cv2.cvtColor(target_cv, cv2.COLOR_BGR2GRAY)
+
+        run = 1
+        # 这里的返回值根据不同版本的 open-cv 其返回结果会有不同的个数
+        # w, h, z = template_cv.shape[::-1]
+        # 在背景图里面查找滑块图的位置
+        res = cv2.matchTemplate(target_cv, template_cv, cv2.TM_CCOEFF_NORMED)
+        # 使用二分法查找阈值的精确值
+        L = 0
+        R = 1
+        loc = None
+        while run < 20:
+            run += 1
+            threshold = (R + L) / 2
+            if threshold < 0:
+                # 逻辑走到这里，则说明出错了，并未找出目标位置
+                return None
+
+            # 匹配程度大于百分之 threshold 的坐标 x, y
+            loc = np.where(res >= threshold)
+            if len(loc[1]) > 1:
+                L += (R - L) / 2
+            elif len(loc[1]) == 1:
+                # 找到目标区域起点x坐标为：loc[1][0]
+                break
+            elif len(loc[1]) < 1:
+                R -= (R - L) / 2
+        # 返回 x 坐标
+        return loc[1][0]
+
+    @staticmethod
+    def get_normal_track(space):
+        """通用的根据滑块距离获取轨迹数组方法
+
+        Args:
+            space: 滑块缺口距离
+
+        Returns:
+            tracks_list: 生成的轨迹数组
+        """
+        x = [0, 0]
+        y = [0, 0, 0]
+        z = [0]
+        # x
+        count = np.linspace(-math.pi / 2, math.pi / 2, random.randrange(20, 30))
+        func = list(map(math.sin, count))
+        nx = [i + 1 for i in func]
+        add = random.randrange(10, 15)
+        sadd = space + add
+        x.extend(list(map(lambda x: x * (sadd / 2), nx)))
+        # x.extend(np.linspace(sadd, space, 4 if add > 12 else 3))
+        x.extend(np.linspace(sadd, space, 3 if add > 12 else 2))
+        x = [math.floor(i) for i in x]
+        # y
+        for i in range(len(x) - 2):
+            if y[-1] < 30:
+                y.append(y[-1] + random.choice([0, 0, 1, 1, 2, 2, 1, 2, 0, 0, 3, 3]))
+            else:
+                y.append(
+                    y[-1] + random.choice([0, 0, -1, -1, -2, -2, -1, -2, 0, 0, -3, -3])
+                )
+        # z
+        for i in range(len(x) - 1):
+            # z.append((z[-1] // 100 * 100) + 100 + random.choice([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2]))
+            z.append(
+                (z[-1] // 100 * 100)
+                + 100
+                + random.choice([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3])
+            )
+
+        tracks_list = list(map(list, zip(x, y, z)))
+        tracks_list = [x for x in tracks_list if x[0] > 0]
+        return tracks_list
+
+
+class BezierTrajectory:
+    """贝塞尔曲线轨迹生成器
+
+    Examples:
+        >>> bt = BezierTrajectory()
+        >>> gen_data = bt.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
+        >>> track = gen_data["trackArray"]
+    """
+
+    def _generate_control_points(self, track: list):
+        """计算贝塞尔曲线的控制点"""
+        track_len = len(track)
+
+        def calculate_bezier_point(x):
+            t = (x - track[0][0]) / (track[-1][0] - track[0][0])
+            y = np.array([0, 0], dtype=np.float64)
+            for s in range(len(track)):
+                y += track[s] * (
+                    (
+                        math.factorial(track_len - 1)
+                        / (math.factorial(s) * math.factorial(track_len - 1 - s))
+                    )
+                    * math.pow(t, s)
+                    * math.pow((1 - t), track_len - 1 - s)
+                )
+            return y[1]
+
+        return calculate_bezier_point
+
+    def _type(self, type, x, length):
+        numbers = []
+        pin = (x[1] - x[0]) / length
+        if type == 0:
+            numbers.extend(i * pin for i in range(length))
+            if pin >= 0:
+                numbers = numbers[::-1]
+        elif type == 1:
+            for i in range(length):
+                numbers.append(1 * ((i * pin) ** 2))
+            numbers = numbers[::-1]
+        elif type == 2:
+            for i in range(length):
+                numbers.append(1 * ((i * pin - x[1]) ** 2))
+
+        elif type == 3:
+            track = [
+                np.array([0, 0]),
+                np.array([(x[1] - x[0]) * 0.8, (x[1] - x[0]) * 0.6]),
+                np.array([x[1] - x[0], 0]),
+            ]
+            fun = self._generate_control_points(track)
+            numbers = [0]
+            numbers.extend(fun(i * pin) + numbers[-1] for i in range(1, length))
+            if pin >= 0:
+                numbers = numbers[::-1]
+        numbers = np.abs(np.array(numbers) - max(numbers))
+        normal_numbers = (
+            (numbers - numbers[numbers.argmin()])
+            / (numbers[numbers.argmax()] - numbers[numbers.argmin()])
+        ) * (x[1] - x[0]) + x[0]
+        normal_numbers[0] = x[0]
+        normal_numbers[-1] = x[1]
+        return normal_numbers
+
+    def simulation(self, start, end, order=1, deviation=0, bias=0.5):
+        """模拟贝塞尔曲线的绘制过程
+
+        Args:
+            start: 开始点的坐标
+            end: 结束点的坐标
+            order: 几阶贝塞尔曲线，越大越复杂
+            deviation: 轨迹上下波动的范围
+            bias: 波动范围的分布位置
+
+        Returns:
+            1). 返回一个字典 equation 对应该曲线的方程，P 对应贝塞尔曲线的影响点
+        """
+        start = np.array(start)
+        end = np.array(end)
+        shake_num = []
+        if order != 1:
+            e = (1 - bias) / (order - 1)
+            shake_num = [[bias + e * i, bias + e * (i + 1)] for i in range(order - 1)]
+
+        track_lst = [start]
+
+        t = random.choice([-1, 1])
+        w = 0
+        for i in shake_num:
+            px1 = start[0] + (end[0] - start[0]) * (
+                random.random() * (i[1] - i[0]) + (i[0])
+            )
+            p = np.array(
+                [px1, self._generate_control_points([start, end])(px1) + t * deviation]
+            )
+            track_lst.append(p)
+            w += 1
+            if w >= 2:
+                w = 0
+                t = -1 * t
+
+        track_lst.append(end)
+        return {
+            "equation": self._generate_control_points(track_lst),
+            "P": np.array(track_lst),
+        }
+
+    def gen_track(
+        self,
+        start: Union[np.ndarray, list],
+        end: Union[np.ndarray, list],
+        num: int,
+        order: int = 1,
+        deviation: int = 0,
+        bias=0.5,
+        type=0,
+        shake_num=0,
+        yhh=10,
+    ) -> dict:
+        """生成轨迹数组
+
+        Args:
+            start: 开始点的坐标
+            end: 结束点的坐标
+            num: 返回的数组的轨迹点的数量
+            order: 几阶贝塞尔曲线，越大越复杂
+            deviation: 轨迹上下波动的范围
+            bias: 波动范围的分布位置
+            type: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
+            shake_num: 在终点来回摆动的次数
+            yhh: 在终点来回摆动的范围
+
+        Returns:
+            1). 返回一个字典 trackArray 对应轨迹数组，P 对应贝塞尔曲线的影响点
+        """
+        s: list = []
+        fun = self.simulation(start, end, order, deviation, bias)
+        w = fun["P"]
+        fun = fun["equation"]
+        if shake_num != 0:
+            track_number = round(num * 0.2 / (shake_num + 1))
+            num -= num * (shake_num + 1)
+
+            x_track_array = self._type(type, [start[0], end[0]], num)
+            s.extend([i, fun(i)] for i in x_track_array)
+            dq = yhh / shake_num
+            kg = 0
+            ends = np.copy(end)
+            for i in range(shake_num):
+                if kg == 0:
+                    d = np.array(
+                        [
+                            end[0] + (yhh - dq * i),
+                            ((end[1] - start[1]) / (end[0] - start[0]))
+                            * (end[0] + (yhh - dq * i))
+                            + (
+                                end[1]
+                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
+                            ),
+                        ]
+                    )
+                    kg = 1
+                else:
+                    d = np.array(
+                        [
+                            end[0] - (yhh - dq * i),
+                            ((end[1] - start[1]) / (end[0] - start[0]))
+                            * (end[0] - (yhh - dq * i))
+                            + (
+                                end[1]
+                                - ((end[1] - start[1]) / (end[0] - start[0])) * end[0]
+                            ),
+                        ]
+                    )
+                    kg = 0
+                y = self.gen_track(
+                    ends,
+                    d,
+                    track_number,
+                    order=2,
+                    deviation=0,
+                    bias=0.5,
+                    type=0,
+                    shake_num=0,
+                    yhh=10,
+                )
+                s += list(y["trackArray"])
+                ends = d
+            y = self.gen_track(
+                ends,
+                end,
+                track_number,
+                order=2,
+                deviation=0,
+                bias=0.5,
+                type=0,
+                shake_num=0,
+                yhh=10,
+            )
+            s += list(y["trackArray"])
+
+        else:
+            x_track_array = self._type(type, [start[0], end[0]], num)
+            s.extend([i, fun(i)] for i in x_track_array)
+        return {"trackArray": np.array(s), "P": w}

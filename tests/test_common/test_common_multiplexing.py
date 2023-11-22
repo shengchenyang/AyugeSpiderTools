@@ -105,22 +105,6 @@ def test_get_req_dict_from_scrapy():
     assert res == {"post_key1": "post_value1", "post_key2": "post_value2"}
 
 
-def test_get_array_dimension():
-    # 二维数组
-    a = [[1, 2], [3, 4]]
-    # 一维数组
-    b = [1, 2, 3]
-    # 三维数组
-    c = [[[1], [2]], [[3], [4]]]
-    len1 = ReuseOperation.get_array_dimension(array=a)
-    len2 = ReuseOperation.get_array_dimension(array=b)
-    len3 = ReuseOperation.get_array_dimension(array=c)
-    print("res len1:", len1)
-    print("res len2:", len2)
-    print("res len3:", len3)
-    assert all([len1 == 2, len2 == 1, len3 == 3])
-
-
 def test_get_array_depth():
     array = ["a", "b"]
     array_two = ["a", [1, [2, [3, 4]]], ["b", "c"]]
