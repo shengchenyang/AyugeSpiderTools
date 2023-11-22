@@ -1,12 +1,17 @@
 import warnings
 from typing import TYPE_CHECKING, Tuple, Union
 
-import oss2
 import requests
 from retrying import retry
 
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.params import Param
+
+try:
+    import oss2
+except ImportError:
+    # pip install ayugespidertools[all]
+    pass
 
 warnings.filterwarnings("ignore")
 

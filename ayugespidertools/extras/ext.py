@@ -1,4 +1,15 @@
 import base64
+import xml.etree.ElementTree as ET
+
+try:
+    import hcl2
+    import mmh3
+    import yaml
+    from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
+    from Crypto.PublicKey import RSA
+except ImportError:
+    # pip install ayugespidertools[all]
+    pass
 
 __all__ = ["EncryptMixin", "AppConfManageMixin"]
 
@@ -14,8 +25,6 @@ class EncryptMixin:
         Returns:
             1). mmh3 hash128 后的结果
         """
-        import mmh3
-
         o = mmh3.hash128(encode_data)
         hash128_encoded = hex(((o & 0xFFFFFFFFFFFFFFFF) << 64) + (o >> 64))
         return hash128_encoded[2:]
@@ -31,9 +40,6 @@ class EncryptMixin:
         Returns:
             1). rsa encrypted result
         """
-        from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcsl_v1_5
-        from Crypto.PublicKey import RSA
-
         public_key = """-----BEGIN PUBLIC KEY-----
             {key}
             -----END PUBLIC KEY-----""".format(
@@ -48,20 +54,14 @@ class EncryptMixin:
 class AppConfManageMixin:
     @staticmethod
     def hcl_parser(data: str) -> dict:
-        import hcl2
-
         return hcl2.loads(data)
 
     @staticmethod
     def yaml_parser(data: str) -> dict:
-        import yaml
-
         return yaml.safe_load(data)
 
     @staticmethod
     def xml_parser(data: str) -> dict:
-        import xml.etree.ElementTree as ET
-
         root = ET.fromstring(data)
         conf_data = {}
         for child in root:
