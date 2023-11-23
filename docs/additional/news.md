@@ -1,5 +1,53 @@
 # Release notes
 
+## AyugeSpiderTools 3.7.0 (2023-11-23)
+
+### Deprecations
+
+- 获取 `nacos` 和 `consul` 中的配置时不再转小写，请按照 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/intro/examples.html) 示例填写。
+- 删除 `html2text` 相关依赖及代码，此场景更适合自行实现。
+- 安装不再包含非核心依赖，可通过 `pip install ayugespidertools[all]` 安装全部依赖。
+- 一些 `api`变动：
+
+  | 更改前                                   | 更改后                                     | 受影响的部分                                                 | 备注                     |
+  | ---------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ | ------------------------ |
+  | extract_html_to_md                       | 删除                                       | ayugespidertools.formatdata                                  |                          |
+  | AliOssBase                               | 转移到 ayugespider.extras 中               | ayugespidertools.oss                                         |                          |
+  | yidungap, imgoperation, verificationcode | 转移到 ayugespider.extras 中，并整理在一起 | ayugespidertools.imgoperation<br>ayugespidertools.verificationcode<br>ayugespidertools.common.yidungap | 在 extras 部分查看变化。 |
+
+- 以下是对 `extras` 相关模块所影响较大部分的介绍：
+
+  | 更改前                 | 更改后                         | 受影响的部分                      | 备注 |
+  | ---------------------- | ------------------------------ | --------------------------------- | ---- |
+  | YiDunGetGap.discern    | CvnpilKit.discern_gap          | ayugespidertools.common.yidungap  |      |
+  | Picture.identify_gap   | CvnpilKit.identify_gap         | ayugespidertools.imgoperation     |      |
+  | match_img_get_distance | CvnpilKit.match_gap            | ayugespidertools.verificationcode |      |
+  | get_normal_track       | CvnpilKit.get_normal_track     | ayugespidertools.verificationcode |      |
+  | get_selenium_tracks    | ToolsForAyu.get_selenium_track | ayugespidertools.verificationcode |      |
+
+注意：
+
+- **此变更包含不兼容部分，如果你只使用其中 `scrapy` 扩展库部分，那么除了 `nacos`，`consul` 的 `yaml` 和 `hcl` 解析外对你无影响。**
+- **再次提醒，使用时请做好依赖管理，以免不兼容部分对你的影响！**
+
+### New features
+
+- `mongo` 场景添加 `authMechanisem` 配置选项，为可选配置，默认为 `SCRAM-SHA-1`。
+- 将 `numpy`, `oss`, `pillow` 等非核心依赖改为可选项，可通过 `pip install ayugespidertools[all]` 安装所有依赖。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 优化 `aiohttp`, `cvnpil` 等测试用例，将图像相关功能整理并放入 `cvnpil` 模块中。
+- `ayuge version` 修改为从 `__version__` 获取信息的方式。
+- 更新模板，`mysql_engine` 的示例改为通过 `sqlalchemy` 的方式，减少依赖数且大部分场景运行效率更好。
+- 将可选装依赖的相关的功能代码统一放入 `extras` 中，更易管理。
+
+<hr>
+
 ## AyugeSpiderTools 3.6.1 (2023-11-06)
 
 ### New features

@@ -20,10 +20,9 @@ author = "shengchenyang"
 #
 # The short X.Y version.
 try:
-    from ayugespidertools.commands.version import AyuCommand
+    import ayugespidertools
 
-    # TODO: Update the version acquisition method before release, and then submit the code to github.
-    release = AyuCommand()._version()
+    release = ayugespidertools.__version__
     version = ".".join(tuple(release.split(".")[:2]))
 except (ImportError, AttributeError):
     release = ""
