@@ -239,8 +239,8 @@ def test_bezier_track():
     )
 
 
-def test_gen_selenium_tracks():
-    tracks = ToolsForAyu.gen_selenium_tracks(distance=120)
+def test_gen_selenium_track():
+    tracks = ToolsForAyu.gen_selenium_track(distance=120)
     print("生成的轨迹为：", tracks)
     assert tracks
 

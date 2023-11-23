@@ -305,7 +305,7 @@ class ToolsForAyu(AppConfManageMixin):
         return f"data:image/{mediatype};base64,{data_base64_encoded}"
 
     @staticmethod
-    def gen_selenium_tracks(distance):
+    def gen_selenium_track(distance):
         """最简陋的根据缺口距离获取轨迹的方法，以供 selenium 使用
 
         Args:
