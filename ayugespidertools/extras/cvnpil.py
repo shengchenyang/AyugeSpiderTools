@@ -97,119 +97,22 @@ class CvnpilKit:
     @classmethod
     def _template_match(
         cls,
-        tpl: "MatLike",
-        target: "MatLike",
+        bg: "MatLike",
+        slider: "MatLike",
         out: Optional[str] = None,
     ) -> int:
         """模板匹配找出滑块缺口的距离
 
         Args:
-            tpl: 缺口图片
-            target: 背景图片
+            bg: 背景图片
+            slider: 缺口(滑块)图片
             out: 展示图片的存储全路径，会将绘制的图片保存至此
 
         Returns:
             tl[0]: 滑块缺口的距离
         """
-        th, tw = tpl.shape[:2]
-        result = cv2.matchTemplate(target, tpl, cv2.TM_CCOEFF_NORMED)
-        # 寻找矩阵(一维数组当作向量,用Mat定义) 中最小值和最大值的位置
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        tl = max_loc
-
-        # 是否展示标注后的图片
-        if out:
-            br = (tl[0] + tw, tl[1] + th)
-            # 绘制矩形边框，将匹配区域标注出来
-            # target：目标图像
-            # tl：矩形定点
-            # br：矩形的宽高
-            # (0,0,255)：矩形边框颜色
-            # 1：矩形边框大小
-            cv2.rectangle(target, tl, br, (0, 0, 255), 2)
-            cv2.imwrite(out, target)
-        return tl[0]
-
-    @classmethod
-    def discern(
-        cls,
-        slide: Union[str, bytes],
-        bg: Union[str, bytes],
-        out: Optional[str] = None,
-    ):
-        """识别滑块缺口方法
-
-        Args:
-            slide: 滑块图，可以是全路径图片，也可以是图片的 bytes 数据
-            bg: 带缺口的背景图，可以是全路径图片，也可以是图片的 bytes 数据
-            out: 绘制图展示的存储地址，参数格式为图片的全路径
-
-        Returns:
-            1): 滑块缺口横坐标
-        """
-        # 先用 opencv 读取图片数据
-        slide_cv = CvnpilKit.read_image_data(slide)
-        bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
-        # 清除图片的空白区域
-        img1 = cls.clear_white(slide_cv)
-        img1 = cv2.cvtColor(img1, cv2.COLOR_RGB2GRAY)
-        # 图像边缘检测处理
-        slide = cls.image_edge_detection(img1)
-        back = cls.image_edge_detection(bg_cv)
-
-        slide_pic = cv2.cvtColor(slide, cv2.COLOR_GRAY2RGB)
-        back_pic = cv2.cvtColor(back, cv2.COLOR_GRAY2RGB)
-        # 输出横坐标, 即滑块在图片上的位置
-        return cls._template_match(slide_pic, back_pic, out)
-
-    @classmethod
-    def match_temp(cls, target, template):
-        """找出图像中最佳匹配位置
-
-        Args:
-            target: 目标（背景图）
-            template: 模板（需要找到的图）
-
-        Returns:
-            value[2:][0][0]: 返回最佳匹配及对应的坐标
-            value[2:][1][0]: 返回最差匹配及对应的坐标
-        """
-        target_rgb = cv2.imread(target)
-        target_gray = cv2.cvtColor(target_rgb, cv2.COLOR_BGR2GRAY)
-        template_rgb = cv2.imread(template, 0)
-        res = cv2.matchTemplate(target_gray, template_rgb, cv2.TM_CCOEFF_NORMED)
-        value = cv2.minMaxLoc(res)
-        return value[2:][0][0], value[2:][1][0]
-
-    @classmethod
-    def identify_gap(
-        cls,
-        bg: Union[bytes, str],
-        tp: Union[bytes, str],
-        out: Optional[str] = None,
-    ) -> int:
-        """通过背景图片和缺口图片识别出滑块距离
-
-        Args:
-            bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
-            tp: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
-            out: 输出图片路径，示例：doc/test.jpg；此参数如果为空，则不输出标记后的图片
-
-        Returns:
-            tl[0]: 滑块缺口距离
-        """
-        # 先读使用 opencv 读取图片数据
-        bg_cv = cls.read_image_data(bg)
-        tp_cv = cls.read_image_data(tp, cv2.IMREAD_GRAYSCALE)
-        # 识别图片边缘
-        bg_edge = cv2.Canny(bg_cv, 100, 200)
-        tp_edge = cv2.Canny(tp_cv, 100, 200)
-        # 转换图片格式
-        bg_pic = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)
-        tp_pic = cv2.cvtColor(tp_edge, cv2.COLOR_GRAY2RGB)
-        # 缺口匹配
-        res = cv2.matchTemplate(bg_pic, tp_pic, cv2.TM_CCOEFF_NORMED)
-        # 寻找最优匹配
+        res = cv2.matchTemplate(bg, slider, cv2.TM_CCOEFF_NORMED)
+        # 寻找最优匹配(一维数组当作向量,用 Mat 定义) 中最小值和最大值的位置
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         # 左上角点的坐标
         tl = max_loc
@@ -217,35 +120,89 @@ class CvnpilKit:
         # 是否要输出绘制图像
         if out:
             # 绘制方框
-            th, tw = tp_pic.shape[:2]
+            th, tw = slider.shape[:2]
             # 右下角点的坐标
             br = (tl[0] + tw, tl[1] + th)
-            # 绘制矩形
-            cv2.rectangle(bg_cv, tl, br, (0, 0, 255), 2)
-            # 保存在本地
-            cv2.imwrite(out, bg_cv)
+            cv2.rectangle(bg, tl, br, (0, 0, 255), 2)
+            cv2.imwrite(out, bg)
         # 返回缺口的X坐标
         return tl[0]
 
+    @classmethod
+    def discern_gap(
+        cls,
+        bg: Union[str, bytes],
+        slider: Union[str, bytes],
+        out: Optional[str] = None,
+    ):
+        """识别滑块缺口方法
+
+        Args:
+            bg: 带缺口的背景图，可以是全路径图片，也可以是图片的 bytes 数据
+            slider: 滑块图，可以是全路径图片，也可以是图片的 bytes 数据
+            out: 绘制图展示的存储地址，参数格式为图片的全路径
+
+        Returns:
+            1): 滑块缺口横坐标
+        """
+        slider_cv = CvnpilKit.read_image_data(slider)
+        bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
+        slider_clr = cls.clear_white(slider_cv)
+        slider_clr = cv2.cvtColor(slider_clr, cv2.COLOR_RGB2GRAY)
+        slider_img = cls.image_edge_detection(slider_clr)
+        bg_img = cls.image_edge_detection(bg_cv)
+        slider_img = cv2.cvtColor(slider_img, cv2.COLOR_GRAY2RGB)
+        bg_img = cv2.cvtColor(bg_img, cv2.COLOR_GRAY2RGB)
+        # 输出横坐标, 即滑块在图片上的位置
+        return cls._template_match(bg_img, slider_img, out)
+
+    @classmethod
+    def identify_gap(
+        cls,
+        bg: Union[bytes, str],
+        slider: Union[bytes, str],
+        out: Optional[str] = None,
+    ) -> int:
+        """通过背景图片和缺口图片识别出滑块距离
+
+        Args:
+            bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
+            slider: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
+            out: 输出图片路径，示例：doc/test.jpg；此参数如果为空，则不输出标记后的图片
+
+        Returns:
+            tl[0]: 滑块缺口距离
+        """
+        # 先读使用 opencv 读取图片数据
+        bg_cv = cls.read_image_data(bg)
+        slider_cv = cls.read_image_data(slider, cv2.IMREAD_GRAYSCALE)
+        # 识别图片边缘
+        bg_edge = cv2.Canny(bg_cv, 100, 200)
+        slider_edge = cv2.Canny(slider_cv, 100, 200)
+        # 转换图片格式
+        bg_img = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)
+        slider_img = cv2.cvtColor(slider_edge, cv2.COLOR_GRAY2RGB)
+        return cls._template_match(bg_img, slider_img, out)
+
     @staticmethod
-    def match_img_get_distance(target, template):
+    def match_gap(bg: Union[str, bytes], slider: Union[str, bytes]):
         """滑块坐标定位方法
 
         Args:
-            target: 1) 带缺口的背景图，全路径; 2) 或者是背景图的 bytes 数据
-            template: 1） 滑块图，全路径; 2）或者是滑块图的 bytes 数据
+            bg: 1) 带缺口的背景图，全路径; 2) 或者是背景图的 bytes 数据
+            slider: 1） 滑块图，全路径; 2）或者是滑块图的 bytes 数据
 
         Returns:
             loc[1][0]: 滑块位置坐标
         """
-        target_cv = CvnpilKit.read_image_data(target, cv2.IMREAD_GRAYSCALE)
-        template_cv = CvnpilKit.read_image_data(template, cv2.IMREAD_GRAYSCALE)
+        bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
+        slider_cv = CvnpilKit.read_image_data(slider, cv2.IMREAD_GRAYSCALE)
 
         run = 1
         # 这里的返回值根据不同版本的 open-cv 其返回结果会有不同的个数
-        # w, h, z = template_cv.shape[::-1]
+        # w, h, z = slider_cv.shape[::-1]
         # 在背景图里面查找滑块图的位置
-        res = cv2.matchTemplate(target_cv, template_cv, cv2.TM_CCOEFF_NORMED)
+        res = cv2.matchTemplate(bg_cv, slider_cv, cv2.TM_CCOEFF_NORMED)
         # 使用二分法查找阈值的精确值
         lft = 0
         rgt = 1
