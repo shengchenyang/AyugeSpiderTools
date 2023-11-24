@@ -114,7 +114,7 @@ class AyuSpider(Spider):
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
         # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
         if mysql_conf := get_spider_conf(
-            MysqlConfCreator().create_product(crawler.settings, remote_option)
+            MysqlConfCreator(), crawler.settings, remote_option
         ):
             spider.mysql_conf = mysql_conf
             if crawler.settings.get("MYSQL_ENGINE_ENABLED", False):
@@ -127,27 +127,27 @@ class AyuSpider(Spider):
                 spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
 
         if mongodb_conf := get_spider_conf(
-            MongoDBConfCreator().create_product(crawler.settings, remote_option)
+            MongoDBConfCreator(), crawler.settings, remote_option
         ):
             spider.mongodb_conf = mongodb_conf
 
         if rabbitmq_conf := get_spider_conf(
-            MQConfCreator().create_product(crawler.settings, remote_option)
+            MQConfCreator(), crawler.settings, remote_option
         ):
             spider.rabbitmq_conf = rabbitmq_conf
 
         if kafka_conf := get_spider_conf(
-            KafkaConfCreator().create_product(crawler.settings, remote_option)
+            KafkaConfCreator(), crawler.settings, remote_option
         ):
             spider.kafka_conf = kafka_conf
 
         if dynamicproxy_conf := get_spider_conf(
-            DynamicProxyCreator().create_product(crawler.settings, remote_option)
+            DynamicProxyCreator(), crawler.settings, remote_option
         ):
             spider.dynamicproxy_conf = dynamicproxy_conf
 
         if exclusiveproxy_conf := get_spider_conf(
-            ExclusiveProxyCreator().create_product(crawler.settings, remote_option)
+            ExclusiveProxyCreator(), crawler.settings, remote_option
         ):
             spider.exclusiveproxy_conf = exclusiveproxy_conf
         return spider

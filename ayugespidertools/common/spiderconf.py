@@ -44,7 +44,7 @@ class Product(ABC):
 
 class Creator(ABC):
     @abstractmethod
-    def create_product(self, *args, **kwargs) -> Product:
+    def create_product(self, settings: "Settings", remote_option: dict) -> Product:
         pass
 
 
@@ -177,6 +177,7 @@ class ExclusiveProxyCreator(Creator):
 
 
 def get_spider_conf(
-    product: Product,
+    creator: Creator, settings: "Settings", remote_option: dict
 ) -> Optional[SpiderConf]:
+    product = creator.create_product(settings, remote_option)
     return product.get_conn_conf()
