@@ -33,10 +33,16 @@
 
 ## 安装
 
-> `python 3.8.1+` 可以直接输入以下命令：
+> `python 3.8+` 可以直接输入以下命令：
 
 ```shell
 pip install ayugespidertools -i https://pypi.org/simple
+```
+
+> 可选：通过以下命令安装所有依赖：
+
+```shell
+pip install ayugespidertools[all]
 ```
 
 ## 用法
@@ -160,8 +166,7 @@ scrapy crawl <spider_name>
         - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
     - [x] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
 - [x] 常用开发场景
-    - [x] `sql` 语句拼接，只是简单场景，后续优化。已给出优化方向，参考库等信息。
-    - [x] `mongoDB` 语句拼接
+    - [x] `sql` 语句拼接，只用于简单场景。已给出优化方向，参考库等信息。
     - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
     - [x] 字体反爬还原方法
         - [x] 基于 `ttf`，`woff` 之类的字体文件映射，或结合 `css` 等实现
@@ -173,7 +178,7 @@ scrapy crawl <spider_name>
     - [x] 添加常用的图片验证码中的处理方法
         - [x] 滑块缺口距离的识别方法（多种实现方式）
         - [x] 根据滑块距离生成轨迹数组的方法
-        - [x] 识别点选验证码位置及点击顺序，识别结果不太好，待优化
+        - [x] 识别点选验证码位置及点击顺序
         - [x] 图片乱序混淆的还原方法示例
 
 注意：功能演示我将放入 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中，以防此部分内容过多。

@@ -14,7 +14,15 @@
 pip install ayugespidertools
 ```
 
-我们强烈建议您将 `ayugespidertools` 安装在专用的 `virtualenv` 中，以避免与您的系统包发生冲突。
+> 可选：通过以下命令安装所有依赖：
+
+```shell
+pip install ayugespidertools[all]
+```
+
+若你只需要 `scrapy` 扩展库的功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 `extras` 部分）若要使用，请使用完整安装。
+
+强烈建议您将 `ayugespidertools` 安装在专用的 `virtualenv` 中，以避免与您的系统包发生冲突。
 
 ### 值得知道的事情
 

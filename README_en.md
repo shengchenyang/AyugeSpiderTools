@@ -43,6 +43,12 @@ as field encoding, Data too long, and non-existent storage fields.
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
+> Optional: Install all dependencies with the following command:
+
+```shell
+pip install ayugespidertools[all]
+```
+
 ## Usage
 
 > Developers only need to generate a sample template according to the command, and then configure the relevant settings.
@@ -178,9 +184,8 @@ functionality of Scrapy.**
         - [x] Example of using asyncio and aioMysql in a pipeline script.
     - [x] Integration of data push functions for Kafka, RabbitMQ, etc.
 - [x] Common development scenarios:
-    - [x] Concatenation of sql statements, only for simple scenarios, with further optimization to be done. Improvement
+    - [x] Concatenation of sql statements, only for simple scenarios. Improvement
       directions and reference libraries have been provided.
-    - [x] Concatenation of MongoDB statements.
     - [x] Formatting data processing, such as removing web page tags, removing unnecessary spaces, etc.
     - [x] Methods for restoring font-encrypted text to its original form to bypass anti-spider measures:
         - [x] Based on mapping of font files such as ttf and woff, or combined with css, etc.
@@ -195,8 +200,7 @@ functionality of Scrapy.**
         - [x] Methods for recognizing the distance of the missing part of a slider captcha (with multiple implementation
           options).
         - [x] Methods for generating a trajectory array based on the distance of a slider.
-        - [x] Identification of the position and click order of click-based CAPTCHAs, with suboptimal results that
-          require further optimization.
+        - [x] Identification of the position and click order of click-based CAPTCHAs.
         - [x] Example methods for restoring images that have been randomly disordered and mixed up.
 
 Notice: I will include the function demo in the [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/)
