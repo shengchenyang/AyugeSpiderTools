@@ -1,10 +1,8 @@
-import threading
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Union
 
 from scrapy.spiders import Spider
-from sqlalchemy import create_engine
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.spiderconf import (
@@ -16,6 +14,7 @@ from ayugespidertools.common.spiderconf import (
     MysqlConfCreator,
     get_spider_conf,
 )
+from ayugespidertools.common.typevars import DatabaseEngineClass
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -30,25 +29,6 @@ if TYPE_CHECKING:
     from scrapy.http import Response
     from scrapy.settings import BaseSettings
     from typing_extensions import Self
-
-
-class MySqlEngineClass:
-    """mysql 链接句柄单例模式"""
-
-    _instance_lock = threading.Lock()
-
-    def __init__(self, engine_url):
-        self.engine = create_engine(
-            engine_url, pool_pre_ping=True, pool_recycle=3600 * 7
-        )
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(MySqlEngineClass, "_instance"):
-            with cls._instance_lock:
-                if not hasattr(MySqlEngineClass, "_instance"):
-                    MySqlEngineClass._instance = object.__new__(cls)
-
-        return MySqlEngineClass._instance
 
 
 class AyuSpider(Spider):
@@ -124,7 +104,7 @@ class AyuSpider(Spider):
                     f":{mysql_conf.port}/{mysql_conf.database}"
                     f"?charset={mysql_conf.charset}"
                 )
-                spider.mysql_engine = MySqlEngineClass(engine_url=mysql_url).engine
+                spider.mysql_engine = DatabaseEngineClass(engine_url=mysql_url).engine
 
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
