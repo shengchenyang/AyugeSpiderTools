@@ -12,6 +12,7 @@ from ayugespidertools.common.spiderconf import (
     MongoDBConfCreator,
     MQConfCreator,
     MysqlConfCreator,
+    PostgreSQLConfCreator,
     get_spider_conf,
 )
 from ayugespidertools.common.typevars import DatabaseEngineClass
@@ -110,6 +111,11 @@ class AyuSpider(Spider):
             MongoDBConfCreator(), crawler.settings, remote_option
         ):
             spider.mongodb_conf = mongodb_conf
+
+        if postgres_conf := get_spider_conf(
+            PostgreSQLConfCreator(), crawler.settings, remote_option
+        ):
+            spider.postgres_conf = postgres_conf
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option

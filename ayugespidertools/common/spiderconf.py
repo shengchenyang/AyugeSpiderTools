@@ -8,6 +8,7 @@ from ayugespidertools.common.typevars import (
     MongoDBConf,
     MQConf,
     MysqlConf,
+    PostgreSQLConf,
 )
 from ayugespidertools.common.utils import ToolsForAyu
 
@@ -16,6 +17,7 @@ __all__ = [
     "MysqlConfCreator",
     "MongoDBConfCreator",
     "MQConfCreator",
+    "PostgreSQLConfCreator",
     "KafkaConfCreator",
     "DynamicProxyCreator",
     "ExclusiveProxyCreator",
@@ -80,6 +82,22 @@ class MongoDBConfProduct(Product):
 
         local_conf = self._settings.get("MONGODB_CONFIG")
         return MongoDBConf(**local_conf) if local_conf else None
+
+
+class PostgreSQLConfProduct(Product):
+    def __init__(self, settings, remote_option):
+        self._settings = settings
+        self._remote_option = remote_option
+
+    def get_conn_conf(self):
+        if _ := self._settings.get("APP_CONF_MANAGE", False):
+            remote_conf = ToolsForAyu.fetch_remote_conf(
+                conf_name="postgresql", **self._remote_option
+            )
+            return PostgreSQLConf(**remote_conf) if remote_conf else None
+
+        local_conf = self._settings.get("POSTGRESQL_CONFIG")
+        return PostgreSQLConf(**local_conf) if local_conf else None
 
 
 class MQConfProduct(Product):
@@ -154,6 +172,11 @@ class MysqlConfCreator(Creator):
 class MongoDBConfCreator(Creator):
     def create_product(self, settings: "Settings", remote_option: dict) -> Product:
         return MongoDBConfProduct(settings, remote_option)
+
+
+class PostgreSQLConfCreator(Creator):
+    def create_product(self, settings: "Settings", remote_option: dict) -> Product:
+        return PostgreSQLConfProduct(settings, remote_option)
 
 
 class MQConfCreator(Creator):

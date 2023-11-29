@@ -1,6 +1,7 @@
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
+import psycopg
 import pymysql
 from retrying import retry
 
@@ -10,14 +11,21 @@ from ayugespidertools.config import logger
 
 __all__ = [
     "MysqlPipeEnhanceMixin",
+    "PostgreSQLPipeEnhanceMixin",
 ]
 
 if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import MysqlConf
+    from psycopg import connection
+    from pymysql.connections import Connection
+
+    from ayugespidertools.common.typevars import MysqlConf, PostgreSQLConf
+
+    PsycopgConnectT = TypeVar("PsycopgConnectT", bound=connection)
+    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
 
 
 class MysqlPipeEnhanceMixin:
-    """扩展 pipelines 的功能"""
+    """扩展 mysql pipelines 的功能"""
 
     @retry(
         stop_max_attempt_number=Param.retry_num,
@@ -27,7 +35,7 @@ class MysqlPipeEnhanceMixin:
     def _connect(
         self,
         mysql_conf: "MysqlConf",
-    ) -> pymysql.connections.Connection:
+    ) -> "PymysqlConnectT":
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -36,7 +44,7 @@ class MysqlPipeEnhanceMixin:
             mysql_conf: pymysql 链接所需的参数
 
         Returns:
-            1). pymysql.connections.Connection, 链接句柄
+            1). mysql 链接句柄
         """
         try:
             conn = pymysql.connect(
@@ -49,9 +57,10 @@ class MysqlPipeEnhanceMixin:
             )
         except Exception as e:
             logger.warning(f"目标数据库：{mysql_conf.database} 不存在，尝试创建中...")
+            # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
                 # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
-                ReuseOperation.create_database(mysql_conf)
+                ReuseOperation.create_database(db_conf=mysql_conf)
         else:
             # 连接没有问题就直接返回连接对象
             return conn
@@ -154,3 +163,55 @@ class MysqlPipeEnhanceMixin:
         else:
             log_info["log_count_ERROR"] = ""
         return log_info
+
+
+class PostgreSQLPipeEnhanceMixin:
+    """扩展 postgresql pipelines 的功能"""
+
+    @retry(
+        stop_max_attempt_number=Param.retry_num,
+        wait_random_min=Param.retry_time_min,
+        wait_random_max=Param.retry_time_max,
+    )
+    def _connect(
+        self,
+        postgres_conf: "PostgreSQLConf",
+    ) -> "PsycopgConnectT":
+        """链接数据库操作：
+            1.如果链接正常，则返回链接句柄；
+            2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
+
+        Args:
+            postgres_conf: postgresql 链接所需的参数
+
+        Returns:
+            1). postgresql 链接句柄
+        """
+        try:
+            conn = psycopg.connect(
+                user=postgres_conf.user,
+                password=postgres_conf.password,
+                host=postgres_conf.host,
+                port=postgres_conf.port,
+                dbname=postgres_conf.database,
+            )
+        except Exception as e:
+            # err msg: connection to server at "x.x.x.x", port x failed: FATAL:  database "xxx" does not exist
+            logger.warning(f"目标数据库：{postgres_conf.database} 不存在，尝试创建中...")
+            if "failed" in str(e).lower():
+                ReuseOperation.create_database(db_conf=postgres_conf)
+        else:
+            return conn
+
+        return psycopg.connect(
+            user=postgres_conf.user,
+            password=postgres_conf.password,
+            host=postgres_conf.host,
+            port=postgres_conf.port,
+            dbname=postgres_conf.database,
+        )
+
+    def _get_sql_by_item(self, table: str, item: dict) -> str:
+        keys = f"""{", ".join(item.keys())}"""
+        values = ", ".join(["%s"] * len(item))
+        return f"INSERT INTO {table} ({keys}) values ({values});"

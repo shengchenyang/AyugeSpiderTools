@@ -1,13 +1,12 @@
 import datetime
 import warnings
-from typing import TYPE_CHECKING, Any, Dict, Optional, Union
+from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
 import pymysql
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
-from ayugespidertools.common.typevars import AlterItem
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.items import DataItem
 
@@ -22,8 +21,12 @@ __all__ = [
 
 if TYPE_CHECKING:
     from pymysql.connections import Connection
+    from pymysql.cursors import Cursor
 
-    from ayugespidertools.common.typevars import MysqlConf
+    from ayugespidertools.common.typevars import AlterItem, MysqlConf
+
+    PymysqlCursorT = TypeVar("PymysqlCursorT", bound=Cursor)
+    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
 
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
@@ -33,9 +36,9 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         # 排序规则，用于创建数据库时使用
         self.collate = None
         self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn: Optional["Connection"] = None
+        self.conn: Optional["PymysqlConnectT"] = None
         self.slog = None
-        self.cursor: "Connection.cursor" = None
+        self.cursor: Optional["PymysqlCursorT"] = None
         self.crawl_time = datetime.date.today()
 
     def open_spider(self, spider):
@@ -46,44 +49,15 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
-    def get_new_item(self, item_dict: Dict[str, Any]) -> AlterItem:
-        """重新整合 item
-
-        Args:
-            item_dict: dict 类型的 item
-
-        Returns:
-            1). 整合后的 item
-        """
-        new_item = {}
-        notes_dic = {}
-
-        insert_data = ReuseOperation.get_items_except_keys(
-            dict_conf=item_dict, keys=["_mongo_update_rule", "_table"]
-        )
-        judge_item = next(iter(insert_data.values()))
-        # 是 namedtuple 类型
-        if ReuseOperation.is_namedtuple_instance(judge_item):
-            for key, value in insert_data.items():
-                new_item[key] = value.key_value
-                notes_dic[key] = value.notes
-        # 是普通的 dict 类型
-        else:
-            for key, value in insert_data.items():
-                new_item[key] = value
-                notes_dic[key] = ""
-
-        return AlterItem(new_item=new_item, notes_dic=notes_dic)
-
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
         self.insert_item(
-            alter_item=self.get_new_item(item_dict),
+            alter_item=ReuseOperation.reshape_item(item_dict),
             table=item_dict["_table"],
         )
         return item
 
-    def insert_item(self, alter_item: AlterItem, table: Union[DataItem, str]):
+    def insert_item(self, alter_item: "AlterItem", table: Union[DataItem, str]):
         """通用插入数据
 
         Args:

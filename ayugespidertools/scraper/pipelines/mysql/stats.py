@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
 
 from retrying import retry
 
@@ -13,8 +13,12 @@ __all__ = [
 
 if TYPE_CHECKING:
     from pymysql.connections import Connection
+    from pymysql.cursors import Cursor
 
     from ayugespidertools.common.typevars import MysqlConf
+
+    PymysqlCursorT = TypeVar("PymysqlCursorT", bound=Cursor)
+    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
 
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
@@ -24,9 +28,9 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         # 排序规则，用于创建数据库时使用
         self.collate = None
         self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn: Optional["Connection"] = None
+        self.conn: Optional["PymysqlConnectT"] = None
         self.slog = None
-        self.cursor: "Connection.cursor" = None
+        self.cursor: Optional["PymysqlCursorT"] = None
         self.crawl_time = datetime.date.today()
 
     def open_spider(self, spider):

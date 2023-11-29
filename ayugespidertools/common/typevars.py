@@ -58,6 +58,15 @@ class MongoDBConf(NamedTuple):
     authMechanism: authMechanismStr = "SCRAM-SHA-1"
 
 
+class PostgreSQLConf(NamedTuple):
+    host: str
+    port: int
+    user: str
+    password: str
+    database: Optional[str] = None
+    charset: str = "UTF8"
+
+
 class AiohttpConf(NamedTuple):
     sleep: int
     proxy: str

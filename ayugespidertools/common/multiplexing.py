@@ -2,11 +2,13 @@ import configparser
 import json
 import os
 import random
-from typing import TYPE_CHECKING, Any, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
+import psycopg
 import pymysql
 from itemadapter import ItemAdapter
 
+from ayugespidertools.common.typevars import AlterItem, MysqlConf, PostgreSQLConf
 from ayugespidertools.config import logger
 from ayugespidertools.items import AyuItem
 
@@ -18,8 +20,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from scrapy.settings import BaseSettings
-
-    from ayugespidertools.common.typevars import MysqlConf
 
 
 class ReuseOperation:
@@ -60,6 +60,15 @@ class ReuseOperation:
                 "user": config_parser.get("mongodb", "user", fallback="admin"),
                 "password": config_parser.get("mongodb", "password", fallback=None),
                 "database": config_parser.get("mongodb", "database", fallback=None),
+            }
+        if "postgresql" in config_parser:
+            inner_settings["POSTGRESQL_CONFIG"] = {
+                "host": config_parser.get("postgresql", "host", fallback=None),
+                "port": config_parser.getint("postgresql", "port", fallback=5432),
+                "user": config_parser.get("postgresql", "user", fallback="postgres"),
+                "password": config_parser.get("postgresql", "password", fallback=None),
+                "database": config_parser.get("postgresql", "database", fallback=None),
+                "charset": config_parser.get("postgresql", "charset", fallback="UTF8"),
             }
         if "consul" in config_parser:
             inner_settings["REMOTE_CONFIG"] = {
@@ -166,6 +175,36 @@ class ReuseOperation:
             item.asdict() if isinstance(item, AyuItem) else ItemAdapter(item).asdict()
         )
 
+    @classmethod
+    def reshape_item(cls, item_dict: Dict[str, Any]) -> AlterItem:
+        """重新整合 item
+
+        Args:
+            item_dict: dict 类型的 item
+
+        Returns:
+            1). 整合后的 item
+        """
+        new_item = {}
+        notes_dic = {}
+
+        insert_data = cls.get_items_except_keys(
+            dict_conf=item_dict, keys=["_mongo_update_rule", "_table"]
+        )
+        judge_item = next(iter(insert_data.values()))
+        # 是 namedtuple 类型
+        if cls.is_namedtuple_instance(judge_item):
+            for key, value in insert_data.items():
+                new_item[key] = value.key_value
+                notes_dic[key] = value.notes
+        # 是普通的 dict 类型
+        else:
+            for key, value in insert_data.items():
+                new_item[key] = value
+                notes_dic[key] = ""
+
+        return AlterItem(new_item=new_item, notes_dic=notes_dic)
+
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
         """判断 x 是否为 namedtuple 类型
@@ -267,28 +306,42 @@ class ReuseOperation:
         return {k: dict_conf[k] for k in dict_conf if k not in keys}
 
     @classmethod
-    def create_database(cls, mysql_conf: "MysqlConf") -> None:
+    def create_database(cls, db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
         """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
         新建(不指定数据库)连接创建好所需数据库即可
 
         Args:
-            mysql_conf: pymysql 的数据库连接配置
+            db_conf: 数据库连接配置，目前支持 mysql 和 postgresql
         """
-        conn = pymysql.connect(
-            user=mysql_conf.user,
-            password=mysql_conf.password,
-            host=mysql_conf.host,
-            port=mysql_conf.port,
-            charset=mysql_conf.charset,
-        )
-        cursor = conn.cursor()
-        cursor.execute(
-            f"CREATE DATABASE `{mysql_conf.database}` character set {mysql_conf.charset};"
-        )
-        conn.close()
-        logger.info(
-            f"创建数据库 {mysql_conf.database} 成功，其 charset 类型是：{mysql_conf.charset}!"
-        )
+        if isinstance(db_conf, MysqlConf):
+            conn = pymysql.connect(
+                user=db_conf.user,
+                password=db_conf.password,
+                host=db_conf.host,
+                port=db_conf.port,
+                charset=db_conf.charset,
+            )
+            cursor = conn.cursor()
+            cursor.execute(
+                f"CREATE DATABASE IF NOT EXISTS `{db_conf.database}` character set {db_conf.charset};"
+            )
+            conn.close()
+
+        if isinstance(db_conf, PostgreSQLConf):
+            conn = psycopg.connect(
+                user=db_conf.user,
+                password=db_conf.password,
+                host=db_conf.host,
+                port=db_conf.port,
+            )
+            conn.autocommit = True
+            cursor = conn.cursor()
+            cursor.execute(
+                f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset}"
+            )
+            cursor.close()
+            conn.close()
+        logger.info(f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!")
 
     @classmethod
     def dict_keys_to_lower(cls, deal_dict: dict) -> dict:

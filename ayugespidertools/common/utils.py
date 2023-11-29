@@ -26,6 +26,7 @@ RemoteTypeStr = Literal["consul", "nacos"]
 RemoteConfNameStr = Literal[
     "mongodb",
     "mysql",
+    "postgresql",
     "rabbitmq",
     "kafka",
     "dynamicproxy",

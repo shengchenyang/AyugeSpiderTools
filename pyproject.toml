@@ -44,6 +44,9 @@ numpy = [
     { version = "~1.24.3", python = "<3.9", optional = true },
     { version = "~1.26.0", python = ">=3.9,<3.13", optional = true },
 ]
+psycopg = { version = "^3.1.13", optional = true }
+psycopg-binary = { version = "^3.1.13", optional = true }
+psycopg-pool = { version = "^3.2.0", optional = true }
 
 [tool.poetry.scripts]
 ayuge = "ayugespidertools.utils.cmdline:execute"
@@ -66,7 +69,8 @@ pre-commit = "3.4.0"
 toml = "0.10.2"
 
 [tool.poetry.extras]
-all = ["mmh3", "pycryptodome", "oss2", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow"]
+all = ["mmh3", "pycryptodome", "oss2", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool"]
+database = ["psycopg", "psycopg-binary", "psycopg-pool"]
 
 [[tool.poetry.source]]
 name = "aliyun"

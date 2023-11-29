@@ -56,7 +56,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         return item
 
     def db_insert(self, cursor, item):
-        alter_item = super(AyuTwistedMysqlPipeline, self).get_new_item(item)
+        alter_item = ReuseOperation.reshape_item(item)
         table = item["_table"]
 
         if not (new_item := alter_item.new_item):
