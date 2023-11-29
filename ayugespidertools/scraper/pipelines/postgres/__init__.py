@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, Optional, TypeVar, Union
 
-from loguru import logger
-
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.postgreserrhandle import Synchronize, deal_postgres_err
@@ -38,7 +36,6 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        logger.warning(f"iiii: {item_dict}")
         self.insert_item(
             alter_item=ReuseOperation.reshape_item(item_dict),
             table=item_dict["_table"],
