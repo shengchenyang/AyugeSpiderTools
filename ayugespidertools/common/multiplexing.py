@@ -4,13 +4,19 @@ import os
 import random
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
-import psycopg
 import pymysql
 from itemadapter import ItemAdapter
 
 from ayugespidertools.common.typevars import AlterItem, MysqlConf, PostgreSQLConf
 from ayugespidertools.config import logger
 from ayugespidertools.items import AyuItem
+
+try:
+    import psycopg
+except ImportError:
+    # pip install ayugespidertools[database]
+    pass
+
 
 __all__ = [
     "ReuseOperation",

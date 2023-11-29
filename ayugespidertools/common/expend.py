@@ -1,13 +1,18 @@
 import datetime
 from typing import TYPE_CHECKING, TypeVar
 
-import psycopg
 import pymysql
 from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
 from ayugespidertools.config import logger
+
+try:
+    import psycopg
+except ImportError:
+    # pip install ayugespidertools[database]
+    pass
 
 __all__ = [
     "MysqlPipeEnhanceMixin",
