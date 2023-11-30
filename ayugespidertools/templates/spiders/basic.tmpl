@@ -12,7 +12,7 @@ class $classname(AyuSpider):
     allowed_domains = ["$domain"]
     start_urls = ["http://$domain/"]
     custom_settings = {
-        "MYSQL_ENGINE_ENABLED": True,
+        "DATABASE_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,

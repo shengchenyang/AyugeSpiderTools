@@ -44,6 +44,7 @@ class AyuSpider(Spider):
     def __init__(self, *args: Any, **kwargs: Any):
         super(AyuSpider, self).__init__(*args, **kwargs)
         self.mysql_engine = None
+        self.postgres_engine = None
 
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
@@ -98,7 +99,7 @@ class AyuSpider(Spider):
             MysqlConfCreator(), crawler.settings, remote_option
         ):
             spider.mysql_conf = mysql_conf
-            if crawler.settings.get("MYSQL_ENGINE_ENABLED", False):
+            if crawler.settings.get("DATABASE_ENGINE_ENABLED", False):
                 mysql_url = (
                     f"mysql+pymysql://{mysql_conf.user}"
                     f":{mysql_conf.password}@{mysql_conf.host}"
@@ -116,6 +117,14 @@ class AyuSpider(Spider):
             PostgreSQLConfCreator(), crawler.settings, remote_option
         ):
             spider.postgres_conf = postgres_conf
+            if crawler.settings.get("DATABASE_ENGINE_ENABLED", False):
+                postgres_url = (
+                    f"postgresql+psycopg://{postgres_conf.user}:{postgres_conf.password}"
+                    f"@{postgres_conf.host}:{postgres_conf.port}/{postgres_conf.database}"
+                )
+                spider.postgres_engine = DatabaseEngineClass(
+                    engine_url=postgres_url
+                ).engine
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
