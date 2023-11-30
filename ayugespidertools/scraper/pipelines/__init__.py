@@ -13,6 +13,9 @@ from ayugespidertools.scraper.pipelines.mysql.stats import AyuStatisticsMysqlPip
 from ayugespidertools.scraper.pipelines.mysql.turbo import AyuTurboMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipeline
 from ayugespidertools.scraper.pipelines.postgres.fantasy import AyuFtyPostgresPipeline
+from ayugespidertools.scraper.pipelines.postgres.twisted import (
+    AyuTwistedPostgresPipeline,
+)
 
 __all__ = [
     "FilesDownloadPipeline",
@@ -26,4 +29,5 @@ __all__ = [
     "AyuTurboMysqlPipeline",
     "AyuTwistedMysqlPipeline",
     "AyuFtyPostgresPipeline",
+    "AyuTwistedPostgresPipeline",
 ]

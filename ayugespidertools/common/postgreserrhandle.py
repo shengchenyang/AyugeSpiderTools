@@ -7,6 +7,7 @@ from ayugespidertools.config import logger
 __all__ = [
     "Synchronize",
     "deal_postgres_err",
+    "TwistedAsynchronous",
 ]
 
 if TYPE_CHECKING:
@@ -19,40 +20,6 @@ if TYPE_CHECKING:
 
 class AbstractClass(ABC):
     """用于处理 postgresql 异常的模板方法类"""
-
-    def _create_table(
-        self,
-        conn: "PsycopgConnectT",
-        cursor: "PsycopgCursorT",
-        table_name: str,
-        table_notes: str = "",
-    ) -> None:
-        """创建数据库表
-
-        Args:
-            cursor: mysql connect cursor，参数选择有：
-                1).
-                2).
-            table_name: 创建表的名称
-            table_notes: 创建表的注释
-        """
-        sql = f"""
-        CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL NOT NULL PRIMARY KEY);
-        COMMENT ON TABLE {table_name} IS '{table_notes}';
-        COMMENT ON COLUMN {table_name}.id IS 'id';
-        """
-
-        try:
-            # 执行 sql 查询，获取数据
-            data = cursor.execute(sql)
-            conn.commit()
-            if any([data == 0, not data]):
-                logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
-
-        except Exception as e:
-            logger.error(
-                f"创建表失败，table_notes：{table_notes}，table_name：{table_name}，error：{e}"
-            )
 
     def template_method(
         self,
@@ -80,12 +47,12 @@ class AbstractClass(ABC):
             self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
 
         elif f'relation "{table}" does not exist' in err_msg:
-            self._create_table(
-                conn=conn,
-                cursor=cursor,
-                table_name=table,
-                table_notes=table_notes,
-            )
+            sql = f"""
+            CREATE TABLE IF NOT EXISTS {table} (id SERIAL NOT NULL PRIMARY KEY);
+            COMMENT ON TABLE {table} IS '{table_notes}';
+            COMMENT ON COLUMN {table}.id IS 'id';
+            """
+            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err="创建表失败")
 
         elif "value too long for type" in err_msg:
             raise Exception(f"postgres 有字段超出长度限制：{err_msg}")
@@ -114,10 +81,10 @@ class AbstractClass(ABC):
         notes = note_dic[colum]
 
         sql = (
-            f"ALTER TABLE {table} ADD COLUMN {colum} VARCHAR(190) DEFAULT '';"
+            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {colum} VARCHAR(190) DEFAULT '';"
             f"COMMENT ON COLUMN {table}.{colum} IS '{notes}'"
         )
-        return sql, f"1054: 添加字段 {colum} 已存在"
+        return sql, f"添加字段 {colum} 已存在"
 
     @abstractmethod
     def _exec_sql(self, *args, **kwargs) -> None:
@@ -143,6 +110,29 @@ class Synchronize(AbstractClass):
         except Exception as e:
             if possible_err:
                 logger.info(f"{possible_err}")
+            else:
+                logger.info(f"{e}")
+
+
+class TwistedAsynchronous(AbstractClass):
+    """pipeline twisted 异步执行 sql 的场景"""
+
+    def _exec_sql(
+        self,
+        cursor: "PsycopgCursorT",
+        sql: str,
+        possible_err: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
+        try:
+            cursor.execute(sql)
+            cursor.execute("COMMIT")
+        except Exception as e:
+            if possible_err:
+                logger.info(f"{possible_err}: {str(e)}")
+                cursor.execute("ROLLBACK")
+                cursor.execute(sql)
             else:
                 logger.info(f"{e}")
 

@@ -36,7 +36,7 @@ class DatabaseEngineClass(metaclass=DatabaseSingletonMeta):
     def __init__(self, engine_url):
         self.engine = create_engine(
             engine_url, pool_pre_ping=True, pool_recycle=3600 * 7
-        )
+        ).connect()
 
 
 class MysqlConf(NamedTuple):
