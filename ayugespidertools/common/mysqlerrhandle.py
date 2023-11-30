@@ -50,7 +50,6 @@ class AbstractClass(ABC):
         """
 
         try:
-            # 执行 sql 查询，获取数据
             data = cursor.execute(sql)
             if any([data == 0, not data]):
                 logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
