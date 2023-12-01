@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
 
 from ayugespidertools.config import logger
 
@@ -13,7 +13,9 @@ __all__ = [
 if TYPE_CHECKING:
     from psycopg.connection import Connection
     from psycopg.cursor import Cursor
+    from twisted.enterprise.adbapi import Transaction
 
+    TwistedTransactionT = TypeVar("TwistedTransactionT", bound=Transaction)
     PsycopgConnectT = TypeVar("PsycopgConnectT", bound=Connection)
     PsycopgCursorT = TypeVar("PsycopgCursorT", bound=Cursor)
 
@@ -25,17 +27,17 @@ class AbstractClass(ABC):
         self,
         err_msg: str,
         conn: "PsycopgConnectT",
-        cursor: "PsycopgCursorT",
+        cursor: Union["PsycopgCursorT", "TwistedTransactionT"],
         table: str,
         table_notes: str,
         note_dic: dict,
     ) -> None:
-        """模板方法，用于处理 mysql 存储场景的异常
+        """模板方法，用于处理 postgresql 存储场景的异常
 
         Args:
             err_msg: pipeline 存储时报错内容
-            conn: mysql conn
-            cursor: mysql connect cursor
+            conn: postgresql conn
+            cursor: postgresql connect cursor or twisted.enterprise.adbapi.Transaction
             table: 数据表
             table_notes: 数据表注释
             note_dic: 当前表字段注释
@@ -119,7 +121,7 @@ class TwistedAsynchronous(AbstractClass):
 
     def _exec_sql(
         self,
-        cursor: "PsycopgCursorT",
+        cursor: "TwistedTransactionT",
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -140,7 +142,7 @@ class TwistedAsynchronous(AbstractClass):
 def deal_postgres_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: "PsycopgCursorT",
+    cursor: Union["PsycopgCursorT", "TwistedTransactionT"],
     table: str,
     table_notes: str,
     note_dic: dict,

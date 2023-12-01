@@ -80,7 +80,7 @@ class MysqlPipeEnhanceMixin:
         )
 
     def _get_sql_by_item(self, table: str, item: dict) -> str:
-        """根据处理后的 item 生成 sql 插入语句
+        """根据处理后的 item 生成 mysql 插入语句
 
         Args:
             table: 数据库表名
@@ -201,7 +201,7 @@ class PostgreSQLPipeEnhanceMixin:
                 dbname=postgres_conf.database,
             )
         except Exception as e:
-            # err msg: connection to server at "x.x.x.x", port x failed: FATAL:  database "xxx" does not exist
+            # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
             logger.warning(f"目标数据库：{postgres_conf.database} 不存在，尝试创建中...")
             if "failed" in str(e).lower():
                 ReuseOperation.create_database(db_conf=postgres_conf)
@@ -217,6 +217,15 @@ class PostgreSQLPipeEnhanceMixin:
         )
 
     def _get_sql_by_item(self, table: str, item: dict) -> str:
+        """根据处理后的 item 生成 postgresql 插入语句
+
+        Args:
+            table: 数据库表名
+            item: 处理后的 item
+
+        Returns:
+            1). sql 插入语句
+        """
         keys = f"""{", ".join(item.keys())}"""
         values = ", ".join(["%s"] * len(item))
         return f"INSERT INTO {table} ({keys}) values ({values});"

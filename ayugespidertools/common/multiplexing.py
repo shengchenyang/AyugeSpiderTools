@@ -343,7 +343,7 @@ class ReuseOperation:
             conn.autocommit = True
             cursor = conn.cursor()
             cursor.execute(
-                f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset}"
+                f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset};"
             )
             cursor.close()
             conn.close()
