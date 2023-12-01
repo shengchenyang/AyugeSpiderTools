@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from scrapy.spiders import Spider
 
@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.settings import BaseSettings
+    from sqlalchemy.engine.base import Engine
     from typing_extensions import Self
 
 
@@ -43,8 +44,8 @@ class AyuSpider(Spider):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super(AyuSpider, self).__init__(*args, **kwargs)
-        self.mysql_engine = None
-        self.postgres_engine = None
+        self.mysql_engine: Optional["Engine"] = None
+        self.postgres_engine: Optional["Engine"] = None
 
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
