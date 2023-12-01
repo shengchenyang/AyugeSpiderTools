@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from scrapy.spiders import Spider
+from sqlalchemy.exc import OperationalError
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.spiderconf import (
@@ -29,7 +30,8 @@ if TYPE_CHECKING:
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.settings import BaseSettings
-    from sqlalchemy.engine.base import Engine
+    from sqlalchemy.engine.base import Connection as SqlalchemyConnectT
+    from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
     from typing_extensions import Self
 
 
@@ -44,8 +46,10 @@ class AyuSpider(Spider):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super(AyuSpider, self).__init__(*args, **kwargs)
-        self.mysql_engine: Optional["Engine"] = None
-        self.postgres_engine: Optional["Engine"] = None
+        self.mysql_engine: Optional["SqlalchemyEngineT"] = None
+        self.mysql_engine_conn: Optional["SqlalchemyConnectT"] = None
+        self.postgres_engine: Optional["SqlalchemyEngineT"] = None
+        self.postgres_engine_conn: Optional["SqlalchemyConnectT"] = None
 
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
@@ -108,6 +112,10 @@ class AyuSpider(Spider):
                     f"?charset={mysql_conf.charset}"
                 )
                 spider.mysql_engine = DatabaseEngineClass(engine_url=mysql_url).engine
+                try:
+                    spider.mysql_engine_conn = spider.mysql_engine.connect()
+                except OperationalError:
+                    spider.mysql_engine_conn = None
 
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
@@ -126,6 +134,10 @@ class AyuSpider(Spider):
                 spider.postgres_engine = DatabaseEngineClass(
                     engine_url=postgres_url
                 ).engine
+                try:
+                    spider.postgres_engine_conn = spider.postgres_engine.connect()
+                except OperationalError:
+                    spider.postgres_engine_conn = None
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
