@@ -19,6 +19,14 @@ authsource=***
 user=***
 password=***
 
+[postgresql]
+host=***
+port=5432
+user=***
+password=***
+database=***
+charset=UTF8
+
 [mq]
 host=***
 port=5672
