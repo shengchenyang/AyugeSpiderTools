@@ -1,5 +1,35 @@
 # Release notes
 
+## AyugeSpiderTools 3.8.0 (2023-12-03)
+
+### Deprecations
+
+- `MYSQL_ENGINE_ENABLED` 的配置项名改为 `DATABASE_ENGINE_ENABLED`，目前支持 `msyql` 和 `postgresql`。
+- 安装再添加 `database` 选项，可通过 `pip install ayugespidertools[database]` 安装所需的所有数据依赖及扩展。
+
+**注意：此变更包含不兼容部分，需要着重注意的部分如下：**
+- 删除了 `MYSQL_ENGINE_ENABLED` 配置项；
+- 由于 `SQLAlchemy` 依赖升级到了 `2.0+` 新版本，与以往的去重使用有变化，具体请查看本库 `readthedocs` 文档。
+
+### New features
+
+- 支持 `python3.12`。
+- 添加 `postgresql` 的存储场景支持，目前有同步场景及结合 `twisted` 的异步场景。
+- `DATABASE_ENGINE_ENABLED` 的配置目前会激活对应场景中数据库的 `engine` 和 `engine_conn` 以供去重使用。
+- 将 `psycopg` 相关的数据库扩展依赖改为可选项，可通过 `pip install ayugespidertools[database]` 安装所需依赖。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 优化 `type hints`。
+- 更新生成脚本模板以匹配新版本，也可使用以往 `pandas` 去重方式。
+- 更明确的日志信息。
+
+<hr>
+
 ## AyugeSpiderTools 3.7.0 (2023-11-23)
 
 ### Deprecations

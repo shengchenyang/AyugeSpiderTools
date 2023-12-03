@@ -46,6 +46,7 @@ from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 from scrapy.http.response.text import TextResponse
+from sqlalchemy import text
 
 
 class DemoOneSpider(AyuSpider):
@@ -53,8 +54,8 @@ class DemoOneSpider(AyuSpider):
     allowed_domains = ["blog.csdn.net"]
     start_urls = ["https://blog.csdn.net/"]
     custom_settings = {
-        # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-        "MYSQL_ENGINE_ENABLED": True,
+        # 数据库引擎开关，打开会有对应的 engine 和 engine_conn，可用于数据入库前去重判断
+        "DATABASE_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -105,10 +106,10 @@ class DemoOneSpider(AyuSpider):
             )
 
             _save_table = "demo_one"
-            # 数据存储方式 1，需要添加注释时的写法
+            # 数据存储方式1，需要添加注释时的写法
             ArticleInfoItem = AyuItem(
                 # 这里也可以写为 article_detail_url = DataItem(article_detail_url)，但没有注释
-                # 功能了，那不如使用下面的数据存储方式 2
+                # 功能了，那不如使用下面的数据存储方式2
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
@@ -117,7 +118,7 @@ class DemoOneSpider(AyuSpider):
                 _table=DataItem(_save_table, "项目列表信息"),
             )
 
-            # 数据存储方式 2，若不需要注释，也可以这样写，但不要两种风格混用
+            # 数据存储方式2，若不需要注释，也可以这样写，但不要两种风格混用
             """
             ArticleInfoItem = AyuItem(
                 article_detail_url=article_detail_url,
@@ -143,13 +144,47 @@ class DemoOneSpider(AyuSpider):
             """
             self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
 
-            # 数据入库逻辑 -> 测试 mysql_engine 的去重功能，你可以自行实现。mysql_engine 也已经给你了
-            sql = f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
-            yield ToolsForAyu.filter_data_before_yield(
-                sql=sql,
-                mysql_engine=self.mysql_engine,
-                item=ArticleInfoItem,
-            )
+            # 数据入库逻辑 -> 测试 mysql_engine / mysql_engine_conn 的去重功能。
+            # 场景对应的 engine 和 engine_conn 也已经给你了，你可自行实现。以下给出示例：
+
+            # 示例一：比如使用 sqlalchemy2 来实现查询如下：
+            if self.mysql_engine_conn:
+                try:
+                    _sql = text(
+                        f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+                    )
+                    result = self.mysql_engine_conn.execute(_sql).fetchone()
+                    if not result:
+                        self.mysql_engine_conn.rollback()
+                        yield ArticleInfoItem
+                    else:
+                        self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
+                except Exception:
+                    self.mysql_engine_conn.rollback()
+                    yield ArticleInfoItem
+            else:
+                yield ArticleInfoItem
+
+            # 示例二：使用 pandas 来实现查询如下：
+            """
+            try:
+                sql = f'''select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1'''
+                df = pandas.read_sql(sql, self.mysql_engine)
+
+                # 如果为空，说明此数据不存在于数据库，则新增
+                if df.empty:
+                    yield ArticleInfoItem
+
+                # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
+                else:
+                    self.slog.debug(f"标题为 ”{article_title}“ 的数据已存在")
+
+            except Exception as e:
+                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
+                    yield ArticleInfoItem
+                else:
+                    self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
+            """
 ```
 
 ### 刚刚发生了什么？

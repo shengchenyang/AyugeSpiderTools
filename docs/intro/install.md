@@ -10,17 +10,29 @@
 
 > 可以使用以下命令从 `PyPI` 安装 `ayugespidertools` 及其依赖项：
 
+1. 若你的数据库场景只需要 `mysql` 和 `mongodb`，且不需要本库中的扩展功能，那么直接简洁安装即可，命令如下：
+
 ```shell
 pip install ayugespidertools
 ```
 
-> 可选：通过以下命令安装所有依赖：
+2. 若你的数据库场景需要本库中的其他扩展，且同样不需要本库中的扩展功能，那么安装数据库版本最好，命令如下：
+
+> 可选1：通过以下命令安装所有包含所有数据库依赖：
+
+```shell
+pip install ayugespidertools[database]
+```
+
+3. 全部依赖安装命令如下：
+
+> 可选2：通过以下命令安装所有依赖：
 
 ```shell
 pip install ayugespidertools[all]
 ```
 
-若你只需要 `scrapy` 扩展库的功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 `extras` 部分）若要使用，请使用完整安装。
+注意：若你只需要 `scrapy` 扩展库的简单功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 `extras` 部分）若要使用，请使用完整安装。
 
 强烈建议您将 `ayugespidertools` 安装在专用的 `virtualenv` 中，以避免与您的系统包发生冲突。
 

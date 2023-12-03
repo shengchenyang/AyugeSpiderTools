@@ -73,7 +73,7 @@
           "user":"***",
           "password":"***",
           "database":"***",
-          "charset":"utf8mb4"
+          "charset":"选填：默认 utf8mb4"
       },
       "mongodb":{
           "host":"***",
@@ -82,7 +82,15 @@
           "password":"***",
           "database":"***",
           "authsource":"***",
-          "authMechanism":"SCRAM-SHA-1"
+          "authMechanism":"选填：默认 SCRAM-SHA-1"
+      },
+      "postgresql": {
+          "host":"***",
+          "port":5432,
+          "user":"***",
+          "password":"***",
+          "database":"***",
+          "charset":"选填：默认 UTF8"
       },
       "mq":{
           "host":"***",

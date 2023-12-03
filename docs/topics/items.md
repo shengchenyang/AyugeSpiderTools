@@ -142,8 +142,8 @@ class DemoOneSpider(AyuSpider):
     allowed_domains = ["csdn.net"]
     start_urls = ["https://www.csdn.net/"]
     custom_settings = {
-        # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-        "MYSQL_ENGINE_ENABLED": True,
+        # 数据库引擎开关，打开会有对应的 engine 和 engine_conn，可用于数据入库前去重判断
+        "DATABASE_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             # 激活此项则数据会存储至 Mysql
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -219,22 +219,23 @@ class DemoOneSpider(AyuSpider):
             #    1.mysql 添加唯一索引去重（本库会根据 on duplicate key update 更新），
             #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
-            # 这里只是为了介绍使用 mysql_engine 来对 mysql 去重的方法。
-            try:
-                _sql = text(
-                    f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
-                )
-                result = self.mysql_engine.execute(_sql).fetchone()
-                if not result:
+            # 这里只是为了介绍使用 mysql_engine / mysql_engine_conn 来对 mysql 去重的方法。
+            if self.mysql_engine_conn:
+                try:
+                    _sql = text(
+                        f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+                    )
+                    result = self.mysql_engine_conn.execute(_sql).fetchone()
+                    if not result:
+                        self.mysql_engine_conn.rollback()
+                        yield ArticleInfoItem
+                    else:
+                        self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
+                except Exception as e:
+                    self.mysql_engine_conn.rollback()
                     yield ArticleInfoItem
-                else:
-                    self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
-            except Exception as e:
-                # 若数据库或数据表不存在时，直接返回 item 即可，会自动创建所依赖的数据库数据表及字段注释（前提是用户有对应权限）
-                if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                    yield ArticleInfoItem
-                else:
-                    raise ValueError(f"请查看网络是否通畅，或 sql 是否正确！Error: {e}") from e
+            else:
+                yield ArticleInfoItem
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。
