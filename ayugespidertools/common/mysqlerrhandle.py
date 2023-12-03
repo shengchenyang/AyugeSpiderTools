@@ -35,31 +35,24 @@ class AbstractClass(ABC):
         """创建数据库表
 
         Args:
-            cursor: mysql connect cursor，参数选择有：
-                1). 类型为 pymysql.cursors.Cursor，在同步 pipelines 中使用；
-                2). dbpool.runInteraction() 方法会将数据库连接的游标对象作为参数传入
-                回调函数中，而游标对象的类型可能是不同的，比如 DictCursor 或 Cursor 类型，在
-                异步 pipelines 中使用；
+            cursor: mysql connect cursor
             table_name: 创建表的名称
             charset: charset
             collate: collate
             table_notes: 创建表的注释
         """
-        sql = f"""
-        CREATE TABLE IF NOT EXISTS `{table_name}`
-        (`id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`))
-        ENGINE=InnoDB DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{table_notes}';
-        """
+        sql = (
+            f"CREATE TABLE IF NOT EXISTS `{table_name}` (`id` int(32) NOT NULL"
+            f" AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`)) ENGINE=InnoDB"
+            f" DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{table_notes}';"
+        )
 
         try:
-            data = cursor.execute(sql)
-            if any([data == 0, not data]):
-                logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
+            cursor.execute(sql)
+            logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
 
         except Exception as e:
-            logger.error(
-                f"创建表失败，table_notes：{table_notes}，table_name：{table_name}，error：{e}"
-            )
+            logger.error(f"创建表 {table_name} 失败，err：{e}")
 
     def _get_column_type(
         self,
@@ -79,23 +72,23 @@ class AbstractClass(ABC):
         Returns:
             column_type: 字段存储类型
         """
-        sql = f"""
-        select COLUMN_TYPE from information_schema.columns
-        where table_schema = '{database}' and table_name = '{table}' and COLUMN_NAME= '{column}';
-        """
+        sql = (
+            f"select COLUMN_TYPE from information_schema.columns where table_schema = '{database}'"
+            f" and table_name = '{table}' and COLUMN_NAME= '{column}';"
+        )
         column_type = None
         try:
-            if _ := cursor.execute(sql):
-                lines = cursor.fetchall()
-                if isinstance(lines, list):
-                    # 注意，此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
-                    column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
-                else:
-                    # 注意，此处 AyuTwistedMysqlPipeline 返回的结构示例为：(('varchar(10)',),)
-                    column_type = lines[0][0] if len(lines) == 1 else ""
+            cursor.execute(sql)
+            lines = cursor.fetchall()
+            if isinstance(lines, list):
+                # 注意，此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
+                column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
+            else:
+                # 注意，此处 AyuTwistedMysqlPipeline 返回的结构示例为：(('varchar(10)',),)
+                column_type = lines[0][0] if len(lines) == 1 else ""
 
         except Exception as e:
-            logger.error(f"{e}")
+            logger.error(f"未获取到当前字段的存储类型，err: {e}")
         return column_type
 
     def template_method(
@@ -160,7 +153,7 @@ class AbstractClass(ABC):
 
         else:
             # 碰到其他的异常才打印错误日志，已处理的异常不打印
-            logger.error(f"ERROR: {err_msg}")
+            logger.error(f"MYSQL OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict
@@ -182,7 +175,7 @@ class AbstractClass(ABC):
         notes = note_dic[colum]
 
         sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(190) NULL DEFAULT '' COMMENT '{notes}';"
-        return sql, f"1054: 添加字段 {colum} 已存在"
+        return sql, f"添加字段 {colum} 已存在"
 
     def deal_1406_error(
         self,
@@ -214,11 +207,11 @@ class AbstractClass(ABC):
                 cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
-            sql = f"""
-            ALTER TABLE `{table}` CHANGE COLUMN
-            `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";
-            """
-            return sql, f"1406: 更新 {colum} 字段类型为 {change_colum_type} 时失败"
+            sql = (
+                f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
+                f' {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";'
+            )
+            return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
 
     def deal_1265_error(
         self,
@@ -250,11 +243,11 @@ class AbstractClass(ABC):
                 cursor=cursor, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
-            sql = f"""
-            ALTER TABLE `{table}` CHANGE COLUMN
-            `{colum}` `{colum}` {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";
-            """
-            return sql, f"1265: 更新 {colum} 字段类型为 {change_colum_type} 时失败"
+            sql = (
+                f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
+                f' {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";'
+            )
+            return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
 
     @abstractmethod
     def _exec_sql(self, *args, **kwargs) -> None:
@@ -275,13 +268,12 @@ class Synchronize(AbstractClass):
         **kwargs,
     ) -> None:
         try:
-            if cursor.execute(sql):
-                conn.commit()
+            cursor.execute(sql)
         except Exception as e:
-            if possible_err:
-                logger.info(f"{possible_err}")
-            else:
-                logger.info(f"{e}")
+            logger.warning(
+                f"synchronize mysql exec sql err: {str(e)}\n"
+                f"possible_err ->: {possible_err}"
+            )
 
 
 class TwistedAsynchronous(AbstractClass):
@@ -298,10 +290,10 @@ class TwistedAsynchronous(AbstractClass):
         try:
             cursor.execute(sql)
         except Exception as e:
-            if possible_err:
-                logger.info(f"{possible_err}")
-            else:
-                logger.info(f"{e}")
+            logger.warning(
+                f"twisted mysql exec sql err: {str(e)}\n"
+                f"possible_err: {possible_err}"
+            )
 
 
 def deal_mysql_err(

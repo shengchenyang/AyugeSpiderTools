@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from scrapy.spiders import Spider
-from sqlalchemy.exc import OperationalError
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.spiderconf import (
@@ -15,8 +14,8 @@ from ayugespidertools.common.spiderconf import (
     MysqlConfCreator,
     PostgreSQLConfCreator,
     get_spider_conf,
+    get_sqlalchemy_conf,
 )
-from ayugespidertools.common.typevars import DatabaseEngineClass
 from ayugespidertools.config import logger
 
 __all__ = [
@@ -97,6 +96,7 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler: "Crawler", *args: Any, **kwargs: Any) -> "Self":
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
+        _db_engine_enabled = crawler.settings.get("DATABASE_ENGINE_ENABLED", False)
 
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
         # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
@@ -104,18 +104,11 @@ class AyuSpider(Spider):
             MysqlConfCreator(), crawler.settings, remote_option
         ):
             spider.mysql_conf = mysql_conf
-            if crawler.settings.get("DATABASE_ENGINE_ENABLED", False):
-                mysql_url = (
-                    f"mysql+pymysql://{mysql_conf.user}"
-                    f":{mysql_conf.password}@{mysql_conf.host}"
-                    f":{mysql_conf.port}/{mysql_conf.database}"
-                    f"?charset={mysql_conf.charset}"
-                )
-                spider.mysql_engine = DatabaseEngineClass(engine_url=mysql_url).engine
-                try:
-                    spider.mysql_engine_conn = spider.mysql_engine.connect()
-                except OperationalError:
-                    spider.mysql_engine_conn = None
+            spider.mysql_engine, spider.mysql_engine_conn = get_sqlalchemy_conf(
+                creator=MysqlConfCreator(),
+                db_conf=mysql_conf,
+                db_engine_enabled=_db_engine_enabled,
+            )
 
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
@@ -126,18 +119,11 @@ class AyuSpider(Spider):
             PostgreSQLConfCreator(), crawler.settings, remote_option
         ):
             spider.postgres_conf = postgres_conf
-            if crawler.settings.get("DATABASE_ENGINE_ENABLED", False):
-                postgres_url = (
-                    f"postgresql+psycopg://{postgres_conf.user}:{postgres_conf.password}"
-                    f"@{postgres_conf.host}:{postgres_conf.port}/{postgres_conf.database}"
-                )
-                spider.postgres_engine = DatabaseEngineClass(
-                    engine_url=postgres_url
-                ).engine
-                try:
-                    spider.postgres_engine_conn = spider.postgres_engine.connect()
-                except OperationalError:
-                    spider.postgres_engine_conn = None
+            spider.postgres_engine, spider.postgres_engine_conn = get_sqlalchemy_conf(
+                creator=PostgreSQLConfCreator(),
+                db_conf=postgres_conf,
+                db_engine_enabled=_db_engine_enabled,
+            )
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option

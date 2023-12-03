@@ -56,12 +56,13 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         sql = self._get_sql_by_item(table=table_name, item=new_item)
 
         try:
-            if self.cursor.execute(sql, tuple(new_item.values())):
-                self.conn.commit()
+            self.cursor.execute(sql, tuple(new_item.values()))
+            self.conn.commit()
 
         except Exception as e:
-            self.slog.warning(f"{e}")
-            self.slog.warning(f"Item: {new_item} Table: {table_name}")
+            self.slog.warning(
+                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+            )
             self.conn.rollback()
             deal_postgres_err(
                 Synchronize(),

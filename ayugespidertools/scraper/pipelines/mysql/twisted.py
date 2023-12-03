@@ -73,8 +73,9 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
             cursor.execute(sql, tuple(new_item.values()) * 2)
 
         except Exception as e:
-            self.slog.warning(f":{e}")
-            self.slog.warning(f"Item:{new_item} Table: {table_name}")
+            self.slog.warning(
+                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+            )
             deal_mysql_err(
                 TwistedAsynchronous(),
                 err_msg=str(e),

@@ -61,7 +61,7 @@ class AbstractClass(ABC):
 
         else:
             # 碰到其他的异常才打印错误日志，已处理的异常不打印
-            logger.error(f"ERROR: {err_msg}")
+            logger.error(f"POSTGRES OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict
@@ -107,13 +107,14 @@ class Synchronize(AbstractClass):
         **kwargs,
     ) -> None:
         try:
-            if cursor.execute(sql):
-                conn.commit()
+            cursor.execute(sql)
+            conn.commit()
         except Exception as e:
-            if possible_err:
-                logger.info(f"{possible_err}")
-            else:
-                logger.info(f"{e}")
+            logger.warning(
+                f"synchronize postgres exec sql err: {str(e)}\n"
+                f"possible_err: {possible_err}"
+            )
+            conn.rollback()
 
 
 class TwistedAsynchronous(AbstractClass):
@@ -131,12 +132,11 @@ class TwistedAsynchronous(AbstractClass):
             cursor.execute(sql)
             cursor.execute("COMMIT")
         except Exception as e:
-            if possible_err:
-                logger.info(f"{possible_err}: {str(e)}")
-                cursor.execute("ROLLBACK")
-                cursor.execute(sql)
-            else:
-                logger.info(f"{e}")
+            logger.warning(
+                f"twisted postgres exec sql err: {str(e)}\n"
+                f"possible_err ->: {possible_err}"
+            )
+            cursor.execute("ROLLBACK")
 
 
 def deal_postgres_err(

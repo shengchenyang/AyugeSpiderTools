@@ -69,8 +69,9 @@ class AyuTwistedPostgresPipeline(AyuPostgresPipeline):
             cursor.execute(sql, tuple(new_item.values()))
 
         except Exception as e:
-            self.slog.warning(f":{e}")
-            self.slog.warning(f"Item:{new_item} Table: {table_name}")
+            self.slog.warning(
+                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+            )
             cursor.execute("ROLLBACK")
             deal_postgres_err(
                 TwistedAsynchronous(),

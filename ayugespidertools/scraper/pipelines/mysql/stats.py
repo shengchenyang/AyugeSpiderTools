@@ -148,11 +148,11 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             data: sql 语句中的参数
         """
         try:
-            if self.cursor.execute(sql, data):
-                self.conn.commit()
+            self.cursor.execute(sql, data)
+            self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            self.slog.warning(f":{e}")
+            self.slog.warning(f"日志记录存储错误: {e}")
 
     def close_spider(self, spider):
         log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)

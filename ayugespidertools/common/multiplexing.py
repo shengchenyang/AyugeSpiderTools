@@ -331,6 +331,7 @@ class ReuseOperation:
             cursor.execute(
                 f"CREATE DATABASE IF NOT EXISTS `{db_conf.database}` character set {db_conf.charset};"
             )
+            cursor.close()
             conn.close()
 
         if isinstance(db_conf, PostgreSQLConf):
