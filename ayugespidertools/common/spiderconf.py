@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Generic, Optional, Tuple, TypeVar
 
 from sqlalchemy.exc import OperationalError
 
@@ -43,7 +43,7 @@ SpiderConf = TypeVar(
 )
 
 
-class Product(ABC):
+class Product(ABC, Generic[SpiderConf]):
     @abstractmethod
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
@@ -68,7 +68,9 @@ class Creator(ABC):
 
 
 class MysqlConfProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[MysqlConf]:
         # 1). 优先从远程配置中取值
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
@@ -80,7 +82,10 @@ class MysqlConfProduct(Product):
         local_conf = settings.get("MYSQL_CONFIG")
         return MysqlConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(
+        self, db_conf: MysqlConf, db_engine_enabled: bool
+    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+        mysql_engine = mysql_engine_conn = None
         if db_engine_enabled:
             mysql_url = (
                 f"mysql+pymysql://{db_conf.user}"
@@ -92,13 +97,14 @@ class MysqlConfProduct(Product):
             try:
                 mysql_engine_conn = mysql_engine.connect()
             except OperationalError:
-                mysql_engine_conn = None
-            return mysql_engine, mysql_engine_conn
-        return None, None
+                pass
+        return mysql_engine, mysql_engine_conn
 
 
 class MongoDBConfProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[MongoDBConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="mongodb", **remote_option
@@ -108,12 +114,14 @@ class MongoDBConfProduct(Product):
         local_conf = settings.get("MONGODB_CONFIG")
         return MongoDBConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(self, db_conf: MongoDBConf, db_engine_enabled: bool):
         pass
 
 
 class PostgreSQLConfProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[PostgreSQLConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="postgresql", **remote_option
@@ -123,7 +131,10 @@ class PostgreSQLConfProduct(Product):
         local_conf = settings.get("POSTGRESQL_CONFIG")
         return PostgreSQLConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(
+        self, db_conf: PostgreSQLConf, db_engine_enabled: bool
+    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+        postgres_engine = postgres_engine_conn = None
         if db_engine_enabled:
             postgres_url = (
                 f"postgresql+psycopg://{db_conf.user}:{db_conf.password}"
@@ -133,13 +144,14 @@ class PostgreSQLConfProduct(Product):
             try:
                 postgres_engine_conn = postgres_engine.connect()
             except OperationalError:
-                postgres_engine_conn = None
-            return postgres_engine, postgres_engine_conn
-        return None, None
+                pass
+        return postgres_engine, postgres_engine_conn
 
 
 class MQConfProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[MQConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="rabbitmq", **remote_option
@@ -149,12 +161,14 @@ class MQConfProduct(Product):
         local_conf = settings.get("MQ_CONFIG")
         return MQConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(self, db_conf: MQConf, db_engine_enabled: bool):
         pass
 
 
 class KafkaConfProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[KafkaConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="kafka", **remote_option
@@ -164,12 +178,14 @@ class KafkaConfProduct(Product):
         local_conf = settings.get("KAFKA_CONFIG")
         return KafkaConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(self, db_conf: KafkaConf, db_engine_enabled: bool):
         pass
 
 
 class DynamicProxyProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[DynamicProxyConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="dynamicproxy", **remote_option
@@ -179,12 +195,14 @@ class DynamicProxyProduct(Product):
         local_conf = settings.get("DYNAMIC_PROXY_CONFIG")
         return DynamicProxyConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(self, db_conf: DynamicProxyConf, db_engine_enabled: bool):
         pass
 
 
 class ExclusiveProxyProduct(Product):
-    def get_conn_conf(self, settings: "Settings", remote_option: dict):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[ExclusiveProxyConf]:
         if _ := settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="exclusiveproxy", **remote_option
@@ -194,7 +212,7 @@ class ExclusiveProxyProduct(Product):
         local_conf = settings.get("EXCLUSIVE_PROXY_CONFIG")
         return ExclusiveProxyConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: SpiderConf, db_engine_enabled: bool):
+    def get_engine(self, db_conf: ExclusiveProxyConf, db_engine_enabled: bool):
         pass
 
 
