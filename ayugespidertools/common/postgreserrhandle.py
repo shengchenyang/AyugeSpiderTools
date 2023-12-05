@@ -16,8 +16,6 @@ if TYPE_CHECKING:
     from twisted.enterprise.adbapi import Transaction
 
     TwistedTransactionT = TypeVar("TwistedTransactionT", bound=Transaction)
-    PsycopgConnectT = TypeVar("PsycopgConnectT", bound=Connection)
-    PsycopgCursorT = TypeVar("PsycopgCursorT", bound=Cursor)
 
 
 class AbstractClass(ABC):
@@ -26,8 +24,8 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: "PsycopgConnectT",
-        cursor: Union["PsycopgCursorT", "TwistedTransactionT"],
+        conn: "Connection",
+        cursor: Union["Cursor", "TwistedTransactionT"],
         table: str,
         table_notes: str,
         note_dic: dict,
@@ -99,8 +97,8 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: "PsycopgConnectT",
-        cursor: "PsycopgCursorT",
+        conn: "Connection",
+        cursor: "Cursor",
         sql: str,
         possible_err: Optional[str] = None,
         *args,
@@ -142,11 +140,11 @@ class TwistedAsynchronous(AbstractClass):
 def deal_postgres_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: Union["PsycopgCursorT", "TwistedTransactionT"],
+    cursor: Union["Cursor", "TwistedTransactionT"],
     table: str,
     table_notes: str,
     note_dic: dict,
-    conn: Optional["PsycopgConnectT"] = None,
+    conn: Optional["Connection"] = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,

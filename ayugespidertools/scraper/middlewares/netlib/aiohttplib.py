@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, ClassVar, Optional, Tuple, TypeVar
 
 import aiohttp
 import scrapy
@@ -26,6 +26,8 @@ ItemAdapterT = TypeVar("ItemAdapterT", bound=ItemAdapter)
 class AiohttpDownloaderMiddleware:
     """Downloader middleware handling the requests with aiohttp"""
 
+    retry_times: ClassVar[Optional[int]]
+
     def __init__(self):
         self.aiohttp_args = None
 
@@ -34,7 +36,7 @@ class AiohttpDownloaderMiddleware:
         request: scrapy.Request,
         reason: int,
         spider: scrapy.Spider,
-    ) -> Union[scrapy.Request, None]:
+    ) -> Optional[scrapy.Request]:
         """重试请求
 
         Args:
@@ -43,7 +45,7 @@ class AiohttpDownloaderMiddleware:
             spider: scrapy spider
 
         Returns:
-            Union[scrapy.Request, None]: 重试的 request 对象
+            Optional[scrapy.Request]: 重试的 request 对象
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -52,6 +54,7 @@ class AiohttpDownloaderMiddleware:
 
         stats.inc_value("retry/max_reached")
         logger.error(f"Gave up retrying {request} (failed {retries} times): {reason}")
+        return None
 
     def _retry_with_limit(self, request, retries, reason, stats):
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
@@ -139,7 +142,7 @@ class AiohttpDownloaderMiddleware:
                     status_code = response.status
                     response_text = await response.text()
                     return status_code, response_text
-        except aiohttp.ClientTimeout:
+        except Exception:
             return 504, ""
 
     async def process_request(self, request, spider):

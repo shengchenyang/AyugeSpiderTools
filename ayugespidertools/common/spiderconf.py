@@ -262,6 +262,6 @@ def get_sqlalchemy_conf(
     creator: Creator,
     db_conf: SpiderConf,
     db_engine_enabled: bool,
-) -> Tuple["SqlalchemyEngineT", "SqlalchemyConnectT"]:
+) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
     product = creator.create_product()
     return product.get_engine(db_conf, db_engine_enabled)

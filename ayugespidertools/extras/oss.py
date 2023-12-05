@@ -53,9 +53,9 @@ class AliOssBase:
         """
         self.endpoint = endpoint
         self.doc = doc
-        self.bucket = bucket
         self.auth = oss2.Auth(access_key_id, access_key_secret)
-        self.bucket = oss2.Bucket(self.auth, f"{self.endpoint}/", self.bucket)
+        self.bk = bucket
+        self.bucket = oss2.Bucket(self.auth, f"{self.endpoint}/", bucket)
         self.headers = {"Connection": "close"}
 
     def delete_oss(self, del_logo_url: str):
@@ -138,7 +138,7 @@ class AliOssBase:
         ], "计数依据的参数类型需要是 str 或 list"
 
         # 如果依据为空，则统计目标目录下的所有文件
-        obj_list = list(oss2.ObjectIterator(self.bucket, prefix=prefix))
+        obj_list = list(oss2.ObjectIterator(self.bk, prefix=prefix))
         if not count_by_type:
             return [obj.key for obj in obj_list][1:]
 

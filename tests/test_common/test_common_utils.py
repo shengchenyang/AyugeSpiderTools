@@ -193,7 +193,9 @@ def test_get_collate_by_charset():
     }
     # sourcery skip: no-loop-in-tests
     for charset, collate in charset_collate_map.items():
-        _mysql_c = MysqlConf(host="", port=0, user="", password="", charset=charset)
+        _mysql_c = MysqlConf(
+            host="", port=0, user="", password="", database="", charset=charset
+        )
         assert ToolsForAyu.get_collate_by_charset(mysql_conf=_mysql_c) == collate
 
 

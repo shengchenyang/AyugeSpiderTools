@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Tuple, TypeVar
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -45,8 +45,8 @@ class AbstractClass(ABC):
         self,
         item_dict: dict,
         db: "PymongoDataBaseT",
-        sys_ver_low: bool = True,
-    ) -> None:
+        sys_ver_low: Optional[bool] = None,
+    ):
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
         Args:
@@ -69,7 +69,7 @@ class AbstractClass(ABC):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        sys_ver_low: bool,
+        sys_ver_low: Optional[bool] = None,
     ):
         if sys_ver_low:
             # 如果没有查重字段时，就直接插入数据（不去重）
@@ -94,7 +94,7 @@ class AbstractClass(ABC):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        sys_ver_low: bool,
+        sys_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
@@ -120,7 +120,7 @@ class Synchronize(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        sys_ver_low: bool,
+        sys_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
@@ -136,7 +136,7 @@ class TwistedAsynchronous(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        sys_ver_low: bool,
+        sys_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
@@ -152,9 +152,10 @@ class AsyncioAsynchronous(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
+        sys_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
-    ) -> None:
+    ):
         if not item_dict.get("_mongo_update_rule"):
             await db[collection_name].insert_one(insert_data)
         else:
@@ -166,8 +167,8 @@ class AsyncioAsynchronous(AbstractClass):
         self,
         item_dict: dict,
         db: "PymongoDataBaseT",
-        sys_ver_low: bool = True,
-    ) -> None:
+        sys_ver_low: Optional[bool] = None,
+    ):
         insert_data, table_name = self._get_insert_data(item_dict)
         await self._data_storage_logic(
             db=db,

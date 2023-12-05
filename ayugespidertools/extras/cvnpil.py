@@ -1,7 +1,7 @@
 import itertools
 import math
 import random
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union
 
 try:
     import cv2
@@ -33,7 +33,7 @@ class CvnpilKit:
     @staticmethod
     def read_image_data(
         img: Union[bytes, str],
-        flags: Optional[int] = cv2.IMREAD_COLOR,
+        flags: int = cv2.IMREAD_COLOR,
     ) -> np.ndarray:
         """
         用 opencv 读取图片数据
@@ -204,9 +204,9 @@ class CvnpilKit:
         # 在背景图里面查找滑块图的位置
         res = cv2.matchTemplate(bg_cv, slider_cv, cv2.TM_CCOEFF_NORMED)
         # 使用二分法查找阈值的精确值
-        lft = 0
-        rgt = 1
-        loc = None
+        lft: float = 0.0
+        rgt: float = 1.0
+        loc: Tuple[np.ndarray[Any, np.dtype[np.signedinteger[Any]]], ...] = ()
         while run < 20:
             run += 1
             threshold = (rgt + lft) / 2

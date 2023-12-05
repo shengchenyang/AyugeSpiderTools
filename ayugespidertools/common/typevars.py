@@ -44,7 +44,7 @@ class MysqlConf(NamedTuple):
     port: int
     user: str
     password: str
-    database: Optional[str] = None
+    database: str
     charset: str = "utf8mb4"
 
 

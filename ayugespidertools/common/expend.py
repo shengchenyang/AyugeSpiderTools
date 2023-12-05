@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 import pymysql
 from retrying import retry
@@ -20,13 +20,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from psycopg import connection
-    from pymysql.connections import Connection
+    from psycopg.connection import Connection as PsycopgConnection
+    from pymysql.connections import Connection as PymysqlConnection
 
     from ayugespidertools.common.typevars import MysqlConf, PostgreSQLConf
-
-    PsycopgConnectT = TypeVar("PsycopgConnectT", bound=connection)
-    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
 
 
 class MysqlPipeEnhanceMixin:
@@ -40,7 +37,7 @@ class MysqlPipeEnhanceMixin:
     def _connect(
         self,
         mysql_conf: "MysqlConf",
-    ) -> "PymysqlConnectT":
+    ) -> "PymysqlConnection":
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -181,7 +178,7 @@ class PostgreSQLPipeEnhanceMixin:
     def _connect(
         self,
         postgres_conf: "PostgreSQLConf",
-    ) -> "PsycopgConnectT":
+    ) -> "PsycopgConnection":
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。

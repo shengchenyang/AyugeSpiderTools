@@ -63,7 +63,7 @@ class AppConfManageMixin:
     @staticmethod
     def xml_parser(data: str) -> dict:
         root = ET.fromstring(data)
-        conf_data = {}
+        conf_data: dict = {}
         for child in root:
             conf_data[child.tag] = {}
             for sub_child in child:

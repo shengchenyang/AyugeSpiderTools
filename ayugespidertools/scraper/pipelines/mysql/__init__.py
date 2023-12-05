@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import TYPE_CHECKING, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import pymysql
 
@@ -25,20 +25,17 @@ if TYPE_CHECKING:
 
     from ayugespidertools.common.typevars import AlterItem, MysqlConf
 
-    PymysqlCursorT = TypeVar("PymysqlCursorT", bound=Cursor)
-    PymysqlConnectT = TypeVar("PymysqlConnectT", bound=Connection)
-
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
     def __init__(self) -> None:
         # 排序规则，用于创建数据库时使用
-        self.collate = None
+        self.collate: str = ""
         self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn: Optional["PymysqlConnectT"] = None
+        self.conn: Optional["Connection[Cursor]"] = None
         self.slog = None
-        self.cursor: Optional["PymysqlCursorT"] = None
+        self.cursor: Optional["Cursor"] = None
         self.crawl_time = datetime.date.today()
 
     def open_spider(self, spider):
