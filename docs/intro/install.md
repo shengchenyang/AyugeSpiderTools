@@ -2,13 +2,13 @@
 
 ## 支持的 Python 版本
 
-`AyugeSpiderTools` 需要 `Python 3.8.1+`。
+`AyugeSpiderTools` 需要 `Python 3.8+`。
 
 ## 安装 AyugeSpiderTools
 
 为了向您展示 `ayugespidertools` 带来了什么，我们将带您通过一个 `Scrapy Spider` 示例，使用最简单的方式来运行蜘蛛。
 
-> 可以使用以下命令从 `PyPI` 安装 `ayugespidertools` 及其依赖项：
+> 可以使用以下命令安装 `ayugespidertools` 及其依赖项：
 
 1. 若你的数据库场景只需要 `mysql` 和 `mongodb`，且不需要本库中的扩展功能，那么直接简洁安装即可，命令如下：
 
@@ -18,7 +18,7 @@ pip install ayugespidertools
 
 2. 若你的数据库场景需要本库中的其他扩展，且同样不需要本库中的扩展功能，那么安装数据库版本最好，命令如下：
 
-> 可选1：通过以下命令安装所有包含所有数据库依赖：
+> 可选1，通过以下命令安装所有包含所有数据库依赖：
 
 ```shell
 pip install ayugespidertools[database]
@@ -26,7 +26,7 @@ pip install ayugespidertools[database]
 
 3. 全部依赖安装命令如下：
 
-> 可选2：通过以下命令安装所有依赖：
+> 可选2，通过以下命令安装所有依赖：
 
 ```shell
 pip install ayugespidertools[all]
@@ -35,6 +35,38 @@ pip install ayugespidertools[all]
 注意：若你只需要 `scrapy` 扩展库的简单功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 `extras` 部分）若要使用，请使用完整安装。
 
 强烈建议您将 `ayugespidertools` 安装在专用的 `virtualenv` 中，以避免与您的系统包发生冲突。
+
+### 可能遇到的问题
+
+> 在安装时可能会遇到以下问题：
+
+- `zsh: no matches found: ayugespidertools[database]`
+
+  ```shell
+  # zsh 中需要修改对应的命令
+  pip install 'ayugespidertools[database]'
+  pip install 'ayugespidertools[all]'
+  ```
+
+- 无法安装到最新版本
+
+  这是国内源对第三方库同步(完整度和速度)的问题。
+
+  ```shell
+  # 1.首先查看 pypi 上的版本信息
+  pip index versions ayugespidertools
+
+  # 2.如果输出的 latest 版本信息非最新，说明你的 pip 的 pypi 源还未同步，可选择“科学上网”或手动安装。
+  # 这里只介绍手动安装的方法：
+  # 先到 https://pypi.org/project/AyugeSpiderTools/#files 或 https://github.com/shengchenyang/AyugeSpiderTools/releases 下载 whl 文件
+
+  # 3.然后 pip 安装此 whl 即可
+  pip install ayugespidertools-x.x.x-py3-none-any.whl[database] -i https://mirrors.aliyun.com/pypi/simple/
+  # zsh 中的命令同样需要修改
+  pip install 'ayugespidertools-x.x.x-py3-none-any.whl[database]' -i https://mirrors.aliyun.com/pypi/simple/
+  ```
+
+若遇到其它的各种问题，请提 [issues](https://github.com/shengchenyang/AyugeSpiderTools/issues/new/choose)。
 
 ### 值得知道的事情
 
