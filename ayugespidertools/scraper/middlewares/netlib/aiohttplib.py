@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, ClassVar, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
 
 import aiohttp
 import scrapy
@@ -25,8 +25,6 @@ ItemAdapterT = TypeVar("ItemAdapterT", bound=ItemAdapter)
 
 class AiohttpDownloaderMiddleware:
     """Downloader middleware handling the requests with aiohttp"""
-
-    retry_times: ClassVar[Optional[int]]
 
     def __init__(self):
         self.aiohttp_args = None
