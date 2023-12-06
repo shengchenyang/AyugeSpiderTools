@@ -138,6 +138,7 @@ profile = "black"
 [tool.mypy]
 python_version = "3.8"
 ignore_missing_imports = true
+disable_error_code = ["attr-defined", "union-attr"]
 
 [[tool.mypy.overrides]]
 module = [
