@@ -9,7 +9,7 @@
 
 [![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
 ![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python](https://img.shields.io/badge/python-3.8.1%2B-blue)
+![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -39,11 +39,19 @@
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-> 可选：通过以下命令安装所有依赖：
+> 可选安装1，安装数据库相关的所有依赖：
+
+```shell
+pip install ayugespidertools[database]
+```
+
+> 可选安装2，通过以下命令安装所有依赖：
 
 ```shell
 pip install ayugespidertools[all]
 ```
+
+*注：详细的安装介绍请查看[安装指南](https://ayugespidertools.readthedocs.io/en/latest/intro/install.html)。*
 
 ## 用法
 
@@ -92,6 +100,11 @@ scrapy crawl <spider_name>
 + 2).demo_two: 根据本地 VIT 中的 .conf 取 mongodb 配置
 + 4).demo_four: 根据 consul 中取 mongodb 配置
 + 6).demo_six: 异步存入 MongoDB 的场景
+
+# 数据存入 PostgreSQL 的场景（需要安装 ayugespidertools[database] 的依赖）：
++ 21).demo_nine: 根据本地 VIT 中的 .conf 取 postgresql 配置
++ 22).demo_ten: 异步存入 PostgreSQL 的场景
+- 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
 
 - 7).demo_seven: 使用 requests 来请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
@@ -160,7 +173,8 @@ scrapy crawl <spider_name>
         - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
     - [x] `Mysql` 存储的场景下适配
         - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
-    - [x] `MongoDB` 存储的场景下适配，编写风格与 `Mysql` 存储等场景下一致
+    - [x] `MongoDB` 存储的场景下适配
+    - [x] `PostgreSQL` 存储场景适配
     - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
         - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
         - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例

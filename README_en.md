@@ -9,7 +9,7 @@
 
 [![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
 ![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python](https://img.shields.io/badge/python-3.8.1%2B-blue)
+![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -43,11 +43,19 @@ as field encoding, Data too long, and non-existent storage fields.
 pip install ayugespidertools -i https://pypi.org/simple
 ```
 
-> Optional: Install all dependencies with the following command:
+> Optional installation 1, install all database-related dependencies:
+
+```shell
+pip install ayugespidertools[database]
+```
+
+> Optional installation 2: Install all dependencies with the following command:
 
 ```shell
 pip install ayugespidertools[all]
 ```
+
+*Note: For detailed installation instructions, please see [Installation Guide](https://ayugespidertools.readthedocs.io/en/latest/intro/install.html).*
 
 ## Usage
 
@@ -97,6 +105,11 @@ Scenario of storing data in MongoDB:
 + 2).demo_two: Get mongodb configuration based on .conf in local VIT.
 + 4).demo_four: Get mongodb configuration from consul.
 + 6).demo_six: Scenario of asynchronously storing data in MongoDB.
+
+Scenario of storing data in PostgreSQL(need to install ayugespidertools[database] dependencies):
++ 21).demo_nine: Get postgresql configuration based on .conf in local VIT.
++ 22).demo_ten: Scenario of asynchronously storing data in PostgreSQL.
+- 23). It also supports obtaining configuration from nacos or consul, no more examples.
 
 - 7).demo_seven: Scenarios using requests to request (this feature has been removed, and using aiohttp is recommended instead)
 + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
@@ -177,8 +190,8 @@ functionality of Scrapy.**
     - [x] Adaptation for scenarios where storage is done in Mysql:
         - [x] Automatically create the required databases, tables, field formats, and field comments for scenarios where
           Mysql users need to be created.
-    - [x] Adaptation for scenarios where storage is done in MongoDB, with coding style consistent with storage in Mysql
-      and other scenarios.
+    - [x] Adaptation for scenarios where storage is done in MongoDB.
+    - [x] Adaptation for scenarios where storage is done in PostgreSQL.
     - [x] Examples of asyncio syntax support and third-party library support for async:
         - [x] Example of using asyncio and aiohttp in a spider script.
         - [x] Example of using asyncio and aioMysql in a pipeline script.
