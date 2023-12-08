@@ -56,6 +56,7 @@ class MongoDBConf(NamedTuple):
     database: Optional[str] = None
     authsource: Optional[str] = None
     authMechanism: authMechanismStr = "SCRAM-SHA-1"
+    uri: Optional[str] = None
 
 
 class PostgreSQLConf(NamedTuple):

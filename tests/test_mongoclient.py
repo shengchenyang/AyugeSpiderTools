@@ -1,3 +1,4 @@
+import copy
 import json
 import uuid
 from pathlib import Path
@@ -5,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from ayugespidertools.mongoclient import MongoDbBase
-from tests import tests_dir
-from tests.conftest import mongodb_database, mongodb_ori, test_table
+from tests import MONGODB_CONFIG, tests_dir
+from tests.conftest import mongodb_database, test_table
 
 add_data_list = [
     {
@@ -45,36 +46,27 @@ def mongodb_first_step(mongodb_conn):
     mongodb_conn[mongodb_database][test_table].insert_many(save_data)
 
 
-def test_uri_connect(mongodb_first_step):
-    """测试 mongoDB 的 uri 链接方式"""
-    mongodb = MongoDbBase(**mongodb_ori)
-    select_res = mongodb.find(test_table, {"nick_name": "菜只因C"})
-    print("select_res:", list(select_res))
-    print("select_res:", select_res.count())
-    assert select_res.count() >= 1
-
-
-def test_key_connect():
-    """测试 mongoDB 的 key 关键字链接方式"""
-    mongodb_ori["connect_style"] = "K"
-    mongodb = MongoDbBase(**mongodb_ori)
+def test_key_connect(mongodb_first_step):
+    """测试 mongoDB 的 key 链接方式"""
+    _mongo_conf = copy.deepcopy(MONGODB_CONFIG)
+    _mongo_conf.pop("uri")
+    mongodb = MongoDbBase(**_mongo_conf)
     select_res = mongodb.find(test_table, {"nick_name": "菜只因C"})
     print("select_res:", list(select_res), select_res.count())
     assert select_res.count() >= 1
 
 
-def test_auth_connect():
-    """测试 mongoDB 的 auth 认证链接方式 (pymongo 3.11.0 及以下版本使用)"""
-    mongodb_ori["connect_style"] = "A"
-    mongodb = MongoDbBase(**mongodb_ori)
+def test_uri_connect():
+    """测试 mongoDB 的 uri 关键字链接方式"""
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     select_res = mongodb.find(test_table, {"nick_name": "菜只因C"})
-    print("select_res:", list(select_res))
+    print("select_res:", list(select_res), select_res.count())
     assert select_res.count() >= 1
 
 
 def test_insert_one():
     """测试 mongoDB 插入一条数据"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     insert_id = mongodb.insert_one(
         test_table,
         add_data_list[0],
@@ -85,7 +77,7 @@ def test_insert_one():
 
 def test_insert_many():
     """测试 mongoDB 插入多条数据"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     insert_res = mongodb.insert_many(
         test_table,
         add_data_list[1:],
@@ -96,7 +88,7 @@ def test_insert_many():
 
 def test_update():
     """测试 mongoDB 更新数据"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     update_res = mongodb.update_super(
         collection=test_table,
         select_dict={
@@ -111,7 +103,7 @@ def test_update():
 
 def test_delete():
     """测试 mongoDB 删除数据"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     delete_res = mongodb.delete(
         test_table, {"article_title": {"$regex": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略"}}
     )
@@ -121,7 +113,7 @@ def test_delete():
 
 def test_find():
     """测试 mongoDB 查询数据"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     select_res = mongodb.find(test_table, {"favor_count": "46"}).count()
     print("select_res:", select_res)
     assert select_res >= 1
@@ -143,7 +135,7 @@ def test_find():
 
 def test_upload():
     """测试 mongoDB 上传图片方法"""
-    mongodb = MongoDbBase(**mongodb_ori)
+    mongodb = MongoDbBase(**MONGODB_CONFIG)
     png_bytes = Path(tests_dir, "docs/image/mongo_upload.png").read_bytes()
 
     # 返回上传后的 ID 及图片链接

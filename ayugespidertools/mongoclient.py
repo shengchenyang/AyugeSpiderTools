@@ -16,16 +16,17 @@ class MongoDbBase:
 
     def __init__(
         self,
-        user: str,
-        password: str,
-        host: str,
-        port: int,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
+        host: str = "localhost",
+        port: int = 27017,
         authsource: str = "admin",
         authMechanism: "authMechanismStr" = "SCRAM-SHA-1",
         database: Optional[str] = None,
-        connect_style: Optional[str] = None,
+        uri: Optional[str] = None,
     ) -> None:
         """初始化 mongo 连接句柄
+        可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
 
         Args:
             user: 用户名
@@ -35,18 +36,13 @@ class MongoDbBase:
             authsource: mongoDB 身份验证需要的数据库名称
             authMechanism: mongoDB 身份验证机制
             database: mongoDB 链接需要的数据库
-            connect_style: mongoDB 的链接方式，参数选择有：
-                1). uri: uri 方式；
-                2). key: 关键字变量方式；
-                3). auth: authenticate 或 admin 认证方式;
-                默认为 uri 方式，但其实对外使用还是只传 user, password ... connect_style 的形式
+            uri: mongoDB uri，需要包含 database 参数， demo: 'mongodb://host/my_database'
         """
-        # uri 方式，默认使用此方式连接
-        if any([not connect_style, connect_style in {"uri", "U"}]):
-            uri = f"mongodb://{user}:{password}@{host}:{port}/?authSource={authsource}&authMechanism={authMechanism}"
+        if uri is not None:
             self.conn = MongoClient(uri)
+            self.db = self.conn.get_database()
 
-        elif connect_style in {"key", "K"}:
+        else:
             self.conn = MongoClient(
                 host=host,
                 port=port,
@@ -55,37 +51,7 @@ class MongoDbBase:
                 authSource=authsource,
                 authMechanism=authMechanism,
             )
-
-        elif connect_style in {"auth", "A"}:
-            self.conn = MongoClient(host, port)
-            # 连接 admin 数据库，账号密码认证(其实这里也可以使用 uri 的 auth 认证方式)
-            db = self.conn.admin
-            db.authenticate(user, password)
-
-        else:
-            raise ValueError("你指定错误了 connect_style 的 mongo 链接类型，请正确输入！")
-
-        if database:
-            self.db = self.init_db(database)
-
-    def get_state(self):
-        """获取 mongoDB 链接状态
-
-        Returns:
-            1). bool: 链接是否正常
-        """
-        return all([self.conn is not None, self.db is not None])
-
-    def init_db(self, database: str):
-        """指定链接的数据库为 database
-
-        Args:
-            database: 链接的目标数据库
-
-        Returns:
-            1). connect: 数据库链接
-        """
-        return self.conn[database]
+            self.db = self.conn[database]
 
     def insert_one(self, collection: str, data: dict) -> str:
         """插入一条数据
@@ -97,10 +63,8 @@ class MongoDbBase:
         Returns:
             inserted_id: 成功返回的 id
         """
-        if self.get_state():
-            ret = self.db[collection].insert_one(data)
-            return ret.inserted_id
-        return ""
+        ret = self.db[collection].insert_one(data)
+        return ret.inserted_id
 
     def insert_many(self, collection: str, data: List[Dict]):
         """批量插入
@@ -112,10 +76,8 @@ class MongoDbBase:
         Returns:
             inserted_ids: list: 成功返回的 ids
         """
-        if self.get_state():
-            ret = self.db[collection].insert_many(data)
-            return ret.inserted_ids
-        return ""
+        ret = self.db[collection].insert_many(data)
+        return ret.inserted_ids
 
     def update(self, collection, data):
         """更新
@@ -132,13 +94,11 @@ class MongoDbBase:
         for key in data.keys():
             data_filter[key] = data[key][0]
             data_revised[key] = data[key][1]
-        if self.get_state():
-            return (
-                self.db[collection]
-                .update_many(data_filter, {"$set": data_revised})
-                .modified_count
-            )
-        return 0
+        return (
+            self.db[collection]
+            .update_many(data_filter, {"$set": data_revised})
+            .modified_count
+        )
 
     def find(self, collection, condition, column: Optional[dict] = None):
         """查询
@@ -152,15 +112,12 @@ class MongoDbBase:
             1). 查询条件的搜索结果
         """
         try:
-            if self.get_state():
-                if column is None:
-                    return self.db[collection].find(condition)
-                else:
-                    return self.db[collection].find(condition, column)
+            if column is None:
+                return self.db[collection].find(condition)
             else:
-                return None
-        except Exception:
-            return "查询数据格式有误"
+                return self.db[collection].find(condition, column)
+        except Exception as e:
+            return f"查询数据格式有误{e}"
 
     def t_update(self, collection, s_key, s_value, update_data):
         # self.db.get_collection(collection).update_one({s_key: s_value}, {"$set": update_data})
@@ -196,9 +153,7 @@ class MongoDbBase:
 
     # 删除
     def delete(self, collection, condition):
-        if self.get_state():
-            return self.db[collection].delete_many(filter=condition).deleted_count
-        return 0
+        return self.db[collection].delete_many(filter=condition).deleted_count
 
     # 上传数据
     def upload_file(self, file_name, collection, content_type, file_data, metadata):
@@ -255,9 +210,6 @@ class MongoDbBase:
         res = gridfs_col.find_one({"filename": file_name})
         return res._id, f"/file/find/{str(res._id)}/{res.md5}"
 
-    def close_mongodb(self):
-        """手动关闭连接"""
-        self.conn.close()
-
     def __del__(self):
-        self.conn.close()
+        if hasattr(self, "conn"):
+            self.conn.close()

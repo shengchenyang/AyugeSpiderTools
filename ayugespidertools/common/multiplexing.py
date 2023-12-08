@@ -55,7 +55,7 @@ class ReuseOperation:
             }
         if "mongodb" in config_parser:
             inner_settings["MONGODB_CONFIG"] = {
-                "host": config_parser.get("mongodb", "host", fallback=None),
+                "host": config_parser.get("mongodb", "host", fallback="localhost"),
                 "port": config_parser.getint("mongodb", "port", fallback=27017),
                 "authsource": config_parser.get(
                     "mongodb", "authsource", fallback="admin"
@@ -66,6 +66,7 @@ class ReuseOperation:
                 "user": config_parser.get("mongodb", "user", fallback="admin"),
                 "password": config_parser.get("mongodb", "password", fallback=None),
                 "database": config_parser.get("mongodb", "database", fallback=None),
+                "uri": config_parser.get("mongodb", "uri", fallback=None),
             }
         if "postgresql" in config_parser:
             inner_settings["POSTGRESQL_CONFIG"] = {

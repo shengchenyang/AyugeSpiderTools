@@ -165,6 +165,7 @@ class SpiderTest(unittest.TestCase):
             "authsource": MONGODB_CONFIG["authsource"],
             "authMechanism": MONGODB_CONFIG["authMechanism"],
             "database": MONGODB_CONFIG["database"],
+            "uri": MONGODB_CONFIG["uri"],
         }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)

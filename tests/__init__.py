@@ -30,6 +30,7 @@ MONGODB_CONFIG = {
     "authsource": mongodb_conf["authsource"],
     "authMechanism": mongodb_conf.get("authMechanism", "SCRAM-SHA-1"),
     "database": mongodb_conf["database"],
+    "uri": mongodb_conf.get("uri"),
 }
 
 OSS_CONFIG = {

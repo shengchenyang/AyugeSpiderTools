@@ -13,7 +13,6 @@ script_coll_table = "script_collection_statistics"
 table_coll_table = "table_collection_statistics"
 article_list_table = "_article_info_list"
 mongodb_database = MONGODB_CONFIG["database"]
-mongodb_ori = copy.deepcopy(MONGODB_CONFIG)
 
 
 class ForTestConfig:
@@ -52,6 +51,7 @@ def mysql_db_cursor():
 @pytest.fixture(scope="session")
 def mongodb_conn():
     pymongo_conf = copy.deepcopy(MONGODB_CONFIG)
+    pymongo_conf.pop("uri")
     database = pymongo_conf.pop("database")
     pymongo_conf["username"] = pymongo_conf.pop("user")
     pymongo_conf["authSource"] = pymongo_conf.pop("authsource")
