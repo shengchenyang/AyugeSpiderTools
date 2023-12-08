@@ -18,6 +18,8 @@ database=***
 authsource=***
 user=***
 password=***
+# 也可用 uri 的方式设置连接配置，会优先从 uri 中获取，示例如下:
+uri=mongodb://user:password@host:port/database?authSource=*&authMechanism=* # 两种方式请按需选择一种即可
 
 [postgresql]
 host=***
