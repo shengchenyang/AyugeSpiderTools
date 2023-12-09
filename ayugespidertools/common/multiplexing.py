@@ -321,34 +321,33 @@ class ReuseOperation:
             db_conf: 数据库连接配置，目前支持 mysql 和 postgresql
         """
         if isinstance(db_conf, MysqlConf):
-            conn = pymysql.connect(
+            with pymysql.connect(
                 user=db_conf.user,
                 password=db_conf.password,
                 host=db_conf.host,
                 port=db_conf.port,
                 charset=db_conf.charset,
-            )
-            cursor = conn.cursor()
-            cursor.execute(
-                f"CREATE DATABASE IF NOT EXISTS `{db_conf.database}` character set {db_conf.charset};"
-            )
-            cursor.close()
-            conn.close()
+            ) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        f"CREATE DATABASE IF NOT EXISTS `{db_conf.database}` character set {db_conf.charset};"
+                    )
 
-        if isinstance(db_conf, PostgreSQLConf):
-            conn = psycopg.connect(
+        elif isinstance(db_conf, PostgreSQLConf):
+            with psycopg.connect(
                 user=db_conf.user,
                 password=db_conf.password,
                 host=db_conf.host,
                 port=db_conf.port,
-            )
-            conn.autocommit = True
-            cursor = conn.cursor()
-            cursor.execute(
-                f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset};"
-            )
-            cursor.close()
-            conn.close()
+            ) as conn:
+                with conn.cursor() as cur:
+                    conn.autocommit = True
+                    cur.execute(
+                        f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset};"
+                    )
+
+        else:
+            assert False, f"Invalid db_conf type: {type(db_conf)}"
         logger.info(f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!")
 
     @classmethod
