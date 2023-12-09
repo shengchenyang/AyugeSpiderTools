@@ -36,7 +36,7 @@
 > `python 3.8+` 可以直接输入以下命令：
 
 ```shell
-pip install ayugespidertools -i https://pypi.org/simple
+pip install ayugespidertools
 ```
 
 > 可选安装1，安装数据库相关的所有依赖：

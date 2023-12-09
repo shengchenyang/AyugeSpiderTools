@@ -40,7 +40,7 @@ as field encoding, Data too long, and non-existent storage fields.
 > `python 3.8.1+` can directly enter the following command:
 
 ```shell
-pip install ayugespidertools -i https://pypi.org/simple
+pip install ayugespidertools
 ```
 
 > Optional installation 1, install all database-related dependencies:

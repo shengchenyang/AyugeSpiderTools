@@ -54,13 +54,15 @@ pip install ayugespidertools[all]
 
   ```shell
   # 1.首先查看 pypi 上的版本信息
+  # 如果输出的 latest 版本信息非最新，说明你的 pip 的 pypi 源还未同步，可选择“科学上网”或手动安装。
   pip index versions ayugespidertools
 
-  # 2.如果输出的 latest 版本信息非最新，说明你的 pip 的 pypi 源还未同步，可选择“科学上网”或手动安装。
-  # 这里只介绍手动安装的方法：
-  # 先到 https://pypi.org/project/AyugeSpiderTools/#files 或 https://github.com/shengchenyang/AyugeSpiderTools/releases 下载 whl 文件
+  # 1.1. 若你可以科学访问，安装只需指定 pypi 官方源即可：
+  pip install ayugespidertools -i https://pypi.org/simple
 
-  # 3.然后 pip 安装此 whl 即可
+  # 1.2. 若访问受限，则需要手动安装：
+  # 先到 https://pypi.org/project/AyugeSpiderTools/#files 或 https://github.com/shengchenyang/AyugeSpiderTools/releases 下载 whl 文件
+  # 然后 pip 安装此 whl 即可
   pip install ayugespidertools-x.x.x-py3-none-any.whl[database] -i https://mirrors.aliyun.com/pypi/simple/
   # zsh 中的命令同样需要修改
   pip install 'ayugespidertools-x.x.x-py3-none-any.whl[database]' -i https://mirrors.aliyun.com/pypi/simple/
