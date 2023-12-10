@@ -15,11 +15,11 @@ def mysql_first_step(mysql_db_cursor):
         f"""
         CREATE TABLE IF NOT EXISTS `{test_table}` (
           `id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
-          `article_detail_url` varchar(190) DEFAULT '' COMMENT '文章详情链接',
-          `article_title` varchar(190) DEFAULT '' COMMENT '文章标题',
-          `comment_count` varchar(190) DEFAULT '' COMMENT '文章评论数量',
-          `favor_count` varchar(190) DEFAULT '' COMMENT '文章赞成数量',
-          `nick_name` varchar(190) DEFAULT '' COMMENT '文章作者昵称',
+          `article_detail_url` varchar(255) DEFAULT '' COMMENT '文章详情链接',
+          `article_title` varchar(255) DEFAULT '' COMMENT '文章标题',
+          `comment_count` varchar(255) DEFAULT '' COMMENT '文章评论数量',
+          `favor_count` varchar(255) DEFAULT '' COMMENT '文章赞成数量',
+          `nick_name` varchar(255) DEFAULT '' COMMENT '文章作者昵称',
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测试表示例';
         """

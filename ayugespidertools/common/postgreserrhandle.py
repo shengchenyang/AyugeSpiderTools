@@ -81,7 +81,7 @@ class AbstractClass(ABC):
         notes = note_dic[colum]
 
         sql = (
-            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {colum} VARCHAR(190) DEFAULT '';"
+            f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {colum} VARCHAR(255) DEFAULT '';"
             f"COMMENT ON COLUMN {table}.{colum} IS '{notes}'"
         )
         return sql, f"添加字段 {colum} 已存在"

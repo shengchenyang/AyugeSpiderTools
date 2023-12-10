@@ -172,7 +172,7 @@ class AbstractClass(ABC):
         colum = text[0]
         notes = note_dic[colum]
 
-        sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(190) NULL DEFAULT '' COMMENT '{notes}';"
+        sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(255) NULL DEFAULT '' COMMENT '{notes}';"
         return sql, f"添加字段 {colum} 已存在"
 
     def deal_1406_error(
