@@ -9,7 +9,7 @@ port=3306
 user=***
 password=***
 database=***
-charset=***
+charset=*** # 可选参数，默认 utf8mb4
 
 [mongodb]
 host=***
@@ -27,7 +27,7 @@ port=5432
 user=***
 password=***
 database=***
-charset=UTF8
+charset=*** # 可选参数，默认 UTF8
 
 [mq]
 host=***
@@ -40,7 +40,7 @@ exchange=***
 routing_key=***
 
 [kafka]
-bootstrap_servers=host:port
+bootstrap_servers=host:port #若多个用逗号分隔
 topic=***
 key=***
 
