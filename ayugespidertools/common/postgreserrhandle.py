@@ -58,8 +58,7 @@ class AbstractClass(ABC):
             raise Exception(f"postgres 有字段超出长度限制：{err_msg}")
 
         else:
-            # 碰到其他的异常才打印错误日志，已处理的异常不打印
-            logger.error(f"POSTGRES OTHER ERROR: {err_msg}")
+            raise Exception(f"POSTGRES OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict

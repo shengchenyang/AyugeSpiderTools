@@ -150,8 +150,7 @@ class AbstractClass(ABC):
             self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
 
         else:
-            # 碰到其他的异常才打印错误日志，已处理的异常不打印
-            logger.error(f"MYSQL OTHER ERROR: {err_msg}")
+            raise Exception(f"MYSQL OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict
