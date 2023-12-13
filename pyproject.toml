@@ -70,7 +70,7 @@ pre-commit = "3.4.0"
 toml = "0.10.2"
 
 [tool.poetry.extras]
-all = ["mmh3", "pycryptodome", "oss2", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool"]
+all = ["mmh3", "pycryptodome", "oss2", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool", "oracledb"]
 database = ["psycopg", "psycopg-binary", "psycopg-pool", "oracledb"]
 
 [[tool.poetry.source]]
@@ -139,7 +139,7 @@ profile = "black"
 [tool.mypy]
 python_version = "3.8"
 ignore_missing_imports = true
-disable_error_code = ["attr-defined", "union-attr"]
+disable_error_code = ["attr-defined", "arg-type", "union-attr"]
 
 [[tool.mypy.overrides]]
 module = [
