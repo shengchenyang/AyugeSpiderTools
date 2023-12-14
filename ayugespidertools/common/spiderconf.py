@@ -11,6 +11,7 @@ from ayugespidertools.common.typevars import (
     MongoDBConf,
     MQConf,
     MysqlConf,
+    OracleConf,
     PostgreSQLConf,
 )
 from ayugespidertools.common.utils import ToolsForAyu
@@ -148,6 +149,36 @@ class PostgreSQLConfProduct(Product):
         return postgres_engine, postgres_engine_conn
 
 
+class OracleConfProduct(Product):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[OracleConf]:
+        if _ := settings.get("APP_CONF_MANAGE", False):
+            remote_conf = ToolsForAyu.fetch_remote_conf(
+                conf_name="oracle", **remote_option
+            )
+            return OracleConf(**remote_conf) if remote_conf else None
+
+        local_conf = settings.get("ORACLE_CONFIG")
+        return OracleConf(**local_conf) if local_conf else None
+
+    def get_engine(
+        self, db_conf: OracleConf, db_engine_enabled: bool
+    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+        oracle_engine = oracle_engine_conn = None
+        if db_engine_enabled:
+            oracle_url = (
+                f"oracle+oracledb://{db_conf.user}:{db_conf.password}"
+                f"@{db_conf.host}:{db_conf.port}/{db_conf.service_name}"
+            )
+            oracle_engine = DatabaseEngineClass(engine_url=oracle_url).engine
+            try:
+                oracle_engine_conn = oracle_engine.connect()
+            except OperationalError:
+                pass
+        return oracle_engine, oracle_engine_conn
+
+
 class MQConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
@@ -229,6 +260,11 @@ class MongoDBConfCreator(Creator):
 class PostgreSQLConfCreator(Creator):
     def create_product(self) -> Product:
         return PostgreSQLConfProduct()
+
+
+class OracleConfCreator(Creator):
+    def create_product(self) -> Product:
+        return OracleConfProduct()
 
 
 class MQConfCreator(Creator):

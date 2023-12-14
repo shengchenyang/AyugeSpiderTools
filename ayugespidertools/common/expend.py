@@ -9,6 +9,7 @@ from ayugespidertools.common.params import Param
 from ayugespidertools.config import logger
 
 try:
+    import oracledb
     import psycopg
 except ImportError:
     # pip install ayugespidertools[database]
@@ -17,13 +18,15 @@ except ImportError:
 __all__ = [
     "MysqlPipeEnhanceMixin",
     "PostgreSQLPipeEnhanceMixin",
+    "OraclePipeEnhanceMixin",
 ]
 
 if TYPE_CHECKING:
+    from oracledb.connection import Connection as OracleConnection
     from psycopg.connection import Connection as PsycopgConnection
     from pymysql.connections import Connection as PymysqlConnection
 
-    from ayugespidertools.common.typevars import MysqlConf, PostgreSQLConf
+    from ayugespidertools.common.typevars import MysqlConf, OracleConf, PostgreSQLConf
 
 
 class MysqlPipeEnhanceMixin:
@@ -226,3 +229,49 @@ class PostgreSQLPipeEnhanceMixin:
         keys = f"""{", ".join(item.keys())}"""
         values = ", ".join(["%s"] * len(item))
         return f"INSERT INTO {table} ({keys}) values ({values});"
+
+
+class OraclePipeEnhanceMixin:
+    """扩展 oracle pipelines 的功能"""
+
+    @retry(
+        stop_max_attempt_number=Param.retry_num,
+        wait_random_min=Param.retry_time_min,
+        wait_random_max=Param.retry_time_max,
+    )
+    def _connect(
+        self,
+        oracle_conf: "OracleConf",
+    ) -> "OracleConnection":
+        """链接数据库返回链接句柄
+
+        Args:
+            oracle_conf: oracle 链接所需的参数
+
+        Returns:
+            1). oracle 链接句柄
+        """
+        if oracle_thick_path := oracle_conf.thick_path:
+            oracledb.init_oracle_client(oracle_thick_path)
+            return oracledb.connect(
+                user=oracle_conf.user,
+                password=oracle_conf.password,
+                host=oracle_conf.host,
+                port=oracle_conf.port,
+                service_name=oracle_conf.service_name,
+                encoding=oracle_conf.encoding,
+            )
+
+    def _get_sql_by_item(self, table: str, item: dict) -> str:
+        """根据处理后的 item 生成 oracle 插入语句
+
+        Args:
+            table: 数据库表名
+            item: 处理后的 item
+
+        Returns:
+            1). sql 插入语句
+        """
+        keys = f""":{", :".join(item.keys())}"""
+        table_keys = ", ".join(map(lambda key: f'"{key}"', item.keys()))
+        return f'INSERT INTO "{table}" ({table_keys}) values ({keys})'

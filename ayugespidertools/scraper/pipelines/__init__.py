@@ -12,6 +12,7 @@ from ayugespidertools.scraper.pipelines.mysql.fantasy import AyuFtyMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.stats import AyuStatisticsMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.turbo import AyuTurboMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipeline
+from ayugespidertools.scraper.pipelines.oracle.fantasy import AyuFtyOraclePipeline
 from ayugespidertools.scraper.pipelines.postgres.fantasy import AyuFtyPostgresPipeline
 from ayugespidertools.scraper.pipelines.postgres.twisted import (
     AyuTwistedPostgresPipeline,
@@ -28,6 +29,7 @@ __all__ = [
     "AyuStatisticsMysqlPipeline",
     "AyuTurboMysqlPipeline",
     "AyuTwistedMysqlPipeline",
+    "AyuFtyOraclePipeline",
     "AyuFtyPostgresPipeline",
     "AyuTwistedPostgresPipeline",
 ]

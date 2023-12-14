@@ -49,10 +49,10 @@ class MysqlConf(NamedTuple):
 
 
 class MongoDBConf(NamedTuple):
-    host: str
-    port: int
-    user: str
-    password: str
+    host: str = ""
+    port: int = 27017
+    user: str = ""
+    password: str = ""
     database: Optional[str] = None
     authsource: Optional[str] = None
     authMechanism: authMechanismStr = "SCRAM-SHA-1"
@@ -66,6 +66,16 @@ class PostgreSQLConf(NamedTuple):
     password: str
     database: Optional[str] = None
     charset: str = "UTF8"
+
+
+class OracleConf(NamedTuple):
+    host: str
+    port: int
+    user: str
+    password: str
+    service_name: Optional[str] = None
+    encoding: str = "utf8"
+    thick_path: Optional[str] = None
 
 
 class AiohttpConf(NamedTuple):

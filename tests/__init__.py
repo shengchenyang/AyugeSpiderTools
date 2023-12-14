@@ -10,6 +10,7 @@ config_parser.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 # 测试环境中各种配置信息，已脱敏，请自行配置 VIT 的 .conf 文件后测试
 mysql_conf = config_parser["mysql"]
 mongodb_conf = config_parser["mongodb"]
+mongodb_uri_conf = config_parser["mongodb:uri"]
 oss_conf = config_parser["ali_oss"]
 
 PYMYSQL_CONFIG = {
@@ -30,7 +31,7 @@ MONGODB_CONFIG = {
     "authsource": mongodb_conf["authsource"],
     "authMechanism": mongodb_conf.get("authMechanism", "SCRAM-SHA-1"),
     "database": mongodb_conf["database"],
-    "uri": mongodb_conf.get("uri"),
+    "uri": mongodb_uri_conf.get("uri"),
 }
 
 OSS_CONFIG = {

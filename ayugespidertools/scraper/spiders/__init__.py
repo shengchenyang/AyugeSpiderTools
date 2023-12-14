@@ -12,6 +12,7 @@ from ayugespidertools.common.spiderconf import (
     MongoDBConfCreator,
     MQConfCreator,
     MysqlConfCreator,
+    OracleConfCreator,
     PostgreSQLConfCreator,
     get_spider_conf,
     get_sqlalchemy_conf,
@@ -124,6 +125,11 @@ class AyuSpider(Spider):
                 db_conf=postgres_conf,
                 db_engine_enabled=_db_engine_enabled,
             )
+
+        if oracle_conf := get_spider_conf(
+            OracleConfCreator(), crawler.settings, remote_option
+        ):
+            spider.oracle_conf = oracle_conf
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
