@@ -46,14 +46,18 @@ class ReuseOperation:
         config_parser.read(f"{vit_dir}/.conf", encoding="utf-8")
         if "mysql" in config_parser:
             inner_settings["MYSQL_CONFIG"] = {
-                "host": config_parser.get("mysql", "host", fallback=None),
+                "host": config_parser.get("mysql", "host", fallback="localhost"),
                 "port": config_parser.getint("mysql", "port", fallback=3306),
-                "user": config_parser.get("mysql", "user", fallback="root"),
-                "password": config_parser.get("mysql", "password", fallback=None),
+                "user": config_parser.get("mysql", "user", fallback=""),
+                "password": config_parser.get("mysql", "password", fallback=""),
                 "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
-                "database": config_parser.get("mysql", "database", fallback=None),
+                "database": config_parser.get("mysql", "database", fallback=""),
             }
-        if "mongodb" in config_parser:
+        if "mongodb:uri" in config_parser:
+            inner_settings["MONGODB_CONFIG"] = {
+                "uri": config_parser.get("mongodb:uri", "uri", fallback=None)
+            }
+        elif "mongodb" in config_parser:
             inner_settings["MONGODB_CONFIG"] = {
                 "host": config_parser.get("mongodb", "host", fallback="localhost"),
                 "port": config_parser.getint("mongodb", "port", fallback=27017),
@@ -66,16 +70,27 @@ class ReuseOperation:
                 "user": config_parser.get("mongodb", "user", fallback="admin"),
                 "password": config_parser.get("mongodb", "password", fallback=None),
                 "database": config_parser.get("mongodb", "database", fallback=None),
-                "uri": config_parser.get("mongodb", "uri", fallback=None),
             }
         if "postgresql" in config_parser:
             inner_settings["POSTGRESQL_CONFIG"] = {
-                "host": config_parser.get("postgresql", "host", fallback=None),
+                "host": config_parser.get("postgresql", "host", fallback="localhost"),
                 "port": config_parser.getint("postgresql", "port", fallback=5432),
                 "user": config_parser.get("postgresql", "user", fallback="postgres"),
-                "password": config_parser.get("postgresql", "password", fallback=None),
-                "database": config_parser.get("postgresql", "database", fallback=None),
+                "password": config_parser.get("postgresql", "password", fallback=""),
+                "database": config_parser.get("postgresql", "database", fallback=""),
                 "charset": config_parser.get("postgresql", "charset", fallback="UTF8"),
+            }
+        if "oracle" in config_parser:
+            inner_settings["ORACLE_CONFIG"] = {
+                "host": config_parser.get("oracle", "host", fallback="localhost"),
+                "port": config_parser.getint("oracle", "port", fallback=1521),
+                "user": config_parser.get("oracle", "user", fallback=None),
+                "password": config_parser.get("oracle", "password", fallback=None),
+                "service_name": config_parser.get(
+                    "oracle", "service_name", fallback=None
+                ),
+                "encoding": config_parser.get("oracle", "encoding", fallback="utf8"),
+                "thick_path": config_parser.get("oracle", "thick_path", fallback=None),
             }
         if "consul" in config_parser:
             inner_settings["REMOTE_CONFIG"] = {

@@ -1,7 +1,6 @@
-[notice]
-info=这是 .conf 文件的示例；跑通部分测试文件，可能需要在同目录下配置 .conf 文件！
-about_consul_and_nacos=使用远程配置服务时，优先从 consul 中获取配置信息
-detail=以下为所需的配置信息，具体值请自行添加。
+; 这是 .conf 文件的示例；跑通部分测试文件，需要在同目录下配置 .conf 文件！
+; 使用远程配置服务时，优先从 consul 中获取配置信息。
+; 以下为所需的配置信息，具体值请自行添加。
 
 [mysql]
 host=***
@@ -9,7 +8,10 @@ port=3306
 user=***
 password=***
 database=***
-charset=*** # 可选参数，默认 utf8mb4
+charset=***
+
+[mongodb:uri]
+uri=mongodb://user:password@host:port/database?authSource=*&authMechanism=*
 
 [mongodb]
 host=***
@@ -18,8 +20,6 @@ database=***
 authsource=***
 user=***
 password=***
-# 也可用 uri 的方式设置连接配置，会优先从 uri 中获取，示例如下:
-uri=mongodb://user:password@host:port/database?authSource=*&authMechanism=* # 两种方式请按需选择一种即可
 
 [postgresql]
 host=***
@@ -28,6 +28,15 @@ user=***
 password=***
 database=***
 charset=*** # 可选参数，默认 UTF8
+
+[oracle]
+host=***
+port=1521
+user=***
+password=***
+service_name=XE
+encoding=utf8
+thick_path=thick 模式参数
 
 [mq]
 host=***
