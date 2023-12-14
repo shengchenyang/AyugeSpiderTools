@@ -7,7 +7,6 @@
 
 # AyugeSpiderTools 介绍
 
-[![OSCS Status](https://www.oscs1024.com/platform/badge/AyugeSpiderTools.svg?size=small)](https://www.murphysec.com/accept?code=0ec375759aebea7fd260248910b98806&type=1&from=2)
 ![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
 ![python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
