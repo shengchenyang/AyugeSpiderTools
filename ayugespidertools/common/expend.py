@@ -253,14 +253,15 @@ class OraclePipeEnhanceMixin:
         """
         if oracle_thick_path := oracle_conf.thick_path:
             oracledb.init_oracle_client(oracle_thick_path)
-            return oracledb.connect(
-                user=oracle_conf.user,
-                password=oracle_conf.password,
-                host=oracle_conf.host,
-                port=oracle_conf.port,
-                service_name=oracle_conf.service_name,
-                encoding=oracle_conf.encoding,
-            )
+
+        return oracledb.connect(
+            user=oracle_conf.user,
+            password=oracle_conf.password,
+            host=oracle_conf.host,
+            port=oracle_conf.port,
+            service_name=oracle_conf.service_name,
+            encoding=oracle_conf.encoding,
+        )
 
     def _get_sql_by_item(self, table: str, item: dict) -> str:
         """根据处理后的 item 生成 oracle 插入语句
