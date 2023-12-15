@@ -75,7 +75,7 @@ class OracleConf(NamedTuple):
     password: str
     service_name: Optional[str] = None
     encoding: str = "utf8"
-    thick_path: Optional[str] = None
+    thick_lib_dir: Union[bool, str] = False
 
 
 class AiohttpConf(NamedTuple):

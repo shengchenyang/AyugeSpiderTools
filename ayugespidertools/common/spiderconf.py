@@ -175,7 +175,7 @@ class OracleConfProduct(Product):
                 f"@{db_conf.host}:{db_conf.port}/{db_conf.service_name}"
             )
             thick_mode = (
-                {"lib_dir": db_conf.thick_path} if db_conf.thick_path else False
+                {"lib_dir": db_conf.thick_lib_dir} if db_conf.thick_lib_dir else False
             )
 
             try:

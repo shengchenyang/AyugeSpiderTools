@@ -251,8 +251,8 @@ class OraclePipeEnhanceMixin:
         Returns:
             1). oracle 链接句柄
         """
-        if oracle_thick_path := oracle_conf.thick_path:
-            oracledb.init_oracle_client(oracle_thick_path)
+        if oracle_thick_lib_dir := oracle_conf.thick_lib_dir:
+            oracledb.init_oracle_client(oracle_thick_lib_dir)
 
         return oracledb.connect(
             user=oracle_conf.user,

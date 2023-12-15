@@ -36,7 +36,7 @@ user=***
 password=***
 service_name=XE
 encoding=utf8
-thick_path=thick 模式参数
+thick_lib_dir=thick 模式参数
 
 [mq]
 host=***
