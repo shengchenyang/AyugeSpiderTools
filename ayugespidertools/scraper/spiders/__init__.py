@@ -56,18 +56,13 @@ class AyuSpider(Spider):
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
         """本库的日志管理模块，使用 loguru 来管理日志
-        注意：
-            1. 本库不是通过适配器模式或 mixin 等方法对 scrapy logger 重写或扩展，而是
-        新增一个 slog 的日志管理方法，目前感觉这样最适合；
-            2. 本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
+        Note:
+            本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
         """
         loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
         assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
 
-        if loguru_enabled:
-            return logger
-        else:
-            return super(AyuSpider, self).logger
+        return logger if loguru_enabled else super(AyuSpider, self).logger
 
     @classmethod
     def update_settings(cls, settings: "BaseSettings") -> None:
