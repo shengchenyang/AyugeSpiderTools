@@ -90,7 +90,7 @@ class ReuseOperation:
                     "oracle", "service_name", fallback=None
                 ),
                 "encoding": config_parser.get("oracle", "encoding", fallback="utf8"),
-                "thick_path": config_parser.get("oracle", "thick_path", fallback=None),
+                "thick_path": config_parser.get("oracle", "thick_path", fallback=False),
             }
         if "consul" in config_parser:
             inner_settings["REMOTE_CONFIG"] = {

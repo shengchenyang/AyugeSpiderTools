@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, Optional, Tuple, TypeVar
 
+from oracledb.exceptions import DatabaseError
 from sqlalchemy.exc import OperationalError
 
 from ayugespidertools.common.typevars import (
@@ -15,6 +16,7 @@ from ayugespidertools.common.typevars import (
     PostgreSQLConf,
 )
 from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.config import logger
 
 __all__ = [
     "get_spider_conf",
@@ -95,11 +97,11 @@ class MysqlConfProduct(Product):
                 f":{db_conf.port}/{db_conf.database}"
                 f"?charset={db_conf.charset}"
             )
-            mysql_engine = DatabaseEngineClass(engine_url=mysql_url).engine
             try:
+                mysql_engine = DatabaseEngineClass(engine_url=mysql_url).engine
                 mysql_engine_conn = mysql_engine.connect()
-            except OperationalError:
-                pass
+            except OperationalError as err:
+                logger.warning(f"MySQL engine enabled failed: {err}")
         return mysql_engine, mysql_engine_conn
 
 
@@ -142,11 +144,11 @@ class PostgreSQLConfProduct(Product):
                 f"postgresql+psycopg://{db_conf.user}:{db_conf.password}"
                 f"@{db_conf.host}:{db_conf.port}/{db_conf.database}"
             )
-            postgres_engine = DatabaseEngineClass(engine_url=postgres_url).engine
             try:
+                postgres_engine = DatabaseEngineClass(engine_url=postgres_url).engine
                 postgres_engine_conn = postgres_engine.connect()
-            except OperationalError:
-                pass
+            except OperationalError as err:
+                logger.warning(f"PostgreSQL engine enabled failed: {err}")
         return postgres_engine, postgres_engine_conn
 
 
@@ -172,14 +174,18 @@ class OracleConfProduct(Product):
                 f"oracle+oracledb://{db_conf.user}:{db_conf.password}"
                 f"@{db_conf.host}:{db_conf.port}/{db_conf.service_name}"
             )
-            oracle_engine = DatabaseEngineClass(
-                engine_url=oracle_url,
-                thick_mode={"lib_dir": db_conf.thick_path},
-            ).engine
+            thick_mode = (
+                {"lib_dir": db_conf.thick_path} if db_conf.thick_path else False
+            )
+
             try:
+                oracle_engine = DatabaseEngineClass(
+                    engine_url=oracle_url,
+                    thick_mode=thick_mode,
+                ).engine
                 oracle_engine_conn = oracle_engine.connect()
-            except OperationalError:
-                pass
+            except (OperationalError, DatabaseError) as err:
+                logger.warning(f"Oracle engine enabled failed: {err}")
         return oracle_engine, oracle_engine_conn
 
 
