@@ -117,13 +117,6 @@
           "username":"***",
           "password":"***",
           "index":1
-      },
-      "ali_oss":{
-          "accesskeyid":"LTA***",
-          "accesskeysecret":"***",
-          "endpoint":"https://oss-cn-***.aliyuncs.com",
-          "bucket":"***",
-          "doc":"***"
       }
   }
   ```

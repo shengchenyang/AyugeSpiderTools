@@ -11,7 +11,6 @@ config_parser.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 mysql_conf = config_parser["mysql"]
 mongodb_conf = config_parser["mongodb"]
 mongodb_uri_conf = config_parser["mongodb:uri"]
-oss_conf = config_parser["ali_oss"]
 
 PYMYSQL_CONFIG = {
     "host": mysql_conf["host"],
@@ -32,14 +31,6 @@ MONGODB_CONFIG = {
     "authMechanism": mongodb_conf.get("authMechanism", "SCRAM-SHA-1"),
     "database": mongodb_conf["database"],
     "uri": mongodb_uri_conf.get("uri"),
-}
-
-OSS_CONFIG = {
-    "accesskeyid": oss_conf["accesskeyid"],
-    "accesskeysecret": oss_conf["accesskeysecret"],
-    "endpoint": oss_conf["endpoint"],
-    "bucket": oss_conf["bucket"],
-    "doc": oss_conf["doc"],
 }
 
 CONSUL_CONFIG = {

@@ -131,18 +131,6 @@ class ReuseOperation:
                     "kdl_exclusive_proxy", "index", fallback=1
                 ),
             }
-        if "ali_oss" in config_parser:
-            inner_settings["OSS_CONFIG"] = {
-                "accesskeyid": config_parser.get(
-                    "ali_oss", "accesskeyid", fallback=None
-                ),
-                "accesskeysecret": config_parser.get(
-                    "ali_oss", "accesskeysecret", fallback=None
-                ),
-                "endpoint": config_parser.get("ali_oss", "endpoint", fallback=None),
-                "bucket": config_parser.get("ali_oss", "bucket", fallback=None),
-                "doc": config_parser.get("ali_oss", "doc", fallback=None),
-            }
         if "mq" in config_parser:
             inner_settings["MQ_CONFIG"] = {
                 "host": config_parser.get("mq", "host", fallback=None),
