@@ -21,6 +21,7 @@ __all__ = [
     "MysqlConfCreator",
     "MongoDBConfCreator",
     "MQConfCreator",
+    "OracleConfCreator",
     "PostgreSQLConfCreator",
     "KafkaConfCreator",
     "DynamicProxyCreator",
@@ -171,7 +172,10 @@ class OracleConfProduct(Product):
                 f"oracle+oracledb://{db_conf.user}:{db_conf.password}"
                 f"@{db_conf.host}:{db_conf.port}/{db_conf.service_name}"
             )
-            oracle_engine = DatabaseEngineClass(engine_url=oracle_url).engine
+            oracle_engine = DatabaseEngineClass(
+                engine_url=oracle_url,
+                thick_mode={"lib_dir": db_conf.thick_path},
+            ).engine
             try:
                 oracle_engine_conn = oracle_engine.connect()
             except OperationalError:

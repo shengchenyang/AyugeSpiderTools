@@ -33,9 +33,9 @@ class DatabaseSingletonMeta(type):
 class DatabaseEngineClass(metaclass=DatabaseSingletonMeta):
     """database engine 单例模式：同一个 engine_url 只能存在一个实例"""
 
-    def __init__(self, engine_url):
+    def __init__(self, engine_url, *args, **kwargs):
         self.engine = create_engine(
-            engine_url, pool_pre_ping=True, pool_recycle=3600 * 7
+            engine_url, pool_pre_ping=True, pool_recycle=3600 * 7, *args, **kwargs
         )
 
 

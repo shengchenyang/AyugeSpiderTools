@@ -50,6 +50,8 @@ class AyuSpider(Spider):
         self.mysql_engine_conn: Optional["SqlalchemyConnectT"] = None
         self.postgres_engine: Optional["SqlalchemyEngineT"] = None
         self.postgres_engine_conn: Optional["SqlalchemyConnectT"] = None
+        self.oracle_engine: Optional["SqlalchemyEngineT"] = None
+        self.oracle_engine_conn: Optional["SqlalchemyConnectT"] = None
 
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
@@ -130,6 +132,11 @@ class AyuSpider(Spider):
             OracleConfCreator(), crawler.settings, remote_option
         ):
             spider.oracle_conf = oracle_conf
+            spider.oracle_engine, spider.oracle_engine_conn = get_sqlalchemy_conf(
+                creator=OracleConfCreator(),
+                db_conf=oracle_conf,
+                db_engine_enabled=_db_engine_enabled,
+            )
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
