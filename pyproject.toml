@@ -35,7 +35,6 @@ pymongo = [
 ]
 mmh3 = { version = "^3.0.0", optional = true }
 pycryptodome = { version = "^3.15.0", optional = true }
-oss2 = { version = "^2.16.0", optional = true }
 python-hcl2 = { version = "^4.3.0", optional = true }
 pyyaml = { version = "~6.0", optional = true }
 opencv-python = { version = "^4.6.0.66", optional = true }
@@ -70,7 +69,7 @@ pre-commit = "3.4.0"
 toml = "0.10.2"
 
 [tool.poetry.extras]
-all = ["mmh3", "pycryptodome", "oss2", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool", "oracledb"]
+all = ["mmh3", "pycryptodome", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool", "oracledb"]
 database = ["psycopg", "psycopg-binary", "psycopg-pool", "oracledb"]
 
 [[tool.poetry.source]]
