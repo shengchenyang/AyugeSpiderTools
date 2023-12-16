@@ -68,6 +68,26 @@ pip install ayugespidertools[all]
   pip install 'ayugespidertools-x.x.x-py3-none-any.whl[database]' -i https://mirrors.aliyun.com/pypi/simple/
   ```
 
+- 无法查找到 `ayugespidertools`
+
+  这也是国内源的完整度问题，推荐优先配置为阿里云源或者清华大学源即可，若还不行请切换到官方源。
+
+  报错详情如下：
+
+  ```shell
+  ERROR: Could not find a version that satisfies the requirement ayugespidertools (from versions: none)
+  ERROR: No matching distribution found for ayugespidertools
+  ```
+
+  解决方法如下：
+
+  ```shell
+  pip install ayugespidertools -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+  # 或者使用官方源：
+  pip install ayugespidertools -i https://pypi.org/simple
+  ```
+
+
 若遇到其它的各种问题，请提 [issues](https://github.com/shengchenyang/AyugeSpiderTools/issues/new/choose)。
 
 ### 值得知道的事情
