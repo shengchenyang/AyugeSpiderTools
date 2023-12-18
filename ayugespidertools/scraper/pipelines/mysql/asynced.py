@@ -22,7 +22,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
         self.mysql_conf: Optional["MysqlConf"] = None
         self.slog = None
         self.pool = None
-        self.running_tasks = set()
+        self.running_tasks: set = set()
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
