@@ -1,5 +1,5 @@
 from ayugespidertools.scraper.pipelines.download.file import FilesDownloadPipeline
-from ayugespidertools.scraper.pipelines.mongo.asynced import AsyncMongoPipeline
+from ayugespidertools.scraper.pipelines.mongo.asynced import AyuAsyncMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.twisted import AyuTwistedMongoPipeline
 from ayugespidertools.scraper.pipelines.msgproducer.kafkapub import AyuKafkaPipeline
@@ -10,6 +10,7 @@ from ayugespidertools.scraper.pipelines.mysql.stats import AyuStatisticsMysqlPip
 from ayugespidertools.scraper.pipelines.mysql.turbo import AyuTurboMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipeline
 from ayugespidertools.scraper.pipelines.oracle.fantasy import AyuFtyOraclePipeline
+from ayugespidertools.scraper.pipelines.oracle.twisted import AyuTwistedOraclePipeline
 from ayugespidertools.scraper.pipelines.postgres.fantasy import AyuFtyPostgresPipeline
 from ayugespidertools.scraper.pipelines.postgres.twisted import (
     AyuTwistedPostgresPipeline,
@@ -20,7 +21,7 @@ __all__ = [
     "AyuStatisticsMysqlPipeline",
     "AyuTurboMysqlPipeline",
     "AyuTwistedMysqlPipeline",
-    "AsyncMongoPipeline",
+    "AyuAsyncMongoPipeline",
     "AyuAsyncMysqlPipeline",
     "AyuFtyMongoPipeline",
     "AyuTwistedMongoPipeline",
@@ -28,6 +29,7 @@ __all__ = [
     "AyuKafkaPipeline",
     "FilesDownloadPipeline",
     "AyuFtyOraclePipeline",
+    "AyuTwistedOraclePipeline",
     "AyuFtyPostgresPipeline",
     "AyuTwistedPostgresPipeline",
 ]

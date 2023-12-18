@@ -7,7 +7,7 @@ from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
 
 
-class AsyncMongoPipeline:
+class AyuAsyncMongoPipeline:
     """通过 motor 实现异步写入 MongoDB 的存储管道"""
 
     def __init__(self):

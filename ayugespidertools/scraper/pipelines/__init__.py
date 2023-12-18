@@ -3,6 +3,7 @@
 # Don"t forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 from ayugespidertools.scraper.pipelines.download.file import FilesDownloadPipeline
+from ayugespidertools.scraper.pipelines.mongo.asynced import AyuAsyncMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.twisted import AyuTwistedMongoPipeline
 from ayugespidertools.scraper.pipelines.msgproducer.mqpub import AyuMQPipeline
@@ -13,6 +14,7 @@ from ayugespidertools.scraper.pipelines.mysql.stats import AyuStatisticsMysqlPip
 from ayugespidertools.scraper.pipelines.mysql.turbo import AyuTurboMysqlPipeline
 from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipeline
 from ayugespidertools.scraper.pipelines.oracle.fantasy import AyuFtyOraclePipeline
+from ayugespidertools.scraper.pipelines.oracle.twisted import AyuTwistedOraclePipeline
 from ayugespidertools.scraper.pipelines.postgres.fantasy import AyuFtyPostgresPipeline
 from ayugespidertools.scraper.pipelines.postgres.twisted import (
     AyuTwistedPostgresPipeline,
@@ -20,6 +22,7 @@ from ayugespidertools.scraper.pipelines.postgres.twisted import (
 
 __all__ = [
     "FilesDownloadPipeline",
+    "AyuAsyncMongoPipeline",
     "AyuFtyMongoPipeline",
     "AyuTwistedMongoPipeline",
     "AyuMQPipeline",
@@ -30,6 +33,7 @@ __all__ = [
     "AyuTurboMysqlPipeline",
     "AyuTwistedMysqlPipeline",
     "AyuFtyOraclePipeline",
+    "AyuTwistedOraclePipeline",
     "AyuFtyPostgresPipeline",
     "AyuTwistedPostgresPipeline",
 ]
