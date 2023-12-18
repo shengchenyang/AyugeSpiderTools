@@ -1,5 +1,32 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.0 (2023-12-18)
+
+### Deprecations
+
+- `AsyncMysqlPipeline` 改名为 `AyuAsyncMysqlPipeline`。
+- `AsyncMongoPipeline` 改名为 `AyuAsyncMongoPipeline`。
+- 删除 `oss` 的模块及依赖。
+
+注：最新示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 中查看，以往旧版请切换对应分支查看。
+
+### New features
+
+- 添加 `oracle` 的存储场景支持，目前有 `fty` 及 `twisted` 两种方式。
+- 添加 `mongodb:uri` 的配置方式。
+
+### Bug fixes
+
+- 解决 `asyncio mysql` 协程场景下可能会出现的被垃圾回收而阻塞的问题。
+- 解决 `mysql` 或 `postgresql` 的错误处理场景下由于权限等问题造成的循环递归问题。
+
+### Code optimizations
+
+- 优化 `.conf` 模板示例，配置更明确且更易管理。
+- `mypy check`.
+
+<hr>
+
 ## AyugeSpiderTools 3.8.0 (2023-12-03)
 
 ### Deprecations
@@ -14,7 +41,7 @@
 ### New features
 
 - 支持 `python3.12`。
-- 添加 `postgresql` 的存储场景支持，目前有同步场景及结合 `twisted` 的异步场景。
+- 添加 `postgresql` 的存储场景支持，目前有 `fty` 及 `twisted` 两种方式。
 - `DATABASE_ENGINE_ENABLED` 的配置目前会激活对应场景中数据库的 `engine` 和 `engine_conn` 以供去重使用。
 - 将 `psycopg` 相关的数据库扩展依赖改为可选项，可通过 `pip install ayugespidertools[database]` 安装所需依赖。
 

@@ -78,7 +78,7 @@ custom_settings = {
 #### 2.2.2. asyncio motor 实现
 
 ```python
-# 依赖 AsyncMongoPipeline
+# 依赖 AyuAsyncMongoPipeline
 ```
 
 ## 3. 消息推送服务

@@ -73,6 +73,7 @@ Getting help
    topics/items
    topics/loaders
    topics/settings
+   topics/configuration
 
 :doc:`topics/commands`
     了解用于管理 ``Scrapy`` 项目的命令行工具。
@@ -85,6 +86,9 @@ Getting help
 
 :doc:`topics/settings`
     了解如何配置 ``AyugeSpiderTools`` 并查看所有可用设置。
+
+:doc:`topics/configuration`
+    了解如何配置 ``AyugeSpiderTools`` 的 ``.conf`` 内容。
 
 内置服务
 ==================================
