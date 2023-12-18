@@ -135,7 +135,7 @@ class ReuseOperation:
             }
         if "mq" in config_parser:
             inner_settings["MQ_CONFIG"] = {
-                "host": config_parser.get("mq", "host", fallback=None),
+                "host": config_parser.get("mq", "host", fallback="localhost"),
                 "port": config_parser.getint("mq", "port", fallback=5672),
                 "username": config_parser.get("mq", "username", fallback="guest"),
                 "password": config_parser.get("mq", "password", fallback="guest"),
