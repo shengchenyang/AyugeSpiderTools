@@ -79,20 +79,24 @@ class MysqlPipeEnhanceMixin:
             charset=mysql_conf.charset,
         )
 
-    def _get_sql_by_item(self, table: str, item: dict) -> str:
+    def _get_sql_by_item(self, table: str, item: dict, odku_enable: bool = True) -> str:
         """根据处理后的 item 生成 mysql 插入语句
 
         Args:
             table: 数据库表名
             item: 处理后的 item
+            odku_enable: 是否开启 ON DUPLICATE KEY UPDATE
 
         Returns:
             1). sql 插入语句
         """
         keys = f"""`{"`, `".join(item.keys())}`"""
         values = ", ".join(["%s"] * len(item))
-        update = ",".join([f" `{key}` = %s" for key in item])
-        return f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+        if odku_enable:
+            update = ",".join([f" `{key}` = %s" for key in item])
+            return f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+        else:
+            return f"INSERT INTO `{table}` ({keys}) values ({values})"
 
     def _get_log_by_spider(self, spider, crawl_time):
         """获取 spider 的运行日志情况

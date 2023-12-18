@@ -1,69 +1,33 @@
 import asyncio
+from typing import TYPE_CHECKING, Optional
 
 import aiomysql
 from scrapy.utils.defer import deferred_from_coro
 
+from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
-    "AsyncMysqlPipeline",
-    "AsyncNormalMysqlPipeline",
+    "AyuAsyncMysqlPipeline",
 ]
 
-
-class AsyncNormalMysqlPipeline(AyuMysqlPipeline):
-    """通过 aiomysql 实现异步写入 Mysql 数据库的普通版本"""
-
-    def open_spider(self, spider):
-        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
-        self.slog = spider.slog
-        self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=spider.mysql_conf)
-        return deferred_from_coro(self._open_spider(spider))
-
-    async def _open_spider(self, spider):
-        self.loop = asyncio.get_event_loop()
-        self.lock = asyncio.Lock()
-        self.db = await aiomysql.connect(
-            loop=self.loop,
-            host=self.mysql_conf.host,
-            port=self.mysql_conf.port,
-            user=self.mysql_conf.user,
-            password=self.mysql_conf.password,
-            db=self.mysql_conf.database,
-            charset=self.mysql_conf.charset,
-            cursorclass=aiomysql.DictCursor,
-        )
-
-    async def process_item(self, item, spider):
-        item_dict = ReuseOperation.item_to_dict(item)
-        async with self.db.cursor() as cursor:
-            async with self.lock:
-                alter_item = ReuseOperation.reshape_item(item_dict)
-                new_item = alter_item.new_item
-                sql = self._get_sql_by_item(table=item_dict["_table"], item=new_item)
-                await cursor.execute(sql, tuple(new_item.values()) * 2)
-                await self.db.commit()
-        return item
-
-    async def _close_spider(self):
-        pass
-
-    def close_spider(self, spider):
-        self.db.close()
-        return deferred_from_coro(self._close_spider())
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import MysqlConf
 
 
-class AsyncMysqlPipeline(AyuMysqlPipeline):
-    """通过 aiomysql 实现异步写入 Mysql 数据库的连接池版本"""
+class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
+    """结合 aiomysql 实现异步写入 Mysql 数据库"""
+
+    def __init__(self) -> None:
+        self.mysql_conf: Optional["MysqlConf"] = None
+        self.slog = None
+        self.pool = None
+        self.running_tasks = set()
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=spider.mysql_conf)
         return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider):
@@ -76,12 +40,9 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
             charset=self.mysql_conf.charset,
             cursorclass=aiomysql.DictCursor,
             autocommit=True,
-            maxsize=10,
-            minsize=1,
         )
 
-    async def process_item(self, item, spider):
-        item_dict = ReuseOperation.item_to_dict(item)
+    async def my_coroutine(self, item_dict):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 alter_item = ReuseOperation.reshape_item(item_dict)
@@ -89,13 +50,21 @@ class AsyncMysqlPipeline(AyuMysqlPipeline):
                 sql = self._get_sql_by_item(
                     table=item_dict["_table"],
                     item=new_item,
+                    odku_enable=False,
                 )
-                await asyncio.shield(cursor.execute(sql, tuple(new_item.values()) * 2))
+                await cursor.execute(sql, tuple(new_item.values()))
+
+    async def process_item(self, item, spider):
+        item_dict = ReuseOperation.item_to_dict(item)
+        task = asyncio.create_task(self.my_coroutine(item_dict))
+        self.running_tasks.add(task)
+        await task
+        task.add_done_callback(lambda t: self.running_tasks.remove(t))
         return item
 
     async def _close_spider(self):
-        self.pool.close()
         await self.pool.wait_closed()
 
     def close_spider(self, spider):
+        self.pool.close()
         return deferred_from_coro(self._close_spider())
