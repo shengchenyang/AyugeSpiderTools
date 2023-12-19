@@ -78,7 +78,6 @@ cd <project_name>
 
 # Replace (or overwrite) with the actual configuration .conf file:
 # This is just for demonstration purposes. Normally, you can simply fill in the required configuration in the .conf file under the VIT path.
-# It is strongly recommended to delete unnecessary configurations to ensure the maintainability of the configuration.
 cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # Generate spider script

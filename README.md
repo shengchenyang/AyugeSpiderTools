@@ -73,8 +73,7 @@ ayuge startproject <project_name>
 cd <project_name>
 
 # 替换(覆盖)为真实的配置 .conf 文件：
-# 这里是为了演示方便，正常情况是直接在 VIT 路径下的 .conf 配置文件填上你需要的配置即可
-# 不需要的配置强烈建议删除，保证配置的可维护性
+# 这里是为了演示方便，正常情况是直接在 VIT 中的 .conf 文件填上你需要的配置即可
 cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
 # 生成爬虫脚本
@@ -101,7 +100,7 @@ scrapy crawl <spider_name>
 + 4).demo_four: 根据 consul 中取 mongodb 配置
 + 6).demo_six: 异步存入 MongoDB 的场景
 
-# 数据存入 PostgreSQL 的场景（需要安装 ayugespidertools[database]）：
+# 数据存入 PostgreSQL 的场景(需要安装 ayugespidertools[database])
 + 21).demo_nine: 根据本地 VIT 中的 .conf 取 postgresql 配置
 + 22).demo_ten: 异步存入 PostgreSQL 的场景
 - 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
