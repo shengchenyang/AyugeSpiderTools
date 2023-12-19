@@ -94,16 +94,21 @@ scrapy crawl <spider_name>
 + 3).demo_three: 根据 consul 中取 mysql 配置
 + 21).demo_mysql_nacos: 根据 nacos 中取 mysql 配置(其它从 nacos 中获取配置的场景不再举例)
 + 5).demo_five: 异步存入 Mysql 的场景
++ 24).demo_aiomysql: 结合 aiomysql 的方式
 
 # 数据存入 MongoDB 的场景：
 + 2).demo_two: 根据本地 VIT 中的 .conf 取 mongodb 配置
 + 4).demo_four: 根据 consul 中取 mongodb 配置
 + 6).demo_six: 异步存入 MongoDB 的场景
 
-# 数据存入 PostgreSQL 的场景（需要安装 ayugespidertools[database] 的依赖）：
+# 数据存入 PostgreSQL 的场景（需要安装 ayugespidertools[database]）：
 + 21).demo_nine: 根据本地 VIT 中的 .conf 取 postgresql 配置
 + 22).demo_ten: 异步存入 PostgreSQL 的场景
 - 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
+
+# 数据存入 Oracle 的场景(需要安装 ayugespidertools[database])
++ 25). demo_oracle: AyuFtyOraclePipeline 使用介绍
++ 26). demo_oracle_twisted: AyuTwistedOraclePipeline 使用介绍
 
 - 7).demo_seven: 使用 requests 来请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
@@ -112,17 +117,17 @@ scrapy crawl <spider_name>
 
 + 11).demo_proxy_one: 快代理动态隧道代理示例
 + 12).demo_proxy_two: 测试快代理独享代理
-+13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
-+14).demo_crawl: 支持 scrapy CrawlSpider 的示例
++ 13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
++ 14).demo_crawl: 支持 scrapy CrawlSpider 的示例
 
 # 本库中给出支持 Item Loaders 特性的示例
-+15).demo_item_loader: 本库中使用 Item Loaders 的示例
--16).demo_item_loader_two: 已删除，可查看上个 demo_item_loader，目前已经可以很方便的使用 Item Loaders 功能了
++ 15).demo_item_loader: 本库中使用 Item Loaders 的示例
+- 16).demo_item_loader_two: 已删除，可查看上个 demo_item_loader，目前已经可以很方便的使用 Item Loaders 功能了
 
-+17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
-+18).demo_mq: 数据存入 rabbitmq 的模板示例
-+19).demo_kafka: 数据存入 kafka 的模板示例
-+20).demo_file: 下载图片等文件到本地的模板示例
++ 17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
++ 18).demo_mq: 数据存入 rabbitmq 的模板示例
++ 19).demo_kafka: 数据存入 kafka 的模板示例
++ 20).demo_file: 下载图片等文件到本地的模板示例
 ```
 
 ## 跑通测试
@@ -172,8 +177,9 @@ scrapy crawl <spider_name>
         - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
     - [x] `Mysql` 存储的场景下适配
         - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
-    - [x] `MongoDB` 存储的场景下适配
+    - [x] `MongoDB` 存储场景适配
     - [x] `PostgreSQL` 存储场景适配
+    - [x] `Oracle` 存储场景适配
     - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
         - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
         - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例

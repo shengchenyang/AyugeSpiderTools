@@ -99,16 +99,21 @@ Scenario of storing data in Mysql:
 + 3).demo_three: Get the mysql configuration from consul.
 + 21).demo_mysql_nacos: Get the mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
 + 5).demo_five: Scenario of asynchronously storing data in MySQL.
++ 24).demo_aiomysql: combining aiomysql.
 
 Scenario of storing data in MongoDB:
 + 2).demo_two: Get mongodb configuration based on .conf in local VIT.
 + 4).demo_four: Get mongodb configuration from consul.
 + 6).demo_six: Scenario of asynchronously storing data in MongoDB.
 
-Scenario of storing data in PostgreSQL(need to install ayugespidertools[database] dependencies):
+Scenario of storing data in PostgreSQL(need to install ayugespidertools[database]):
 + 21).demo_nine: Get postgresql configuration based on .conf in local VIT.
 + 22).demo_ten: Scenario of asynchronously storing data in PostgreSQL.
 - 23). It also supports obtaining configuration from nacos or consul, no more examples.
+
+Scenario of storing data in Oracle(need to install ayugespidertools[database]):
++ 25). demo_oracle: AyuFtyOraclePipeline usage introduction.
++ 26). demo_oracle_twisted: AyuTwistedOraclePipeline usage introduction.
 
 - 7).demo_seven: Scenarios using requests to request (this feature has been removed, and using aiohttp is recommended instead)
 + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
@@ -117,17 +122,17 @@ Scenario of storing data in PostgreSQL(need to install ayugespidertools[database
 
 + 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".
 + 12).demo_proxy_two: Example of using dedicated proxies with "kuaidaili.com".
-+13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
-+14).demo_crawl: Example of supporting scrapy CrawlSpider.
++ 13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
++ 14).demo_crawl: Example of supporting scrapy CrawlSpider.
 
 # Example of supporting Item "Loaders feature" in this library
-+15).demo_item_loader: Example of using Item Loaders in this library.
--16).demo_item_loader_two: This example has been removed. You can refer to the example in the previous demo_item_loader. Currently, it is very convenient to use the Item Loaders feature.
++ 15).demo_item_loader: Example of using Item Loaders in this library.
+- 16).demo_item_loader_two: This example has been removed. You can refer to the example in the previous demo_item_loader. Currently, it is very convenient to use the Item Loaders feature.
 
-+17).demo_mongo_async: Example of pipelines for storing data in MongoDB with asyncio version.
-+18).demo_mq: Template example of storing data in RabbitMQ.
-+19).demo_kafka: Template example of storing data in Kafka.
-+20).demo_file: Template example of downloading images and other files to the local machine.
++ 17).demo_mongo_async: Example of pipelines for storing data in MongoDB with asyncio version.
++ 18).demo_mq: Template example of storing data in RabbitMQ.
++ 19).demo_kafka: Template example of storing data in Kafka.
++ 20).demo_file: Template example of downloading images and other files to the local machine.
 ```
 
 ## Run Through The Test
@@ -191,6 +196,7 @@ functionality of Scrapy.**
           Mysql users need to be created.
     - [x] Adaptation for scenarios where storage is done in MongoDB.
     - [x] Adaptation for scenarios where storage is done in PostgreSQL.
+    - [x] Adaptation for scenarios where storage is done in Oracle.
     - [x] Examples of asyncio syntax support and third-party library support for async:
         - [x] Example of using asyncio and aiohttp in a spider script.
         - [x] Example of using asyncio and aioMysql in a pipeline script.
