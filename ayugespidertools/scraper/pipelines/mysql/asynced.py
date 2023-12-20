@@ -42,7 +42,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
             autocommit=True,
         )
 
-    async def my_coroutine(self, item_dict):
+    async def insert_item(self, item_dict):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 alter_item = ReuseOperation.reshape_item(item_dict)
@@ -56,10 +56,10 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        task = asyncio.create_task(self.my_coroutine(item_dict))
+        task = asyncio.create_task(self.insert_item(item_dict))
         self.running_tasks.add(task)
         await task
-        task.add_done_callback(lambda t: self.running_tasks.remove(t))
+        task.add_done_callback(lambda t: self.running_tasks.discard(t))
         return item
 
     async def _close_spider(self):
