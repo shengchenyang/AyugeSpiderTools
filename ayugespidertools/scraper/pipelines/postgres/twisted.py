@@ -22,7 +22,7 @@ class AyuTwistedPostgresPipeline(AyuPostgresPipeline):
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
-        self.conn = self._connect(self.postgres_conf).close()
+        self._connect(self.postgres_conf).close()
 
         _postgres_conf = {
             "user": spider.postgres_conf.user,
