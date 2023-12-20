@@ -1,8 +1,7 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.items import DataItem
 
 __all__ = ["AyuOraclePipeline"]
 
@@ -31,24 +30,20 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        self.insert_item(
-            alter_item=ReuseOperation.reshape_item(item_dict), table=item_dict["_table"]
-        )
+        alter_item = ReuseOperation.reshape_item(item_dict)
+        self.insert_item(alter_item)
         return item
 
-    def insert_item(self, alter_item: "AlterItem", table: Union[DataItem, str]):
+    def insert_item(self, alter_item: "AlterItem"):
         """通用插入数据
 
         Args:
             alter_item: 经过转变后的 item
-            table: 数据库表名
         """
         if not (new_item := alter_item.new_item):
             return
 
-        table_name = table.key_value if isinstance(table, DataItem) else table
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
-
+        sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
         # no err handing
         self.cursor.execute(sql, tuple(new_item.values()))
         self.conn.commit()

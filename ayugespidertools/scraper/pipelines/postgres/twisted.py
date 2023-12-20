@@ -5,7 +5,6 @@ from ayugespidertools.common.postgreserrhandle import (
     TwistedAsynchronous,
     deal_postgres_err,
 )
-from ayugespidertools.items import DataItem
 from ayugespidertools.scraper.pipelines.postgres import AyuPostgresPipeline
 
 __all__ = ["AyuTwistedPostgresPipeline"]
@@ -51,34 +50,28 @@ class AyuTwistedPostgresPipeline(AyuPostgresPipeline):
 
     def db_insert(self, cursor, item):
         alter_item = ReuseOperation.reshape_item(item)
-        table = item["_table"]
-
         if not (new_item := alter_item.new_item):
             return
 
-        if isinstance(table, DataItem):
-            table_name = table.key_value
-            table_notes = table.notes
-        else:
-            table_name = table
-            table_notes = ""
+        _table_name = alter_item.table.name
+        _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
+        sql = self._get_sql_by_item(table=_table_name, item=new_item)
 
         try:
             cursor.execute(sql, tuple(new_item.values()))
 
         except Exception as e:
             self.slog.warning(
-                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+                f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             cursor.execute("ROLLBACK")
             deal_postgres_err(
                 TwistedAsynchronous(),
                 err_msg=str(e),
                 cursor=cursor,
-                table=table_name,
-                table_notes=table_notes,
+                table=_table_name,
+                table_notes=_table_notes,
                 note_dic=note_dic,
             )
             return self.db_insert(cursor, item)

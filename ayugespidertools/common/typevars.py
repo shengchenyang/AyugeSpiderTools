@@ -92,9 +92,22 @@ class AiohttpConf(NamedTuple):
     allow_redirects: bool
 
 
+class AlterItemTable(NamedTuple):
+    """用于描述 AlterItem 中的 table 字段
+
+    Attributes:
+        name: table name
+        notes: table name 的注释
+    """
+
+    name: str
+    notes: str = ""
+
+
 class AlterItem(NamedTuple):
     new_item: dict
     notes_dic: dict
+    table: AlterItemTable
 
 
 @dataclass

@@ -4,7 +4,6 @@ from twisted.enterprise import adbapi
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.items import DataItem
 
 __all__ = [
     "AyuTwistedOraclePipeline",
@@ -59,14 +58,10 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
 
     def db_insert(self, cursor, item):
         alter_item = ReuseOperation.reshape_item(item)
-        table = item["_table"]
-
         if not (new_item := alter_item.new_item):
             return
 
-        table_name = table.key_value if isinstance(table, DataItem) else table
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
-
+        sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
         cursor.execute(sql, tuple(new_item.values()))
         return item
 

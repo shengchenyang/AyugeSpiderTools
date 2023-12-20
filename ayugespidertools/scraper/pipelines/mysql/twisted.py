@@ -4,7 +4,6 @@ from twisted.enterprise import adbapi
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import TwistedAsynchronous, deal_mysql_err
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
@@ -24,7 +23,6 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
-
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         self._connect(self.mysql_conf).close()
 
@@ -55,26 +53,20 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
 
     def db_insert(self, cursor, item):
         alter_item = ReuseOperation.reshape_item(item)
-        table = item["_table"]
-
         if not (new_item := alter_item.new_item):
             return
 
-        if isinstance(table, DataItem):
-            table_name = table.key_value
-            table_notes = table.notes
-        else:
-            table_name = table
-            table_notes = ""
+        _table_name = alter_item.table.name
+        _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
+        sql = self._get_sql_by_item(table=_table_name, item=new_item)
 
         try:
             cursor.execute(sql, tuple(new_item.values()) * 2)
 
         except Exception as e:
             self.slog.warning(
-                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+                f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             deal_mysql_err(
                 TwistedAsynchronous(),
@@ -83,8 +75,8 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                 charset=self.mysql_conf.charset,
                 collate=self.collate,
                 database=self.mysql_conf.database,
-                table=table_name,
-                table_notes=table_notes,
+                table=_table_name,
+                table_notes=_table_notes,
                 note_dic=note_dic,
             )
             return self.db_insert(cursor, item)

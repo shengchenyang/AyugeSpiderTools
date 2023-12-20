@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.postgreserrhandle import Synchronize, deal_postgres_err
-from ayugespidertools.items import DataItem
 
 __all__ = ["AyuPostgresPipeline"]
 
@@ -33,24 +32,18 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        self.insert_item(
-            alter_item=ReuseOperation.reshape_item(item_dict),
-            table=item_dict["_table"],
-        )
+        alter_item = ReuseOperation.reshape_item(item_dict)
+        self.insert_item(alter_item)
         return item
 
-    def insert_item(self, alter_item: "AlterItem", table: Union[DataItem, str]):
+    def insert_item(self, alter_item: "AlterItem"):
         if not (new_item := alter_item.new_item):
             return
 
-        if isinstance(table, DataItem):
-            table_name = table.key_value
-            table_notes = table.notes
-        else:
-            table_name = table
-            table_notes = ""
+        _table_name = alter_item.table.name
+        _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
+        sql = self._get_sql_by_item(table=_table_name, item=new_item)
 
         try:
             self.cursor.execute(sql, tuple(new_item.values()))
@@ -58,7 +51,7 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
         except Exception as e:
             self.slog.warning(
-                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+                f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             self.conn.rollback()
             deal_postgres_err(
@@ -66,11 +59,11 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
                 err_msg=str(e),
                 conn=self.conn,
                 cursor=self.cursor,
-                table=table_name,
-                table_notes=table_notes,
+                table=_table_name,
+                table_notes=_table_notes,
                 note_dic=note_dic,
             )
-            return self.insert_item(alter_item, table)
+            return self.insert_item(alter_item)
 
     def close_spider(self, spider):
         if self.cursor:

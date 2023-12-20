@@ -7,7 +7,12 @@ from typing import TYPE_CHECKING, Any, Dict, List, Union
 import pymysql
 from itemadapter import ItemAdapter
 
-from ayugespidertools.common.typevars import AlterItem, MysqlConf, PostgreSQLConf
+from ayugespidertools.common.typevars import (
+    AlterItem,
+    AlterItemTable,
+    MysqlConf,
+    PostgreSQLConf,
+)
 from ayugespidertools.config import logger
 from ayugespidertools.items import AyuItem
 
@@ -206,16 +211,21 @@ class ReuseOperation:
         judge_item = next(iter(insert_data.values()))
         # 是 namedtuple 类型
         if cls.is_namedtuple_instance(judge_item):
+            _table_name = item_dict["_table"].key_value
+            _table_notes = item_dict["_table"].notes
+            table_info = AlterItemTable(_table_name, _table_notes)
             for key, value in insert_data.items():
                 new_item[key] = value.key_value
                 notes_dic[key] = value.notes
         # 是普通的 dict 类型
         else:
+            _table_name = item_dict["_table"]
+            table_info = AlterItemTable(_table_name, "")
             for key, value in insert_data.items():
                 new_item[key] = value
                 notes_dic[key] = ""
 
-        return AlterItem(new_item=new_item, notes_dic=notes_dic)
+        return AlterItem(new_item, notes_dic, table_info)
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:

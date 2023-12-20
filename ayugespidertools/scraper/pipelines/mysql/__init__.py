@@ -1,6 +1,6 @@
 import datetime
 import warnings
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 import pymysql
 
@@ -8,7 +8,6 @@ from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
 from ayugespidertools.common.utils import ToolsForAyu
-from ayugespidertools.items import DataItem
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
 warnings.filterwarnings(
@@ -48,30 +47,23 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
-        self.insert_item(
-            alter_item=ReuseOperation.reshape_item(item_dict),
-            table=item_dict["_table"],
-        )
+        alter_item = ReuseOperation.reshape_item(item_dict)
+        self.insert_item(alter_item)
         return item
 
-    def insert_item(self, alter_item: "AlterItem", table: Union[DataItem, str]):
+    def insert_item(self, alter_item: "AlterItem"):
         """通用插入数据
 
         Args:
             alter_item: 经过转变后的 item
-            table: 数据库表名
         """
         if not (new_item := alter_item.new_item):
             return
 
-        if isinstance(table, DataItem):
-            table_name = table.key_value
-            table_notes = table.notes
-        else:
-            table_name = table
-            table_notes = ""
+        _table_name = alter_item.table.name
+        _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=table_name, item=new_item)
+        sql = self._get_sql_by_item(table=_table_name, item=new_item)
 
         try:
             self.cursor.execute(sql, tuple(new_item.values()) * 2)
@@ -79,7 +71,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
 
         except Exception as e:
             self.slog.warning(
-                f"Pipe Warn: {e} & Table: {table_name} & Item: {new_item}"
+                f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             self.conn.rollback()
             deal_mysql_err(
@@ -90,11 +82,11 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 charset=self.mysql_conf.charset,
                 collate=self.collate,
                 database=self.mysql_conf.database,
-                table=table_name,
-                table_notes=table_notes,
+                table=_table_name,
+                table_notes=_table_notes,
                 note_dic=note_dic,
             )
-            return self.insert_item(alter_item, table)
+            return self.insert_item(alter_item)
 
     def close_spider(self, spider):
         if self.conn:

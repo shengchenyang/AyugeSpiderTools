@@ -48,7 +48,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                 alter_item = ReuseOperation.reshape_item(item_dict)
                 new_item = alter_item.new_item
                 sql = self._get_sql_by_item(
-                    table=item_dict["_table"],
+                    table=alter_item.table.name,
                     item=new_item,
                     odku_enable=False,
                 )
