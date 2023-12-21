@@ -55,5 +55,8 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         task.add_done_callback(lambda t: self.running_tasks.discard(t))
         return item
 
+    async def _close_spider(self):
+        await self.conn.close()
+
     def close_spider(self, spider):
-        self.conn.close()
+        return deferred_from_coro(self._close_spider())
