@@ -6,8 +6,6 @@
 
 ## 安装 AyugeSpiderTools
 
-为了向您展示 `ayugespidertools` 带来了什么，我们将带您通过一个 `Scrapy Spider` 示例，使用最简单的方式来运行蜘蛛。
-
 > 可以使用以下命令安装 `ayugespidertools` 及其依赖项：
 
 1. 若你的数据库场景只需要 `mysql` 和 `mongodb`，且不需要本库中的扩展功能，那么直接简洁安装即可，命令如下：
