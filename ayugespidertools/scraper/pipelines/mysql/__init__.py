@@ -1,4 +1,3 @@
-import datetime
 import warnings
 from typing import TYPE_CHECKING, Optional
 
@@ -35,7 +34,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.conn: Optional["Connection[Cursor]"] = None
         self.slog = None
         self.cursor: Optional["Cursor"] = None
-        self.crawl_time = datetime.date.today()
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
