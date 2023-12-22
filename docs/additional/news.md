@@ -1,5 +1,25 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.1 (2023-12-22)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 添加 `postgresql` 的 `asyncio` 的 `AsyncConnectionPool` 存储场景支持。(AsyncConnection: #35255e2c #f7b65118) (AsyncConnectionPool: #341e7681)
+
+### Bug fixes
+
+- 解决 `asyncio` 协程场景下的 `spider` 的 `AyuItem` 写法风格不兼容的问题。(#66177e40)
+
+### Code optimizations
+
+- 更新 `spider` 模板示例。(#61e10b14)
+
+<hr>
+
 ## AyugeSpiderTools 3.9.0 (2023-12-18)
 
 ### Deprecations
