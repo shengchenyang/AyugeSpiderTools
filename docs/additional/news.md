@@ -8,15 +8,15 @@
 
 ### New features
 
-- 添加 `postgresql` 的 `asyncio` 的 `AsyncConnectionPool` 存储场景支持。(AsyncConnection: #35255e2c #f7b65118) (AsyncConnectionPool: #341e7681)
+- 添加 `postgresql` 的 `asyncio` 的 `AsyncConnectionPool` 存储场景支持。([`341e768`](https://github.com/shengchenyang/AyugeSpiderTools/commit/341e7681931f796b5167696b948ea331e2b62dbb))
 
 ### Bug fixes
 
-- 解决 `asyncio` 协程场景下的 `spider` 的 `AyuItem` 写法风格不兼容的问题。(#66177e40)
+- 解决 `asyncio` 协程场景下的 `spider` 的 `AyuItem` 写法风格不兼容的问题。([`66177e4`](https://github.com/shengchenyang/AyugeSpiderTools/commit/66177e402d0e9c15b559664bfc40c6de0e545735))
 
 ### Code optimizations
 
-- 更新 `spider` 模板示例。(#61e10b14)
+- 更新 `spider` 模板示例。([`61e10b1`](https://github.com/shengchenyang/AyugeSpiderTools/commit/61e10b140e880c7b2348b35687c167b6fad99b99))
 
 <hr>
 
