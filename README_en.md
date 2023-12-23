@@ -166,9 +166,9 @@ and modify any methods (e.g. you may need a different default log configuration 
 templates for your project scenario), and then package and use it by running `poetry build` or `make build` after
 modification.
 
-For example, if you need to update pymongo in the dependency library to a new version `x.x.x`, you can simply install
-the existing dependencies with `poetry install`, and then install the target version with `poetry add pymongo@x.x.x` (
-try not to use `poetry update pymongo`). After ensuring that the test is working properly, you can package the modified
+For example, if you need to update kafka-python in the dependency library to a new version `x.x.x`, you can simply install
+the existing dependencies with `poetry install`, and then install the target version with `poetry add kafka-python==x.x.x` (
+try not to use `poetry update kafka-python`). After ensuring that the test is working properly, you can package the modified
 library with `poetry build` for use.
 
 **I hope that this project can provide guidance for you when you encounter scenarios where you need to extend the

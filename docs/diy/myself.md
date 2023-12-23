@@ -18,19 +18,19 @@
 
 你可以 `clone` 源码后，修改任意方法，修改完成后 `poetry build` 或 `make build` 即可打包并内部使用。
 
-> 以更新 `pymongo` 版本为例：
+> 以更新 `kafka-python` 版本为例：
 
-- `clone` 项目并准备开发环境
+- Prepare: `clone` 项目并准备开发环境
 
-  将项目克隆到本地，创建 `python 3.8.1+` 环境并安装 `poetry`，然后在项目根目录下运行 `poetry install` 安装依赖即可。
+  将项目克隆到本地，创建 `python 3.8+` 虚拟环境并安装 `poetry`，然后在项目根目录下运行 `poetry install` 安装依赖即可。
 
-- 自定义内容
+- Make your changes: 自定义更改的内容
 
   修改你所关注的部分，比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板，更改库名等。
 
-  若需要更新本项目的 `pymongo` 依赖库版本为 `x.x.x`，那只需 `poetry add pymongo==x.x.x` 安装目标版本即可。
+  若需要更新本项目的 `kafka-python` 依赖库版本为 `x.x.x`，那只需 `poetry add kafka-python==x.x.x` 安装目标版本即可。
 
-- 重打包
+- Run tests & Rebuild: 测试功能并重打包
 
   修改完毕并测试可用后，即可通过 `poetry build` 或 `make` 工具的 `make build` 打包即可使用。
 

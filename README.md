@@ -154,8 +154,8 @@ scrapy crawl <spider_name>
 源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板等），修改完成后 `poetry build`
 或 `make build` 即可打包使用。
 
-比如你可能需要更新依赖库中 `pymongo` 为新版本 `x.x.x`，那只需 `poetry install`
-安装现有依赖后，再 `poetry add pymongo@x.x.x` 安装目标版本（尽量不要使用 `poetry update pymongo`
+比如你可能需要更新依赖库中 `kafka-python` 为新版本 `x.x.x`，那只需 `poetry install`
+安装现有依赖后，再 `poetry add kafka-python==x.x.x` 安装目标版本（尽量不要使用 `poetry update kafka-python`
 ），确定测试正常了即可 `poetry build` 打包使用。
 
 **希望此项目能在你遇到扩展 scrapy 功能的场景时能对你有所指引。**
