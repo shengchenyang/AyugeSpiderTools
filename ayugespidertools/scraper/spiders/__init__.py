@@ -28,7 +28,6 @@ if TYPE_CHECKING:
 
     from loguru import Logger
     from scrapy.crawler import Crawler
-    from scrapy.http import Response
     from scrapy.settings import BaseSettings
     from sqlalchemy.engine.base import Connection as SqlalchemyConnectT
     from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
@@ -39,10 +38,6 @@ class AyuSpider(Spider):
     """用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等"""
 
     SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
-
-    def parse(self, response: "Response", **kwargs: Any) -> Any:
-        """实现所继承类的 abstract 方法 parse"""
-        super(AyuSpider, self).parse(response, **kwargs)
 
     def __init__(self, *args: Any, **kwargs: Any):
         super(AyuSpider, self).__init__(*args, **kwargs)
