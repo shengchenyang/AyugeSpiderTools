@@ -1,7 +1,7 @@
 # Define your TypeVar here
 import threading
 from dataclasses import dataclass, field
-from typing import List, Literal, NamedTuple, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, Union
 
 from sqlalchemy import create_engine
 
@@ -15,6 +15,13 @@ AiohttpRequestMethodStr = Literal["GET", "POST"]
 authMechanismStr = Literal[
     "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
 ]
+
+if TYPE_CHECKING:
+    from scrapy.http.response.html import HtmlResponse
+    from scrapy.http.response.text import TextResponse
+    from scrapy.http.response.xml import XmlResponse
+
+    ScrapyResponse = Union[TextResponse, HtmlResponse, XmlResponse]
 
 
 class DatabaseSingletonMeta(type):
