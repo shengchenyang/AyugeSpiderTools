@@ -28,7 +28,7 @@ _ = Path(__file__).parent
 VIT_DIR = _ / "VIT"
 
 LOG_LEVEL = "ERROR"
-LOG_FILE = _ / "logs/DemoSpider.log"
+LOG_FILE = _ / "logs/$project_name.log"
 logger.add(
     _ / "logs/error.log",
     level="ERROR",
