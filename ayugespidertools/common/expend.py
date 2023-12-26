@@ -61,11 +61,13 @@ class MysqlPipeEnhanceMixin:
                 charset=mysql_conf.charset,
             )
         except Exception as e:
-            logger.warning(f"目标数据库：{mysql_conf.database} 不存在，尝试创建中...")
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
+                logger.warning(f"目标数据库：{mysql_conf.database} 不存在，尝试创建中...")
                 # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
                 ReuseOperation.create_database(db_conf=mysql_conf)
+            else:
+                logger.error(f"connect to mysql failed: {e}")
         else:
             # 连接没有问题就直接返回连接对象
             return conn
@@ -206,9 +208,11 @@ class PostgreSQLPipeEnhanceMixin:
             )
         except Exception as e:
             # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
-            logger.warning(f"目标数据库：{postgres_conf.database} 不存在，尝试创建中...")
             if "failed" in str(e).lower():
+                logger.warning(f"目标数据库：{postgres_conf.database} 不存在，尝试创建中...")
                 ReuseOperation.create_database(db_conf=postgres_conf)
+            else:
+                logger.error(f"connect to postgresql failed: {e}")
         else:
             return conn
 
