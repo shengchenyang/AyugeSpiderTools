@@ -1,7 +1,10 @@
 import aiohttp
 from scrapy.http import Request
-from scrapy.http.response.text import TextResponse
+from typing import TYPE_CHECKING
 from ayugespidertools.spiders import AyuSpider
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import ScrapyResponse
 
 
 class $classname(AyuSpider):
@@ -12,7 +15,7 @@ class $classname(AyuSpider):
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }
 
-    async def parse(self, response):
+    async def parse(self, response: "ScrapyResponse"):
         self.slog.info("starting ...")
         async with aiohttp.ClientSession() as session:
             async with session.get("https://myip.ipip.net") as additional_response:
@@ -24,5 +27,5 @@ class $classname(AyuSpider):
                     dont_filter=True,
                 )
 
-    async def parse_first(self, response: TextResponse):
+    async def parse_first(self, response: "ScrapyResponse"):
         self.slog.debug(f"parse_first 响应内容: {response.text}")
