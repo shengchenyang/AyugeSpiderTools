@@ -76,7 +76,7 @@ class MysqlConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MysqlConf]:
         # 1). 优先从远程配置中取值
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="mysql", **remote_option
             )
@@ -109,7 +109,7 @@ class MongoDBConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MongoDBConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="mongodb", **remote_option
             )
@@ -126,7 +126,7 @@ class PostgreSQLConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[PostgreSQLConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="postgresql", **remote_option
             )
@@ -156,7 +156,7 @@ class OracleConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[OracleConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="oracle", **remote_option
             )
@@ -193,7 +193,7 @@ class MQConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MQConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="rabbitmq", **remote_option
             )
@@ -210,7 +210,7 @@ class KafkaConfProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[KafkaConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="kafka", **remote_option
             )
@@ -227,7 +227,7 @@ class DynamicProxyProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[DynamicProxyConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="dynamicproxy", **remote_option
             )
@@ -244,7 +244,7 @@ class ExclusiveProxyProduct(Product):
     def get_conn_conf(
         self, settings: "Settings", remote_option: dict
     ) -> Optional[ExclusiveProxyConf]:
-        if _ := settings.get("APP_CONF_MANAGE", False):
+        if settings.get("APP_CONF_MANAGE", False):
             remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="exclusiveproxy", **remote_option
             )
