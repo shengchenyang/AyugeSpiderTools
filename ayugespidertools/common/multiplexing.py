@@ -47,133 +47,113 @@ class ReuseOperation:
         Returns:
             inner_settings: 本库所需的配置
         """
-        config_parser = configparser.ConfigParser()
-        config_parser.read(f"{vit_dir}/.conf", encoding="utf-8")
-        if "mysql" in config_parser:
+        cfg = configparser.ConfigParser()
+        cfg.read(f"{vit_dir}/.conf", encoding="utf-8")
+        if "mysql" in cfg:
+            mysql_section = cfg["mysql"]
             inner_settings["MYSQL_CONFIG"] = {
-                "host": config_parser.get("mysql", "host", fallback="localhost"),
-                "port": config_parser.getint("mysql", "port", fallback=3306),
-                "user": config_parser.get("mysql", "user", fallback=""),
-                "password": config_parser.get("mysql", "password", fallback=""),
-                "charset": config_parser.get("mysql", "charset", fallback="utf8mb4"),
-                "database": config_parser.get("mysql", "database", fallback=""),
+                "host": mysql_section.get("host", "localhost"),
+                "port": mysql_section.getint("port", 3306),
+                "user": mysql_section.get("user", ""),
+                "password": mysql_section.get("password", ""),
+                "charset": mysql_section.get("charset", "utf8mb4"),
+                "database": mysql_section.get("database", ""),
             }
-        if "mongodb:uri" in config_parser:
+        if "mongodb:uri" in cfg:
             inner_settings["MONGODB_CONFIG"] = {
-                "uri": config_parser.get("mongodb:uri", "uri", fallback=None)
+                "uri": cfg.get("mongodb:uri", "uri", fallback=None)
             }
-        elif "mongodb" in config_parser:
+        elif "mongodb" in cfg:
+            mongodb_section = cfg["mongodb"]
             inner_settings["MONGODB_CONFIG"] = {
-                "host": config_parser.get("mongodb", "host", fallback="localhost"),
-                "port": config_parser.getint("mongodb", "port", fallback=27017),
-                "authsource": config_parser.get(
-                    "mongodb", "authsource", fallback="admin"
-                ),
-                "authMechanism": config_parser.get(
-                    "mongodb", "authMechanism", fallback="SCRAM-SHA-1"
-                ),
-                "user": config_parser.get("mongodb", "user", fallback="admin"),
-                "password": config_parser.get("mongodb", "password", fallback=None),
-                "database": config_parser.get("mongodb", "database", fallback=None),
+                "host": mongodb_section.get("host", "localhost"),
+                "port": mongodb_section.getint("port", 27017),
+                "authsource": mongodb_section.get("authsource", "admin"),
+                "authMechanism": mongodb_section.get("authMechanism", "SCRAM-SHA-1"),
+                "user": mongodb_section.get("user", "admin"),
+                "password": mongodb_section.get("password", None),
+                "database": mongodb_section.get("database", None),
             }
-        if "postgresql" in config_parser:
+        if "postgresql" in cfg:
+            postgres_section = cfg["postgresql"]
             inner_settings["POSTGRESQL_CONFIG"] = {
-                "host": config_parser.get("postgresql", "host", fallback="localhost"),
-                "port": config_parser.getint("postgresql", "port", fallback=5432),
-                "user": config_parser.get("postgresql", "user", fallback="postgres"),
-                "password": config_parser.get("postgresql", "password", fallback=""),
-                "database": config_parser.get("postgresql", "database", fallback=""),
-                "charset": config_parser.get("postgresql", "charset", fallback="UTF8"),
+                "host": postgres_section.get("host", "localhost"),
+                "port": postgres_section.getint("port", 5432),
+                "user": postgres_section.get("user", "postgres"),
+                "password": postgres_section.get("password", ""),
+                "database": postgres_section.get("database", ""),
+                "charset": postgres_section.get("charset", "UTF8"),
             }
-        if "oracle" in config_parser:
+        if "oracle" in cfg:
+            oracle_section = cfg["oracle"]
             inner_settings["ORACLE_CONFIG"] = {
-                "host": config_parser.get("oracle", "host", fallback="localhost"),
-                "port": config_parser.getint("oracle", "port", fallback=1521),
-                "user": config_parser.get("oracle", "user", fallback=None),
-                "password": config_parser.get("oracle", "password", fallback=None),
-                "service_name": config_parser.get(
-                    "oracle", "service_name", fallback=None
-                ),
-                "encoding": config_parser.get("oracle", "encoding", fallback="utf8"),
-                "thick_lib_dir": config_parser.get(
-                    "oracle", "thick_lib_dir", fallback=False
-                ),
+                "host": oracle_section.get("host", "localhost"),
+                "port": oracle_section.getint("port", 1521),
+                "user": oracle_section.get("user", None),
+                "password": oracle_section.get("password", None),
+                "service_name": oracle_section.get("service_name", None),
+                "encoding": oracle_section.get("encoding", "utf8"),
+                "thick_lib_dir": oracle_section.get("thick_lib_dir", False),
             }
-        if "consul" in config_parser:
+        if "consul" in cfg:
+            consul_section = cfg["consul"]
             inner_settings["REMOTE_CONFIG"] = {
-                "token": config_parser.get("consul", "token", fallback=None),
-                "url": config_parser.get("consul", "url", fallback=None),
-                "format": config_parser.get("consul", "format", fallback="json"),
+                "token": consul_section.get("token", None),
+                "url": consul_section.get("url", None),
+                "format": consul_section.get("format", "json"),
                 "remote_type": "consul",
             }
-        elif "nacos" in config_parser:
+        elif "nacos" in cfg:
+            nacos_section = cfg["nacos"]
             inner_settings["REMOTE_CONFIG"] = {
-                "token": config_parser.get("nacos", "token", fallback=None),
-                "url": config_parser.get("nacos", "url", fallback=None),
-                "format": config_parser.get("nacos", "format", fallback="json"),
+                "token": nacos_section.get("token", None),
+                "url": nacos_section.get("url", None),
+                "format": nacos_section.get("format", "json"),
                 "remote_type": "nacos",
             }
-        if "kdl_dynamic_proxy" in config_parser:
+        if "kdl_dynamic_proxy" in cfg:
+            kdl_dynamic_section = cfg["kdl_dynamic_proxy"]
             inner_settings["DYNAMIC_PROXY_CONFIG"] = {
-                "proxy": config_parser.get("kdl_dynamic_proxy", "proxy", fallback=None),
-                "username": config_parser.get(
-                    "kdl_dynamic_proxy", "username", fallback=None
-                ),
-                "password": config_parser.get(
-                    "kdl_dynamic_proxy", "password", fallback=None
-                ),
+                "proxy": kdl_dynamic_section.get("proxy", None),
+                "username": kdl_dynamic_section.get("username", None),
+                "password": kdl_dynamic_section.get("password", None),
             }
-        if "kdl_exclusive_proxy" in config_parser:
+        if "kdl_exclusive_proxy" in cfg:
+            kdl_exclusive_section = cfg["kdl_exclusive_proxy"]
             inner_settings["EXCLUSIVE_PROXY_CONFIG"] = {
-                "proxy": config_parser.get(
-                    "kdl_exclusive_proxy", "proxy", fallback=None
-                ),
-                "username": config_parser.get(
-                    "kdl_exclusive_proxy", "username", fallback=None
-                ),
-                "password": config_parser.get(
-                    "kdl_exclusive_proxy", "password", fallback=None
-                ),
-                "index": config_parser.getint(
-                    "kdl_exclusive_proxy", "index", fallback=1
-                ),
+                "proxy": kdl_exclusive_section.get("proxy", None),
+                "username": kdl_exclusive_section.get("username", None),
+                "password": kdl_exclusive_section.get("password", None),
+                "index": kdl_exclusive_section.getint("index", 1),
             }
-        if "mq" in config_parser:
+        if "mq" in cfg:
+            mq_section = cfg["mq"]
             inner_settings["MQ_CONFIG"] = {
-                "host": config_parser.get("mq", "host", fallback="localhost"),
-                "port": config_parser.getint("mq", "port", fallback=5672),
-                "username": config_parser.get("mq", "username", fallback="guest"),
-                "password": config_parser.get("mq", "password", fallback="guest"),
-                "virtualhost": config_parser.get("mq", "virtualhost", fallback="/"),
-                "heartbeat": config_parser.getint("mq", "heartbeat", fallback=0),
-                "socket_timeout": config_parser.getint(
-                    "mq", "socket_timeout", fallback=1
-                ),
-                "queue": config_parser.get("mq", "queue", fallback=None),
-                "durable": config_parser.getboolean("mq", "durable", fallback=True),
-                "exclusive": config_parser.getboolean(
-                    "mq", "exclusive", fallback=False
-                ),
-                "auto_delete": config_parser.getboolean(
-                    "mq", "auto_delete", fallback=False
-                ),
-                "exchange": config_parser.get("mq", "exchange", fallback=None),
-                "routing_key": config_parser.get("mq", "routing_key", fallback=None),
-                "content_type": config_parser.getint(
-                    "mq", "content_type", fallback="text/plain"
-                ),
-                "delivery_mode": config_parser.getint(
-                    "mq", "delivery_mode", fallback=1
-                ),
-                "mandatory": config_parser.getboolean("mq", "mandatory", fallback=True),
+                "host": mq_section.get("host", "localhost"),
+                "port": mq_section.getint("port", 5672),
+                "username": mq_section.get("username", "guest"),
+                "password": mq_section.get("password", "guest"),
+                "virtualhost": mq_section.get("virtualhost", "/"),
+                "heartbeat": mq_section.getint("heartbeat", 0),
+                "socket_timeout": mq_section.getint("socket_timeout", 1),
+                "queue": mq_section.get("queue", None),
+                "durable": mq_section.getboolean("durable", True),
+                "exclusive": mq_section.getboolean("exclusive", False),
+                "auto_delete": mq_section.getboolean("auto_delete", False),
+                "exchange": mq_section.get("exchange", None),
+                "routing_key": mq_section.get("routing_key", None),
+                "content_type": mq_section.getint("content_type", "text/plain"),
+                "delivery_mode": mq_section.getint("delivery_mode", 1),
+                "mandatory": mq_section.getboolean("mandatory", True),
             }
-        if "kafka" in config_parser:
+        if "kafka" in cfg:
+            kafka_section = cfg["kafka"]
             inner_settings["KAFKA_CONFIG"] = {
-                "bootstrap_servers": config_parser.get(
-                    "kafka", "bootstrap_servers", fallback="127.0.0.1:9092"
+                "bootstrap_servers": kafka_section.get(
+                    "bootstrap_servers", "127.0.0.1:9092"
                 ),
-                "topic": config_parser.get("kafka", "topic", fallback=None),
-                "key": config_parser.get("kafka", "key", fallback=None),
+                "topic": kafka_section.get("topic", None),
+                "key": kafka_section.get("key", None),
             }
         return inner_settings
 

@@ -4,13 +4,12 @@ from pathlib import Path
 tests_dir = Path(__file__).parent
 tests_vitdir = str(Path(__file__).parent.resolve() / "VIT")
 tests_sqlfiledir = str(Path(__file__).parent.resolve() / "docs/sqlfile")
-config_parser = configparser.ConfigParser()
-config_parser.read(f"{tests_vitdir}/.conf", encoding="utf-8")
+cfg = configparser.ConfigParser()
+cfg.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 
-# 测试环境中各种配置信息，已脱敏，请自行配置 VIT 的 .conf 文件后测试
-mysql_conf = config_parser["mysql"]
-mongodb_conf = config_parser["mongodb"]
-mongodb_uri_conf = config_parser["mongodb:uri"]
+mysql_conf = cfg["mysql"]
+mongodb_conf = cfg["mongodb"]
+mongodb_uri_conf = cfg["mongodb:uri"]
 
 PYMYSQL_CONFIG = {
     "host": mysql_conf["host"],
@@ -34,7 +33,7 @@ MONGODB_CONFIG = {
 }
 
 CONSUL_CONFIG = {
-    "token": config_parser.get("consul", "token", fallback=None),
-    "url": config_parser.get("consul", "url", fallback=None),
-    "format": config_parser.get("consul", "format", fallback="json"),
+    "token": cfg.get("consul", "token", fallback=None),
+    "url": cfg.get("consul", "url", fallback=None),
+    "format": cfg.get("consul", "format", fallback="json"),
 }
