@@ -18,8 +18,13 @@ PYMYSQL_CONFIG = {
     "password": mysql_conf["password"],
     "database": mysql_conf["database"],
     "charset": mysql_conf["charset"],
-    # "cursorclass": pymysql.cursors.Cursor,
 }
+
+MYSQL_CONFIG = {
+    "engine": mysql_conf["engine"],
+    "collate": mysql_conf["collate"],
+}
+MYSQL_CONFIG.update(PYMYSQL_CONFIG)
 
 MONGODB_CONFIG = {
     "host": mongodb_conf["host"],

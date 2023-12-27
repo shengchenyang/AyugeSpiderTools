@@ -6,7 +6,6 @@ import pymysql
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
-from ayugespidertools.common.utils import ToolsForAyu
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
 warnings.filterwarnings(
@@ -28,8 +27,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
     def __init__(self) -> None:
-        # 排序规则，用于创建数据库时使用
-        self.collate: str = ""
         self.mysql_conf: Optional["MysqlConf"] = None
         self.conn: Optional["Connection[Cursor]"] = None
         self.slog = None
@@ -39,7 +36,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
@@ -77,9 +73,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                 err_msg=str(e),
                 conn=self.conn,
                 cursor=self.cursor,
-                charset=self.mysql_conf.charset,
-                collate=self.collate,
-                database=self.mysql_conf.database,
+                mysql_conf=self.mysql_conf,
                 table=_table_name,
                 table_notes=_table_notes,
                 note_dic=note_dic,

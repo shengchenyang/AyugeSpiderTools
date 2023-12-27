@@ -15,6 +15,7 @@ AiohttpRequestMethodStr = Literal["GET", "POST"]
 authMechanismStr = Literal[
     "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
 ]
+MysqlEngineStr = Literal["InnoDB", "MyISAM", "MEMORY", "NDB", "ARCHIVE"]
 
 if TYPE_CHECKING:
     from scrapy.http.response.html import HtmlResponse
@@ -52,7 +53,9 @@ class MysqlConf(NamedTuple):
     user: str
     password: str
     database: str
+    engine: MysqlEngineStr = "InnoDB"
     charset: str = "utf8mb4"
+    collate: str = "utf8mb4_general_ci"
 
 
 class MongoDBConf(NamedTuple):

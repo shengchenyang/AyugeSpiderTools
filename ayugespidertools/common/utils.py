@@ -19,7 +19,7 @@ __all__ = ["ToolsForAyu"]
 if TYPE_CHECKING:
     from scrapy.http import Response
 
-    from ayugespidertools.common.typevars import MysqlConf, Str_Lstr
+    from ayugespidertools.common.typevars import Str_Lstr
 
 RemoteFormatStr = Literal["json", "hcl", "yaml", "xml"]
 RemoteTypeStr = Literal["consul", "nacos"]
@@ -219,34 +219,6 @@ class ToolsForAyu(AppConfManageMixin):
             if extract_res := cls.extract_with_json(json_data=json_data, query=query):
                 return extract_res
         return ""
-
-    @staticmethod
-    def get_collate_by_charset(mysql_conf: "MysqlConf") -> str:
-        """根据 mysql 的 charset 获取对应默认的 collate
-
-        Args:
-            mysql_conf: mysql 连接配置
-
-        Returns:
-            collate: 排序规则
-        """
-        charset_collate_map = {
-            # utf8mb4_unicode_ci 也是经常使用的
-            "utf8mb4": "utf8mb4_general_ci",
-            "utf8": "utf8_general_ci",
-            "gbk": "gbk_chinese_ci",
-            "latin1": "latin1_swedish_ci",
-            "utf16": "utf16_general_ci",
-            "utf16le": "utf16le_general_ci",
-            "cp1251": "cp1251_general_ci",
-            "euckr": "euckr_korean_ci",
-            "greek": "greek_general_ci",
-        }
-        collate = charset_collate_map.get(mysql_conf.charset)
-        assert (
-            collate is not None
-        ), f"数据库配置出现未知 charset：{mysql_conf.charset}，若抛错请查看或手动创建所需数据表！"
-        return collate
 
     @staticmethod
     def first_not_none(data_lst: List[Any]) -> Any:

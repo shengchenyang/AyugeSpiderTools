@@ -13,7 +13,7 @@ from scrapy.utils.test import get_crawler
 
 from ayugespidertools.scraper.spiders import AyuSpider
 from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
-from tests import CONSUL_CONFIG, MONGODB_CONFIG, PYMYSQL_CONFIG
+from tests import CONSUL_CONFIG, MONGODB_CONFIG, MYSQL_CONFIG
 from tests.conftest import ForTestConfig
 
 
@@ -110,20 +110,9 @@ class SpiderTest(unittest.TestCase):
     def test_from_crawler_get_mysql_conf(self):
         """测试从爬虫 AyugeSpider(即 spider) 中获取 mysql 配置的方法"""
         # 测试本地 mysql 配置
-        local_mysql_conf = {
-            "host": PYMYSQL_CONFIG["host"],
-            "port": PYMYSQL_CONFIG["port"],
-            "user": PYMYSQL_CONFIG["user"],
-            "password": PYMYSQL_CONFIG["password"],
-            "charset": PYMYSQL_CONFIG["charset"],
-            "database": PYMYSQL_CONFIG["database"],
-        }
-        true_mysql_conf = {
-            key.lower(): value for key, value in local_mysql_conf.items()
-        }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {"MYSQL_CONFIG": local_mysql_conf}
+        project_settings = {"MYSQL_CONFIG": MYSQL_CONFIG}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
@@ -131,7 +120,7 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mysql_conf")
-        assert spider.mysql_conf._asdict() == true_mysql_conf
+        assert spider.mysql_conf._asdict() == MYSQL_CONFIG
 
         # 测试应用管理中心 mysql 配置
         CONSUL_CONF = {
@@ -152,7 +141,7 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mysql_conf")
-        assert spider.mysql_conf._asdict() == true_mysql_conf
+        assert spider.mysql_conf._asdict() == MYSQL_CONFIG
 
     def test_from_crawler_get_mongodb_conf(self):
         """测试从爬虫 AyugeSpider(即 spider) 中获取 mongodb 配置的方法"""

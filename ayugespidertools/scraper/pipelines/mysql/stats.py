@@ -5,7 +5,6 @@ from retrying import retry
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.utils import ToolsForAyu
 
 __all__ = [
     "AyuStatisticsMysqlPipeline",
@@ -22,8 +21,6 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储且记录脚本运行状态的简单示例"""
 
     def __init__(self) -> None:
-        # 排序规则，用于创建数据库时使用
-        self.collate = None
         self.mysql_conf: Optional["MysqlConf"] = None
         self.conn: Optional["Connection[Cursor]"] = None
         self.slog = None
@@ -33,8 +30,6 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     def open_spider(self, spider):
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
-
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 

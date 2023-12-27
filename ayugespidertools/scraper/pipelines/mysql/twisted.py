@@ -3,7 +3,6 @@ from twisted.enterprise import adbapi
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import TwistedAsynchronous, deal_mysql_err
-from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
@@ -22,7 +21,6 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         self._connect(self.mysql_conf).close()
 
@@ -72,9 +70,7 @@ class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
                 TwistedAsynchronous(),
                 err_msg=str(e),
                 cursor=cursor,
-                charset=self.mysql_conf.charset,
-                collate=self.collate,
-                database=self.mysql_conf.database,
+                mysql_conf=self.mysql_conf,
                 table=_table_name,
                 table_notes=_table_notes,
                 note_dic=note_dic,

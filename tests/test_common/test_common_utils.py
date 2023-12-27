@@ -6,7 +6,6 @@ from scrapy.http.request import Request
 from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.typevars import MysqlConf
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.extras.cvnpil import BezierTrajectory
 from tests import CONSUL_CONFIG, tests_dir
@@ -177,26 +176,6 @@ def test_extract_with_json_rules():
             json_data=json_data_example, query_rules=[["data", "im", "cc"], "message"]
         )
     assert str(_attribute_err.value) == "'int' object has no attribute 'get'"
-
-
-def test_get_collate_by_charset():
-    charset_collate_map = {
-        "utf8mb4": "utf8mb4_general_ci",
-        "utf8": "utf8_general_ci",
-        "gbk": "gbk_chinese_ci",
-        "latin1": "latin1_swedish_ci",
-        "utf16": "utf16_general_ci",
-        "utf16le": "utf16le_general_ci",
-        "cp1251": "cp1251_general_ci",
-        "euckr": "euckr_korean_ci",
-        "greek": "greek_general_ci",
-    }
-    # sourcery skip: no-loop-in-tests
-    for charset, collate in charset_collate_map.items():
-        _mysql_c = MysqlConf(
-            host="", port=0, user="", password="", database="", charset=charset
-        )
-        assert ToolsForAyu.get_collate_by_charset(mysql_conf=_mysql_c) == collate
 
 
 def test_first_not_none():

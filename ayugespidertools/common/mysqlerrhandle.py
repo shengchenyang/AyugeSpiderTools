@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from pymysql.cursors import Cursor, DictCursor
     from twisted.enterprise.adbapi import Transaction
 
+    from ayugespidertools.common.typevars import MysqlConf
+
     TwistedTransactionT = TypeVar("TwistedTransactionT", bound=Transaction)
     PymysqlDictCursorT = TypeVar("PymysqlDictCursorT", bound=DictCursor)
 
@@ -94,9 +96,7 @@ class AbstractClass(ABC):
         err_msg: str,
         conn: "Connection[Cursor]",
         cursor: Union["Cursor", "TwistedTransactionT"],
-        charset: str,
-        collate: str,
-        database: str,
+        mysql_conf: "MysqlConf",
         table: str,
         table_notes: str,
         note_dic: dict,
@@ -107,9 +107,7 @@ class AbstractClass(ABC):
             err_msg: pipeline 存储时报错内容
             conn: mysql conn
             cursor: mysql connect cursor
-            charset: mysql table charset
-            collate: mysql table collate
-            database: 数据库
+            mysql_conf: spider mysql_conf
             table: 数据表
             table_notes: 数据表注释
             note_dic: 当前表字段注释
@@ -124,8 +122,8 @@ class AbstractClass(ABC):
             self._create_table(
                 cursor=cursor,
                 table_name=table,
-                charset=charset,
-                collate=collate,
+                charset=mysql_conf.charset,
+                collate=mysql_conf.collate,
                 table_notes=table_notes,
             )
 
@@ -133,7 +131,7 @@ class AbstractClass(ABC):
             sql, possible_err = self.deal_1406_error(
                 err_msg=err_msg,
                 cursor=cursor,
-                database=database,
+                database=mysql_conf.database,
                 table=table,
                 note_dic=note_dic,
             )
@@ -143,7 +141,7 @@ class AbstractClass(ABC):
             sql, possible_err = self.deal_1265_error(
                 err_msg=err_msg,
                 cursor=cursor,
-                database=database,
+                database=mysql_conf.database,
                 table=table,
                 note_dic=note_dic,
             )
@@ -299,9 +297,7 @@ def deal_mysql_err(
     abstract_class: AbstractClass,
     err_msg: str,
     cursor: Union["Cursor", "TwistedTransactionT"],
-    charset: str,
-    collate: str,
-    database: str,
+    mysql_conf: "MysqlConf",
     table: str,
     table_notes: str,
     note_dic: dict,
@@ -311,9 +307,7 @@ def deal_mysql_err(
         err_msg,
         conn,
         cursor,
-        charset,
-        collate,
-        database,
+        mysql_conf,
         table,
         table_notes,
         note_dic,

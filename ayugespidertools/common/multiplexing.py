@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Union
 import pymysql
 from itemadapter import ItemAdapter
 
+from ayugespidertools.common.params import Param
 from ayugespidertools.common.typevars import (
     AlterItem,
     AlterItemTable,
@@ -51,13 +52,19 @@ class ReuseOperation:
         cfg.read(f"{vit_dir}/.conf", encoding="utf-8")
         if "mysql" in cfg:
             mysql_section = cfg["mysql"]
+            _charset = mysql_section.get("charset", "utf8mb4")
             inner_settings["MYSQL_CONFIG"] = {
                 "host": mysql_section.get("host", "localhost"),
                 "port": mysql_section.getint("port", 3306),
                 "user": mysql_section.get("user", ""),
                 "password": mysql_section.get("password", ""),
-                "charset": mysql_section.get("charset", "utf8mb4"),
+                "charset": _charset,
                 "database": mysql_section.get("database", ""),
+                "engine": mysql_section.get("engine", "InnoDB"),
+                "collate": mysql_section.get(
+                    "collate",
+                    Param.charset_collate_map.get(_charset, "utf8mb4_general_ci"),
+                ),
             }
         if "mongodb:uri" in cfg:
             inner_settings["MONGODB_CONFIG"] = {

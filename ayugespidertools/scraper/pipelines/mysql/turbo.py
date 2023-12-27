@@ -1,7 +1,6 @@
 import pymysql
 from dbutils.pooled_db import PooledDB
 
-from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
@@ -38,7 +37,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
                 "blocking": True,
             }
         self.mysql_conf = spider.mysql_conf
-        self.collate = ToolsForAyu.get_collate_by_charset(mysql_conf=self.mysql_conf)
 
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。这个并不需要此连接对象，直接关闭即可
         self._connect(spider.mysql_conf).close()

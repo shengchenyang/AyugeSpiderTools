@@ -65,6 +65,19 @@ class Param:
         "retry_times": 3,
     }
 
+    charset_collate_map = {
+        # utf8mb4_unicode_ci 也是经常使用的
+        "utf8mb4": "utf8mb4_general_ci",
+        "utf8": "utf8_general_ci",
+        "gbk": "gbk_chinese_ci",
+        "latin1": "latin1_swedish_ci",
+        "utf16": "utf16_general_ci",
+        "utf16le": "utf16le_general_ci",
+        "cp1251": "cp1251_general_ci",
+        "euckr": "euckr_korean_ci",
+        "greek": "greek_general_ci",
+    }
+
     # 随机请求头列表
     fake_useragent_dict = {
         "chrome": [
