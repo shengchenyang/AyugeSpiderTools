@@ -99,16 +99,19 @@ Scenario of storing data in Mysql:
 + 21).demo_mysql_nacos: Get the mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
 + 5).demo_five: Scenario of asynchronously storing data in MySQL.
 + 24).demo_aiomysql: combining aiomysql.
++ 13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
 
 Scenario of storing data in MongoDB:
 + 2).demo_two: Get mongodb configuration based on .conf in local VIT.
 + 4).demo_four: Get mongodb configuration from consul.
 + 6).demo_six: Scenario of asynchronously storing data in MongoDB.
++ 17).demo_mongo_async: Example of pipelines for storing data in MongoDB with asyncio version.
 
 Scenario of storing data in PostgreSQL(need to install ayugespidertools[database]):
 + 21).demo_nine: Get postgresql configuration based on .conf in local VIT.
 + 22).demo_ten: Scenario of asynchronously storing data in PostgreSQL.
 - 23). It also supports obtaining configuration from nacos or consul, no more examples.
++ 27).demo_eleven: Example of pipelines for storing data in PostgreSQL with asyncio version.
 
 Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 + 25). demo_oracle: AyuFtyOraclePipeline usage introduction.
@@ -121,14 +124,12 @@ Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 
 + 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".
 + 12).demo_proxy_two: Example of using dedicated proxies with "kuaidaili.com".
-+ 13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
 + 14).demo_crawl: Example of supporting scrapy CrawlSpider.
 
 # Example of supporting Item "Loaders feature" in this library
 + 15).demo_item_loader: Example of using Item Loaders in this library.
 - 16).demo_item_loader_two: This example has been removed. You can refer to the example in the previous demo_item_loader. Currently, it is very convenient to use the Item Loaders feature.
 
-+ 17).demo_mongo_async: Example of pipelines for storing data in MongoDB with asyncio version.
 + 18).demo_mq: Template example of storing data in RabbitMQ.
 + 19).demo_kafka: Template example of storing data in Kafka.
 + 20).demo_file: Template example of downloading images and other files to the local machine.

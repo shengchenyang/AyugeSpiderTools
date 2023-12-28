@@ -94,16 +94,19 @@ scrapy crawl <spider_name>
 + 21).demo_mysql_nacos: 根据 nacos 中取 mysql 配置(其它从 nacos 中获取配置的场景不再举例)
 + 5).demo_five: 异步存入 Mysql 的场景
 + 24).demo_aiomysql: 结合 aiomysql 的方式
++ 13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
 
 # 数据存入 MongoDB 的场景：
 + 2).demo_two: 根据本地 VIT 中的 .conf 取 mongodb 配置
 + 4).demo_four: 根据 consul 中取 mongodb 配置
 + 6).demo_six: 异步存入 MongoDB 的场景
++ 17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 
 # 数据存入 PostgreSQL 的场景(需要安装 ayugespidertools[database])
 + 21).demo_nine: 根据本地 VIT 中的 .conf 取 postgresql 配置
 + 22).demo_ten: 异步存入 PostgreSQL 的场景
 - 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
++ 27).demo_eleven: asyncio 版本存储 PostgreSQL 的 pipelines 示例
 
 # 数据存入 Oracle 的场景(需要安装 ayugespidertools[database])
 + 25). demo_oracle: AyuFtyOraclePipeline 使用介绍
@@ -116,14 +119,12 @@ scrapy crawl <spider_name>
 
 + 11).demo_proxy_one: 快代理动态隧道代理示例
 + 12).demo_proxy_two: 测试快代理独享代理
-+ 13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
 + 14).demo_crawl: 支持 scrapy CrawlSpider 的示例
 
 # 本库中给出支持 Item Loaders 特性的示例
 + 15).demo_item_loader: 本库中使用 Item Loaders 的示例
 - 16).demo_item_loader_two: 已删除，可查看上个 demo_item_loader，目前已经可以很方便的使用 Item Loaders 功能了
 
-+ 17).demo_mongo_async: asyncio 版本存储 mongoDB 的 pipelines 示例
 + 18).demo_mq: 数据存入 rabbitmq 的模板示例
 + 19).demo_kafka: 数据存入 kafka 的模板示例
 + 20).demo_file: 下载图片等文件到本地的模板示例
