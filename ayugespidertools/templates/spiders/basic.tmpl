@@ -1,5 +1,5 @@
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from ayugespidertools.items import AyuItem, DataItem
 from ayugespidertools.spiders import AyuSpider
@@ -8,6 +8,11 @@ from sqlalchemy import text
 
 if TYPE_CHECKING:
     from scrapy.http import Response
+    from scrapy.http.response.html import HtmlResponse
+    from scrapy.http.response.text import TextResponse
+    from scrapy.http.response.xml import XmlResponse
+
+    ScrapyResponse = Union[TextResponse, XmlResponse, HtmlResponse, Response]
 
 
 class $classname(AyuSpider):
@@ -39,7 +44,7 @@ class $classname(AyuSpider):
             dont_filter=True
         )
 
-    def parse_first(self, response: "Response", curr_site: str):
+    def parse_first(self, response: "ScrapyResponse", curr_site: str):
         self.slog.info(f"当前采集的站点为: {curr_site}")
         _save_table = "_article_info_list"
 
