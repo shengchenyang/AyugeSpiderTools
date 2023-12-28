@@ -51,15 +51,16 @@ class MysqlPipeEnhanceMixin:
         Returns:
             1). mysql 链接句柄
         """
+        pymysql_conn_args = {
+            "user": mysql_conf.user,
+            "password": mysql_conf.password,
+            "host": mysql_conf.host,
+            "port": mysql_conf.port,
+            "database": mysql_conf.database,
+            "charset": mysql_conf.charset,
+        }
         try:
-            conn = pymysql.connect(
-                user=mysql_conf.user,
-                password=mysql_conf.password,
-                host=mysql_conf.host,
-                port=mysql_conf.port,
-                database=mysql_conf.database,
-                charset=mysql_conf.charset,
-            )
+            conn = pymysql.connect(**pymysql_conn_args)
         except Exception as e:
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
@@ -72,14 +73,7 @@ class MysqlPipeEnhanceMixin:
             # 连接没有问题就直接返回连接对象
             return conn
         # 出现数据库不存在问题后，在创建数据库后，再次返回连接对象
-        return pymysql.connect(
-            user=mysql_conf.user,
-            password=mysql_conf.password,
-            host=mysql_conf.host,
-            port=mysql_conf.port,
-            database=mysql_conf.database,
-            charset=mysql_conf.charset,
-        )
+        return pymysql.connect(**pymysql_conn_args)
 
     def _get_sql_by_item(self, table: str, item: dict, odku_enable: bool = True) -> str:
         """根据处理后的 item 生成 mysql 插入语句
