@@ -1,5 +1,27 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.2 (2023-12-28)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- `mysql` 配置项支持自定义自动创建库表场景的 `engine` 和 `collate` 参数。([`e652666`](https://github.com/shengchenyang/AyugeSpiderTools/commit/e6526668b818ec0d442160e60a98b73bd45fb673))
+
+### Bug fixes
+
+- 解决 `settings` 模板生成的 `LOG_FILE` 不是当前项目名的问题。([`93c19d6`](https://github.com/shengchenyang/AyugeSpiderTools/commit/93c19d6c6812a86f6ea1ece7618c98e0f8c63957))
+
+### Code optimizations
+
+- 更新 `spider` 模板，模板中解析方式改为 `scrapy` 的形式，防止对开发者造成理解成本。([`91ad948`](https://github.com/shengchenyang/AyugeSpiderTools/commit/91ad948506495bee210a673cd08541329375d8c4))
+- 更新 `spider` 模板中的 `type hint`，优化了开发者使用体验。([`c2a0908`](https://github.com/shengchenyang/AyugeSpiderTools/commit/c2a09087f9b9fa1d20927d51f9e9f670c74d00f3))
+- 优化一些数据库连接处理和配置解析方法等。
+
+<hr>
+
 ## AyugeSpiderTools 3.9.1 (2023-12-22)
 
 ### Deprecations
