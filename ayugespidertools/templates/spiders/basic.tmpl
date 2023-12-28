@@ -7,7 +7,7 @@ from scrapy.http import Request
 from sqlalchemy import text
 
 if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import ScrapyResponse
+    from scrapy.http import Response
 
 
 class $classname(AyuSpider):
@@ -39,7 +39,7 @@ class $classname(AyuSpider):
             dont_filter=True
         )
 
-    def parse_first(self, response: "ScrapyResponse", curr_site: str):
+    def parse_first(self, response: "Response", curr_site: str):
         self.slog.info(f"当前采集的站点为: {curr_site}")
         _save_table = "_article_info_list"
 
