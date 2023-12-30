@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, Optional, Tuple, TypeVar
 
-from oracledb.exceptions import DatabaseError
 from sqlalchemy.exc import OperationalError
 
 from ayugespidertools.common.typevars import (
@@ -17,6 +16,12 @@ from ayugespidertools.common.typevars import (
 )
 from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.config import logger
+
+try:
+    from oracledb.exceptions import DatabaseError
+except ImportError:
+    # pip install ayugespidertools[database]
+    pass
 
 __all__ = [
     "get_spider_conf",
