@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.3 (2023-12-30)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- `无`。
+
+### Bug fixes
+
+- 解决 `pip install ayugespidertools` 并执行简单场景时提示 `oracledb` 的依赖缺失问题。([`e363937`](https://github.com/shengchenyang/AyugeSpiderTools/commit/e363937f2de8cb5dd06938ca2eb470e1a5b08847))
+
+注：出现此问题又是因为未重新新建环境来测试，且使用 `Pycharm ssh` 远程开发时不会自动索引环境依赖导致，所以未检视出项目依赖的问题。后续也会添加对 `DemoSpider` 场景的测试自动化来完善测试流程。
+
+由于对用户体验影响较大，先修复此问题并发布。
+
+### Code optimizations
+
+- 统一代码风格。([`ecb97e8`](https://github.com/shengchenyang/AyugeSpiderTools/commit/ecb97e803b36da5a5fd0bca14c98654a4b5d743b))
+
+<hr>
+
 ## AyugeSpiderTools 3.9.2 (2023-12-28)
 
 ### Deprecations
