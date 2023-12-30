@@ -23,7 +23,6 @@ except ImportError:
     # pip install ayugespidertools[database]
     pass
 
-
 __all__ = [
     "ReuseOperation",
 ]

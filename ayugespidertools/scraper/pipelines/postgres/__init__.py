@@ -6,7 +6,6 @@ from ayugespidertools.common.postgreserrhandle import Synchronize, deal_postgres
 
 __all__ = ["AyuPostgresPipeline"]
 
-
 if TYPE_CHECKING:
     from psycopg.connection import Connection
     from psycopg.cursor import Cursor

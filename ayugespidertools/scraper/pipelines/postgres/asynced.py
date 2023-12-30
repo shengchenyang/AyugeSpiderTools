@@ -1,17 +1,22 @@
 from typing import TYPE_CHECKING, Optional
 
-from psycopg_pool import AsyncConnectionPool
 from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 
-if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import PostgreSQLConf
+try:
+    from psycopg_pool import AsyncConnectionPool
+except ImportError:
+    # pip install ayugespidertools[database]
+    pass
 
 __all__ = [
     "AyuAsyncPostgresPipeline",
 ]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import PostgreSQLConf
 
 
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
