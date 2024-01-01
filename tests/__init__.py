@@ -25,8 +25,8 @@ PYMYSQL_CONFIG = {
 }
 
 MYSQL_CONFIG = {
-    "engine": mysql_conf["engine"],
-    "collate": mysql_conf["collate"],
+    "engine": mysql_conf.get("engine"),
+    "collate": mysql_conf.get("collate"),
 }
 MYSQL_CONFIG.update(PYMYSQL_CONFIG)
 
