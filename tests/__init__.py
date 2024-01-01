@@ -1,19 +1,24 @@
 import configparser
+import os
 from pathlib import Path
 
 tests_dir = Path(__file__).parent
 tests_vitdir = str(Path(__file__).parent.resolve() / "VIT")
+tests_vit_conf = f"{tests_vitdir}/.conf"
 tests_sqlfiledir = str(Path(__file__).parent.resolve() / "docs/sqlfile")
 cfg = configparser.ConfigParser()
-cfg.read(f"{tests_vitdir}/.conf", encoding="utf-8")
 
-if not cfg.sections():
+if not Path(tests_vit_conf).exists():
     print("没有 .conf 文件或其中无配置内容，若是 github action 请忽略。")
-    from tests.defaultcfg import mongodb_conf, mongodb_uri_conf, mysql_conf
+    runtest_cfg_demo = os.environ.get("RUNTEST_CFG_DEMO")
+    runtest_cfg = os.environ["RUNTEST_CFG"]
+    cfg.read_string(runtest_cfg)
 else:
-    mysql_conf = cfg["mysql"]
-    mongodb_conf = cfg["mongodb"]
-    mongodb_uri_conf = cfg["mongodb:uri"]
+    cfg.read(tests_vit_conf, encoding="utf-8")
+
+mysql_conf = cfg["mysql"]
+mongodb_conf = cfg["mongodb"]
+mongodb_uri_conf = cfg["mongodb:uri"]
 
 PYMYSQL_CONFIG = {
     "host": mysql_conf["host"],
