@@ -1,4 +1,4 @@
-name: "UbuntuDemo"
+name: "Ubuntu"
 on: [ "push", "pull_request" ]
 
 concurrency:
@@ -8,17 +8,6 @@ concurrency:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_USER: ayuge
-          MYSQL_PASSWORD: test
-          MYSQL_ROOT_PASSWORD: RootAyuge
-          MYSQL_DATABASE: demo
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - uses: actions/checkout@v4
@@ -31,5 +20,7 @@ jobs:
         pip install -U poetry tox
         tox
 
-    - name: Upload coverage report
-      run: bash <(curl -s https://codecov.io/bash)
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
