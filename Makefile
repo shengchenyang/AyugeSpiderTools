@@ -83,5 +83,7 @@ clean:
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.crt)
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)keys$(PATHSEP)localhost.key)
+	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.crt)
+	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.key)
 	poetry install
 	pip uninstall -y ayugespidertools

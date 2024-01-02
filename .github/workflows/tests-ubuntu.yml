@@ -18,8 +18,9 @@ jobs:
     - name: Run tests
       env:
         RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
-        RUNTEST_CFG_DEMO: ${{ secrets.RUNTEST_CFG_DEMO }}
       run: |
+        sudo apt-get update
+        sudo apt-get install libxml2-dev libxslt-dev
         pip install -U poetry tox
         tox
 

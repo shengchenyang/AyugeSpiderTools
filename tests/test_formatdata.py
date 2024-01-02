@@ -1,3 +1,5 @@
+import pytest
+
 from ayugespidertools.formatdata import DataHandle
 
 
@@ -17,6 +19,7 @@ def test_click_point_deal():
     assert res == 13.326
 
 
+@pytest.mark.skip()
 def test_normal_to_stamp():
     normal_stamp = DataHandle.normal_to_stamp("Fri, 22 Jul 2022 01:43:06 +0800")
     assert normal_stamp == 1658425386

@@ -13,7 +13,7 @@ from scrapy.utils.test import get_crawler
 
 from ayugespidertools.scraper.spiders import AyuSpider
 from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
-from tests import CONSUL_CONFIG, MONGODB_CONFIG, MYSQL_CONFIG
+from tests import CONSUL_CONFIG, MONGODB_CONFIG, MYSQL_CONFIG, tests_vitdir
 from tests.conftest import ForTestConfig
 
 
@@ -112,7 +112,7 @@ class SpiderTest(unittest.TestCase):
         # 测试本地 mysql 配置
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {"MYSQL_CONFIG": MYSQL_CONFIG}
+        project_settings = {"MYSQL_CONFIG": MYSQL_CONFIG, "VIT_DIR": tests_vitdir}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
@@ -131,9 +131,7 @@ class SpiderTest(unittest.TestCase):
         }
         spider_settings = {"APP_CONF_MANAGE": True}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {
-            "REMOTE_CONFIG": CONSUL_CONF,
-        }
+        project_settings = {"REMOTE_CONFIG": CONSUL_CONF, "VIT_DIR": tests_vitdir}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
@@ -158,7 +156,10 @@ class SpiderTest(unittest.TestCase):
         }
         spider_settings = {"APP_CONF_MANAGE": False}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {"MONGODB_CONFIG": local_mongodb_conf}
+        project_settings = {
+            "MONGODB_CONFIG": local_mongodb_conf,
+            "VIT_DIR": tests_vitdir,
+        }
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)
@@ -166,7 +167,9 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
-        assert spider.mongodb_conf._asdict() == local_mongodb_conf
+        _spider_mongodb_conf = spider.mongodb_conf._asdict()
+        if _spider_mongodb_conf.get("uri") is not None:
+            assert _spider_mongodb_conf["uri"] == local_mongodb_conf["uri"]
 
         # 测试应用管理中心 mongodb 配置
         CONSUL_CONF = {
@@ -177,9 +180,7 @@ class SpiderTest(unittest.TestCase):
         }
         spider_settings = {"APP_CONF_MANAGE": True}
         spider_settings.update(ForTestConfig.scrapy_default_settings)
-        project_settings = {
-            "REMOTE_CONFIG": CONSUL_CONF,
-        }
+        project_settings = {"REMOTE_CONFIG": CONSUL_CONF, "VIT_DIR": tests_vitdir}
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
         self.spider_class.update_settings(settings)

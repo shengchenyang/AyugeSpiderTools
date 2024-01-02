@@ -136,3 +136,5 @@ dmypy.json
 /tests/VIT/.conf
 /tests/docs/keys/localhost.crt
 /tests/docs/keys/localhost.key
+/tests/keys/localhost.crt
+/tests/keys/localhost.key

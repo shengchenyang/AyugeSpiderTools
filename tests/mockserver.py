@@ -276,8 +276,8 @@ class MockServer:
             stdout=PIPE,
             env=get_mockserver_env(),
         )
-        http_address = self.proc.stdout.readline().strip().decode("ascii")
-        https_address = self.proc.stdout.readline().strip().decode("ascii")
+        http_address = self.proc.stdout.readline().strip().decode("utf-8")
+        https_address = self.proc.stdout.readline().strip().decode("utf-8")
 
         self.http_address = http_address
         self.https_address = https_address
@@ -358,8 +358,8 @@ class MockFTPServer:
 
 
 def ssl_context_factory(
-    keyfile="docs/keys/localhost.key",
-    certfile="docs/keys/localhost.crt",
+    keyfile="keys/localhost.key",
+    certfile="keys/localhost.crt",
     cipher_string=None,
 ):
     factory = ssl.DefaultOpenSSLContextFactory(

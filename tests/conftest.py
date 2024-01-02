@@ -6,7 +6,7 @@ from pymongo import MongoClient
 from scrapy.utils.reactor import install_reactor
 
 from tests import MONGODB_CONFIG, PYMYSQL_CONFIG
-from tests.docs.keys import generate_keys
+from tests.keys import generate_keys
 
 test_table = "_test_article_info_table"
 script_coll_table = "script_collection_statistics"
