@@ -13,6 +13,7 @@
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads)
+![codecov](https://codecov.io/gh/shengchenyang/AyugeSpiderTools/graph/badge.svg?token=1QLOEW2NTI)
 
 **简体中文** | [English](./README_en.md)
 
@@ -22,7 +23,7 @@
 
 在使用 `Scrapy` 开发爬虫时，免不了会重复地编写 `settings`，`items`，`middlewares`，`pipelines`
 和一些通用方法，但各项目中的这些内容都大致相同，那为何不把它们统一整理在一起呢？我也想扩展一些功能，比如当 `spider`
-中添加字段后，不用再修改对应的 `item` 和 `pipeline` 甚至不用手动修改 `Mysql` 表结构。
+中添加字段后，不用再修改对应的 `item` 和 `pipeline` 甚至不用手动修改 `Mysql` 和 `PostgreSQL` 的表结构。
 
 项目的主旨是让开发者只需专注于 `spider` 脚本的编写，减少开发和维护流程。理想状态下，只需关注 `spider`
 中字段的解析规则和 `VIT` 下的 `.conf` 配置即可，**脱离无意义的重复操作**。
@@ -143,9 +144,15 @@ scrapy crawl <spider_name>
 ## 你可能在意的事
 
 1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，比如移除对你无用模块、修改库名等，你可以自行修改后 `build`。
+
 2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy`
    项目及其它组件。
-3. 如果你想对此项目做出贡献，请参考[pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
+
+3. 代码测试覆盖率有点低，考虑增加吗？
+
+   不考虑，场景所依赖服务太多，且云服务等其它因素导致个人维护成本过高，但不必担心，我会和本地服务的自动化测试结合使用。
+
+4. 如果你想对此项目做出贡献，请参考[pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
 
 ## 构建你的专属库
 
