@@ -1,0 +1,28 @@
+name: "macOS"
+on: [ "push", "pull_request" ]
+
+concurrency:
+  group: ${{github.workflow}}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: macos-11
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Run tests
+      env:
+        RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
+      run: |
+        pip install -U poetry tox
+        tox -e py
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
