@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libxml2-dev libxslt-dev
-        pip install -U tox
+        pip install -U poetry tox
         tox
 
     - name: Upload coverage reports to Codecov
