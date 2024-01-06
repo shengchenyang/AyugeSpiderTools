@@ -27,6 +27,7 @@ RemoteConfNameStr = Literal[
     "mongodb",
     "mysql",
     "postgresql",
+    "elasticsearch",
     "oracle",
     "rabbitmq",
     "kafka",

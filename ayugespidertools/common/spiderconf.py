@@ -6,6 +6,7 @@ from sqlalchemy.exc import OperationalError
 from ayugespidertools.common.typevars import (
     DatabaseEngineClass,
     DynamicProxyConf,
+    ESConf,
     ExclusiveProxyConf,
     KafkaConf,
     MongoDBConf,
@@ -18,13 +19,16 @@ from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.config import logger
 
 try:
+    from elasticsearch_dsl import connections
     from oracledb.exceptions import DatabaseError
 except ImportError:
-    # pip install ayugespidertools[database]
+    # pip install ayugespidertools[database]    # oracledb ImportError
+    # pip install elasticsearch_dsl             # elasticsearch_dsl ImportError
     pass
 
 __all__ = [
     "get_spider_conf",
+    "ESConfCreator",
     "MysqlConfCreator",
     "MongoDBConfCreator",
     "MQConfCreator",
@@ -37,6 +41,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from elasticsearch import Elasticsearch
     from scrapy.settings import Settings
     from sqlalchemy.engine.base import Connection as SqlalchemyConnectT
     from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
@@ -65,7 +70,8 @@ class Product(ABC, Generic[SpiderConf]):
         self, db_conf: SpiderConf, db_engine_enabled: bool
     ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
         """获取各个工具中对应的 sqlalchemy db_engine 和 db_engine_conn。
-        需要此方法的工具有 mysql，postgresql，mongodb，oracle，其余的不需要。
+        需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
+        其中 elasticsearch 不采用 sqlalchemy 的方式了。
         """
         pass
 
@@ -142,7 +148,7 @@ class PostgreSQLConfProduct(Product):
 
     def get_engine(
         self, db_conf: PostgreSQLConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> Tuple[Optional["Elasticsearch"], Optional["Elasticsearch"]]:
         postgres_engine = postgres_engine_conn = None
         if db_engine_enabled:
             postgres_url = (
@@ -155,6 +161,36 @@ class PostgreSQLConfProduct(Product):
             except OperationalError as err:
                 logger.warning(f"PostgreSQL engine enabled failed: {err}")
         return postgres_engine, postgres_engine_conn
+
+
+class ESConfProduct(Product):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[ESConf]:
+        if settings.get("APP_CONF_MANAGE", False):
+            remote_conf = ToolsForAyu.fetch_remote_conf(
+                conf_name="elasticsearch", **remote_option
+            )
+            return ESConf(**remote_conf) if remote_conf else None
+
+        local_conf = settings.get("ES_CONFIG")
+        return ESConf(**local_conf) if local_conf else None
+
+    def get_engine(
+        self, db_conf: ESConf, db_engine_enabled: bool
+    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+        if db_engine_enabled:
+            _hosts_lst = db_conf.hosts.split(",")
+            if any([db_conf.user is not None, db_conf.password is not None]):
+                http_auth = (db_conf.user, db_conf.password)
+            else:
+                http_auth = None
+            client = connections.create_connection(
+                hosts=_hosts_lst,
+                http_auth=http_auth,
+                verify_certs=db_conf.verify_certs,
+            )
+            return client, client
 
 
 class OracleConfProduct(Product):
@@ -275,6 +311,11 @@ class MongoDBConfCreator(Creator):
 class PostgreSQLConfCreator(Creator):
     def create_product(self) -> Product:
         return PostgreSQLConfProduct()
+
+
+class ESConfCreator(Creator):
+    def create_product(self) -> Product:
+        return ESConfProduct()
 
 
 class OracleConfCreator(Creator):

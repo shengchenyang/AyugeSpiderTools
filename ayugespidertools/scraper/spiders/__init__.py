@@ -7,6 +7,7 @@ from scrapy.spiders import Spider
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.spiderconf import (
     DynamicProxyCreator,
+    ESConfCreator,
     ExclusiveProxyCreator,
     KafkaConfCreator,
     MongoDBConfCreator,
@@ -26,6 +27,7 @@ __all__ = [
 if TYPE_CHECKING:
     import logging
 
+    from elasticsearch import Elasticsearch
     from loguru import Logger
     from scrapy.crawler import Crawler
     from scrapy.settings import BaseSettings
@@ -47,6 +49,8 @@ class AyuSpider(Spider):
         self.postgres_engine_conn: Optional["SqlalchemyConnectT"] = None
         self.oracle_engine: Optional["SqlalchemyEngineT"] = None
         self.oracle_engine_conn: Optional["SqlalchemyConnectT"] = None
+        self.es_engine: Optional["Elasticsearch"] = None
+        self.es_engine_conn: Optional["Elasticsearch"] = None
 
     @property
     def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
@@ -115,6 +119,14 @@ class AyuSpider(Spider):
             spider.postgres_engine, spider.postgres_engine_conn = get_sqlalchemy_conf(
                 creator=PostgreSQLConfCreator(),
                 db_conf=postgres_conf,
+                db_engine_enabled=_db_engine_enabled,
+            )
+
+        if es_conf := get_spider_conf(ESConfCreator(), crawler.settings, remote_option):
+            spider.es_conf = es_conf
+            spider.es_engine, spider.es_engine_conn = get_sqlalchemy_conf(
+                creator=ESConfCreator(),
+                db_conf=es_conf,
                 db_engine_enabled=_db_engine_enabled,
             )
 

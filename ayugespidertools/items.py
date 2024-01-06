@@ -29,7 +29,7 @@ class DataItem(NamedTuple):
     """
 
     key_value: Any
-    notes: str = ""
+    notes: Any = ""
 
 
 class ItemMeta(ABCMeta):

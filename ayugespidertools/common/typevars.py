@@ -71,6 +71,15 @@ class PostgreSQLConf(NamedTuple):
     charset: str = "UTF8"
 
 
+class ESConf(NamedTuple):
+    hosts: str
+    index_class: dict
+    user: Optional[str] = None
+    password: Optional[str] = None
+    init: bool = False
+    verify_certs: bool = False
+
+
 class OracleConf(NamedTuple):
     host: str
     port: int

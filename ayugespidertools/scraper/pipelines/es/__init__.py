@@ -1,0 +1,62 @@
+from typing import TYPE_CHECKING, Optional
+
+from ayugespidertools.common.multiplexing import ReuseOperation
+
+try:
+    from elasticsearch_dsl import Document, connections
+
+    def dynamic_es_document(class_name, fields, index_settings=None):
+        class_attrs = fields.copy()
+
+        if index_settings:
+            class_attrs["Index"] = type("Index", (), index_settings)
+
+        return type(class_name, (Document,), class_attrs)
+
+except ImportError:
+    # pip install elasticsearch-dsl
+    pass
+
+__all__ = ["AyuESPipeline"]
+
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import ESConf
+
+
+class AyuESPipeline:
+    def __init__(self):
+        self.es_conf: Optional["ESConf"] = None
+        self.es_type = None
+
+    def open_spider(self, spider):
+        self.es_conf = spider.es_conf
+        assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
+        _hosts_lst = self.es_conf.hosts.split(",")
+        if any([self.es_conf.user is not None, self.es_conf.password is not None]):
+            http_auth = (self.es_conf.user, self.es_conf.password)
+        else:
+            http_auth = None
+        connections.create_connection(
+            hosts=_hosts_lst,
+            http_auth=http_auth,
+            verify_certs=self.es_conf.verify_certs,
+        )
+
+    def process_item(self, item, spider):
+        item_dict = ReuseOperation.item_to_dict(item)
+        alert_item = ReuseOperation.reshape_item(item_dict)
+        if not (new_item := alert_item.new_item):
+            return
+
+        if not self.es_type:
+            fields_definition = {k: v.notes for k, v in item_dict.items()}
+            es_index_define = self.es_conf.index_class
+            es_index_define["name"] = alert_item.table.name
+            self.es_type = dynamic_es_document(
+                "ESType", fields_definition, es_index_define
+            )
+            if self.es_conf.init:
+                self.es_type.init()
+        es_item = self.es_type(**new_item)
+        es_item.save()
+        return item

@@ -90,6 +90,20 @@ class ReuseOperation:
                 "database": postgres_section.get("database", ""),
                 "charset": postgres_section.get("charset", "UTF8"),
             }
+        if "elasticsearch" in cfg:
+            es_section = cfg["elasticsearch"]
+            inner_settings["ES_CONFIG"] = {
+                "hosts": es_section.get("hosts", None),
+                "index_class": json.loads(
+                    es_section.get(
+                        "index_class", '{"settings":{"number_of_shards": 2}}'
+                    )
+                ),
+                "user": es_section.get("user", None),
+                "password": es_section.get("password", None),
+                "init": es_section.getboolean("init", False),
+                "verify_certs": es_section.getboolean("verify_certs", False),
+            }
         if "oracle" in cfg:
             oracle_section = cfg["oracle"]
             inner_settings["ORACLE_CONFIG"] = {
