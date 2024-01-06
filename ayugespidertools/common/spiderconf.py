@@ -71,7 +71,7 @@ class Product(ABC, Generic[SpiderConf]):
     ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
         """获取各个工具中对应的 sqlalchemy db_engine 和 db_engine_conn。
         需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
-        其中 elasticsearch 不采用 sqlalchemy 的方式了。
+        但其中 elasticsearch 不采用 sqlalchemy 的方式。
         """
         pass
 
@@ -148,7 +148,7 @@ class PostgreSQLConfProduct(Product):
 
     def get_engine(
         self, db_conf: PostgreSQLConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["Elasticsearch"], Optional["Elasticsearch"]]:
+    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
         postgres_engine = postgres_engine_conn = None
         if db_engine_enabled:
             postgres_url = (
@@ -178,19 +178,19 @@ class ESConfProduct(Product):
 
     def get_engine(
         self, db_conf: ESConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> Optional["Elasticsearch"]:  # @override to fix mypy [override] error.
         if db_engine_enabled:
             _hosts_lst = db_conf.hosts.split(",")
             if any([db_conf.user is not None, db_conf.password is not None]):
                 http_auth = (db_conf.user, db_conf.password)
             else:
                 http_auth = None
-            client = connections.create_connection(
+            return connections.create_connection(
                 hosts=_hosts_lst,
                 http_auth=http_auth,
                 verify_certs=db_conf.verify_certs,
             )
-            return client, client
+        return None
 
 
 class OracleConfProduct(Product):

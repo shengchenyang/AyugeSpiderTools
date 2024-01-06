@@ -124,7 +124,7 @@ class AyuSpider(Spider):
 
         if es_conf := get_spider_conf(ESConfCreator(), crawler.settings, remote_option):
             spider.es_conf = es_conf
-            spider.es_engine, spider.es_engine_conn = get_sqlalchemy_conf(
+            spider.es_engine = spider.es_engine_conn = get_sqlalchemy_conf(
                 creator=ESConfCreator(),
                 db_conf=es_conf,
                 db_engine_enabled=_db_engine_enabled,
