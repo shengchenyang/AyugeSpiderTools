@@ -42,24 +42,24 @@ def mysql_db_cursor():
             yield cursor
 
             # 清理 mysql 测试产生的数据
-            cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
-            cursor.execute(f"DROP TABLE IF EXISTS {script_coll_table}")
-            cursor.execute(f"DROP TABLE IF EXISTS {table_coll_table}")
-            cursor.execute(f"DROP TABLE IF EXISTS {article_list_table}")
+            # cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
+            # cursor.execute(f"DROP TABLE IF EXISTS {script_coll_table}")
+            # cursor.execute(f"DROP TABLE IF EXISTS {table_coll_table}")
+            # cursor.execute(f"DROP TABLE IF EXISTS {article_list_table}")
 
 
 @pytest.fixture(scope="session")
 def mongodb_conn():
     pymongo_conf = copy.deepcopy(MONGODB_CONFIG)
     pymongo_conf.pop("uri")
-    database = pymongo_conf.pop("database")
+    pymongo_conf.pop("database")
     pymongo_conf["username"] = pymongo_conf.pop("user")
     pymongo_conf["authSource"] = pymongo_conf.pop("authsource")
     with MongoClient(**pymongo_conf) as conn:
         yield conn
 
         # 清理 mongodb 测试产生的数据
-        conn[database][test_table].drop()
+        # conn[database][test_table].drop()
 
 
 def pytest_addoption(parser):
