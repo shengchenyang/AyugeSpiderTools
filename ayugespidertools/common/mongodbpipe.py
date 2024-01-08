@@ -146,7 +146,7 @@ class TwistedAsynchronous(AbstractClass):
 class AsyncioAsynchronous(AbstractClass):
     """pipeline asyncio 异步执行 mongodb 存储的场景 - 使用 motor 实现"""
 
-    async def _data_storage_logic(
+    async def _data_storage_logic(  # type: ignore[override]
         self,
         db: "PymongoDataBaseT",
         item_dict: dict,

@@ -176,7 +176,7 @@ class ESConfProduct(Product):
         local_conf = settings.get("ES_CONFIG")
         return ESConf(**local_conf) if local_conf else None
 
-    def get_engine(
+    def get_engine(  # type: ignore[override]
         self, db_conf: ESConf, db_engine_enabled: bool
     ) -> Optional["Elasticsearch"]:  # @override to fix mypy [override] error.
         if db_engine_enabled:
