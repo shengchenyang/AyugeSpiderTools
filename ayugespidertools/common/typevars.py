@@ -78,6 +78,10 @@ class ESConf(NamedTuple):
     password: Optional[str] = None
     init: bool = False
     verify_certs: bool = False
+    ca_certs: str = None
+    client_cert: str = None
+    client_key: str = None
+    ssl_assert_fingerprint: str = None
 
 
 class OracleConf(NamedTuple):

@@ -103,6 +103,12 @@ class ReuseOperation:
                 "password": es_section.get("password", None),
                 "init": es_section.getboolean("init", False),
                 "verify_certs": es_section.getboolean("verify_certs", False),
+                "ca_certs": es_section.get("ca_certs", None),
+                "client_cert": es_section.get("client_cert", None),
+                "client_key": es_section.get("client_key", None),
+                "ssl_assert_fingerprint": es_section.get(
+                    "ssl_assert_fingerprint", None
+                ),
             }
         if "oracle" in cfg:
             oracle_section = cfg["oracle"]

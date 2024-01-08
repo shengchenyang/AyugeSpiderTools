@@ -17,7 +17,7 @@ except ImportError:
     # pip install elasticsearch-dsl
     pass
 
-__all__ = ["AyuESPipeline"]
+__all__ = ["AyuESPipeline", "dynamic_es_document"]
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
@@ -40,6 +40,10 @@ class AyuESPipeline:
             hosts=_hosts_lst,
             http_auth=http_auth,
             verify_certs=self.es_conf.verify_certs,
+            ca_certs=self.es_conf.ca_certs,
+            client_cert=self.es_conf.client_cert,
+            client_key=self.es_conf.client_key,
+            ssl_assert_fingerprint=self.es_conf.ssl_assert_fingerprint,
         )
 
     def process_item(self, item, spider):

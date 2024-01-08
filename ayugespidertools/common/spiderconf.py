@@ -189,6 +189,10 @@ class ESConfProduct(Product):
                 hosts=_hosts_lst,
                 http_auth=http_auth,
                 verify_certs=db_conf.verify_certs,
+                ca_certs=db_conf.ca_certs,
+                client_cert=db_conf.client_cert,
+                client_key=db_conf.client_key,
+                ssl_assert_fingerprint=db_conf.ssl_assert_fingerprint,
             )
         return None
 
