@@ -3,8 +3,8 @@
 # Don"t forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 from ayugespidertools.scraper.pipelines.download.file import FilesDownloadPipeline
-from ayugespidertools.scraper.pipelines.es import AyuESPipeline
 from ayugespidertools.scraper.pipelines.es.asynced import AyuAsyncESPipeline
+from ayugespidertools.scraper.pipelines.es.fantasy import AyuFtyESPipeline
 from ayugespidertools.scraper.pipelines.mongo.asynced import AyuAsyncMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 from ayugespidertools.scraper.pipelines.mongo.twisted import AyuTwistedMongoPipeline
@@ -25,7 +25,7 @@ from ayugespidertools.scraper.pipelines.postgres.twisted import (
 
 __all__ = [
     "FilesDownloadPipeline",
-    "AyuESPipeline",
+    "AyuFtyESPipeline",
     "AyuAsyncESPipeline",
     "AyuAsyncMongoPipeline",
     "AyuFtyMongoPipeline",
