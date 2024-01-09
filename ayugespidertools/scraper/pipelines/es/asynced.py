@@ -1,15 +1,19 @@
 import asyncio
 from typing import TYPE_CHECKING, Optional
 
-from elasticsearch import AsyncElasticsearch
-from elasticsearch.helpers import async_bulk
 from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.scraper.pipelines.es import dynamic_es_document
+
+try:
+    from elasticsearch import AsyncElasticsearch
+    from elasticsearch.helpers import async_bulk
+except ImportError:
+    # pip install ayugespidertools[database]
+    pass
 
 __all__ = ["AyuAsyncESPipeline"]
-
-from ayugespidertools.scraper.pipelines.es import dynamic_es_document
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
