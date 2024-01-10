@@ -1,5 +1,26 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.4 (2024-01-10)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 添加 `elasticsearch` 支持，具体示例请在 `DemoSpider` 中 `demo_es` 和 `demo_es_async` 查看。([issue 15](https://github.com/shengchenyang/AyugeSpiderTools/issues/15), [c4d048e](https://github.com/shengchenyang/AyugeSpiderTools/commit/c4d048ee74c7246760e2ba91ef2844a5dd3540d7), [7651dd3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7651dd32974f6362b9a2dbc8e7258a5528d98858))
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- mypy check。([`785e36a`](https://github.com/shengchenyang/AyugeSpiderTools/commit/785e36a5a85b141168ce24bfae9efe605ac05c36))
+
+<hr>
+
+
 ## AyugeSpiderTools 3.9.3 (2023-12-30)
 
 ### Deprecations

@@ -4,15 +4,6 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 
 try:
     from elasticsearch_dsl import Document, connections
-
-    def dynamic_es_document(class_name, fields, index_settings=None):
-        class_attrs = fields.copy()
-
-        if index_settings:
-            class_attrs["Index"] = type("Index", (), index_settings)
-
-        return type(class_name, (Document,), class_attrs)
-
 except ImportError:
     # pip install elasticsearch-dsl
     pass
@@ -21,6 +12,15 @@ __all__ = ["AyuESPipeline", "dynamic_es_document"]
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
+
+
+def dynamic_es_document(class_name, fields, index_settings=None):
+    class_attrs = fields.copy()
+
+    if index_settings:
+        class_attrs["Index"] = type("Index", (), index_settings)
+
+    return type(class_name, (Document,), class_attrs)
 
 
 class AyuESPipeline:
