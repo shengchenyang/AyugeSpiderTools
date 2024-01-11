@@ -129,7 +129,8 @@ item = AyuItem(_table="ta")
 `AyuItem` 在 `spider` 中常用的基础使用方法示例，以本库模板中的 `basic.tmpl` 为例来作解释：
 
 ```python
-from ayugespidertools.common.utils import ToolsForAyu
+import json
+
 from ayugespidertools.items import AyuItem, DataItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
@@ -176,33 +177,17 @@ class DemoOneSpider(AyuSpider):
         # 日志使用: scrapy 的 self.logger 或本库的 self.slog 或直接使用全局的 logger handle 也行（根据场景自行选择）
         self.slog.info(f"当前采集的站点为: {curr_site}")
 
+        _save_table = "_article_info_list"
         # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
-        data_list = ToolsForAyu.extract_with_json(
-            json_data=response.json(), query="data"
-        )
+        data_list = json.loads(response.text)["data"]
         for curr_data in data_list:
-            article_detail_url = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="articleDetailUrl"
-            )
+            article_detail_url = curr_data.get("articleDetailUrl")
+            article_title = curr_data.get("articleTitle")
+            comment_count = curr_data.get("commentCount")
+            favor_count = curr_data.get("favorCount")
+            nick_name = curr_data.get("nickName")
 
-            article_title = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="articleTitle"
-            )
-
-            comment_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="commentCount"
-            )
-
-            favor_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="favorCount"
-            )
-
-            nick_name = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="nickName"
-            )
-
-            _save_table = "_article_info_list"
-            ArticleInfoItem = AyuItem(
+            article_item = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
@@ -212,7 +197,7 @@ class DemoOneSpider(AyuSpider):
                 # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
-            self.slog.info(f"ArticleInfoItem: {ArticleInfoItem}")
+            self.slog.info(f"article_item: {article_item}")
 
             # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
             # 此时更适合：
@@ -228,14 +213,14 @@ class DemoOneSpider(AyuSpider):
                     result = self.mysql_engine_conn.execute(_sql).fetchone()
                     if not result:
                         self.mysql_engine_conn.rollback()
-                        yield ArticleInfoItem
+                        yield article_item
                     else:
                         self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
                 except Exception as e:
                     self.mysql_engine_conn.rollback()
-                    yield ArticleInfoItem
+                    yield article_item
             else:
-                yield ArticleInfoItem
+                yield article_item
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。

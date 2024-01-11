@@ -51,7 +51,8 @@ DemoSpider/
 这是我们第一个 `Spider` 的代码。`demo_one.py`将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
 
 ```python
-from ayugespidertools.common.utils import ToolsForAyu
+import json
+
 from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
@@ -91,31 +92,15 @@ class DemoEightSpider(AyuSpider):
         )
 
     def parse_first(self, response):
-        data_list = ToolsForAyu.extract_with_json(
-            json_data=response.json(), query="data"
-        )
+        data_list = json.loads(response.text)["data"]
         for curr_data in data_list:
-            article_detail_url = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="articleDetailUrl"
-            )
+            article_detail_url = curr_data.get("articleDetailUrl")
+            article_title = curr_data.get("articleTitle")
+            comment_count = curr_data.get("commentCount")
+            favor_count = curr_data.get("favorCount")
+            nick_name = curr_data.get("nickName")
 
-            article_title = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="articleTitle"
-            )
-
-            comment_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="commentCount"
-            )
-
-            favor_count = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="favorCount"
-            )
-
-            nick_name = ToolsForAyu.extract_with_json(
-                json_data=curr_data, query="nickName"
-            )
-
-            ArticleItem = AyuItem(
+            article_item = AyuItem(
                 article_detail_url=DataItem(article_detail_url, "文章详情链接"),
                 article_title=DataItem(article_title, "文章标题"),
                 comment_count=DataItem(comment_count, "文章评论数量"),
@@ -123,7 +108,7 @@ class DemoEightSpider(AyuSpider):
                 nick_name=DataItem(nick_name, "文章作者昵称"),
                 _table=DataItem("_article_info_list", "文章信息列表"),
             )
-            yield ArticleItem
+            yield article_item
 ```
 
 如您所见，我们的 `Spider` 子类化`AyugeSpider.AyuSpider` 并定义了一些属性和方法：
