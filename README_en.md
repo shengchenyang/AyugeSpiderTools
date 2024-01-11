@@ -114,6 +114,10 @@ Scenario of storing data in PostgreSQL(need to install ayugespidertools[database
 - 23). It also supports obtaining configuration from nacos or consul, no more examples.
 + 27).demo_eleven: Example of pipelines for storing data in PostgreSQL with asyncio version.
 
+Scenario of storing data in ElasticSearch(need to install ayugespidertools[database]):
++ 28).demo_es: AyuFtyESPipeline usage introduction.
++ 29).demo_es_async: AyuAsyncESPipeline usage introduction.
+
 Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 + 25). demo_oracle: AyuFtyOraclePipeline usage introduction.
 + 26). demo_oracle_twisted: AyuTwistedOraclePipeline usage introduction.
@@ -201,6 +205,7 @@ functionality of Scrapy.**
           Mysql users need to be created.
     - [x] Adaptation for scenarios where storage is done in MongoDB.
     - [x] Adaptation for scenarios where storage is done in PostgreSQL.
+    - [x] Adaptation for scenarios where storage is done in ElasticSearch.
     - [x] Adaptation for scenarios where storage is done in Oracle.
     - [x] Examples of asyncio syntax support and third-party library support for async:
         - [x] Example of using asyncio and aiohttp in a spider script.

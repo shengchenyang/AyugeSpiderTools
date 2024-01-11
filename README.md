@@ -109,6 +109,10 @@ scrapy crawl <spider_name>
 - 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
 + 27).demo_eleven: asyncio 版本存储 PostgreSQL 的 pipelines 示例
 
+# 数据存入 ElasticSearch 的场景(需要安装 ayugespidertools[database])
++ 28).demo_es: AyuFtyESPipeline 使用介绍
++ 29).demo_es_async: AyuAsyncESPipeline 使用介绍
+
 # 数据存入 Oracle 的场景(需要安装 ayugespidertools[database])
 + 25). demo_oracle: AyuFtyOraclePipeline 使用介绍
 + 26). demo_oracle_twisted: AyuTwistedOraclePipeline 使用介绍
@@ -186,6 +190,7 @@ scrapy crawl <spider_name>
         - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
     - [x] `MongoDB` 存储场景适配
     - [x] `PostgreSQL` 存储场景适配
+    - [x] `ElasticSearch` 存储场景适配
     - [x] `Oracle` 存储场景适配
     - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
         - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例

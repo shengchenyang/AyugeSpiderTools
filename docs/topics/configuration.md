@@ -83,6 +83,25 @@
 | port     | 可选，默认 5432      | _                                                            |
 | charset  | 可选，默认 UTF8      | 同 mysql 一样，用于在表不存在而创建时需要，可随意配置，后续也可手动修改。 |
 
+## [elasticsearch]
+
+用于 `elasticsearch` 存储相关场景中使用，也具有对应的 `es_engine`，`es_engine_conn` 来用于存储前的去重(查询及更新等自定义)逻辑。
+
+| 参数名                 | 参数备注                                  | 描述                                                         |
+| ---------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| hosts                  | _                                         | 若有多个，用逗号分隔，比如 https://x.x.x.x:9200,https://x.x.x.x:9201 |
+| index_class            | 默认 {"settings":{"number_of_shards": 2}} | es Document 中的配置，比如 {"settings":{"number_of_shards": 2}} |
+| user                   | 默认 elastic                              | _                                                            |
+| password               | 默认 elastic                              | _                                                            |
+| init                   | 是否初始化 es Document，默认 false        | 是否创建 es 索引，此设置一般只在第一次运行项目时打开，或者选择手动创建并配置此参数永远为 false。 |
+| verify_certs           | 默认 false                                | 证书验证，推荐开启                                           |
+| ca_certs               | 默认 None                                 | ca_certs 路径                                                |
+| client_cert            | 默认 None                                 | client_cert 路径                                             |
+| client_key             | 默认 None                                 | client_key 路径                                              |
+| ssl_assert_fingerprint | 默认 None                                 | es 启动中的 HTTP CA certificate SHA-256 fingerprint 参数     |
+
+注：`ca_certs`，`client_cert`，`client_key`，`ssl_assert_fingerprint` 中只用配置一个即可，若 `verify_certs` 设置为 `false` 则都不用配置以上参数，但推荐开启此参数。
+
 ## [mq]
 
 推送到 `RabbitMQ`  场景所需的参数。以下配置参数与 `pika` 中一致，这里放入 [pika 文档](https://pika.readthedocs.io/en/stable/)，请自行对照查看。

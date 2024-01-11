@@ -70,7 +70,10 @@ pre-commit = "3.4.0"
 toml = "0.10.2"
 
 [tool.poetry.extras]
-all = ["mmh3", "pycryptodome", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary", "psycopg-pool", "oracledb", "elasticsearch-dsl"]
+all = [
+    "mmh3", "pycryptodome", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary",
+    "psycopg-pool", "oracledb", "elasticsearch-dsl"
+]
 database = ["psycopg", "psycopg-binary", "psycopg-pool", "oracledb", "elasticsearch-dsl"]
 
 [[tool.poetry.source]]
