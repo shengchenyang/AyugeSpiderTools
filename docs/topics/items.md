@@ -4,18 +4,68 @@
 
 本教程将引导您完成这些任务：
 
-- 演示本库推荐的 `Item` 适配方式
+- 演示本库推荐的 `AyuItem` 适配方式
 - 补充适配 `add_value`, `add_xpath`, `add_css` 等方法的示例
+
+## 快速开始
+
+`scrapy` 中 `Item` 对应本库的 `AyuItem`，`AyuItem` 可用 `AyuItem(key=value)` 的形式直接动态赋值，其中 `value` 介绍如下：
+
+`value` 可选择的类型有：
+
+- 普通字段
+
+  ```
+  from ayugespidertools.items import AyuItem
+
+  _title = "article_title_value"
+  demo_item = AyuItem(
+  	article_title=_title
+  )
+  ```
+
+- `DataItem` 字段
+
+  - 完整赋值
+
+    ```
+    # `DataItem` 有 `key_value` 和 `notes` 两个参数，`key_value` 为存储的值；
+    # `notes` 在其他(需要字段注释，比如 `Mysql`，`postgresql`)场景中表示为字段注释，在
+    # `ElasticSearch` 中表示 `es document fields`。
+
+    # 普通场景
+    demo_item = AyuItem(
+    	article_title=DataItem(_title, "文章标题"),
+    )
+
+    # es 场景
+    from elasticsearch_dsl import Keyword
+
+    demo_item = AyuItem(
+    	article_title=DataItem(_title, Keyword()),
+    )
+
+  - 无 `notes` 赋值
+
+    ```
+    # 即不需要注释，也不是 es 存储场景下，只赋值 key_value 参数
+
+    demo_item = AyuItem(
+    	article_title=DataItem(_title),
+    )
+
+    # 不过，这种不如直接使用 【普通字段】的优雅赋值方式。
+    ```
 
 ## 实现原理
 
-> 以下为本库中推荐的 `mysql` 和 `MongoDB` 存储时的主要 `Item` 示例：
+> 以下为 `Mysql`， `MongoDB` 和 `ElasticSearch` 存储时的 `AyuItem` 示例，其它场景的用法也都一样：
 
 本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，也可以使用 `add_field` 方法动态添加字段。
 
 ```python
 def parse(self, response):
-    # 存储到 Mysql 场景时需要的 Item 构建示例
+    # 存储到 Mysql 场景时需要的 Item 构建示例：
     ArticleMysqlItem = AyuItem(
         article_detail_url=DataItem(article_detail_url, "文章详情链接"),
         article_title=DataItem(article_title, "文章标题"),
@@ -25,7 +75,7 @@ def parse(self, response):
         _table=DataItem("_article_info_list", "文章信息列表"),
     )
 
-    # 存储到 MongoDB 场景时需要的 Item 构建示例
+    # 存储到 MongoDB 场景时需要的 Item 构建示例：
     ArticleMongoItem = AyuItem(
         article_detail_url=article_detail_url,
         article_title=article_title,
@@ -35,6 +85,21 @@ def parse(self, response):
         _table="_article_info_list",
         # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
         _mongo_update_rule={"article_detail_url": article_detail_url},
+    )
+
+    # 存储到 ElasticSearch 场景时需要的 Item 构建示例：
+    # 同样地，为保持风格统一，es 存储场景中会把 es Document 中 fields 的声明
+    # 放在 AyuItem 中 DataItem 的 notes 参数中。
+    # 这个参数在其他(需要字段注释，比如 Mysql，postgresql)场景中表示为字段注释。
+    from elasticsearch_dsl import Keyword, Search, Text
+
+    book_info_item = AyuItem(
+        book_name=DataItem(
+            book_name, Text(analyzer="snowball", fields={"raw": Keyword()})
+        ),
+        book_href=DataItem(book_href, Keyword()),
+        book_intro=DataItem(book_intro, Keyword()),
+        _table=DataItem(_save_table, "这里的索引注释可有可无，程序中不会使用。"),
     )
 
 
