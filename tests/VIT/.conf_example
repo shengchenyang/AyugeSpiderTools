@@ -9,6 +9,7 @@ user=***
 password=***
 database=***
 charset=***
+odku_enable=false
 
 [mongodb:uri]
 uri=mongodb://user:password@host:port/database?authSource=*&authMechanism=*

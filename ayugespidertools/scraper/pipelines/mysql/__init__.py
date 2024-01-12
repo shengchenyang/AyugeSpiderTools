@@ -57,12 +57,15 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=_table_name, item=new_item)
+        sql, args = self._get_sql_by_item(
+            table=_table_name,
+            item=new_item,
+            odku_enable=self.mysql_conf.odku_enable,
+        )
 
         try:
-            self.cursor.execute(sql, tuple(new_item.values()) * 2)
+            self.cursor.execute(sql, args)
             self.conn.commit()
-
         except Exception as e:
             self.slog.warning(
                 f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"

@@ -49,6 +49,7 @@ class MysqlConf(NamedTuple):
     engine: MysqlEngineStr = "InnoDB"
     charset: str = "utf8mb4"
     collate: str = "utf8mb4_general_ci"
+    odku_enable: bool = False
 
 
 class MongoDBConf(NamedTuple):

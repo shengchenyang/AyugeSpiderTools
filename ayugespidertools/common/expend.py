@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 import pymysql
 from retrying import retry
@@ -75,7 +75,9 @@ class MysqlPipeEnhanceMixin:
         # 出现数据库不存在问题后，在创建数据库后，再次返回连接对象
         return pymysql.connect(**pymysql_conn_args)
 
-    def _get_sql_by_item(self, table: str, item: dict, odku_enable: bool = True) -> str:
+    def _get_sql_by_item(
+        self, table: str, item: dict, odku_enable: bool = True
+    ) -> Tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
         Args:
@@ -85,14 +87,18 @@ class MysqlPipeEnhanceMixin:
 
         Returns:
             1). sql 插入语句
+            2). sql 语句执行和格式化需要的 value
         """
         keys = f"""`{"`, `".join(item.keys())}`"""
         values = ", ".join(["%s"] * len(item))
         if odku_enable:
             update = ",".join([f" `{key}` = %s" for key in item])
-            return f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+            sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+            args = tuple(item.values()) * 2
         else:
-            return f"INSERT INTO `{table}` ({keys}) values ({values})"
+            sql = f"INSERT INTO `{table}` ({keys}) values ({values})"
+            args = tuple(item.values())
+        return sql, args
 
     def _get_log_by_spider(self, spider, crawl_time):
         """获取 spider 的运行日志情况

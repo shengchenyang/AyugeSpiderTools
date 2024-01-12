@@ -89,8 +89,12 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         """
         self.cursor.execute(create_table_sql)
 
-        sql = self._get_sql_by_item(table=table, item=data)
-        self._log_record(sql=sql, data=tuple(data.values()) * 2)
+        sql, args = self._get_sql_by_item(
+            table=table,
+            item=data,
+            odku_enable=self.mysql_conf.odku_enable,
+        )
+        self._log_record(sql=sql, data=args)
 
     @retry(
         stop_max_attempt_number=Param.retry_num,
@@ -129,8 +133,12 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
                 """
         )
 
-        sql = self._get_sql_by_item(table=table, item=data)
-        self._log_record(sql=sql, data=tuple(data.values()) * 2)
+        sql, args = self._get_sql_by_item(
+            table=table,
+            item=data,
+            odku_enable=self.mysql_conf.odku_enable,
+        )
+        self._log_record(sql=sql, data=args)
 
     def _log_record(self, sql: str, data: Tuple) -> None:
         """执行日志记录的 sql 语句

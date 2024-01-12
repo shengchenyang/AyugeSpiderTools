@@ -47,12 +47,12 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
             async with conn.cursor() as cursor:
                 alter_item = ReuseOperation.reshape_item(item_dict)
                 new_item = alter_item.new_item
-                sql = self._get_sql_by_item(
+                sql, args = self._get_sql_by_item(
                     table=alter_item.table.name,
                     item=new_item,
-                    odku_enable=False,
+                    odku_enable=self.mysql_conf.odku_enable,
                 )
-                await cursor.execute(sql, tuple(new_item.values()))
+                await cursor.execute(sql, args)
 
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)

@@ -64,6 +64,7 @@ class ReuseOperation:
                     "collate",
                     Param.charset_collate_map.get(_charset, "utf8mb4_general_ci"),
                 ),
+                "odku_enable": mysql_section.getboolean("odku_enable", False),
             }
         if "mongodb:uri" in cfg:
             inner_settings["MONGODB_CONFIG"] = {
