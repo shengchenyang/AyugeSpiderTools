@@ -53,12 +53,10 @@ class AyuESPipeline:
             return
 
         if not self.es_type:
-            fields_definition = {k: v.notes for k, v in item_dict.items()}
-            es_index_define = self.es_conf.index_class
-            es_index_define["name"] = alert_item.table.name
-            self.es_type = dynamic_es_document(
-                "ESType", fields_definition, es_index_define
-            )
+            fields_define = {k: v.notes for k, v in item_dict.items()}
+            index_define = self.es_conf.index_class
+            index_define["name"] = alert_item.table.name
+            self.es_type = dynamic_es_document("ESType", fields_define, index_define)
             if self.es_conf.init:
                 self.es_type.init()
         es_item = self.es_type(**new_item)
