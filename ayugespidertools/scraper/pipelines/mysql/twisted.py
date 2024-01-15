@@ -1,36 +1,49 @@
+from typing import TYPE_CHECKING, Optional, Union
+
 from pymysql import cursors
 from twisted.enterprise import adbapi
 
+from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import TwistedAsynchronous, deal_mysql_err
-from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
     "AyuTwistedMysqlPipeline",
 ]
 
+if TYPE_CHECKING:
+    import logging
 
-class AyuTwistedMysqlPipeline(AyuMysqlPipeline):
+    from loguru import Logger
+    from twisted.enterprise.adbapi import ConnectionPool
+
+    from ayugespidertools.common.typevars import MysqlConf
+
+    slogT = Union[Logger, logging.LoggerAdapter]
+
+
+class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     """使用 twisted 的 adbapi 实现 Mysql 存储场景下的异步操作"""
 
     def __init__(self):
-        super(AyuTwistedMysqlPipeline, self).__init__()
-        self.dbpool = None
+        self.mysql_conf: Optional["MysqlConf"] = None
+        self.slog: Optional["slogT"] = None
+        self.dbpool: Optional["ConnectionPool"] = None
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
-        self.slog = spider.slog
-        self.mysql_conf = spider.mysql_conf
+        self.slog: "slogT" = spider.slog
+        self.mysql_conf: "MysqlConf" = spider.mysql_conf
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         self._connect(self.mysql_conf).close()
 
         _mysql_conf = {
-            "user": spider.mysql_conf.user,
-            "password": spider.mysql_conf.password,
-            "host": spider.mysql_conf.host,
-            "port": spider.mysql_conf.port,
-            "db": spider.mysql_conf.database,
-            "charset": spider.mysql_conf.charset,
+            "user": self.mysql_conf.user,
+            "password": self.mysql_conf.password,
+            "host": self.mysql_conf.host,
+            "port": self.mysql_conf.port,
+            "db": self.mysql_conf.database,
+            "charset": self.mysql_conf.charset,
             "cursorclass": cursors.DictCursor,
         }
         self.dbpool = adbapi.ConnectionPool("pymysql", cp_reconnect=True, **_mysql_conf)
