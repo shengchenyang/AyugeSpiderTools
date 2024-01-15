@@ -1,9 +1,16 @@
 # Define your TypeVar here
 import threading
 from dataclasses import dataclass, field
-from typing import List, Literal, NamedTuple, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, Union
 
 from sqlalchemy import create_engine
+
+if TYPE_CHECKING:
+    import logging
+
+    from loguru import Logger
+
+    slogT = TypeVar("slogT", Logger, logging.LoggerAdapter)
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)

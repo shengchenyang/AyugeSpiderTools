@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from pymysql import cursors
 from twisted.enterprise import adbapi
@@ -12,28 +12,20 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    import logging
-
-    from loguru import Logger
-    from twisted.enterprise.adbapi import ConnectionPool
-
-    from ayugespidertools.common.typevars import MysqlConf
-
-    slogT = Union[Logger, logging.LoggerAdapter]
+    from ayugespidertools.common.typevars import MysqlConf, slogT
 
 
 class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     """使用 twisted 的 adbapi 实现 Mysql 存储场景下的异步操作"""
 
-    def __init__(self):
-        self.mysql_conf: Optional["MysqlConf"] = None
-        self.slog: Optional["slogT"] = None
-        self.dbpool: Optional["ConnectionPool"] = None
+    mysql_conf: "MysqlConf"
+    slog: "slogT"
+    dbpool: "adbapi.ConnectionPool"
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
-        self.slog: "slogT" = spider.slog
-        self.mysql_conf: "MysqlConf" = spider.mysql_conf
+        self.slog = spider.slog
+        self.mysql_conf = spider.mysql_conf
         # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         self._connect(self.mysql_conf).close()
 

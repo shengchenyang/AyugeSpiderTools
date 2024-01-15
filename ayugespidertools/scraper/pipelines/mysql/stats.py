@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Tuple
 
 from retrying import retry
 
@@ -14,20 +14,20 @@ if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
 
-    from ayugespidertools.common.typevars import MysqlConf
+    from ayugespidertools.common.typevars import MysqlConf, slogT
 
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储且记录脚本运行状态的简单示例"""
 
-    def __init__(self) -> None:
-        self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn: Optional["Connection[Cursor]"] = None
-        self.slog = None
-        self.cursor: Optional["Cursor"] = None
-        self.crawl_time = datetime.date.today()
+    mysql_conf: "MysqlConf"
+    conn: "Connection[Cursor]"
+    slog: "slogT"
+    cursor: "Cursor"
+    crawl_time: "datetime.date"
 
     def open_spider(self, spider):
+        self.crawl_time = datetime.date.today()
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.conn = self._connect(self.mysql_conf)

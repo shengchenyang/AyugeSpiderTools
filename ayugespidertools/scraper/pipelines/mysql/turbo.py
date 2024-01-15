@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import pymysql
 from dbutils.pooled_db import PooledDB
 
@@ -7,12 +9,23 @@ __all__ = [
     "AyuTurboMysqlPipeline",
 ]
 
+if TYPE_CHECKING:
+    from pymysql.connections import Connection
+    from pymysql.cursors import Cursor
+
+    from ayugespidertools.common.typevars import MysqlConf, slogT
+
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     """Mysql 存储场景的 scrapy pipeline 扩展，使用 dbutils.pooled_db 实现"""
 
+    mysql_conf: "MysqlConf"
+    conn: "Connection[Cursor]"
+    slog: "slogT"
+    cursor: "Cursor"
+    pool_db_conf: dict
+
     def __init__(self, pool_db_conf):
-        super(AyuTurboMysqlPipeline, self).__init__()
         self.pool_db_conf = pool_db_conf
 
     @classmethod

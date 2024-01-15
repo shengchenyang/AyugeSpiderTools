@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import aiomysql
 from scrapy.utils.defer import deferred_from_coro
@@ -12,19 +12,19 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import MysqlConf
+    from ayugespidertools.common.typevars import MysqlConf, slogT
 
 
 class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     """结合 aiomysql 实现异步写入 Mysql 数据库"""
 
-    def __init__(self) -> None:
-        self.mysql_conf: Optional["MysqlConf"] = None
-        self.slog = None
-        self.pool = None
-        self.running_tasks: set = set()
+    mysql_conf: "MysqlConf"
+    slog: "slogT"
+    pool: aiomysql.Pool
+    running_tasks: set
 
     def open_spider(self, spider):
+        self.running_tasks = set()
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf

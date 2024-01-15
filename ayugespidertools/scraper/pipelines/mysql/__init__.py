@@ -1,5 +1,5 @@
 import warnings
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import pymysql
 
@@ -20,17 +20,16 @@ if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
 
-    from ayugespidertools.common.typevars import AlterItem, MysqlConf
+    from ayugespidertools.common.typevars import AlterItem, MysqlConf, slogT
 
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
-    def __init__(self) -> None:
-        self.mysql_conf: Optional["MysqlConf"] = None
-        self.conn: Optional["Connection[Cursor]"] = None
-        self.slog = None
-        self.cursor: Optional["Cursor"] = None
+    mysql_conf: "MysqlConf"
+    conn: "Connection[Cursor]"
+    slog: "slogT"
+    cursor: "Cursor"
 
     def open_spider(self, spider):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
