@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from gridfs import GridFS
 from pymongo import MongoClient
@@ -11,6 +11,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    import pymongo
+    from pymongo import database
+
     from ayugespidertools.common.typevars import authMechanismStr
 
 
@@ -34,7 +37,7 @@ class MongoDbBase:
         authMechanism: "authMechanismStr" = "SCRAM-SHA-1",
         database: Optional[str] = None,
         uri: Optional[str] = None,
-    ):
+    ) -> Tuple["pymongo.MongoClient", "database.Database"]:
         """初始化 mongo 连接句柄
         可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
 
