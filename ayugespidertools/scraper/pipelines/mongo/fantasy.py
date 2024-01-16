@@ -1,39 +1,29 @@
 import sys
+from typing import TYPE_CHECKING
 
 from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.mongoclient import MongoDbBase
 
-__all__ = [
-    "AyuFtyMongoPipeline",
-]
+__all__ = ["AyuFtyMongoPipeline"]
+
+if TYPE_CHECKING:
+    import pymongo
+    from pymongo import database
 
 
-# noinspection PyMissingConstructor
-class AyuFtyMongoPipeline(MongoDbBase):
+class AyuFtyMongoPipeline:
     """MongoDB 存储场景的 scrapy pipeline 扩展"""
 
-    def __init__(self):
-        self.conn = None
-        self.db = None
-        self.sys_ver_low = sys.version_info < (3, 11)
+    conn: "pymongo.MongoClient"
+    db: "database.Database"
+    sys_ver_low: bool
 
     def open_spider(self, spider):
+        self.sys_ver_low = sys.version_info < (3, 11)
         assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
-        super(AyuFtyMongoPipeline, self).__init__(
-            user=spider.mongodb_conf.user,
-            password=spider.mongodb_conf.password,
-            host=spider.mongodb_conf.host,
-            port=spider.mongodb_conf.port,
-            database=spider.mongodb_conf.database,
-            authsource=spider.mongodb_conf.authsource,
-            authMechanism=spider.mongodb_conf.authMechanism,
-            uri=spider.mongodb_conf.uri,
-        )
-
-    def close_spider(self, spider):
-        if self.conn:
-            self.conn.close()
+        mongodb_conf_dict = spider.mongodb_conf._asdict()
+        self.conn, self.db = MongoDbBase.connects(**mongodb_conf_dict)
 
     def process_item(self, item, spider):
         """mongoDB 存储的方法，item["mongo_update_rule"] 用于存储查询条件，如果查询数据存在的话就更新，不存在
@@ -55,3 +45,7 @@ class AyuFtyMongoPipeline(MongoDbBase):
             sys_ver_low=self.sys_ver_low,
         )
         return item
+
+    def close_spider(self, spider):
+        if self.conn:
+            self.conn.close()

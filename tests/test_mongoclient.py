@@ -5,9 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from ayugespidertools.mongoclient import MongoDbBase
+from ayugespidertools.mongoclient import MongoDbBase, MongoDBEngineClass
 from tests import MONGODB_CONFIG, tests_dir
 from tests.conftest import mongodb_database, test_table
+
+mongodb_uri = MONGODB_CONFIG["uri"]
 
 add_data_list = [
     {
@@ -50,84 +52,73 @@ def test_key_connect(mongodb_first_step):
     """测试 mongoDB 的 key 链接方式"""
     _mongo_conf = copy.deepcopy(MONGODB_CONFIG)
     _mongo_conf.pop("uri")
-    mongodb = MongoDbBase(**_mongo_conf)
-    select_res = mongodb.find(test_table, {"nick_name": "菜只因C"})
-    print("select_res:", list(select_res), select_res.count())
+    conn, db = MongoDbBase.connects(**_mongo_conf)
+    select_res = db[test_table].find({"nick_name": "菜只因C"})
+    conn.close()
     assert select_res.count() >= 1
 
 
 def test_uri_connect():
     """测试 mongoDB 的 uri 关键字链接方式"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    select_res = mongodb.find(test_table, {"nick_name": "菜只因C"})
-    print("select_res:", list(select_res), select_res.count())
+    conn, db = MongoDbBase.connects(uri=mongodb_uri)
+    select_res = db[test_table].find({"nick_name": "菜只因C"})
     assert select_res.count() >= 1
 
 
 def test_insert_one():
     """测试 mongoDB 插入一条数据"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    insert_id = mongodb.insert_one(
-        test_table,
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
+    insert_res = db[test_table].insert_one(
         add_data_list[0],
     )
-    print("insert_id:", insert_id)
-    assert insert_id is not None
+    assert insert_res.inserted_id is not None
 
 
 def test_insert_many():
     """测试 mongoDB 插入多条数据"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    insert_res = mongodb.insert_many(
-        test_table,
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
+    insert_res = db[test_table].insert_many(
         add_data_list[1:],
     )
-    print(insert_res, type(insert_res))
-    assert len(insert_res) == 2
+    assert len(insert_res.inserted_ids) == 2
 
 
-def test_update():
+def test_update_one():
     """测试 mongoDB 更新数据"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    update_res = mongodb.update_super(
-        collection=test_table,
-        select_dict={
-            "article_title": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略（C/C++）",
-            "nick_name": "菜只因C",
-        },
-        set_dict={"favor_count": "500"},
-    )
-    print("update_res:", update_res)
-    assert update_res >= 0
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
+    select_dict = {
+        "article_title": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略（C/C++）",
+        "nick_name": "菜只因C",
+    }
+    set_dict = {"favor_count": "500"}
+    update_res = db[test_table].update_one(select_dict, {"$set": set_dict})
+    assert update_res.modified_count >= 0
 
 
 def test_delete():
     """测试 mongoDB 删除数据"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    delete_res = mongodb.delete(
-        test_table, {"article_title": {"$regex": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略"}}
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
+    delete_res = db[test_table].delete_many(
+        filter={"article_title": {"$regex": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略"}}
     )
-    print("delete_res:", delete_res)
-    assert delete_res >= 0
+    assert delete_res.deleted_count >= 0
 
 
 def test_find():
     """测试 mongoDB 查询数据"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
-    select_res = mongodb.find(test_table, {"favor_count": "46"}).count()
-    print("select_res:", select_res)
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
+    select_res = db[test_table].find({"favor_count": "46"}).count()
     assert select_res >= 1
 
     select_res = list(
-        mongodb.find(
-            test_table,
+        db[test_table]
+        .find(
             {"nick_name": {"$exists": True}},
             {"article_title": 1, "nick_name": 1, "favor_count": 1, "_id": 0},
         )
         .limit(2)
         .skip(1)
     )
-    print("select_res:", select_res)
     assert len(select_res) == 2, (
         select_res[0]["article_title"] == "出道即封神的ChatGPT，现在怎么样了？"
     )
@@ -135,15 +126,17 @@ def test_find():
 
 def test_upload():
     """测试 mongoDB 上传图片方法"""
-    mongodb = MongoDbBase(**MONGODB_CONFIG)
+    conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
     png_bytes = Path(tests_dir, "docs/image/mongo_upload.png").read_bytes()
 
     # 返回上传后的 ID 及图片链接
-    mongo_upload_id, image_id = mongodb.upload(
+    mongo_upload_id, image_id = MongoDbBase.upload(
+        db=db,
         file_name="test2.jpg",
         _id="121212121213",
         content_type="image/png",
         collection="fs",
         file_data=png_bytes,
     )
+    conn.close()
     assert mongo_upload_id is not None, image_id is not None

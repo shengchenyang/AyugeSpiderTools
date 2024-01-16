@@ -1,18 +1,23 @@
 import asyncio
 import urllib.parse
+from typing import TYPE_CHECKING
 
 import motor.motor_asyncio
 
 from ayugespidertools.common.mongodbpipe import AsyncioAsynchronous
 from ayugespidertools.common.multiplexing import ReuseOperation
 
+__all__ = ["AyuAsyncMongoPipeline"]
+
+if TYPE_CHECKING:
+    from motor.core import AgnosticClient, AgnosticDatabase
+
 
 class AyuAsyncMongoPipeline:
     """通过 motor 实现异步写入 MongoDB 的存储管道"""
 
-    def __init__(self):
-        self.client = None
-        self.db = None
+    client: "AgnosticClient"
+    db: "AgnosticDatabase"
 
     def open_spider(self, spider):
         assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"

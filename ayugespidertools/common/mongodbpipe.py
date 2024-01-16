@@ -11,9 +11,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from motor.core import AgnosticDatabase
     from pymongo.database import Database
 
-    PymongoDataBaseT = TypeVar("PymongoDataBaseT", bound=Database)
+    PymongoDataBaseT = TypeVar("PymongoDataBaseT", Database, AgnosticDatabase)
 
 
 class AbstractClass(ABC):
