@@ -7,9 +7,7 @@ from kafka.errors import KafkaError
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
 
-__all__ = [
-    "AyuKafkaPipeline",
-]
+__all__ = ["AyuKafkaPipeline"]
 
 
 class KafkaProducerClient:
@@ -78,8 +76,7 @@ class KafkaProducerClient:
 
 
 class AyuKafkaPipeline:
-    def __init__(self):
-        self.kp = None
+    kp: KafkaProducerClient
 
     def open_spider(self, spider):
         assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
