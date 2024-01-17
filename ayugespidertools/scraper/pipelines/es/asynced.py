@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Type, TypeVar
 
 from scrapy.utils.defer import deferred_from_coro
 
@@ -16,20 +16,24 @@ except ImportError:
 __all__ = ["AyuAsyncESPipeline"]
 
 if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import ESConf
+    from elasticsearch_dsl import Document
+
+    from ayugespidertools.common.typevars import ESConf, slogT
+
+    DocumentType = TypeVar("DocumentType", Type[Document], type)
 
 
 class AyuAsyncESPipeline:
-    def __init__(self) -> None:
-        self.es_conf: Optional["ESConf"] = None
-        self.slog = None
-        self.client = None
-        self.es_type = None
-        self.running_tasks: set = set()
+    es_conf: "ESConf"
+    slog: "slogT"
+    client: "AsyncElasticsearch"
+    es_type: "DocumentType"
+    running_tasks: set
 
     def open_spider(self, spider):
-        self.es_conf = spider.es_conf
+        self.running_tasks = set()
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
+        self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
         if any([self.es_conf.user is not None, self.es_conf.password is not None]):
             http_auth = (self.es_conf.user, self.es_conf.password)
@@ -52,7 +56,7 @@ class AyuAsyncESPipeline:
             return
 
         _index = alert_item.table.name
-        if not self.es_type:
+        if not hasattr(self, "es_type"):
             fields_define = {k: v.notes for k, v in item_dict.items()}
             index_define = self.es_conf.index_class
             index_define["name"] = _index

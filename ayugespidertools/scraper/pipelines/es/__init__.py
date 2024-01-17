@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Type, TypeVar
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -13,10 +13,11 @@ __all__ = ["AyuESPipeline", "dynamic_es_document"]
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
 
+    DocumentType = TypeVar("DocumentType", Type[Document], type)
+
 
 def dynamic_es_document(class_name, fields, index_settings=None):
     class_attrs = fields.copy()
-
     if index_settings:
         class_attrs["Index"] = type("Index", (), index_settings)
 
@@ -24,13 +25,12 @@ def dynamic_es_document(class_name, fields, index_settings=None):
 
 
 class AyuESPipeline:
-    def __init__(self):
-        self.es_conf: Optional["ESConf"] = None
-        self.es_type = None
+    es_conf: "ESConf"
+    es_type: "DocumentType"
 
     def open_spider(self, spider):
-        self.es_conf = spider.es_conf
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
+        self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
         if any([self.es_conf.user is not None, self.es_conf.password is not None]):
             http_auth = (self.es_conf.user, self.es_conf.password)
@@ -52,7 +52,7 @@ class AyuESPipeline:
         if not (new_item := alert_item.new_item):
             return
 
-        if not self.es_type:
+        if not hasattr(self, "es_type"):
             fields_define = {k: v.notes for k, v in item_dict.items()}
             index_define = self.es_conf.index_class
             index_define["name"] = alert_item.table.name
