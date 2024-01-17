@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from scrapy.utils.defer import deferred_from_coro
 
@@ -16,20 +16,18 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from ayugespidertools.common.typevars import PostgreSQLConf
+    from ayugespidertools.common.typevars import PostgreSQLConf, slogT
 
 
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
-    """postgresql asyncio 版本"""
-
-    def __init__(self) -> None:
-        self.postgres_conf: Optional["PostgreSQLConf"] = None
-        self.slog = None
-        self.pool = None
-        self.running_tasks: set = set()
+    postgres_conf: "PostgreSQLConf"
+    slog: "slogT"
+    pool: "AsyncConnectionPool"
+    running_tasks: set
 
     def open_spider(self, spider):
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
+        self.running_tasks = set()
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
         return deferred_from_coro(self._open_spider(spider))

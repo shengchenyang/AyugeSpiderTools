@@ -1,21 +1,26 @@
+from typing import TYPE_CHECKING
+
 from twisted.enterprise import adbapi
 
+from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.postgreserrhandle import (
     TwistedAsynchronous,
     deal_postgres_err,
 )
-from ayugespidertools.scraper.pipelines.postgres import AyuPostgresPipeline
 
 __all__ = ["AyuTwistedPostgresPipeline"]
 
+if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import PostgreSQLConf, slogT
 
-class AyuTwistedPostgresPipeline(AyuPostgresPipeline):
+
+class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     """使用 twisted 的 adbapi 实现 PostgreSQL 存储场景下的异步操作"""
 
-    def __init__(self):
-        super(AyuTwistedPostgresPipeline, self).__init__()
-        self.dbpool = None
+    postgres_conf: "PostgreSQLConf"
+    dbpool: "adbapi.ConnectionPool"
+    slog: "slogT"
 
     def open_spider(self, spider):
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
@@ -24,11 +29,11 @@ class AyuTwistedPostgresPipeline(AyuPostgresPipeline):
         self._connect(self.postgres_conf).close()
 
         _postgres_conf = {
-            "user": spider.postgres_conf.user,
-            "password": spider.postgres_conf.password,
-            "host": spider.postgres_conf.host,
-            "port": spider.postgres_conf.port,
-            "dbname": spider.postgres_conf.database,
+            "user": self.postgres_conf.user,
+            "password": self.postgres_conf.password,
+            "host": self.postgres_conf.host,
+            "port": self.postgres_conf.port,
+            "dbname": self.postgres_conf.database,
         }
         self.dbpool = adbapi.ConnectionPool(
             "psycopg", cp_reconnect=True, **_postgres_conf

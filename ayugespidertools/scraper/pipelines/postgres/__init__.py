@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -10,23 +10,20 @@ if TYPE_CHECKING:
     from psycopg.connection import Connection
     from psycopg.cursor import Cursor
 
-    from ayugespidertools.common.typevars import AlterItem, PostgreSQLConf
+    from ayugespidertools.common.typevars import AlterItem, slogT
 
 
 class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     """Postgresql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
 
-    def __init__(self) -> None:
-        self.postgres_conf: Optional["PostgreSQLConf"] = None
-        self.conn: Optional["Connection"] = None
-        self.slog = None
-        self.cursor: Optional["Cursor"] = None
+    conn: "Connection"
+    slog: "slogT"
+    cursor: "Cursor"
 
     def open_spider(self, spider):
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
         self.slog = spider.slog
-        self.postgres_conf = spider.postgres_conf
-        self.conn = self._connect(self.postgres_conf)
+        self.conn = self._connect(spider.postgres_conf)
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
