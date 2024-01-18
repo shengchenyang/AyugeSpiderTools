@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from twisted.enterprise import adbapi
 
@@ -12,17 +12,14 @@ __all__ = [
 if TYPE_CHECKING:
     from oracledb.connection import Connection
 
-    from ayugespidertools.common.typevars import OracleConf
+    from ayugespidertools.common.typevars import OracleConf, slogT
 
 
 class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
-    """Oracle 存储场景下的异步操作"""
-
-    def __init__(self):
-        self.oracle_conf: Optional["OracleConf"] = None
-        self.slog = None
-        self.conn: Optional["Connection"] = None
-        self.dbpool = None
+    oracle_conf: "OracleConf"
+    slog: "slogT"
+    conn: "Connection"
+    dbpool: "adbapi.ConnectionPool"
 
     def open_spider(self, spider):
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
@@ -30,13 +27,13 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         self.oracle_conf = spider.oracle_conf
 
         _oracle_conf = {
-            "user": spider.oracle_conf.user,
-            "password": spider.oracle_conf.password,
-            "host": spider.oracle_conf.host,
-            "port": spider.oracle_conf.port,
-            "service_name": spider.oracle_conf.service_name,
-            "encoding": spider.oracle_conf.encoding,
-            "config_dir": spider.oracle_conf.thick_lib_dir or None,
+            "user": self.oracle_conf.user,
+            "password": self.oracle_conf.password,
+            "host": self.oracle_conf.host,
+            "port": self.oracle_conf.port,
+            "service_name": self.oracle_conf.service_name,
+            "encoding": self.oracle_conf.encoding,
+            "config_dir": self.oracle_conf.thick_lib_dir or None,
         }
         self.dbpool = adbapi.ConnectionPool(
             "oracledb", cp_reconnect=True, **_oracle_conf

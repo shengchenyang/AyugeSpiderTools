@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -9,23 +9,16 @@ if TYPE_CHECKING:
     from oracledb.connection import Connection
     from oracledb.cursor import Cursor
 
-    from ayugespidertools.common.typevars import AlterItem, OracleConf
+    from ayugespidertools.common.typevars import AlterItem
 
 
 class AyuOraclePipeline(OraclePipeEnhanceMixin):
-    """Oracle 存储场景的 scrapy pipeline 扩展的功能示例"""
-
-    def __init__(self):
-        self.oracle_conf: Optional["OracleConf"] = None
-        self.slog = None
-        self.conn: Optional["Connection"] = None
-        self.cursor: Optional["Cursor"] = None
+    conn: "Connection"
+    cursor: "Cursor"
 
     def open_spider(self, spider):
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
-        self.slog = spider.slog
-        self.oracle_conf = spider.oracle_conf
-        self.conn = self._connect(self.oracle_conf)
+        self.conn = self._connect(spider.oracle_conf)
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):

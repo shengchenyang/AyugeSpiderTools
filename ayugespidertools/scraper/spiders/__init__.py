@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 from scrapy.spiders import Spider
 
@@ -25,35 +25,32 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    import logging
-
     from elasticsearch import Elasticsearch
-    from loguru import Logger
     from scrapy.crawler import Crawler
     from scrapy.settings import BaseSettings
     from sqlalchemy.engine.base import Connection as SqlalchemyConnectT
     from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
     from typing_extensions import Self
 
+    from ayugespidertools.common.typevars import slogT
+
 
 class AyuSpider(Spider):
     """用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等"""
 
+    mysql_engine: "SqlalchemyEngineT"
+    mysql_engine_conn: "SqlalchemyConnectT"
+    postgres_engine: "SqlalchemyEngineT"
+    postgres_engine_conn: "SqlalchemyConnectT"
+    oracle_engine: "SqlalchemyEngineT"
+    oracle_engine_conn: "SqlalchemyConnectT"
+    es_engine: "Elasticsearch"
+    es_engine_conn: "Elasticsearch"
+
     SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
 
-    def __init__(self, *args: Any, **kwargs: Any):
-        super(AyuSpider, self).__init__(*args, **kwargs)
-        self.mysql_engine: Optional["SqlalchemyEngineT"] = None
-        self.mysql_engine_conn: Optional["SqlalchemyConnectT"] = None
-        self.postgres_engine: Optional["SqlalchemyEngineT"] = None
-        self.postgres_engine_conn: Optional["SqlalchemyConnectT"] = None
-        self.oracle_engine: Optional["SqlalchemyEngineT"] = None
-        self.oracle_engine_conn: Optional["SqlalchemyConnectT"] = None
-        self.es_engine: Optional["Elasticsearch"] = None
-        self.es_engine_conn: Optional["Elasticsearch"] = None
-
     @property
-    def slog(self) -> Union["Logger", "logging.LoggerAdapter"]:
+    def slog(self) -> "slogT":
         """本库的日志管理模块，使用 loguru 来管理日志
         Note:
             本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
