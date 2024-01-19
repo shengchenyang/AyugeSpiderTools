@@ -18,6 +18,7 @@ __all__ = ["ToolsForAyu"]
 
 if TYPE_CHECKING:
     from scrapy.http import Response
+    from scrapy.http.headers import Headers
 
     from ayugespidertools.common.typevars import Str_Lstr
 
@@ -235,7 +236,7 @@ class ToolsForAyu(AppConfManageMixin):
         return _res[0] if _res else None
 
     @staticmethod
-    def get_dict_form_scrapy_req_headers(scrapy_headers) -> dict:
+    def get_dict_form_scrapy_req_headers(scrapy_headers: "Headers") -> dict:
         """根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
 
         Args:

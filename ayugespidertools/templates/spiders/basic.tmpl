@@ -70,7 +70,7 @@ class $classname(AyuSpider):
 
             # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
             # 此时更适合：
-            #    1.mysql 添加唯一索引去重（本库会根据 on duplicate key update 更新），
+            #    1.mysql 添加唯一索引去重（结合 odku_enable 配置，本库会根据 on duplicate key update 更新），
             #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
             #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
             # 这里只是为了介绍使用 mysql_engine_conn 来对 mysql 去重的方法。

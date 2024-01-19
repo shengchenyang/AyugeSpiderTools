@@ -50,7 +50,6 @@ class AbstractClass(ABC):
         try:
             cursor.execute(sql)
             logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
-
         except Exception as e:
             logger.error(f"创建表 {table_name} 失败，err：{e}")
 

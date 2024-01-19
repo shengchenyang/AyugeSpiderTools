@@ -91,7 +91,7 @@ class DataHandle:
         return _y_m_d_format
 
     @staticmethod
-    def _time_format(date_str) -> str:
+    def _time_format(date_str: str) -> str:
         """判断时间是什么格式的，比如：xxxx-xx-xx 或 xxxx.xx.xx
 
         Args:

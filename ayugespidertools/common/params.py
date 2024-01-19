@@ -9,34 +9,17 @@ __all__ = [
 class Param:
     """用于存储项目中需要的参数变量设置"""
 
-    # 基本的请求头
-    base_headers = {
-        "Connection": "close",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
-    }
-
-    # 请求错误重试相关参数（重试次数: retry_num -1，重试最小等待时间，重试最大等待时间）
     retry_num = 3
-    # wait_random_min 每次最小重试等待的时间
     retry_time_min = 200
-    # wait_random_max 每次最大重试等待的时间
     retry_time_max = 1000
     # stop_max_delay 限制最长重试时间
     stop_max_delay = 5000
 
-    # requests 连接超时，响应时间超时，随机休眠间隔等设置
     requests_req_timeout = 3
     requests_res_timeout = 5
     requests_time_sleep_list = [x / 10 for x in range(5, 19)]
     requests_time_sleep_random = random.choice(requests_time_sleep_list)
 
-    # aiohttp 连接超时，响应时间超时，随机休眠间隔等设置
-    aiohttp_req_timeout = 1
-    aiohttp_res_timeout = 1
-    aiohttp_time_sleep_list = [x / 10 for x in range(5, 19)]
-    aiohttp_time_sleep_random = random.choice(aiohttp_time_sleep_list)
-    aiohttp_timeout_default = 25
-    aiohttp_sleep_default = 1
     aiohttp_retry_times_default = 3
 
     # 部署运行的平台为 win 或 linux

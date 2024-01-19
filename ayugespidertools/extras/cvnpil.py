@@ -173,7 +173,7 @@ class CvnpilKit:
         Returns:
             tl[0]: 滑块缺口距离
         """
-        # 先读使用 opencv 读取图片数据
+        # 读取图片数据
         bg_cv = cls.read_image_data(bg)
         slider_cv = cls.read_image_data(slider, cv2.IMREAD_GRAYSCALE)
         # 识别图片边缘
@@ -276,7 +276,7 @@ class BezierTrajectory:
 
     Examples:
         >>> bt = BezierTrajectory()
-        >>> gen_data = bt.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, type=2)
+        >>> gen_data = bt.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, mode=2)
         >>> track = gen_data["trackArray"]
     """
 
@@ -300,22 +300,22 @@ class BezierTrajectory:
 
         return calculate_bezier_point
 
-    def _type(self, type, x, length):
+    def _type(self, mode, x, length):
         numbers = []
         pin = (x[1] - x[0]) / length
-        if type == 0:
+        if mode == 0:
             numbers.extend(i * pin for i in range(length))
             if pin >= 0:
                 numbers = numbers[::-1]
-        elif type == 1:
+        elif mode == 1:
             for i in range(length):
                 numbers.append(1 * ((i * pin) ** 2))
             numbers = numbers[::-1]
-        elif type == 2:
+        elif mode == 2:
             for i in range(length):
                 numbers.append(1 * ((i * pin - x[1]) ** 2))
 
-        elif type == 3:
+        elif mode == 3:
             track = [
                 np.array([0, 0]),
                 np.array([(x[1] - x[0]) * 0.8, (x[1] - x[0]) * 0.6]),
@@ -386,7 +386,7 @@ class BezierTrajectory:
         order: int = 1,
         deviation: int = 0,
         bias=0.5,
-        type=0,
+        mode=0,
         shake_num=0,
         yhh=10,
     ) -> dict:
@@ -399,7 +399,7 @@ class BezierTrajectory:
             order: 几阶贝塞尔曲线，越大越复杂
             deviation: 轨迹上下波动的范围
             bias: 波动范围的分布位置
-            type: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
+            mode: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
             shake_num: 在终点来回摆动的次数
             yhh: 在终点来回摆动的范围
 
@@ -414,7 +414,7 @@ class BezierTrajectory:
             track_number = round(num * 0.2 / (shake_num + 1))
             num -= num * (shake_num + 1)
 
-            x_track_array = self._type(type, [start[0], end[0]], num)
+            x_track_array = self._type(mode, [start[0], end[0]], num)
             s.extend([i, fun(i)] for i in x_track_array)
             dq = yhh / shake_num
             kg = 0
@@ -453,7 +453,7 @@ class BezierTrajectory:
                     order=2,
                     deviation=0,
                     bias=0.5,
-                    type=0,
+                    mode=0,
                     shake_num=0,
                     yhh=10,
                 )
@@ -466,13 +466,13 @@ class BezierTrajectory:
                 order=2,
                 deviation=0,
                 bias=0.5,
-                type=0,
+                mode=0,
                 shake_num=0,
                 yhh=10,
             )
             s += list(y["trackArray"])
 
         else:
-            x_track_array = self._type(type, [start[0], end[0]], num)
+            x_track_array = self._type(mode, [start[0], end[0]], num)
             s.extend([i, fun(i)] for i in x_track_array)
         return {"trackArray": np.array(s), "P": w}
