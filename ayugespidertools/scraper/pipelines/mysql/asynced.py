@@ -24,8 +24,8 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     running_tasks: set
 
     def open_spider(self, spider):
-        self.running_tasks = set()
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
+        self.running_tasks = set()
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         return deferred_from_coro(self._open_spider(spider))

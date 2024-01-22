@@ -20,8 +20,8 @@ class AyuFtyMongoPipeline:
     sys_ver_low: bool
 
     def open_spider(self, spider):
-        self.sys_ver_low = sys.version_info < (3, 11)
         assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
+        self.sys_ver_low = sys.version_info < (3, 11)
         mongodb_conf_dict = spider.mongodb_conf._asdict()
         self.conn, self.db = MongoDbBase.connects(**mongodb_conf_dict)
 

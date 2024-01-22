@@ -31,8 +31,8 @@ class AyuAsyncESPipeline:
     running_tasks: set
 
     def open_spider(self, spider):
-        self.running_tasks = set()
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
+        self.running_tasks = set()
         self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
         if any([self.es_conf.user is not None, self.es_conf.password is not None]):
