@@ -11,10 +11,12 @@ def test_base64_encode():
     base64_encode_url_res = EncryptOperation.base64_encode(
         encode_data="https://www.demo.com/", url_safe=True
     )
+    base64_encode_bytes_res = EncryptOperation.base64_encode(bytes("test", "utf-8"))
     assert all(
         [
             base64_encode_str_res == "MTIzNDU2",
             base64_encode_url_res == "aHR0cHM6Ly93d3cuZGVtby5jb20v",
+            base64_encode_bytes_res == "dGVzdA==",
         ]
     )
 
