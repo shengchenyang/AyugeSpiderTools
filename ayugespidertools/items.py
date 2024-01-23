@@ -53,18 +53,13 @@ class ItemMeta(ABCMeta):
             setattr(self, key, value)
             self._AyuItem__fields.add(key)
 
-        def asdict(
-            self,
-        ) -> Dict[str, Any]:
+        def asdict(self) -> Dict[str, Any]:
             """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
             _item_dict = {key: getattr(self, key) for key in self._AyuItem__fields}
             return _item_dict
 
-        def asitem(
-            self,
-            assignment: bool = True,
-        ) -> ScrapyItem:
+        def asitem(self, assignment: bool = True) -> ScrapyItem:
             """将 AyuItem 转换为 ScrapyItem
 
             Args:

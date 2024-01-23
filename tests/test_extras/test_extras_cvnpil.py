@@ -15,9 +15,6 @@ def test_get_array_dimension():
     len1 = CvnpilKit.get_array_dimension(array=a)
     len2 = CvnpilKit.get_array_dimension(array=b)
     len3 = CvnpilKit.get_array_dimension(array=c)
-    print("res len1:", len1)
-    print("res len2:", len2)
-    print("res len3:", len3)
     assert all([len1 == 2, len2 == 1, len3 == 3])
 
 
