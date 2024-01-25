@@ -46,5 +46,4 @@ class AyuAsyncMongoPipeline:
         return item
 
     def close_spider(self, spider):
-        if self.client:
-            self.client.close()
+        self.client.close()

@@ -47,5 +47,4 @@ class AyuFtyMongoPipeline:
         return item
 
     def close_spider(self, spider):
-        if self.conn:
-            self.conn.close()
+        self.conn.close()

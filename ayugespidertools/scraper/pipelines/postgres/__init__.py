@@ -62,7 +62,5 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
             return self.insert_item(alter_item)
 
     def close_spider(self, spider):
-        if self.cursor:
-            self.cursor.close()
-        if self.conn:
-            self.conn.close()
+        self.cursor.close()
+        self.conn.close()
