@@ -1,26 +1,60 @@
 import hashlib
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
 from scrapy.utils.defer import maybe_deferred_to_future
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.config import logger
 from ayugespidertools.items import DataItem
 
 __all__ = [
     "FilesDownloadPipeline",
+    "files_download_by_scrapy",
 ]
+
+if TYPE_CHECKING:
+    from scrapy import Spider
 
 DataItemModeStr = Literal["normal", "namedtuple", "dict"]
 
 
-class FilesDownloadPipeline:
-    """文件下载的 scrapy pipeline 扩展"""
+async def files_download_by_scrapy(
+    spider: "Spider",
+    file_path: str,
+    file_url: str,
+    item: Any,
+    key: str,
+    mode: DataItemModeStr = "namedtuple",
+):
+    request = scrapy.Request(file_url, callback=NO_CALLBACK)
+    response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
+    headers_dict = ToolsForAyu.get_dict_form_scrapy_req_headers(
+        scrapy_headers=response.headers
+    )
+    content_type = headers_dict.get("Content-Type")
+    file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
 
-    _type: DataItemModeStr = "normal"
+    if response.status != 200:
+        return item
+
+    # Save screenshot to file, filename will be hash of url.
+    url_hash = hashlib.md5(file_url.encode("utf8")).hexdigest()
+    filename = f"{file_path}/{url_hash}.{file_format}"
+    Path(filename).write_bytes(response.body)
+
+    # Store file in item.
+    if mode == "namedtuple":
+        item[key] = DataItem(key_value=filename, notes=f"{key} 文件存储路径")
+    else:
+        item[key] = filename
+
+
+class FilesDownloadPipeline:
+    """文件下载扩展"""
 
     def __init__(self, file_path=None):
         self.file_path = file_path
@@ -38,39 +72,18 @@ class FilesDownloadPipeline:
     async def process_item(self, item, spider):
         item_dict = ReuseOperation.item_to_dict(item)
         judge_item = next(iter(item_dict.values()))
+        file_url_keys = {
+            key: value for key, value in item_dict.items() if key.endswith("_file_url")
+        }
         if ReuseOperation.is_namedtuple_instance(judge_item):
-            self._type = "namedtuple"
-            file_url = item_dict.get("file_url").key_value
-            file_format = item_dict.get("file_format").key_value
+            for key, value in file_url_keys.items():
+                await files_download_by_scrapy(
+                    spider, self.file_path, value.key_value, item, f"_{key}"
+                )
         else:
-            file_url = item_dict.get("file_url")
-            file_format = item_dict.get("file_format")
+            for key, value in file_url_keys.items():
+                await files_download_by_scrapy(
+                    spider, self.file_path, value, item, f"_{key}", "normal"
+                )
 
-        assert (
-            file_format is not None
-        ), "使用文件下载 pipelines 时，其 item 中 file_format 字段可能未设置！"
-
-        if any([not file_url, not file_format]):
-            return item
-
-        if file_url is not None:
-            request = scrapy.Request(file_url, callback=NO_CALLBACK)
-            response = await maybe_deferred_to_future(
-                spider.crawler.engine.download(request)
-            )
-
-            if response.status != 200:
-                # Error happened, return item.
-                return item
-
-            # Save screenshot to file, filename will be hash of url.
-            url_hash = hashlib.md5(file_url.encode("utf8")).hexdigest()
-            filename = f"{self.file_path}/{url_hash}.{file_format}"
-            Path(filename).write_bytes(response.body)
-
-            # Store filename in item.
-            if self._type == "namedtuple":
-                item["_filename"] = DataItem(key_value=filename, notes="文件存储路径")
-            else:
-                item["_filename"] = filename
         return item
