@@ -1,10 +1,11 @@
 import hashlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
 from scrapy.utils.defer import maybe_deferred_to_future
+from scrapy.utils.python import to_bytes
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.utils import ToolsForAyu
@@ -19,7 +20,7 @@ __all__ = [
 if TYPE_CHECKING:
     from scrapy import Spider
 
-DataItemModeStr = Literal["normal", "namedtuple", "dict"]
+    from ayugespidertools.common.typevars import DataItemModeStr
 
 
 async def files_download_by_scrapy(
@@ -28,22 +29,20 @@ async def files_download_by_scrapy(
     file_url: str,
     item: Any,
     key: str,
-    mode: DataItemModeStr = "namedtuple",
+    mode: "DataItemModeStr" = "namedtuple",
 ):
     request = scrapy.Request(file_url, callback=NO_CALLBACK)
     response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
+    if response.status != 200:
+        return item
+
     headers_dict = ToolsForAyu.get_dict_form_scrapy_req_headers(
         scrapy_headers=response.headers
     )
     content_type = headers_dict.get("Content-Type")
     file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
-
-    if response.status != 200:
-        return item
-
-    # Save screenshot to file, filename will be hash of url.
-    url_hash = hashlib.md5(file_url.encode("utf8")).hexdigest()
-    filename = f"{file_path}/{url_hash}.{file_format}"
+    file_guid = hashlib.sha1(to_bytes(file_url)).hexdigest()
+    filename = f"{file_path}/{file_guid}.{file_format}"
     Path(filename).write_bytes(response.body)
 
     # Store file in item.

@@ -23,6 +23,7 @@ authMechanismStr = Literal[
     "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
 ]
 MysqlEngineStr = Literal["InnoDB", "MyISAM", "MEMORY", "NDB", "ARCHIVE"]
+DataItemModeStr = Literal["normal", "namedtuple", "dict"]
 
 
 class DatabaseSingletonMeta(type):
