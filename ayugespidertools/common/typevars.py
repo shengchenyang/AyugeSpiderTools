@@ -186,6 +186,14 @@ class KafkaConf(NamedTuple):
     key: str
 
 
+class OssConf(NamedTuple):
+    access_key: str
+    access_secret: str
+    endpoint: str
+    bucket: str
+    doc: Optional[str] = None
+
+
 class FieldAlreadyExistsError(Exception):
     def __init__(self, field_name: str):
         self.field_name = field_name

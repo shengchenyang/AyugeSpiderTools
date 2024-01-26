@@ -13,6 +13,7 @@ from ayugespidertools.common.typevars import (
     MQConf,
     MysqlConf,
     OracleConf,
+    OssConf,
     PostgreSQLConf,
 )
 from ayugespidertools.common.utils import ToolsForAyu
@@ -37,6 +38,7 @@ __all__ = [
     "KafkaConfCreator",
     "DynamicProxyCreator",
     "ExclusiveProxyCreator",
+    "OssConfCreator",
     "get_sqlalchemy_conf",
 ]
 
@@ -52,6 +54,7 @@ SpiderConf = TypeVar(
     MongoDBConf,
     MQConf,
     KafkaConf,
+    OssConf,
     DynamicProxyConf,
     ExclusiveProxyConf,
 )
@@ -302,6 +305,23 @@ class ExclusiveProxyProduct(Product):
         pass
 
 
+class OssConfProduct(Product):
+    def get_conn_conf(
+        self, settings: "Settings", remote_option: dict
+    ) -> Optional[OssConf]:
+        if settings.get("APP_CONF_MANAGE", False):
+            remote_conf = ToolsForAyu.fetch_remote_conf(
+                conf_name="oss:ali", **remote_option
+            )
+            return OssConf(**remote_conf) if remote_conf else None
+
+        local_conf = settings.get("OSS_CONFIG")
+        return OssConf(**local_conf) if local_conf else None
+
+    def get_engine(self, db_conf: OssConf, db_engine_enabled: bool):
+        pass
+
+
 class MysqlConfCreator(Creator):
     def create_product(self) -> Product:
         return MysqlConfProduct()
@@ -345,6 +365,11 @@ class DynamicProxyCreator(Creator):
 class ExclusiveProxyCreator(Creator):
     def create_product(self) -> Product:
         return ExclusiveProxyProduct()
+
+
+class OssConfCreator(Creator):
+    def create_product(self) -> Product:
+        return OssConfProduct()
 
 
 def get_spider_conf(

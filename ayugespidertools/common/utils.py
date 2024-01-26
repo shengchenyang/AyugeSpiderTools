@@ -30,6 +30,7 @@ RemoteConfNameStr = Literal[
     "postgresql",
     "elasticsearch",
     "oracle",
+    "oss:ali",
     "rabbitmq",
     "kafka",
     "dynamicproxy",

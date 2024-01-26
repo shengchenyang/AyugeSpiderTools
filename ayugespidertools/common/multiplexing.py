@@ -182,6 +182,15 @@ class ReuseOperation:
                 "topic": kafka_section.get("topic", None),
                 "key": kafka_section.get("key", None),
             }
+        if "oss:ali" in cfg:
+            oss_section = cfg["oss:ali"]
+            inner_settings["OSS_CONFIG"] = {
+                "access_key": oss_section.get("access_key", None),
+                "access_secret": oss_section.get("access_secret", None),
+                "endpoint": oss_section.get("endpoint", None),
+                "bucket": oss_section.get("bucket", None),
+                "doc": oss_section.get("doc", None),
+            }
         return inner_settings
 
     @staticmethod

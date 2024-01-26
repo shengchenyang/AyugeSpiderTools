@@ -14,6 +14,7 @@ from ayugespidertools.common.spiderconf import (
     MQConfCreator,
     MysqlConfCreator,
     OracleConfCreator,
+    OssConfCreator,
     PostgreSQLConfCreator,
     get_spider_conf,
     get_sqlalchemy_conf,
@@ -156,4 +157,9 @@ class AyuSpider(Spider):
             ExclusiveProxyCreator(), crawler.settings, remote_option
         ):
             spider.exclusiveproxy_conf = exclusiveproxy_conf
+
+        if oss_conf := get_spider_conf(
+            OssConfCreator(), crawler.settings, remote_option
+        ):
+            spider.oss_conf = oss_conf
         return spider
