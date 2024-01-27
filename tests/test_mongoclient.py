@@ -54,7 +54,6 @@ def test_key_connect(mongodb_first_step):
     _mongo_conf.pop("uri")
     conn, db = MongoDbBase.connects(**_mongo_conf)
     select_res = db[test_table].find({"nick_name": "菜只因C"})
-    conn.close()
     assert select_res.count() >= 1
 
 
@@ -138,5 +137,4 @@ def test_upload():
         collection="fs",
         file_data=png_bytes,
     )
-    conn.close()
     assert mongo_upload_id is not None, image_id is not None
