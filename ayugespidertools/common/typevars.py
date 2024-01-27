@@ -192,6 +192,8 @@ class OssConf(NamedTuple):
     endpoint: str
     bucket: str
     doc: Optional[str] = None
+    upload_fields_suffix: Optional[str] = "_file_url"
+    oss_fields_prefix: Optional[str] = "_"
 
 
 class FieldAlreadyExistsError(Exception):

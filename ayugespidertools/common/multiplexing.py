@@ -190,6 +190,10 @@ class ReuseOperation:
                 "endpoint": oss_section.get("endpoint", None),
                 "bucket": oss_section.get("bucket", None),
                 "doc": oss_section.get("doc", None),
+                "upload_fields_suffix": oss_section.get(
+                    "upload_fields_suffix", "_file_url"
+                ),
+                "oss_fields_prefix": oss_section.get("oss_fields_prefix", "_"),
             }
         return inner_settings
 

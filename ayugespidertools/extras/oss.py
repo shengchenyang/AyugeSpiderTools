@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional
+from typing import Any, Optional
 
 from retrying import retry
 
@@ -33,6 +33,8 @@ class AliOssBase:
         endpoint: str,
         bucket: str,
         doc: Optional[str] = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """初始化 auth，bucket 等信息
         注：阿里云账号 AccessKey 拥有所有 API 的访问权限，风险很高；
