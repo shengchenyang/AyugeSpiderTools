@@ -92,11 +92,11 @@ class AiohttpDownloaderMiddleware:
                 retry_times=local_aiohttp_conf.get(
                     "retry_times", Param.aiohttp_retry_times_default
                 ),
-                limit=local_aiohttp_conf.get("limit"),
-                ssl=local_aiohttp_conf.get("ssl"),
-                verify_ssl=local_aiohttp_conf.get("verify_ssl"),
-                limit_per_host=local_aiohttp_conf.get("limit_per_host"),
-                allow_redirects=local_aiohttp_conf.get("allow_redirects"),
+                limit=local_aiohttp_conf.get("limit", 100),
+                ssl=local_aiohttp_conf.get("ssl", True),
+                verify_ssl=local_aiohttp_conf.get("verify_ssl", True),
+                limit_per_host=local_aiohttp_conf.get("limit_per_host", 0),
+                allow_redirects=local_aiohttp_conf.get("allow_redirects", True),
             )
 
             # 初始化所需要的参数信息，用于构建 aiohttp 请求信息
