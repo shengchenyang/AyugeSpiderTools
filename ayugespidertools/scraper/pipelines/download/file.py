@@ -77,12 +77,12 @@ class FilesDownloadPipeline:
         if ReuseOperation.is_namedtuple_instance(judge_item):
             for key, value in file_url_keys.items():
                 await files_download_by_scrapy(
-                    spider, self.file_path, value.key_value, item, f"_{key}"
+                    spider, self.file_path, value.key_value, item, f"{key}_local"
                 )
         else:
             for key, value in file_url_keys.items():
                 await files_download_by_scrapy(
-                    spider, self.file_path, value, item, f"_{key}", "normal"
+                    spider, self.file_path, value, item, f"{key}_local", "normal"
                 )
 
         return item
