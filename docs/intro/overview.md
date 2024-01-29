@@ -90,20 +90,7 @@ class DemoOneSpider(AyuSpider):
             favor_count = curr_data.get("favorCount")
             nick_name = curr_data.get("nickName")
 
-            # 数据存储方式1，需要添加注释时的写法
-            article_item = AyuItem(
-                # 这里也可以写为 article_detail_url = DataItem(article_detail_url)，但没有注释
-                # 功能了，那不如使用下面的数据存储方式2
-                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
-                article_title=DataItem(article_title, "文章标题"),
-                comment_count=DataItem(comment_count, "文章评论数量"),
-                favor_count=DataItem(favor_count, "文章赞成数量"),
-                nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=DataItem(_save_table, "项目列表信息"),
-            )
-
-            # 数据存储方式2，若不需要注释，也可以这样写，但不要两种风格混用
-            """
+            # NOTE: 数据存储方式 1，推荐此风格写法。
             article_item = AyuItem(
                 article_detail_url=article_detail_url,
                 article_title=article_title,
@@ -112,9 +99,22 @@ class DemoOneSpider(AyuSpider):
                 nick_name=nick_name,
                 _table=_save_table,
             )
+
+            # NOTE: 数据存储方式 2，需要自动添加表字段注释时的写法。但不要风格混用。
+            """
+            article_item = AyuItem(
+                # 这里也可以写为 article_detail_url = DataItem(article_detail_url)，但没有字段
+                # 注释功能了，那不如使用 <数据存储方式 1>
+                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
+                article_title=DataItem(article_title, "文章标题"),
+                comment_count=DataItem(comment_count, "文章评论数量"),
+                favor_count=DataItem(favor_count, "文章赞成数量"),
+                nick_name=DataItem(nick_name, "文章作者昵称"),
+                _table=DataItem(_save_table, "项目列表信息"),
+            )
             """
 
-            # 数据存储方式 3，当然也可以直接 yield dict
+            # NOTE: 数据存储方式 3，当然也可以直接 yield dict
             # 但 _table，_mongo_update_rule 等参数就没有 IDE 提示功能了
             """
             yield {

@@ -65,17 +65,17 @@
 
 ```python
 def parse(self, response):
-    # 存储到 Mysql 场景时需要的 Item 构建示例：
+    # 存储到 Mysql 场景时 Item 构建示例：
     ArticleMysqlItem = AyuItem(
-        article_detail_url=DataItem(article_detail_url, "文章详情链接"),
-        article_title=DataItem(article_title, "文章标题"),
-        comment_count=DataItem(comment_count, "文章评论数量"),
-        favor_count=DataItem(favor_count, "文章赞成数量"),
-        nick_name=DataItem(nick_name, "文章作者昵称"),
-        _table=DataItem("_article_info_list", "文章信息列表"),
+        article_detail_url=article_detail_url,
+        article_title=article_title,
+        comment_count=comment_count,
+        favor_count=favor_count,
+        nick_name=nick_name,
+        _table="_article_info_list",
     )
 
-    # 存储到 MongoDB 场景时需要的 Item 构建示例：
+    # 存储到 MongoDB 场景时 Item 构建示例：
     ArticleMongoItem = AyuItem(
         article_detail_url=article_detail_url,
         article_title=article_title,
@@ -87,7 +87,7 @@ def parse(self, response):
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
 
-    # 存储到 ElasticSearch 场景时需要的 Item 构建示例：
+    # 存储到 ElasticSearch 场景时 Item 构建示例：
     # 同样地，为保持风格统一，es 存储场景中会把 es Document 中 fields 的声明
     # 放在 AyuItem 中 DataItem 的 notes 参数中。
     # 这个参数在其他(需要字段注释，比如 Mysql，postgresql)场景中表示为字段注释。
@@ -103,7 +103,8 @@ def parse(self, response):
     )
 
 
-# 其实，以上可以只赋值一次 AyuItem ，然后在 ITEM_PIPELINES 中激活对应的 pipelines 即可，这里是为了方便展示功能。
+# 以上可以做到只赋值一次 AyuItem ，然后在 ITEM_PIPELINES 中激活对应的 pipelines 即可，这里是为了方便展示；
+# 如非场景需要，不推荐使用 DataItem 的方式构建 AyuItem，不太优雅。
 ```
 
 以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 即为存储至库中字段，`value` 为存储内容。
