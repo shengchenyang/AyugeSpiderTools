@@ -102,7 +102,8 @@ class DemoAiohttpSpider(SimpleSpider):
             # 同时连接到一台主机的数量
             "limit_per_host": 0,
             "retry_times": 3,
-            "verify_ssl": False,
+            "ssl": False,
+            # "verify_ssl": False,
             "allow_redirects": False,
         },
         "DOWNLOAD_TIMEOUT": 35,
