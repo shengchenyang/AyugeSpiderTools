@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
     from loguru import Logger
 
-    slogT = TypeVar("slogT", Logger, logging.LoggerAdapter)
+    slogT = Union[Logger, logging.LoggerAdapter]
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)

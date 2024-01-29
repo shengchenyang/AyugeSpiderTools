@@ -34,11 +34,7 @@ class DataItem(NamedTuple):
 
 class ItemMeta(ABCMeta):
     def __new__(cls, class_name, bases, attrs):
-        def add_field(
-            self,
-            key: str,
-            value: Optional[Any] = None,
-        ) -> None:
+        def add_field(self, key: str, value: Any) -> None:
             """动态添加字段方法
 
             Args:
@@ -181,11 +177,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         self.__fields.discard("_AyuItem__fields")
         return self.__fields
 
-    def add_field(
-        self,
-        key: str,
-        value: Optional[Any] = None,
-    ) -> None:
+    def add_field(self, key: str, value: Any) -> None:
         ...
 
     def asdict(self) -> Dict[str, Any]:

@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Type, TypeVar
+from typing import TYPE_CHECKING, Type, Union
 
 from scrapy.utils.defer import deferred_from_coro
 
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from ayugespidertools.common.typevars import ESConf, slogT
 
-    DocumentType = TypeVar("DocumentType", Type[Document], type)
+    DocumentType = Union[Type[Document], type]
 
 
 class AyuAsyncESPipeline:

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Type, TypeVar
+from typing import TYPE_CHECKING, Type, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -13,7 +13,7 @@ __all__ = ["AyuESPipeline", "dynamic_es_document"]
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
 
-    DocumentType = TypeVar("DocumentType", Type[Document], type)
+    DocumentType = Union[Type[Document], type]
 
 
 def dynamic_es_document(class_name, fields, index_settings=None):
