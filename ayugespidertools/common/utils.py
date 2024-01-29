@@ -26,6 +26,7 @@ RemoteFormatStr = Literal["json", "hcl", "yaml", "xml"]
 RemoteTypeStr = Literal["consul", "nacos"]
 RemoteConfNameStr = Literal[
     "mongodb",
+    "mongodb:uri",
     "mysql",
     "postgresql",
     "elasticsearch",

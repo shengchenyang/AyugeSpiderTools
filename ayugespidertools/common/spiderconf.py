@@ -23,8 +23,7 @@ try:
     from elasticsearch_dsl import connections
     from oracledb.exceptions import DatabaseError
 except ImportError:
-    # pip install ayugespidertools[database]    # oracledb ImportError
-    # pip install elasticsearch_dsl             # elasticsearch_dsl ImportError
+    # pip install ayugespidertools[database]  # oracledb or elasticsearch_dsl ImportError
     pass
 
 __all__ = [
@@ -124,9 +123,13 @@ class MongoDBConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MongoDBConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
+            uri_remote_conf = ToolsForAyu.fetch_remote_conf(
+                conf_name="mongodb:uri", **remote_option
+            )
+            normal_remote_conf = ToolsForAyu.fetch_remote_conf(
                 conf_name="mongodb", **remote_option
             )
+            remote_conf = uri_remote_conf or normal_remote_conf
             return MongoDBConf(**remote_conf) if remote_conf else None
 
         local_conf = settings.get("MONGODB_CONFIG")
