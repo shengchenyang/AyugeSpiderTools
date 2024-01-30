@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.5 (2024-01-30)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- `mysql` 场景添加 `odku_enable` 配置来设置是否开启 `ON DUPLICATE KEY UPDATE` 功能。([25d71dd](https://github.com/shengchenyang/AyugeSpiderTools/commit/25d71ddb789c71f3f570f85576ff225aeaf58d7b))
+- 添加 `oss pipeline` 的示例，请在 `DemoSpider` 中 `demo_oss` 和 `demo_oss_sec` 查看具体使用方法。([issue 16](https://github.com/shengchenyang/AyugeSpiderTools/issues/16))
+
+### Bug fixes
+
+- 解决文件下载不支持多字段下载的问题，请在 `DemoSpider` 中 `demo_file` 和 `demo_file_sec` 查看具体使用方法。([f836f02](https://github.com/shengchenyang/AyugeSpiderTools/commit/f836f02d3c15b57623851888c0451ea0bfe8c631), [f504c45](https://github.com/shengchenyang/AyugeSpiderTools/commit/f504c45b86f2e328e2a9bb9f61328b693a571b52))
+- 解决远程配置管理中缺失的 `mongodb:uri` 优先级设置。([51ea7da](https://github.com/shengchenyang/AyugeSpiderTools/commit/51ea7da83c81fe97ea5cd6a6500fdb7fc3fa233b))
+
+### Code optimizations
+
+- `mq` 场景添加关闭链接处理。([ac54fd0](https://github.com/shengchenyang/AyugeSpiderTools/commit/ac54fd0a7611a8e63b46689da83718a9cebdb013))
+- 更新 `readthedocs` 中的教程指南，以方便快速上手。
+- 更新部分依赖库版本。
+
+<hr>
+
 ## AyugeSpiderTools 3.9.4 (2024-01-10)
 
 ### Deprecations
@@ -19,7 +43,6 @@
 - mypy check。([`785e36a`](https://github.com/shengchenyang/AyugeSpiderTools/commit/785e36a5a85b141168ce24bfae9efe605ac05c36))
 
 <hr>
-
 
 ## AyugeSpiderTools 3.9.3 (2023-12-30)
 
