@@ -48,6 +48,7 @@ psycopg-binary = { version = "^3.1.13", optional = true }
 psycopg-pool = { version = "^3.2.0", optional = true }
 oracledb = {version = "^1.4.2", optional = true}
 elasticsearch-dsl = {version = "^8.11.0", optional = true}
+oss2 = { version = "^2.18.4", optional = true }
 
 [tool.poetry.scripts]
 ayuge = "ayugespidertools.utils.cmdline:execute"
@@ -72,7 +73,7 @@ toml = "0.10.2"
 [tool.poetry.extras]
 all = [
     "mmh3", "pycryptodome", "python-hcl2", "pyyaml", "opencv-python", "numpy", "Pillow", "psycopg", "psycopg-binary",
-    "psycopg-pool", "oracledb", "elasticsearch-dsl"
+    "psycopg-pool", "oracledb", "elasticsearch-dsl", "oss2"
 ]
 database = ["psycopg", "psycopg-binary", "psycopg-pool", "oracledb", "elasticsearch-dsl"]
 
