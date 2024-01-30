@@ -137,7 +137,10 @@ Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 
 + 18).demo_mq: Template example of storing data in RabbitMQ.
 + 19).demo_kafka: Template example of storing data in Kafka.
-+ 20).demo_file: Template example of downloading images and other files to the local machine.
++ 20).demo_file: Example of using this library pipeline to download images and other files to local.
++ 30).demo_file_sec: Self-implemented image download example.
++ 31).demo_oss: Example of using this library pipeline to upload to oss.
++ 32).demo_oss_sec: Self-implemented oss upload example.
 ```
 
 ## Run Through The Test
@@ -207,6 +210,7 @@ functionality of Scrapy.**
     - [x] Adaptation for scenarios where storage is done in PostgreSQL.
     - [x] Adaptation for scenarios where storage is done in ElasticSearch.
     - [x] Adaptation for scenarios where storage is done in Oracle.
+    - [x] oss uploads scene adaptation.
     - [x] Examples of asyncio syntax support and third-party library support for async:
         - [x] Example of using asyncio and aiohttp in a spider script.
         - [x] Example of using asyncio and aioMysql in a pipeline script.

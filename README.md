@@ -132,7 +132,10 @@ scrapy crawl <spider_name>
 
 + 18).demo_mq: 数据存入 rabbitmq 的模板示例
 + 19).demo_kafka: 数据存入 kafka 的模板示例
-+ 20).demo_file: 下载图片等文件到本地的模板示例
++ 20).demo_file: 使用本库 pipeline 下载图片等文件到本地的示例
++ 30).demo_file_sec: 自行实现的图片下载示例
++ 31).demo_oss: 使用本库 pipeline 上传到 oss 的示例
++ 32).demo_oss_sec: 自行是实现的 oss 上传示例
 ```
 
 ## 跑通测试
@@ -192,6 +195,7 @@ scrapy crawl <spider_name>
     - [x] `PostgreSQL` 存储场景适配
     - [x] `ElasticSearch` 存储场景适配
     - [x] `Oracle` 存储场景适配
+    - [x] `oss` 上传场景适配
     - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
         - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
         - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
