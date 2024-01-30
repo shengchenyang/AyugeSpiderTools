@@ -20,7 +20,7 @@
 
   _title = "article_title_value"
   demo_item = AyuItem(
-  	article_title=_title
+      article_title=_title
   )
   ```
 
@@ -35,14 +35,14 @@
 
     # 普通场景
     demo_item = AyuItem(
-    	article_title=DataItem(_title, "文章标题"),
+        article_title=DataItem(_title, "文章标题"),
     )
 
     # es 场景
     from elasticsearch_dsl import Keyword
 
     demo_item = AyuItem(
-    	article_title=DataItem(_title, Keyword()),
+        article_title=DataItem(_title, Keyword()),
     )
 
   - 无 `notes` 赋值
@@ -51,7 +51,7 @@
     # 即不需要注释，也不是 es 存储场景下，只赋值 key_value 参数
 
     demo_item = AyuItem(
-    	article_title=DataItem(_title),
+        article_title=DataItem(_title),
     )
 
     # 不过，这种不如直接使用 【普通字段】的优雅赋值方式。
@@ -197,7 +197,7 @@ item = AyuItem(_table="ta")
 ```python
 import json
 
-from ayugespidertools.items import AyuItem, DataItem
+from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 from scrapy.http.response.text import TextResponse
@@ -254,12 +254,12 @@ class DemoOneSpider(AyuSpider):
             nick_name = curr_data.get("nickName")
 
             article_item = AyuItem(
-                article_detail_url=DataItem(article_detail_url, "文章详情链接"),
-                article_title=DataItem(article_title, "文章标题"),
-                comment_count=DataItem(comment_count, "文章评论数量"),
-                favor_count=DataItem(favor_count, "文章赞成数量"),
-                nick_name=DataItem(nick_name, "文章作者昵称"),
-                _table=DataItem(_save_table, "文章信息列表"),
+                article_detail_url=article_detail_url,
+                article_title=article_title,
+                comment_count=comment_count,
+                favor_count=favor_count,
+                nick_name=nick_name,
+                _table=_save_table,
                 # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"article_detail_url": article_detail_url},
             )
@@ -300,24 +300,30 @@ class DemoOneSpider(AyuSpider):
   - `MongoDB` 存储场景可能会需要 `_mongo_update_rule` 来设置去重的更新条件
 - 最后 `yield` 对应 `item` 即可
 
+补充：其中 `AyuItem` 也可以改成 `DataItem` 的赋值方式，那么 `mysql` 场景下在表字段不存在时会添加字段注释，`mongodb` 则没有影响。推荐直接赋值的方式，更明了。
+
 ## yield item
 
 > 这里解释下 `item` 的格式问题，虽说也是支持直接 `yield dict` ，`scrapy` 的 `item` 格式(即本库中的 `ScrapyItem`)，还有就是本库推荐的 `AyuItem` 的形式。
 
 这里介绍下 `item` 字段及其注释，以上所有 `item` 都有参数提示：
 
-| item 字段              | 类型            | 注释                                                         |
-| ---------------------- |---------------| ------------------------------------------------------------ |
-| **自定义字段**         | DataItem，Any  | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
+| item 字段              | 类型          | 注释                                                         |
+| ---------------------- | ------------- | ------------------------------------------------------------ |
+| **自定义字段**         | DataItem，Any | `item` 所有需要存储的字段，若有多个，请按规则自定义添加即可。 |
 | **_table**             | DataItem, str | 存储至数据表或集合的名称。                                   |
 | **_mongo_update-rule** | dict          | `MongoDB item` 场景下的查重规则。                            |
-| **file_url**           | DataItem，Any  | `FilesDownloadPipeline` 文件下载场景时需要的下载链接参数。   |
-| **file_format**        | DataItem，Any  | `FilesDownloadPipeline` 文件下载场景时需要的下载文件格式参数。 |
+
+一些规则：
+
+| item 字段规则                 | 类型          | 注释                                                         |
+| ----------------------------- | ------------- | ------------------------------------------------------------ |
+| 后缀包含 _file_url            | str, DataItem | 文件下载 pipeline 中使用，当包含此规则的字段会下载此字段资源到本地。生成的对应新字段会在原字段添加 _local 后缀。 |
+| 前缀包含 upload_fields_suffix | str           | oss 管道中使用，upload_fields_suffix 在 [oss:ali] 中配置，会上传此规则字段的资源到 oss。对应的新字段会在前缀添加 oss_fields_prefix。 |
 
 注，对以上表格中内容进行扩充解释：
 
-- `file_url`，`file_format` 的字段只有在使用文件下载的场景时才需要设置，且对应的保存名称也会以 `_filename` 的新增字段添加到 `AyuItem` 中。
-- 自定义字段使用示例请在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/intro/tutorial.html) 中查看。
+- 一般不推荐使用规则的方式来使用 `AyuItem`，推荐自行构建 `Ayuitem` 的逻辑更清晰更易维护，这里只是给出代码示例。
 
 ## 自定义 Item 字段和实现 Item Loaders
 

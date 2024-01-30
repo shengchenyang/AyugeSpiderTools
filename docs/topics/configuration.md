@@ -161,3 +161,19 @@
 | username | _            | _                          |
 | password | _            | _                          |
 | index    | 可选，默认 1 | 表示取其索引值对应的代理。 |
+
+## [oss:ali]
+
+上传到阿里云 oss 的配置参数。
+
+| 参数名               | 参数备注 | 描述                                                         |
+| -------------------- | -------- | ------------------------------------------------------------ |
+| access_key           | _        | 阿里云 access_key_id                                         |
+| access_secret        | _        | 阿里云账号对应的 access_key_secret                           |
+| endpoint             | _        | 填写 Bucket 所在地域对应的 Endpoint                          |
+| bucket               | -        | Bucket                                                       |
+| doc                  | -        | 需要操作的文件夹目录，比如 file/img，为可选参数。            |
+| upload_fields_suffix | 规则字段 | 上传到 oss 的字段规则，包含 upload_fields_suffix 后缀的字段会上传到 oss。 |
+| oss_fields_prefix    | 规则字段 | 上传到 oss 的字段生成的新字段规则，会在原字段添加 oss_fields_prefix 前缀。 |
+
+遵守规则时的 `oss` 上传逻辑时使用，但更推荐自行实现和构建 `AyuItem` 的方式。具体请看 `demo_oss` 和 `demo_oss_sec` 的场景示例。请自行选择可接受的风格。

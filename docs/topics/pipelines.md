@@ -174,4 +174,23 @@ custom_settings = {
 }
 ```
 
-具体示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中的 `demo_file` 查看。
+具体示例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider) 项目中的 `demo_file` 和 `demo_file_sec` 查看。
+
+## 8. oss 上传
+
+> 此场景给出的是以 `oss2` 实现的 `oss` 上传示例
+
+对应的 `pipelines` 名称为 `AyuAsyncOssPipeline`，其中 `.conf` 中的所需配置如下：
+
+具体的配置解释不再介绍了，请在 `item` 部分查看。
+
+```ini
+[oss:ali]
+access_key=
+access_secret=
+endpoint=
+bucket=
+doc=
+upload_fields_suffix=_file_url
+oss_fields_prefix=_
+```
