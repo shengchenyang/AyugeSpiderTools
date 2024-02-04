@@ -110,7 +110,7 @@ class DemoEightSpider(AyuSpider):
             yield article_item
 ```
 
-如您所见，我们的 `Spider` 子类化`AyugeSpider.AyuSpider` 并定义了一些属性和方法：
+如您所见，`Spider` 子类化 `AyuSpider` 并定义了一些属性和方法：
 
 - `name`: 标识蜘蛛。在一个项目中必须是唯一的，即不能为不同的Spiders设置相同的名字。
 - `start_requests()`: 必须返回一个可迭代的请求（你可以返回一个请求列表或编写一个生成器函数），蜘蛛将从中开始爬行。后续请求将从这些初始请求中依次生成。
