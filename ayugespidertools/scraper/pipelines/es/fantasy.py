@@ -4,6 +4,4 @@ __all__ = ["AyuFtyESPipeline"]
 
 
 class AyuFtyESPipeline(AyuESPipeline):
-    """Elasticsearch 存储场景"""
-
     ...

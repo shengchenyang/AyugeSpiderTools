@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 
 
 class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
-    """Postgresql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
-
     conn: "Connection"
     slog: "slogT"
     cursor: "Cursor"

@@ -12,11 +12,6 @@ __all__ = ["AyuKafkaPipeline"]
 
 class KafkaProducerClient:
     def __init__(self, bootstrap_servers: list) -> None:
-        """kafka 生产者
-
-        Args:
-            bootstrap_servers: kafka 服务地址
-        """
         self.producer = KafkaProducer(
             bootstrap_servers=bootstrap_servers,
             key_serializer=lambda k: json.dumps(k).encode(),

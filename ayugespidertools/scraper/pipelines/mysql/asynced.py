@@ -16,8 +16,6 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
-    """结合 aiomysql 实现异步写入 Mysql 数据库"""
-
     mysql_conf: "MysqlConf"
     slog: "slogT"
     pool: aiomysql.Pool

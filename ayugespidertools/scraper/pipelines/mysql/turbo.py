@@ -17,8 +17,6 @@ if TYPE_CHECKING:
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
-    """Mysql 存储场景的 scrapy pipeline 扩展，使用 dbutils.pooled_db 实现"""
-
     mysql_conf: "MysqlConf"
     conn: "Connection[Cursor]"
     slog: "slogT"

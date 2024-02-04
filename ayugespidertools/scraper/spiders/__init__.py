@@ -37,8 +37,6 @@ if TYPE_CHECKING:
 
 
 class AyuSpider(Spider):
-    """用于初始配置 scrapy 的各种 setting 的值及 spider 全局变量等"""
-
     mysql_engine: "SqlalchemyEngineT"
     mysql_engine_conn: "SqlalchemyConnectT"
     postgres_engine: "SqlalchemyEngineT"

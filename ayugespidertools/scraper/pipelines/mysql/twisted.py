@@ -16,8 +16,6 @@ if TYPE_CHECKING:
 
 
 class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
-    """使用 twisted 的 adbapi 实现 Mysql 存储场景下的异步操作"""
-
     mysql_conf: "MysqlConf"
     slog: "slogT"
     dbpool: "adbapi.ConnectionPool"

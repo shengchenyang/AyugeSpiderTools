@@ -18,8 +18,6 @@ if TYPE_CHECKING:
 
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
-    """Mysql 存储且记录脚本运行状态的简单示例"""
-
     mysql_conf: "MysqlConf"
     conn: "Connection[Cursor]"
     slog: "slogT"

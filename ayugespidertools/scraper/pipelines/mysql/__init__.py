@@ -24,8 +24,6 @@ if TYPE_CHECKING:
 
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
-    """Mysql 存储场景的 scrapy pipeline 扩展的主要功能示例"""
-
     mysql_conf: "MysqlConf"
     conn: "Connection[Cursor]"
     slog: "slogT"

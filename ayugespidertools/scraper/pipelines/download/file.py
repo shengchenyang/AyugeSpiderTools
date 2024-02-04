@@ -53,8 +53,6 @@ async def files_download_by_scrapy(
 
 
 class FilesDownloadPipeline:
-    """文件下载扩展"""
-
     def __init__(self, file_path=None):
         self.file_path = file_path
 

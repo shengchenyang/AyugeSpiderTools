@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncMongoPipeline:
-    """通过 motor 实现异步写入 MongoDB 的存储管道"""
-
     client: "AgnosticClient"
     db: "AgnosticDatabase"
 

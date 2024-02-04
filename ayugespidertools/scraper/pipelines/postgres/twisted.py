@@ -16,8 +16,6 @@ if TYPE_CHECKING:
 
 
 class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
-    """使用 twisted 的 adbapi 实现 PostgreSQL 存储场景下的异步操作"""
-
     postgres_conf: "PostgreSQLConf"
     dbpool: "adbapi.ConnectionPool"
     slog: "slogT"
