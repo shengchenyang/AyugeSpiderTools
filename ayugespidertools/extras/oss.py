@@ -21,9 +21,9 @@ __all__ = [
 class AliOssBase:
     """阿里云 Oss 对象存储 python sdk 示例
     其 GitHub 官方文档地址：
-        https://github.com/aliyun/aliyun-oss-python-sdk?spm=5176.8465980.tools.dpython-github.572b1450ON6Z9R
+        https://github.com/aliyun/aliyun-oss-python-sdk
     阿里云官方 oss sdk 文档地址：
-        https://www.alibabacloud.com/help/zh/object-storage-service/latest/python-quick-start
+        https://www.alibabacloud.com/help/zh/oss/developer-reference
     """
 
     def __init__(
@@ -37,14 +37,12 @@ class AliOssBase:
         **kwargs: Any,
     ) -> None:
         """初始化 auth，bucket 等信息
-        注：阿里云账号 AccessKey 拥有所有 API 的访问权限，风险很高；
-        强烈建议您创建并使用 RAM 用户进行 API 访问或日常运维，请登录 RAM 控制台创建 RAM 用户
 
         Args:
             access_key: 阿里云账号 AccessKey
             access_secret: 阿里云账号 AccessKey 对应的秘钥
             endpoint: 填写 Bucket 所在地域对应的 Endpoint；
-                以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com（注意二级域名等问题）
+                以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com
             bucket: 填写 Bucket 名称，此 oss 项目所属 bucket
             doc: 需要操作的 oss 文件夹目录，比如 file/img，可选参数
         """
