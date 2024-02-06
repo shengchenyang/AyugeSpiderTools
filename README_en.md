@@ -95,32 +95,32 @@ following scenarios are currently supported:
 
 ```diff
 Scenario of storing data in Mysql:
-+ 1).demo_one: Get mysql configuration based on .conf in local VIT.
-+ 3).demo_three: Get the mysql configuration from consul.
-+ 21).demo_mysql_nacos: Get the mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
-+ 5).demo_five: Scenario of asynchronously storing data in MySQL.
-+ 24).demo_aiomysql: combining aiomysql.
++ 1).demo_one: Get mysql configuration from .conf.
++ 3).demo_three: Get mysql configuration from consul.
++ 21).demo_mysql_nacos: Get mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
++ 5).demo_five: Twisted asynchronous storage example.
++ 24).demo_aiomysql: Asynchronous storage example implemented with aiomysql.
 + 13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
 
 Scenario of storing data in MongoDB:
-+ 2).demo_two: Get mongodb configuration based on .conf in local VIT.
++ 2).demo_two: Get mongodb configuration from .conf.
 + 4).demo_four: Get mongodb configuration from consul.
-+ 6).demo_six: Scenario of asynchronously storing data in MongoDB.
-+ 17).demo_mongo_async: Example of pipelines for storing data in MongoDB with asyncio version.
++ 6).demo_six: Twisted asynchronous storage example.
++ 17).demo_mongo_async: Asynchronous storage example implemented with motor.
 
 Scenario of storing data in PostgreSQL(need to install ayugespidertools[database]):
-+ 21).demo_nine: Get postgresql configuration based on .conf in local VIT.
-+ 22).demo_ten: Scenario of asynchronously storing data in PostgreSQL.
++ 21).demo_nine: Get postgresql configuration from .conf.
++ 22).demo_ten: Twisted asynchronous storage example.
 - 23). It also supports obtaining configuration from nacos or consul, no more examples.
-+ 27).demo_eleven: Example of pipelines for storing data in PostgreSQL with asyncio version.
++ 27).demo_eleven: Asynchronous storage example.
 
 Scenario of storing data in ElasticSearch(need to install ayugespidertools[database]):
-+ 28).demo_es: AyuFtyESPipeline usage introduction.
-+ 29).demo_es_async: AyuAsyncESPipeline usage introduction.
++ 28).demo_es: synchronous storage example.
++ 29).demo_es_async: Asynchronous storage example.
 
 Scenario of storing data in Oracle(need to install ayugespidertools[database]):
-+ 25). demo_oracle: AyuFtyOraclePipeline usage introduction.
-+ 26). demo_oracle_twisted: AyuTwistedOraclePipeline usage introduction.
++ 25). demo_oracle: synchronous storage example.
++ 26). demo_oracle_twisted: Twisted asynchronous storage example.
 
 - 7).demo_seven: Scenarios using requests to request (this feature has been removed, and using aiohttp is recommended instead)
 + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
