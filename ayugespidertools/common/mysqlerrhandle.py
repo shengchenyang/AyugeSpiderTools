@@ -28,6 +28,7 @@ class AbstractClass(ABC):
         self,
         cursor: "Cursor",
         table_name: str,
+        engine: str,
         charset: str,
         collate: str,
         table_notes: str = "",
@@ -37,13 +38,14 @@ class AbstractClass(ABC):
         Args:
             cursor: mysql connect cursor
             table_name: 创建表的名称
+            engine: 创建表的 engine
             charset: charset
             collate: collate
             table_notes: 创建表的注释
         """
         sql = (
             f"CREATE TABLE IF NOT EXISTS `{table_name}` (`id` int(32) NOT NULL"
-            f" AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`)) ENGINE=InnoDB"
+            f" AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`)) ENGINE={engine}"
             f" DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{table_notes}';"
         )
 
@@ -121,6 +123,7 @@ class AbstractClass(ABC):
             self._create_table(
                 cursor=cursor,
                 table_name=table,
+                engine=mysql_conf.engine,
                 charset=mysql_conf.charset,
                 collate=mysql_conf.collate,
                 table_notes=table_notes,
