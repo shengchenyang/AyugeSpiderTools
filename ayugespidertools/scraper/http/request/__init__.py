@@ -1,6 +1,17 @@
 import copy
 from dataclasses import asdict
-from typing import Callable, List, Optional, Union
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from scrapy import Request
 
@@ -19,10 +30,10 @@ class AiohttpRequest(Request):
         url: str,
         callback: Optional[Callable] = None,
         method: str = "GET",
-        headers: Optional[dict] = None,
+        headers: Union[Mapping[AnyStr, Any], Iterable[Tuple[AnyStr, Any]], None] = None,
         body: Optional[Union[bytes, str]] = None,
         cookies: Optional[Union[dict, List[dict]]] = None,
-        meta: Optional[dict] = None,
+        meta: Optional[Dict[str, Any]] = None,
         args: Optional[Union[AiohttpRequestArgs, dict]] = None,
         **kwargs,
     ) -> None:
