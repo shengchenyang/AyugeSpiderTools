@@ -1950,6 +1950,11 @@ files = [
     {file = "multidict-6.0.5.tar.gz", hash = "sha256:f7e301075edaf50500f0b341543c41194d8df3ae5caf4702f2095f3ca73dd8da"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
 [[package]]
 name = "mypy"
 version = "1.5.1"
@@ -3195,6 +3200,11 @@ files = [
     {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
 [[package]]
 name = "pyyaml"
 version = "6.0.1"
@@ -3331,13 +3341,13 @@ reference = "aliyun"
 
 [[package]]
 name = "scrapy"
-version = "2.11.0"
+version = "2.11.1"
 description = "A high-level Web Crawling and Web Scraping framework"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Scrapy-2.11.0-py2.py3-none-any.whl", hash = "sha256:a7f36544d1f5ceb13cff9b7bc904bd7c0fc43a3af0fbe5aa2034fd937cf092d1"},
-    {file = "Scrapy-2.11.0.tar.gz", hash = "sha256:3cbdedce0c3f0e0482d61be2d7458683be7cd7cf14b0ee6adfbaddb80f5b36a5"},
+    {file = "Scrapy-2.11.1-py2.py3-none-any.whl", hash = "sha256:f1edee0cd214512054c01a8d031a8d213dddb53492b02c9e66256e3efe90d175"},
+    {file = "Scrapy-2.11.1.tar.gz", hash = "sha256:733a039c7423e52b69bf2810b5332093d4e42a848460359c07b02ecff8f73ebe"},
 ]
 
 [package.dependencies]
@@ -3356,7 +3366,7 @@ queuelib = ">=1.4.2"
 service-identity = ">=18.1.0"
 setuptools = "*"
 tldextract = "*"
-Twisted = ">=18.9.0,<23.8.0"
+Twisted = ">=18.9.0"
 w3lib = ">=1.17.0"
 "zope.interface" = ">=5.1.0"
 
@@ -4300,4 +4310,4 @@ database = ["elasticsearch-dsl", "oracledb", "psycopg", "psycopg-binary", "psyco
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "55201d20d1214801e3cbe230d516bb0872be92aface0973affeae6fb9771f27b"
+content-hash = "6f29f336197ffa1ad5fec013a2891e6b26ec8950e53ec954e38a82c9733cda8b"
