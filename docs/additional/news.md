@@ -1,5 +1,26 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.6 (2024-02-18)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 修复 mysql 存储引擎 engine 参数未生效的问题。([1240e37](https://github.com/shengchenyang/AyugeSpiderTools/commit/1240e375dd4e1bc7c87ba876a3cc8faf34b8695f))
+
+### Code optimizations
+
+- 更新 `aiohttp` 依赖库版本以解决破坏兼容性的问题，同步更新 `scrapy` 依赖版本。（[3f0dc5a](https://github.com/shengchenyang/AyugeSpiderTools/commit/3f0dc5ada3a9742eff54e8a77c03a4fb7906795d), [246c824](https://github.com/shengchenyang/AyugeSpiderTools/commit/246c824813b4ffdc844b0df26a9e944a467fb9ea)）
+- 文档更新。
+
+<hr>
+
 ## AyugeSpiderTools 3.9.5 (2024-01-30)
 
 ### Deprecations
