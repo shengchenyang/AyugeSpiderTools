@@ -36,7 +36,7 @@
 
 本项目有两个分支，分别是 `master` 和 `feature`，`master` 为稳定分支，`feature` 分支活跃度较高，通常情况下新功能及 `bug` 修复等通过此分支测试后才会最终同步到 `master` 分支。所以，若您有 `pull request` 需求请推送至 `feature` 。若您不太了解 `pull request` 流程，我会在以下部分介绍，并给出参考文章。
 
-注意：请完成以上前提准备，以下操作皆在你的 `repo` 中操作。
+注意：请完成以上前提准备，以下步骤皆在你的 `repo` 中操作。
 
 1. checkout the `feature` branch
 
@@ -60,9 +60,7 @@
 
 4. Run tests
 
-   ```shell
-   make test
-   ```
+   只测试与当前 `pull request` 相关的功能即可。由于执行全部测试的依赖过多，所以你可以自行本地打包测试通过即可，可不用补充相关测试代码。
 
 5. Commit and push your work
 
