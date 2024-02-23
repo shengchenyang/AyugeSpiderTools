@@ -163,7 +163,9 @@ def test_extract_with_json_rules():
         ToolsForAyu.extract_with_json_rules(
             json_data=json_data_example, query_rules=[[["depth_to_big"], "data", "im"]]
         )
-    assert str(_assertion_err.value) == "query_rules 参数错误，请输入深度最多为 2 的参数！"
+    assert (
+        str(_assertion_err.value) == "query_rules 参数错误，请输入深度最多为 2 的参数！"
+    )
 
     res2 = ToolsForAyu.extract_with_json_rules(
         json_data=json_data_example, query_rules=[["data", "yy"], "message"]

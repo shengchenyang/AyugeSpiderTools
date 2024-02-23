@@ -98,7 +98,9 @@ def test_delete():
     """测试 mongoDB 删除数据"""
     conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
     delete_res = db[test_table].delete_many(
-        filter={"article_title": {"$regex": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略"}}
+        filter={
+            "article_title": {"$regex": "蓝桥杯第十四届蓝桥杯模拟赛第三期考场应对攻略"}
+        }
     )
     assert delete_res.deleted_count >= 0
 

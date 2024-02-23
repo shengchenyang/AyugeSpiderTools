@@ -64,7 +64,9 @@ class MysqlPipeEnhanceMixin:
         except Exception as e:
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
-                logger.warning(f"目标数据库：{mysql_conf.database} 不存在，尝试创建中...")
+                logger.warning(
+                    f"目标数据库：{mysql_conf.database} 不存在，尝试创建中..."
+                )
                 # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
                 ReuseOperation.create_database(db_conf=mysql_conf)
             else:
@@ -132,7 +134,9 @@ class MysqlPipeEnhanceMixin:
                         if status_code == "429":
                             error_reason += f"{status_code}错误：代理超过使用频率限制"
                         else:
-                            error_reason += f"{status_code}错误：网页失效/无此网页/网站拒绝访问"
+                            error_reason += (
+                                f"{status_code}错误：网页失效/无此网页/网站拒绝访问"
+                            )
                     elif status_code.startswith("5"):
                         error_reason += f"{status_code}错误：网站服务器处理出错"
                     elif status_code != "":
@@ -209,7 +213,9 @@ class PostgreSQLPipeEnhanceMixin:
         except Exception as e:
             # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
             if "failed" in str(e).lower():
-                logger.warning(f"目标数据库：{postgres_conf.database} 不存在，尝试创建中...")
+                logger.warning(
+                    f"目标数据库：{postgres_conf.database} 不存在，尝试创建中..."
+                )
                 ReuseOperation.create_database(db_conf=postgres_conf)
             else:
                 logger.error(f"connect to postgresql failed: {e}")

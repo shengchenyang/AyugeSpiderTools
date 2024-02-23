@@ -24,13 +24,13 @@ class DynamicProxyDownloaderMiddleware:
         # TODO: 根据权重来随机获取一个账号 DYNAMIC_PROXY_CONFIG
         # account = ReuseOperation.random_weight(self.account_arr)
         if request.url.startswith("https://"):
-            request.meta[
-                "proxy"
-            ] = f"https://{self.username}:{self.password}@{self.proxy_url}/"
+            request.meta["proxy"] = (
+                f"https://{self.username}:{self.password}@{self.proxy_url}/"
+            )
         elif request.url.startswith("http://"):
-            request.meta[
-                "proxy"
-            ] = f"http://{self.username}:{self.password}@{self.proxy_url}/"
+            request.meta["proxy"] = (
+                f"http://{self.username}:{self.password}@{self.proxy_url}/"
+            )
         else:
             spider.slog.info(
                 f"request url: {request.url} error when use proxy middlewares!"
@@ -61,7 +61,9 @@ class AbuDynamicProxyDownloaderMiddleware:
             dict_conf=dynamic_proxy_conf,
             key_list=["proxy", "username", "password"],
         )
-        assert is_match, f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
+        assert (
+            is_match
+        ), f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
 
         self.proxy_url = dynamic_proxy_conf["proxy"]
         self.username = dynamic_proxy_conf["username"]

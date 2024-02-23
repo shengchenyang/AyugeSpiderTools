@@ -36,7 +36,7 @@ class DataHandle:
             decimal_places: 需要保留的小数点位数
 
         Returns:
-            decimal(float): 四舍五入后的小数点
+            1). 四舍五入后的小数点
         """
         # 先拼接需要保留的位数
         decimal_deal = f"%.{decimal_places}f"

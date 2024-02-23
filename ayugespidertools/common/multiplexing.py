@@ -383,7 +383,9 @@ class ReuseOperation:
 
         else:
             assert False, f"Invalid db_conf type: {type(db_conf)}"
-        logger.info(f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!")
+        logger.info(
+            f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!"
+        )
 
     @classmethod
     def dict_keys_to_lower(cls, deal_dict: dict) -> dict:

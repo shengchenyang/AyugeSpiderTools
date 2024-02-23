@@ -28,6 +28,7 @@ class AbstractClass(ABC):
 
         Returns:
             insert_data: 返回 dict 格式的存储数据
+            table_name: item_dict 对应的 table
         """
         insert_data = ReuseOperation.get_items_except_keys(
             dict_conf=item_dict,

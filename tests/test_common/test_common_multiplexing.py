@@ -130,7 +130,9 @@ def test_judge_str_is_json():
 def test_get_items_except_keys():
     dict_conf = {
         "alldata": {
-            "article_title": DataItem("如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件", "文章标题"),
+            "article_title": DataItem(
+                "如何使用JavaMailSender给曾经心爱的她发送一封特别的邮件", "文章标题"
+            ),
             "comment_count": DataItem("69", "文章评论数量"),
             "favor_count": DataItem("41", "文章赞成数量"),
             "nick_name": DataItem("Binaire", "文章作者昵称"),

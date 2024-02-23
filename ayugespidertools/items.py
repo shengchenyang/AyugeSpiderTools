@@ -63,7 +63,7 @@ class ItemMeta(ABCMeta):
                 assignment: 是否将 AyuItem 中的值赋值给 ScrapyItem，默认为 True
 
             Returns:
-                new_class: 转换 ScrapyItem 后的实例
+                1). 转换 ScrapyItem 后的实例
             """
             item_temp = ScrapyItem()
             for k, v in self.asdict().items():
@@ -177,11 +177,8 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         self.__fields.discard("_AyuItem__fields")
         return self.__fields
 
-    def add_field(self, key: str, value: Any) -> None:
-        ...
+    def add_field(self, key: str, value: Any) -> None: ...
 
-    def asdict(self) -> Dict[str, Any]:
-        ...
+    def asdict(self) -> Dict[str, Any]: ...
 
-    def asitem(self, assignment: bool = True) -> ScrapyItem:
-        ...
+    def asitem(self, assignment: bool = True) -> ScrapyItem: ...

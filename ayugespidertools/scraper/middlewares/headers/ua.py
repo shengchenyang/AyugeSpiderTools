@@ -40,7 +40,9 @@ class RandomRequestUaMiddleware:
         ]
         self.explorer_types = [x["explorer"] for x in ua_arr]
         self.explorer_weights = [x["weight"] for x in ua_arr]
-        spider.slog.info(f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}")
+        spider.slog.info(
+            f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}"
+        )
 
     def process_request(self, request, spider):
         # 根据权重来获取随机请求头 ua 信息
