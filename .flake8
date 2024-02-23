@@ -6,6 +6,10 @@ ignore =
     W503,
     # E203: whitespace before ':'
     E203
+    # E701: multiple statements on one line (colon)
+    E701
+    # E704: multiple statements on one line (def)
+    E704
 
 exclude =
     .git,
