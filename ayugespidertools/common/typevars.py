@@ -113,8 +113,8 @@ class AiohttpConf(NamedTuple):
     ssl: bool
     verify_ssl: bool
     limit_per_host: int
-    timeout: int
     allow_redirects: bool
+    timeout: Optional[int] = None
 
 
 class AlterItemTable(NamedTuple):

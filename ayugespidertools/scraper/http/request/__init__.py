@@ -37,7 +37,6 @@ class AiohttpRequest(Request):
         args: Optional[Union[AiohttpRequestArgs, dict]] = None,
         **kwargs,
     ) -> None:
-        # 用 meta 缓存 scrapy meta 的参数
         meta = copy.deepcopy(meta) or {}
         aiohttp_meta = meta.setdefault("aiohttp", {})
 
