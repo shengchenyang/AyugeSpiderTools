@@ -26,7 +26,10 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ayugespidertools.common.typevars import slogT
+    from ayugespidertools.scraper.http import AiohttpRequest
     from ayugespidertools.spiders import AyuSpider
+
+    AyuRequest = Union[AiohttpRequest, Request]
 
 ItemAdapterT = TypeVar("ItemAdapterT", bound=ItemAdapter)
 
@@ -42,16 +45,16 @@ class AiohttpDownloaderMiddleware:
 
     def _retry(
         self,
-        request: scrapy.Request,
+        request: "AyuRequest",
         reason: int,
-        spider: scrapy.Spider,
+        spider: "AyuSpider",
     ) -> Optional[scrapy.Request]:
         """重试请求
 
         Args:
-            request: scrapy request
-            reason: reason
-            spider: scrapy spider
+            request: retry request
+            reason: retry reason
+            spider: AyuSpider
 
         Returns:
             Optional[scrapy.Request]: 重试的 request 对象
@@ -67,7 +70,7 @@ class AiohttpDownloaderMiddleware:
 
     def _retry_with_limit(
         self,
-        request: scrapy.Request,
+        request: "AyuRequest",
         retries: int,
         reason: int,
         stats: "StatsCollector",
@@ -142,23 +145,23 @@ class AiohttpDownloaderMiddleware:
         """使用 aiohttp 来请求
 
         Args:
-            aio_request_args: 普通的 aiohttp 请求参数
+            aio_request_args: aiohttp 请求参数
 
         Returns:
             1). status_code: 请求状态码
-            2). response_text: 请求返回的文本内容
+            2). r_text: 响应内容
         """
         try:
-            async with self.session.request(**aio_request_args) as response:
-                status_code = response.status
-                response_text = await response.text(errors="ignore")
-                return status_code, response_text
+            async with self.session.request(**aio_request_args) as r:
+                status_code = r.status
+                r_text = await r.text(errors="ignore")
+                return status_code, r_text
         except Exception as e:
             self.slog.error(f"aiohttp 出现请求错误，Error: {e}")
             return 504, ""
 
     async def process_request(
-        self, request: "Request", spider: "AyuSpider"
+        self, request: "AyuRequest", spider: "AyuSpider"
     ) -> Union["Request", "Response", None]:
         aiohttp_options = request.meta.get("aiohttp")
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
@@ -174,7 +177,7 @@ class AiohttpDownloaderMiddleware:
             aiohttp_req_args.method = _method
         elif _method := str(request.method).upper():
             aiohttp_req_args.method = _method
-        if _method not in {"GET", "POST"}:
+        if _method not in {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"}:
             logger.error(f"出现未知请求方式 {_method}，请及时查看，默认 GET")
 
         # 设置请求头信息
