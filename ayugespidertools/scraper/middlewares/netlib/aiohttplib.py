@@ -2,7 +2,6 @@ import asyncio
 from typing import TYPE_CHECKING, Any, Optional, Tuple, TypeVar, Union
 
 import aiohttp
-import scrapy
 from itemadapter import ItemAdapter
 from scrapy import signals
 from scrapy.http import HtmlResponse
@@ -48,7 +47,7 @@ class AiohttpDownloaderMiddleware:
         request: "AyuRequest",
         reason: int,
         spider: "AyuSpider",
-    ) -> Optional[scrapy.Request]:
+    ) -> Optional["AyuRequest"]:
         """重试请求
 
         Args:
@@ -57,7 +56,7 @@ class AiohttpDownloaderMiddleware:
             spider: AyuSpider
 
         Returns:
-            Optional[scrapy.Request]: 重试的 request 对象
+            1). Optional["AyuRequest"]: 重试的 request 对象
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -148,7 +147,7 @@ class AiohttpDownloaderMiddleware:
             aio_request_args: aiohttp 请求参数
 
         Returns:
-            1). status_code: 请求状态码
+            1). status_code: 状态码
             2). r_text: 响应内容
         """
         try:
@@ -162,7 +161,7 @@ class AiohttpDownloaderMiddleware:
 
     async def process_request(
         self, request: "AyuRequest", spider: "AyuSpider"
-    ) -> Union["Request", "Response", None]:
+    ) -> Union["AyuRequest", "Response", None]:
         aiohttp_options = request.meta.get("aiohttp")
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
