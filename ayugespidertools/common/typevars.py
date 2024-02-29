@@ -18,7 +18,9 @@ B_Str = TypeVar("B_Str", bytes, str)
 I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
 Str_Lstr = TypeVar("Str_Lstr", str, List[str])
 
-AiohttpRequestMethodStr = Literal["GET", "POST"]
+AiohttpRequestMethodStr = Literal[
+    "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"
+]
 authMechanismStr = Literal[
     "SCRAM-SHA-1", "SCRAM-SHA-256", "MONGODB-CR", "MONGODB-X509", "PLAIN"
 ]

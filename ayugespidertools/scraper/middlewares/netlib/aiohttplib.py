@@ -175,7 +175,7 @@ class AiohttpDownloaderMiddleware:
         if _method := self.aiohttp_args.get("method"):
             aiohttp_req_args.method = _method
         elif _method := str(request.method).upper():
-            aiohttp_req_args.method = _method
+            aiohttp_req_args.method = _method  # type: ignore
         if _method not in {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"}:
             logger.error(f"出现未知请求方式 {_method}，请及时查看，默认 GET")
 
