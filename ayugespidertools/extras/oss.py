@@ -72,3 +72,16 @@ class AliOssBase:
 
         oss_file_path = f"{self.doc}/{file}" if self.doc else file
         self.bucket.put_object(oss_file_path, put_bytes)
+
+    def get_full_link(self, file: str) -> str:
+        """获取文件的完整链接
+
+        Args:
+            file: 当前文件
+
+        Returns:
+            1). 当前文件的完整链接
+        """
+        ep = self.endpoint.replace("https://", "", 1).replace("http://", "", 1)
+        oss_file_path = f"{self.doc}/{file}" if self.doc else file
+        return f"https://{self.bk}.{ep}/{oss_file_path}"
