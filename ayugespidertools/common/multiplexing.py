@@ -194,6 +194,7 @@ class ReuseOperation:
                     "upload_fields_suffix", "_file_url"
                 ),
                 "oss_fields_prefix": oss_section.get("oss_fields_prefix", "_"),
+                "full_link_enable": oss_section.getboolean("full_link_enable", False),
             }
         return inner_settings
 
@@ -224,6 +225,7 @@ class ReuseOperation:
         """
         new_item = {}
         notes_dic = {}
+        is_namedtuple = False
 
         insert_data = cls.get_items_except_keys(
             dict_conf=item_dict, keys=["_mongo_update_rule", "_table"]
@@ -231,6 +233,7 @@ class ReuseOperation:
         judge_item = next(iter(insert_data.values()))
         # 是 namedtuple 类型
         if cls.is_namedtuple_instance(judge_item):
+            is_namedtuple = True
             _table_name = item_dict["_table"].key_value
             _table_notes = item_dict["_table"].notes
             table_info = AlterItemTable(_table_name, _table_notes)
@@ -245,7 +248,7 @@ class ReuseOperation:
                 new_item[key] = value
                 notes_dic[key] = ""
 
-        return AlterItem(new_item, notes_dic, table_info)
+        return AlterItem(new_item, notes_dic, table_info, is_namedtuple)
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
