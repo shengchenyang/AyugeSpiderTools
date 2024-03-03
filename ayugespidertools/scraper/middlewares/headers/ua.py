@@ -1,4 +1,5 @@
 import random
+from typing import TYPE_CHECKING
 
 from scrapy import signals
 
@@ -7,6 +8,13 @@ from ayugespidertools.common.params import Param
 __all__ = [
     "RandomRequestUaMiddleware",
 ]
+
+if TYPE_CHECKING:
+    from scrapy import Request
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
+
+    from ayugespidertools.spiders import AyuSpider
 
 
 class RandomRequestUaMiddleware:
@@ -24,12 +32,12 @@ class RandomRequestUaMiddleware:
         return random.choice(Param.fake_useragent_dict[explorer_types[0]])
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler: "Crawler") -> "Self":
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
-    def spider_opened(self, spider):
+    def spider_opened(self, spider: "AyuSpider"):
         # 带权重的 ua 列表，这里是根据 fake_useragent 库中的打印信息来规划权重的。
         ua_arr = [
             {"explorer": "opera", "weight": 16},
@@ -44,6 +52,6 @@ class RandomRequestUaMiddleware:
             f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}"
         )
 
-    def process_request(self, request, spider):
+    def process_request(self, request: "Request", spider: "AyuSpider") -> None:
         # 根据权重来获取随机请求头 ua 信息
         request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())
