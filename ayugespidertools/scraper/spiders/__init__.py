@@ -33,7 +33,19 @@ if TYPE_CHECKING:
     from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
     from typing_extensions import Self
 
-    from ayugespidertools.common.typevars import slogT
+    from ayugespidertools.common.typevars import (
+        DynamicProxyConf,
+        ESConf,
+        ExclusiveProxyConf,
+        KafkaConf,
+        MongoDBConf,
+        MQConf,
+        MysqlConf,
+        OracleConf,
+        OssConf,
+        PostgreSQLConf,
+        slogT,
+    )
 
 
 class AyuSpider(Spider):
@@ -45,6 +57,17 @@ class AyuSpider(Spider):
     oracle_engine_conn: "SqlalchemyConnectT"
     es_engine: "Elasticsearch"
     es_engine_conn: "Elasticsearch"
+
+    mysql_conf: "MysqlConf"
+    mongodb_conf: "MongoDBConf"
+    postgres_conf: "PostgreSQLConf"
+    es_conf: "ESConf"
+    oracle_conf: "OracleConf"
+    rabbitmq_conf: "MQConf"
+    kafka_conf: "KafkaConf"
+    dynamicproxy_conf: "DynamicProxyConf"
+    exclusiveproxy_conf: "ExclusiveProxyConf"
+    oss_conf: "OssConf"
 
     SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
 

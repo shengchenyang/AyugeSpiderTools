@@ -167,9 +167,7 @@ class AiohttpDownloaderMiddleware:
 
         # 设置 url
         _url = self.aiohttp_args.get("url") or request.url
-        aiohttp_req_args = AiohttpRequestArgs(
-            url=_url,
-        )
+        aiohttp_req_args = AiohttpRequestArgs(url=_url)
 
         # 设置请求方式
         if _method := self.aiohttp_args.get("method"):
