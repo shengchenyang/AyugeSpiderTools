@@ -1,5 +1,5 @@
 import hashlib
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Tuple
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
@@ -11,31 +11,30 @@ from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.items import DataItem
 
-__all__ = ["AyuAsyncOssPipeline"]
+__all__ = [
+    "AyuAsyncOssPipeline",
+    "files_download_by_scrapy",
+]
 
 if TYPE_CHECKING:
     from scrapy import Spider
+    from scrapy.http.response import Response
 
     from ayugespidertools.common.typevars import AlterItem, OssConf, slogT
     from ayugespidertools.spiders import AyuSpider
 
 
 async def files_download_by_scrapy(
-    spider: "Spider",
-    file_url: str,
-    item: Any,
-):
-    request = scrapy.Request(file_url, callback=NO_CALLBACK)
+    spider: "Spider", url: str
+) -> Tuple["Response", str]:
+    request = scrapy.Request(url, callback=NO_CALLBACK)
     response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
-    if response.status != 200:
-        return item
-
     headers_dict = ToolsForAyu.get_dict_form_scrapy_req_headers(
         scrapy_headers=response.headers
     )
     content_type = headers_dict.get("Content-Type")
     file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
-    file_guid = hashlib.sha1(to_bytes(file_url)).hexdigest()
+    file_guid = hashlib.sha1(to_bytes(url)).hexdigest()
     filename = f"{file_guid}.{file_format}"
     return response, filename
 
@@ -54,38 +53,38 @@ class AyuAsyncOssPipeline:
         self.full_link_enable = self.oss_conf.full_link_enable
         self.slog = spider.slog
 
-    async def _upload_process(self, url: str, item: Any, spider: "AyuSpider"):
-        r, filename = await files_download_by_scrapy(spider, url, item)
+    async def _upload_process(self, url: str, spider: "AyuSpider") -> str:
+        r, filename = await files_download_by_scrapy(spider, url)
         self.oss_bucket.put_oss(put_bytes=r.body, file=filename)
         if self.full_link_enable:
             filename = self.oss_bucket.get_full_link(filename)
         return filename
 
     def _add_oss_field(
-        self, is_namedtuple: bool, item: Any, key: str, value: str
+        self, is_namedtuple: bool, item: Any, key: str, filename: str
     ) -> None:
         if not is_namedtuple:
-            item[f"{self.oss_conf.oss_fields_prefix}{key}"] = value
+            item[f"{self.oss_conf.oss_fields_prefix}{key}"] = filename
         else:
             item[f"{self.oss_conf.oss_fields_prefix}{key}"] = DataItem(
-                key_value=value, notes=f"{key} 对应的 oss 存储字段"
+                key_value=filename, notes=f"{key} 对应的 oss 存储字段"
             )
 
     async def _upload_file(
         self, alter_item: "AlterItem", item: Any, spider: "AyuSpider"
-    ):
+    ) -> None:
         if not (new_item := alter_item.new_item):
             return
 
         file_url_keys = {
-            key: value
-            for key, value in new_item.items()
+            key: url
+            for key, url in new_item.items()
             if key.endswith(self.oss_conf.upload_fields_suffix)
         }
         _is_namedtuple = alter_item.is_namedtuple
-        for key, value in file_url_keys.items():
-            if all([isinstance(value, str), value]):
-                filename = await self._upload_process(value, item, spider)
+        for key, url in file_url_keys.items():
+            if all([isinstance(url, str), url]):
+                filename = await self._upload_process(url, spider)
                 self._add_oss_field(_is_namedtuple, item, key, filename)
 
     async def process_item(self, item: Any, spider: "AyuSpider"):

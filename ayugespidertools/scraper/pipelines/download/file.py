@@ -1,55 +1,16 @@
-import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import scrapy
-from scrapy.http.request import NO_CALLBACK
-from scrapy.utils.defer import maybe_deferred_to_future
-from scrapy.utils.python import to_bytes
-
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import ToolsForAyu
 from ayugespidertools.config import logger
 from ayugespidertools.items import DataItem
+from ayugespidertools.scraper.pipelines.oss.ali import files_download_by_scrapy
 
-__all__ = [
-    "FilesDownloadPipeline",
-    "files_download_by_scrapy",
-]
+__all__ = ["FilesDownloadPipeline"]
 
 if TYPE_CHECKING:
-    from scrapy import Spider
-
-    from ayugespidertools.common.typevars import DataItemModeStr
-
-
-async def files_download_by_scrapy(
-    spider: "Spider",
-    file_path: str,
-    file_url: str,
-    item: Any,
-    key: str,
-    mode: "DataItemModeStr" = "namedtuple",
-):
-    request = scrapy.Request(file_url, callback=NO_CALLBACK)
-    response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
-    if response.status != 200:
-        return item
-
-    headers_dict = ToolsForAyu.get_dict_form_scrapy_req_headers(
-        scrapy_headers=response.headers
-    )
-    content_type = headers_dict.get("Content-Type")
-    file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
-    file_guid = hashlib.sha1(to_bytes(file_url)).hexdigest()
-    filename = f"{file_path}/{file_guid}.{file_format}"
-    Path(filename).write_bytes(response.body)
-
-    # Store file in item.
-    if mode == "namedtuple":
-        item[key] = DataItem(key_value=filename, notes=f"{key} 文件存储路径")
-    else:
-        item[key] = filename
+    from ayugespidertools.common.typevars import AlterItem
+    from ayugespidertools.spiders import AyuSpider
 
 
 class FilesDownloadPipeline:
@@ -66,21 +27,29 @@ class FilesDownloadPipeline:
             Path(_file_path).mkdir(parents=True)
         return cls(file_path=_file_path)
 
-    async def process_item(self, item, spider):
-        item_dict = ReuseOperation.item_to_dict(item)
-        judge_item = next(iter(item_dict.values()))
-        file_url_keys = {
-            key: value for key, value in item_dict.items() if key.endswith("_file_url")
-        }
-        if ReuseOperation.is_namedtuple_instance(judge_item):
-            for key, value in file_url_keys.items():
-                await files_download_by_scrapy(
-                    spider, self.file_path, value.key_value, item, f"{key}_local"
-                )
-        else:
-            for key, value in file_url_keys.items():
-                await files_download_by_scrapy(
-                    spider, self.file_path, value, item, f"{key}_local", "normal"
-                )
+    async def _download_and_add_field(
+        self, alter_item: "AlterItem", item: Any, spider: "AyuSpider"
+    ) -> None:
+        if not (new_item := alter_item.new_item):
+            return
 
+        file_url_keys = {
+            key: url for key, url in new_item.items() if key.endswith("_file_url")
+        }
+        _is_namedtuple = alter_item.is_namedtuple
+        for key, url in file_url_keys.items():
+            if all([isinstance(url, str), url]):
+                _, filename = await files_download_by_scrapy(spider, url)
+                # Store file in item
+                if not _is_namedtuple:
+                    item[f"{key}_local"] = filename
+                else:
+                    item[f"{key}_local"] = DataItem(
+                        key_value=filename, notes=f"{key} 文件存储路径"
+                    )
+
+    async def process_item(self, item: Any, spider: "AyuSpider"):
+        item_dict = ReuseOperation.item_to_dict(item)
+        alter_item = ReuseOperation.reshape_item(item_dict)
+        await self._download_and_add_field(alter_item, item, spider)
         return item
