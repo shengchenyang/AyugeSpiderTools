@@ -89,10 +89,12 @@ scrapy crawl <spider_name>
 项目中查看，也可以在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中查看教程。 目前已适配以下场景：
 
 ```diff
++ 0).以下场景全支持从 nacos 或 consul 中获取配置，不一一举例。
+
 # 数据存入 Mysql 的场景：
 + 1).demo_one: 从 .conf 中获取 mysql 配置
 + 3).demo_three: 从 consul 中获取 mysql 配置
-+ 21).demo_mysql_nacos: 从 nacos 中获取 mysql 配置(其它从 nacos 中获取配置的场景不再举例)
++ 21).demo_mysql_nacos: 从 nacos 中获取 mysql 配置
 + 5).demo_five: Twisted 异步存储示例
 + 24).demo_aiomysql: 结合 aiomysql 实现的 asyncio 异步存储示例
 + 13).demo_AyuTurboMysqlPipeline: mysql 同步连接池的示例
@@ -104,9 +106,8 @@ scrapy crawl <spider_name>
 + 17).demo_mongo_async: 结合 motor 实现的 asyncio 异步存储示例
 
 # 数据存入 PostgreSQL 的场景(需要安装 ayugespidertools[database])
-+ 21).demo_nine: 从 .conf 中获取 postgresql 配置
-+ 22).demo_ten: Twisted 异步存储示例
-- 23). 同样支持从 nacos 或 consul 中获取配置，不再举例
++ 22).demo_nine: 从 .conf 中获取 postgresql 配置
++ 23).demo_ten: Twisted 异步存储示例
 + 27).demo_eleven: asyncio 异步存储示例
 
 # 数据存入 ElasticSearch 的场景(需要安装 ayugespidertools[database])
@@ -117,7 +118,7 @@ scrapy crawl <spider_name>
 + 25). demo_oracle: 普通同步存储示例
 + 26). demo_oracle_twisted: Twisted 异步存储示例
 
-- 7).demo_seven: 使用 requests 来请求的场景(已删除此功能，更推荐使用 aiohttp 方式)
+- 7).demo_seven: 使用 requests 来请求的场景(已删除，更推荐 aiohttp 方式)
 + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
 + 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
 + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
@@ -128,7 +129,7 @@ scrapy crawl <spider_name>
 
 # 本库中给出支持 Item Loaders 特性的示例
 + 15).demo_item_loader: 本库中使用 Item Loaders 的示例
-- 16).demo_item_loader_two: 已删除，可查看上个 demo_item_loader，目前已经可以很方便的使用 Item Loaders 功能了
+- 16).demo_item_loader_two: 已删除，可查看 demo_item_loader，可方便的使用 Item Loaders 了
 
 + 18).demo_mq: 数据存入 rabbitmq 的模板示例
 + 19).demo_kafka: 数据存入 kafka 的模板示例

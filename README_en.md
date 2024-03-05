@@ -94,10 +94,12 @@ the [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) documentat
 following scenarios are currently supported:
 
 ```diff
+0).The following scenarios all support obtaining configuration from nacos or consul, no more examples.
+
 Scenario of storing data in Mysql:
 + 1).demo_one: Get mysql configuration from .conf.
 + 3).demo_three: Get mysql configuration from consul.
-+ 21).demo_mysql_nacos: Get mysql configuration from nacos (other scenarios of getting configuration from nacos are no longer given).
++ 21).demo_mysql_nacos: Get mysql configuration from nacos.
 + 5).demo_five: Twisted asynchronous storage example.
 + 24).demo_aiomysql: Asynchronous storage example implemented with aiomysql.
 + 13).demo_AyuTurboMysqlPipeline: Example of using synchronous connection pooling with MySQL.
@@ -109,9 +111,8 @@ Scenario of storing data in MongoDB:
 + 17).demo_mongo_async: Asynchronous storage example implemented with motor.
 
 Scenario of storing data in PostgreSQL(need to install ayugespidertools[database]):
-+ 21).demo_nine: Get postgresql configuration from .conf.
-+ 22).demo_ten: Twisted asynchronous storage example.
-- 23). It also supports obtaining configuration from nacos or consul, no more examples.
++ 22).demo_nine: Get postgresql configuration from .conf.
++ 23).demo_ten: Twisted asynchronous storage example.
 + 27).demo_eleven: Asynchronous storage example.
 
 Scenario of storing data in ElasticSearch(need to install ayugespidertools[database]):
@@ -133,7 +134,7 @@ Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 
 # Example of supporting Item "Loaders feature" in this library
 + 15).demo_item_loader: Example of using Item Loaders in this library.
-- 16).demo_item_loader_two: This example has been removed. You can refer to the example in the previous demo_item_loader. Currently, it is very convenient to use the Item Loaders feature.
+- 16).demo_item_loader_two: Deleted, you can view demo_item_loader, it is very convenient to use Item Loaders.
 
 + 18).demo_mq: Template example of storing data in RabbitMQ.
 + 19).demo_kafka: Template example of storing data in Kafka.
