@@ -45,7 +45,7 @@ class AyuAsyncOssPipeline:
     slog: "slogT"
     full_link_enable: bool
 
-    def open_spider(self, spider: "AyuSpider"):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "oss_conf"), "未配置 oss 参数！"
         self.oss_conf = spider.oss_conf
         oss_conf_dict = self.oss_conf._asdict()
@@ -87,7 +87,7 @@ class AyuAsyncOssPipeline:
                 filename = await self._upload_process(url, spider)
                 self._add_oss_field(_is_namedtuple, item, key, filename)
 
-    async def process_item(self, item: Any, spider: "AyuSpider"):
+    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         await self._upload_file(alter_item, item, spider)

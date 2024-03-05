@@ -9,6 +9,9 @@ from ayugespidertools.scraper.pipelines.oss.ali import files_download_by_scrapy
 __all__ = ["FilesDownloadPipeline"]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
+
     from ayugespidertools.common.typevars import AlterItem
     from ayugespidertools.spiders import AyuSpider
 
@@ -18,7 +21,7 @@ class FilesDownloadPipeline:
         self.file_path = file_path
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler: "Crawler") -> "Self":
         _file_path = crawler.settings.get("FILES_STORE", None)
         assert _file_path is not None, "未配置 FILES_STORE 存储路径参数！"
 
@@ -48,7 +51,7 @@ class FilesDownloadPipeline:
                         key_value=filename, notes=f"{key} 文件存储路径"
                     )
 
-    async def process_item(self, item: Any, spider: "AyuSpider"):
+    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         await self._download_and_add_field(alter_item, item, spider)

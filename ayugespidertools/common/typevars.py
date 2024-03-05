@@ -135,7 +135,7 @@ class AlterItem(NamedTuple):
     new_item: dict
     notes_dic: dict
     table: AlterItemTable
-    is_namedtuple: Optional[bool] = False
+    is_namedtuple: bool = False
 
 
 @dataclass
@@ -195,9 +195,9 @@ class OssConf(NamedTuple):
     endpoint: str
     bucket: str
     doc: Optional[str] = None
-    upload_fields_suffix: Optional[str] = "_file_url"
-    oss_fields_prefix: Optional[str] = "_"
-    full_link_enable: Optional[bool] = False
+    upload_fields_suffix: str = "_file_url"
+    oss_fields_prefix: str = "_"
+    full_link_enable: bool = False
 
 
 class FieldAlreadyExistsError(Exception):
