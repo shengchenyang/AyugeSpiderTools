@@ -87,11 +87,11 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         >>> item = AyuItem(
         ...     _table="ta",
         ... )
-        >>> # 获取字段；
+        >>> # 获取字段
         >>> item["_table"]
         'ta'
         >>>
-        >>> # 添加 / 修改字段，不存在则创建，存在则修改：
+        >>> # 添加 / 修改字段，不存在则创建，存在则修改
         >>> item["_table"] = "tab"
         >>> item["title"] = "tit"
         >>> # 也可通过 add_field 添加字段，但不能重复添加相同字段
@@ -102,7 +102,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         {'title': 'tit', '_table': 'tab', 'num': 10}
         >>> type(item.asitem())
         <class 'ayugespidertools.items.ScrapyItem'>
-        >>> # 删除字段：
+        >>> # 删除字段
         >>> del item["title"]
         >>> item
         {'_table': 'tab', 'num': 10}
