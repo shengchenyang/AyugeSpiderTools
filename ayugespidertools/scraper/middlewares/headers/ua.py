@@ -37,7 +37,7 @@ class RandomRequestUaMiddleware:
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
-    def spider_opened(self, spider: "AyuSpider"):
+    def spider_opened(self, spider: "AyuSpider") -> None:
         # 带权重的 ua 列表，这里是根据 fake_useragent 库中的打印信息来规划权重的。
         ua_arr = [
             {"explorer": "opera", "weight": 16},

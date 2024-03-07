@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Optional, Tuple, Union
 
 from scrapy import FormRequest
 
@@ -11,20 +11,23 @@ __all__ = [
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import AiohttpRequestArgs
 
+FormdataKVType = Tuple[str, Union[str, Iterable[str]]]
+FormdataType = Optional[Union[dict, List[FormdataKVType]]]
+
 
 class AiohttpFormRequest(AiohttpRequest, FormRequest):
     """使用 aiohttp 发送 FormRequest 请求"""
 
     def __init__(
         self,
-        url=None,
-        callback=None,
-        method=None,
-        formdata=None,
-        body=None,
+        url: str = None,
+        callback: Optional[Callable] = None,
+        method: Optional[str] = None,
+        formdata: FormdataType = None,
+        body: Optional[Union[bytes, str]] = None,
         args: Optional[Union["AiohttpRequestArgs", dict]] = None,
-        **kwargs
-    ):
+        **kwargs: Any
+    ) -> None:
         # First init FormRequest to get url, body and method
         if formdata:
             FormRequest.__init__(self, url=url, method=method, formdata=formdata)
