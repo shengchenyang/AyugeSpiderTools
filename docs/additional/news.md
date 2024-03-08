@@ -1,5 +1,29 @@
 # Release notes
 
+## AyugeSpiderTools 3.9.7 (2024-03-08)
+
+### Deprecations
+
+- 无。
+
+### New features
+
+- `oss` 场景添加是否保存完整链接的配置 `full_link_enable`，默认 `false`，不影响旧项目。([009ac20](https://github.com/shengchenyang/AyugeSpiderTools/commit/009ac20a4db55069c4b0cee5822834e42e21ba00))
+- `oss` 场景不再需要手动添加上传的字段是否为空的判断。([009ac20](https://github.com/shengchenyang/AyugeSpiderTools/commit/009ac20a4db55069c4b0cee5822834e42e21ba00))
+
+### Bug fixes
+
+- 修复 `aiohttp` 场景下由于目标网站未遵守编码时可能会出现的编码问题。([d2772b5](https://github.com/shengchenyang/AyugeSpiderTools/commit/d2772b5960c972c4cc6ee6e6ce541fa00e34a7fb))
+
+### Code optimizations
+
+- 添加 `aiohttp` 可支持的请求方式。([c7c247e](https://github.com/shengchenyang/AyugeSpiderTools/commit/c7c247e1badf411a149d9d6e1430230ec81e99a8))
+- 优化 `oss`, `file download` 场景的 `pipeline` 示例，减少复杂逻辑。([b0929d8](https://github.com/shengchenyang/AyugeSpiderTools/commit/b0929d8adba7c4d3ce2c7064a56656825d8802b7), [f0f1b2f](https://github.com/shengchenyang/AyugeSpiderTools/commit/f0f1b2f61e449e30812d7410e55652d4fcb42169))
+- 测试场景增加剔除无关代码块的规则。([3e0ce94](https://github.com/shengchenyang/AyugeSpiderTools/commit/3e0ce949340b8d27f95d86ecbcbd8bf04e85cccd))
+- 代码风格统一，补充缺失的 `type hint`，提升开发体验。
+
+<hr>
+
 ## AyugeSpiderTools 3.9.6 (2024-02-18)
 
 ### Deprecations
