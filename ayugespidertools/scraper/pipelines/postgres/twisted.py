@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from twisted.enterprise import adbapi
 
@@ -13,6 +13,7 @@ __all__ = ["AyuTwistedPostgresPipeline"]
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import PostgreSQLConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
@@ -20,7 +21,7 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     dbpool: "adbapi.ConnectionPool"
     slog: "slogT"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
@@ -45,7 +46,7 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     def db_create_err(self, failure):
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)

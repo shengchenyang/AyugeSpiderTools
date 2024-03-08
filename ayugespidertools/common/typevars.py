@@ -184,7 +184,7 @@ class ExclusiveProxyConf(NamedTuple):
 
 
 class KafkaConf(NamedTuple):
-    bootstrap_servers: list
+    bootstrap_servers: str
     topic: str
     key: str
 

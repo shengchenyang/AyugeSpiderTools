@@ -12,8 +12,11 @@ __all__ = [
 if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MysqlConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
@@ -23,17 +26,17 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     cursor: "Cursor"
     pool_db_conf: dict
 
-    def __init__(self, pool_db_conf):
+    def __init__(self, pool_db_conf: dict) -> None:
         self.pool_db_conf = pool_db_conf
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler: "Crawler") -> "Self":
         pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
             pool_db_conf=pool_db_conf,
         )
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         if not self.pool_db_conf:

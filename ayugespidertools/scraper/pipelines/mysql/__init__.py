@@ -1,5 +1,5 @@
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pymysql
 
@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from pymysql.cursors import Cursor
 
     from ayugespidertools.common.typevars import AlterItem, MysqlConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
@@ -29,14 +30,14 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     slog: "slogT"
     cursor: "Cursor"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         self.insert_item(alter_item)
@@ -80,5 +81,5 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
             )
             return self.insert_item(alter_item)
 
-    def close_spider(self, spider):
+    def close_spider(self, spider: "AyuSpider") -> None:
         self.conn.close()

@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Any, Tuple
 
 from retrying import retry
 
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from pymysql.cursors import Cursor
 
     from ayugespidertools.common.typevars import MysqlConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
@@ -24,7 +25,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     cursor: "Cursor"
     crawl_time: "datetime.date"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         self.crawl_time = datetime.date.today()
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
@@ -33,7 +34,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def table_collection_statistics(
         self, spider_name: str, database: str, crawl_time: datetime.date
-    ):
+    ) -> None:
         """统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
 
         Args:
@@ -67,7 +68,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def insert_table_statistics(
         self, data: dict, table: str = "table_collection_statistics"
-    ):
+    ) -> None:
         """插入统计数据到表中
 
         Args:
@@ -101,7 +102,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     )
     def insert_script_statistics(
         self, data: dict, table: str = "script_collection_statistics"
-    ):
+    ) -> None:
         """存储运行脚本的统计信息
 
         Args:
@@ -152,7 +153,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             self.conn.rollback()
             self.slog.warning(f"日志记录存储错误: {e}")
 
-    def close_spider(self, spider):
+    def close_spider(self, spider: "AyuSpider") -> None:
         log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
 
         # 运行脚本统计信息
@@ -166,5 +167,5 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         if self.conn:
             self.conn.close()
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         return item

@@ -20,7 +20,7 @@ class AiohttpFormRequest(AiohttpRequest, FormRequest):
 
     def __init__(
         self,
-        url: str = None,
+        url: Optional[str] = None,
         callback: Optional[Callable] = None,
         method: Optional[str] = None,
         formdata: FormdataType = None,

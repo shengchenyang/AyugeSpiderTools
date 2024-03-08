@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Type, Union
+from typing import TYPE_CHECKING, Any, Type, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -12,6 +12,7 @@ __all__ = ["AyuESPipeline", "dynamic_es_document"]
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
+    from ayugespidertools.spiders import AyuSpider
 
     DocumentType = Union[Type[Document], type]
 
@@ -28,7 +29,7 @@ class AyuESPipeline:
     es_conf: "ESConf"
     es_type: "DocumentType"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
         self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
@@ -46,7 +47,7 @@ class AyuESPipeline:
             ssl_assert_fingerprint=self.es_conf.ssl_assert_fingerprint,
         )
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):

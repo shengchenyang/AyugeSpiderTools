@@ -1,5 +1,5 @@
 import json
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Union
 
 import pika
 
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
 
     from ayugespidertools.common.typevars import MQConf
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuMQPipeline:
@@ -26,7 +27,7 @@ class AyuMQPipeline:
         item_json_str = json.dumps(item_dict)
         return bytes(item_json_str, encoding="utf-8")
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
         _mq_conf: "MQConf" = spider.rabbitmq_conf
         mq_conn_param = pika.URLParameters(
@@ -44,10 +45,10 @@ class AyuMQPipeline:
         )
         self.channel.confirm_delivery()
 
-    def close_spider(self, spider):
+    def close_spider(self, spider: "AyuSpider") -> None:
         self.conn.close()
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         self.channel.basic_publish(
             exchange=spider.rabbitmq_conf.exchange,
             routing_key=spider.rabbitmq_conf.routing_key,

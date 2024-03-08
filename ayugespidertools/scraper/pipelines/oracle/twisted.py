@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from twisted.enterprise import adbapi
 
@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from oracledb.connection import Connection
 
     from ayugespidertools.common.typevars import OracleConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
@@ -21,7 +22,7 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
     conn: "Connection"
     dbpool: "adbapi.ConnectionPool"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
         self.slog = spider.slog
         self.oracle_conf = spider.oracle_conf
@@ -47,7 +48,7 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
     def db_create_err(self, failure):
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)

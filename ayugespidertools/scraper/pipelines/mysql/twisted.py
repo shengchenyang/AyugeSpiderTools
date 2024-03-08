@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pymysql import cursors
 from twisted.enterprise import adbapi
@@ -13,6 +13,7 @@ __all__ = [
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import MysqlConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
@@ -20,7 +21,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     slog: "slogT"
     dbpool: "adbapi.ConnectionPool"
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
@@ -46,7 +47,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     def db_create_err(self, failure):
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item, spider):
+    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)

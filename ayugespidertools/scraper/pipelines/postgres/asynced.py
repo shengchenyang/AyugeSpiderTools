@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from scrapy.utils.defer import deferred_from_coro
 
@@ -16,7 +16,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from twisted.internet.defer import Deferred
+
     from ayugespidertools.common.typevars import PostgreSQLConf, slogT
+    from ayugespidertools.spiders import AyuSpider
 
 
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
@@ -25,14 +28,14 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     pool: "AsyncConnectionPool"
     running_tasks: set
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: "AyuSpider") -> "Deferred":
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
         self.running_tasks = set()
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
         return deferred_from_coro(self._open_spider(spider))
 
-    async def _open_spider(self, spider):
+    async def _open_spider(self, spider: "AyuSpider") -> None:
         self.pool = AsyncConnectionPool(
             f"dbname={self.postgres_conf.database} "
             f"user={self.postgres_conf.user} "
@@ -43,7 +46,7 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         )
         await self.pool.open()
 
-    async def process_item(self, item, spider):
+    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
         async with self.pool.connection() as conn:
             item_dict = ReuseOperation.item_to_dict(item)
             alter_item = ReuseOperation.reshape_item(item_dict)
@@ -52,8 +55,8 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
             await conn.execute(sql, tuple(new_item.values()))
         return item
 
-    async def _close_spider(self):
+    async def _close_spider(self) -> None:
         await self.pool.close()
 
-    def close_spider(self, spider):
+    def close_spider(self, spider: "AyuSpider") -> "Deferred":
         return deferred_from_coro(self._close_spider())
