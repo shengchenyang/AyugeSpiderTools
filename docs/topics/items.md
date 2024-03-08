@@ -30,8 +30,8 @@
 
     ```
     # `DataItem` 有 `key_value` 和 `notes` 两个参数，`key_value` 为存储的值；
-    # `notes` 在其他(需要字段注释，比如 `Mysql`，`postgresql`)场景中表示为字段注释，在
-    # `ElasticSearch` 中表示 `es document fields`。
+    # `notes` 在 `ElasticSearch` 存储场景中表示 `es document fields`，在其他(需要字段
+    # 注释时，比如 `Mysql`，`postgresql` 存储)场景中表示为字段注释。
 
     # 普通场景
     demo_item = AyuItem(
@@ -48,13 +48,13 @@
   - 无 `notes` 赋值
 
     ```
-    # 即不需要注释，也不是 es 存储场景下，只赋值 key_value 参数
+    # 即不需要字段注释，也不是 es 存储场景下，只赋值 key_value 参数
 
     demo_item = AyuItem(
         article_title=DataItem(_title),
     )
 
-    # 不过，这种不如直接使用 【普通字段】的优雅赋值方式。
+    # 不过，这种写法风格不如直接使用 【普通字段】的优雅赋值方式。
     ```
 
 ## 实现原理
@@ -66,7 +66,7 @@
 ```python
 def parse(self, response):
     # 存储到 Mysql 场景时 Item 构建示例：
-    ArticleMysqlItem = AyuItem(
+    article_mysql_item = AyuItem(
         article_detail_url=article_detail_url,
         article_title=article_title,
         comment_count=comment_count,
@@ -76,14 +76,14 @@ def parse(self, response):
     )
 
     # 存储到 MongoDB 场景时 Item 构建示例：
-    ArticleMongoItem = AyuItem(
+    article_mongo_item = AyuItem(
         article_detail_url=article_detail_url,
         article_title=article_title,
         comment_count=comment_count,
         favor_count=favor_count,
         nick_name=nick_name,
         _table="_article_info_list",
-        # 这里表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
+        # 可选参数，此示例表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
 
@@ -107,7 +107,7 @@ def parse(self, response):
 # 如非场景需要，不推荐使用 DataItem 的方式构建 AyuItem，不太优雅。
 ```
 
-以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 即为存储至库中字段，`value` 为存储内容。
+以上可知，目前可直接将需要的参数在对应 `Item` 中直接按 `key=value` 赋值即可，`key` 为存储至库中字段，`value` 为对应 `key` 所存储的值。
 
 当然，目前也支持动态赋值，但我还是推荐直接创建好 `AyuItem` ，方便管理：
 

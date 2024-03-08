@@ -23,11 +23,13 @@ ayuge startproject DemoSpider
 
 这将创建一个 `DemoSpider` 包含以下内容的目录：
 
+通常情况下，我们只需关心 `spider` 的编写和 `VIT` 中 `.conf` 的配置即可。
+
 ```ini
 DemoSpider/
 |-- DemoSpider			# project's Python module, you'll import your code from here
 |   |-- __init__.py
-|   |-- items.py		# project items definition file, 数据库表枚举信息示例也迁移至此
+|   |-- items.py		# project items definition file
 |   |-- logs			# 日志管理文件夹，可以自定义规则
 |   |   |-- DemoSpider.log	# scrapy 输出日志，文件名称为项目名
 |   |   |-- error.log		# loguru 日志 error 规则输出文件
@@ -48,7 +50,7 @@ DemoSpider/
 
 ## 我们的第一个 Spider
 
-这是我们第一个 `Spider` 的代码。`demo_one.py`将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
+这是我们第一个 `Spider` 的代码。`demo_one.py` 将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
 
 ```python
 import json
