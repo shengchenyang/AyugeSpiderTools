@@ -8,23 +8,19 @@
 
 > 可以使用以下命令安装 `ayugespidertools` 及其依赖项：
 
-1. 若你的数据库场景只需要 `mysql` 和 `mongodb`，且不需要本库中的扩展功能，那么直接简洁安装即可，命令如下：
+1. 若你的数据库场景只需要 `mysql` 和 `mongodb`，且不需要本库 `extras` 中的扩展功能，那么直接简洁安装即可，命令如下：
 
 ```shell
 pip install ayugespidertools
 ```
 
-2. 若你的数据库场景需要本库中的其他扩展，且同样不需要本库中的扩展功能，那么安装数据库版本最好，命令如下：
-
-> 可选1，通过以下命令安装所有包含所有数据库依赖：
+2. 若你需要更多的数据库场景，且同样不需要本库 `extras` 中的扩展功能，那么安装数据库版本最好，命令如下：
 
 ```shell
 pip install ayugespidertools[database]
 ```
 
-3. 全部依赖安装命令如下：
-
-> 可选2，通过以下命令安装所有依赖：
+3. 安装全部依赖命令如下：
 
 ```shell
 pip install ayugespidertools[all]
