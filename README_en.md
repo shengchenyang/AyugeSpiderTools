@@ -227,6 +227,7 @@ functionality of Scrapy.**
             - [x] For font files where the mapping relationship cannot be found, OCR recognition (with less than 100%
               accuracy) is generally used. First, each mapping is exported as a png using fontforge, and then various
               methods are used for recognition.
+        - [x] Part of the font anti-crawling function has been migrated to the `FontMapster` project.
     - [x] Processing of HTML data, including removal of tags, invisible characters, and conversion of special characters
       to normal display, etc.
     - [x] Common methods for processing image CAPTCHA:

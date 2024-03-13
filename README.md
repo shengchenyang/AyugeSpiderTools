@@ -210,6 +210,7 @@ scrapy crawl <spider_name>
               中找到映射关系的：使用 [fontforge](https://github.com/fontforge/fontforge/releases) 工具导出映射即可。
             - [x] 无法找到映射关系的，则一般使用 `ocr` 识别（准确率非百分百），通过 `fontforge` 导出每个映射的 `png`
               ，后再通过各种方式识别。
+        - [x] 字体反爬部分功能迁移到 `FontMapster` 项目中。
     - [x] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等
     - [x] 添加常用的图片验证码中的处理方法
         - [x] 滑块缺口距离的识别方法（多种实现方式）
