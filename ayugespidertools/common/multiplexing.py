@@ -1,6 +1,5 @@
 import configparser
 import json
-import os
 import random
 from typing import TYPE_CHECKING, Any, Dict, List, Union
 
@@ -261,18 +260,6 @@ class ReuseOperation:
             1). 是否符合 namedtuple 类型
         """
         return isinstance(x, tuple) and hasattr(x, "_fields")
-
-    @staticmethod
-    def get_files_from_path(path: str) -> list:
-        """获取 path 文件夹下的所有文件，并输出以 path 为根目录的相对路径
-
-        Args:
-            path: 需要判断的文件夹路径
-
-        Returns:
-            1). path 文件夹下的文件列表
-        """
-        return [f.path for f in os.scandir(path) if f.is_file()]
 
     @staticmethod
     def random_weight(weight_data: list):
