@@ -7,8 +7,8 @@
 
 # AyugeSpiderTools 介绍
 
-![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python](https://img.shields.io/badge/python-3.8%2B-blue)
+![license](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
+![python support](https://img.shields.io/badge/python-3.8%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -202,7 +202,7 @@ scrapy crawl <spider_name>
         - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
     - [x] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
 - [x] 常用开发场景
-    - [x] `sql` 语句拼接，只用于简单场景。已给出优化方向，参考库等信息。
+    - [x] `sql` 语句拼接，只用于简单场景。
     - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
     - [x] 字体反爬还原方法
         - [x] 基于 `ttf`，`woff` 之类的字体文件映射，或结合 `css` 等实现

@@ -7,8 +7,8 @@
 
 # AyugeSpiderTools Introduce
 
-![GitHub](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python](https://img.shields.io/badge/python-3.8%2B-blue)
+![license](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
+![python support](https://img.shields.io/badge/python-3.8%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -217,8 +217,7 @@ functionality of Scrapy.**
         - [x] Example of using asyncio and aioMysql in a pipeline script.
     - [x] Integration of data push functions for Kafka, RabbitMQ, etc.
 - [x] Common development scenarios:
-    - [x] Concatenation of sql statements, only for simple scenarios. Improvement
-      directions and reference libraries have been provided.
+    - [x] Concatenation of sql statements.
     - [x] Formatting data processing, such as removing web page tags, removing unnecessary spaces, etc.
     - [x] Methods for restoring font-encrypted text to its original form to bypass anti-spider measures:
         - [x] Based on mapping of font files such as ttf and woff, or combined with css, etc.
