@@ -11,7 +11,6 @@ from ayugespidertools.common.params import Param
 
 # 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
-    ("pyproject.toml",),
     ("README.md",),
     ("requirements.txt",),
     ("scrapy.cfg",),

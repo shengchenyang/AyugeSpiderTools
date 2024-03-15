@@ -33,7 +33,6 @@
 |   |   `-- spider1.py
 |   `-- VIT
 |       `-- .conf
-|-- pyproject.toml
 |-- README.md
 |-- requirements.txt
 `-- scrapy.cfg

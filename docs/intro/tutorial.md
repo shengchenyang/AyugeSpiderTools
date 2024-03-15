@@ -42,7 +42,6 @@ DemoSpider/
 |   |   |-- __init__.py
 |   `-- VIT
 |       `-- .conf        	# 配置文件，用于修改 Mysql, MongoDB 等配置
-|-- pyproject.toml		# 项目配置
 |-- README.md			# 说明文档
 |-- requirements.txt		# 依赖文件
 `-- scrapy.cfg                  # deploy configuration file
