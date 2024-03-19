@@ -7,19 +7,14 @@ from scrapy.exceptions import UsageError
 from scrapy.utils.template import render_templatefile, string_camelcase
 
 import ayugespidertools
-from ayugespidertools.common.params import Param
 
 # 添加需要的自定义配置文件
 TEMPLATES_TO_RENDER = (
-    ("README.md",),
-    ("requirements.txt",),
     ("scrapy.cfg",),
     ("${project_name}", "settings.py.tmpl"),
     ("${project_name}", "items.py.tmpl"),
     ("${project_name}", "pipelines.py.tmpl"),
     ("${project_name}", "middlewares.py.tmpl"),
-    # 添加 run.py 总运行文件
-    ("${project_name}", "run.py.tmpl"),
 )
 
 IGNORE = ignore_patterns("*.pyc", "__pycache__", ".svn")
@@ -33,10 +28,8 @@ class AyuCommand(Command):
         project_name = args[0]
 
         if len(args) == 2:
-            _has_project_dir_args = True
             project_dir = Path(args[1])
         else:
-            _has_project_dir_args = False
             project_dir = Path(args[0])
 
         if (project_dir / "scrapy.cfg").exists():
@@ -60,28 +53,6 @@ class AyuCommand(Command):
             )
             render_templatefile(
                 tplfile,
-                project_name=project_name,
-                ProjectName=string_camelcase(project_name),
-            )
-
-        # 添加执行 shell 文件 run.sh 的生成
-        if _has_project_dir_args:
-            run_shell_path = f"{project_dir}/{project_name}/run.sh.tmpl"
-        else:
-            run_shell_path = f"{project_dir}/{project_dir}/run.sh.tmpl"
-        run_shell_abspath = Path(project_dir).resolve()
-        # 如果是 windows 环境的话，就不生成 shell 文件了，没啥必要
-        if Param.IS_WINDOWS:
-            print("Info: The run.sh file is no longer generated under windows.")
-            del_file = Path(run_shell_path)
-            if Path.exists(del_file):
-                del_file.unlink()
-
-        else:
-            render_templatefile(
-                run_shell_path,
-                project_startup_dir=run_shell_abspath,
-                ProjectStartupDir=string_camelcase(str(run_shell_abspath)),
                 project_name=project_name,
                 ProjectName=string_camelcase(project_name),
             )

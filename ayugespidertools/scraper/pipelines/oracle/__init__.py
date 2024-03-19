@@ -38,7 +38,6 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
             return
 
         sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
-        # no err handing
         self.cursor.execute(sql, tuple(new_item.values()))
         self.conn.commit()
 
