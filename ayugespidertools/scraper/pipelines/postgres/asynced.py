@@ -18,20 +18,18 @@ __all__ = [
 if TYPE_CHECKING:
     from twisted.internet.defer import Deferred
 
-    from ayugespidertools.common.typevars import PostgreSQLConf, slogT
+    from ayugespidertools.common.typevars import PostgreSQLConf
     from ayugespidertools.spiders import AyuSpider
 
 
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     postgres_conf: "PostgreSQLConf"
-    slog: "slogT"
     pool: "AsyncConnectionPool"
     running_tasks: set
 
     def open_spider(self, spider: "AyuSpider") -> "Deferred":
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
         self.running_tasks = set()
-        self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
         return deferred_from_coro(self._open_spider(spider))
 

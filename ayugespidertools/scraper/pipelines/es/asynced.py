@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from elasticsearch_dsl import Document
     from twisted.internet.defer import Deferred
 
-    from ayugespidertools.common.typevars import ESConf, slogT
+    from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider
 
     DocumentType = Union[Type[Document], type]
@@ -27,7 +27,6 @@ if TYPE_CHECKING:
 
 class AyuAsyncESPipeline:
     es_conf: "ESConf"
-    slog: "slogT"
     client: "AsyncElasticsearch"
     es_type: "DocumentType"
     running_tasks: set

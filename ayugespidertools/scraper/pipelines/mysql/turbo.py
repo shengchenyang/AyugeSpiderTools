@@ -15,14 +15,13 @@ if TYPE_CHECKING:
     from scrapy.crawler import Crawler
     from typing_extensions import Self
 
-    from ayugespidertools.common.typevars import MysqlConf, slogT
+    from ayugespidertools.common.typevars import MysqlConf
     from ayugespidertools.spiders import AyuSpider
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     mysql_conf: "MysqlConf"
     conn: "Connection[Cursor]"
-    slog: "slogT"
     cursor: "Cursor"
     pool_db_conf: dict
 
@@ -38,7 +37,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
 
     def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
-        self.slog = spider.slog
         if not self.pool_db_conf:
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
             self.pool_db_conf = {

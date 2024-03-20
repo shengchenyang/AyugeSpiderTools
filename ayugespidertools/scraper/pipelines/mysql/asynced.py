@@ -14,20 +14,18 @@ __all__ = [
 if TYPE_CHECKING:
     from twisted.internet.defer import Deferred
 
-    from ayugespidertools.common.typevars import MysqlConf, slogT
+    from ayugespidertools.common.typevars import MysqlConf
     from ayugespidertools.spiders import AyuSpider
 
 
 class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     mysql_conf: "MysqlConf"
-    slog: "slogT"
     pool: aiomysql.Pool
     running_tasks: set
 
     def open_spider(self, spider: "AyuSpider") -> "Deferred":
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.running_tasks = set()
-        self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         return deferred_from_coro(self._open_spider(spider))
 

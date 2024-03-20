@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from scrapy import Spider
     from scrapy.http.response import Response
 
-    from ayugespidertools.common.typevars import AlterItem, OssConf, slogT
+    from ayugespidertools.common.typevars import AlterItem, OssConf
     from ayugespidertools.spiders import AyuSpider
 
 
@@ -42,7 +42,6 @@ async def files_download_by_scrapy(
 class AyuAsyncOssPipeline:
     oss_bucket: AliOssBase
     oss_conf: "OssConf"
-    slog: "slogT"
     full_link_enable: bool
 
     def open_spider(self, spider: "AyuSpider") -> None:
@@ -51,7 +50,6 @@ class AyuAsyncOssPipeline:
         oss_conf_dict = self.oss_conf._asdict()
         self.oss_bucket = AliOssBase(**oss_conf_dict)
         self.full_link_enable = self.oss_conf.full_link_enable
-        self.slog = spider.slog
 
     async def _upload_process(self, url: str, spider: "AyuSpider") -> str:
         r, filename = await files_download_by_scrapy(spider, url)
