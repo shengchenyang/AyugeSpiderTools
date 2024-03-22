@@ -37,24 +37,30 @@
 
 用于 `mysql` 存储相关场景中使用，比如创建对应的 `sqlalchemy` 的 `engine`，`engine_conn` 来用于去重，创建数据库连接来解决表格缺失，字段缺失等问题。
 
-| 参数名   | 参数备注             | 描述                                                         |
-| -------- | -------------------- | ------------------------------------------------------------ |
-| user     | _                    | _                                                            |
-| password | _                    | _                                                            |
-| database | _                    | 链接的数据库名称，在非 aiomysql 场景下，当 database 不存在时会用当前 user 创建所需库表及字段等。 |
-| host     | 可选，默认 localhost | _                                                            |
-| port     | 可选，默认 3306      | _                                                            |
-| charset  | 可选，默认 utf8mb4   | 用于在表不存在而创建时需要，可随意配置，后续也可手动修改。   |
+| 参数名      | 参数备注                      | 描述                                                         |
+| ----------- | ----------------------------- | ------------------------------------------------------------ |
+| user        | _                             | _                                                            |
+| password    | _                             | _                                                            |
+| database    | _                             | 链接的数据库名称，在非 aiomysql 场景下，当 database 不存在时会用当前 user 创建所需库表及字段等。 |
+| host        | 可选，默认 localhost          | _                                                            |
+| port        | 可选，默认 3306               | _                                                            |
+| engine      | 可选，默认 InnoDB             | 自动创建数据库和数据表时需要的参数                           |
+| collate     | 可选，默认 utf8mb4_general_ci | 自动创建数据库和数据表时需要的参数                           |
+| charset     | 可选，默认 utf8mb4            | 自动创建数据库和数据表时需要的参数                           |
+| odku_enable | 可选，默认 false              | 是否开启 ON DUPLICATE KEY UPDATE 功能                        |
 
-注：`charset` 参数选择有 `Literal["utf8mb4", "gbk", "latin1", "utf16", "utf16le", "cp1251", "euckr", "greek"]`，若不存在你所需请提前手动创建好表，或者随意指定后续修改表皆可。
+注：
+
+- `charset` 参数选择有 `Literal["utf8mb4", "gbk", "latin1", "utf16", "utf16le", "cp1251", "euckr", "greek"]`，`charset` 要与 `collate` 参数匹配。
+- 其中 `engine`，`charset`，`collate` 为自动创建数据库和数据表时需要的参数，可随意配置或默认即可，也可提前手动创建好表，也可后续手动修改。
 
 ## [mongodb:uri]
 
 `mongodb` 链接的 `uri` 配置方式。
 
-| 参数名 | 参数备注 | 描述 |
-| ------ | -------- | ---- |
-| uri    | _        | _    |
+| 参数名 | 参数备注 | 描述        |
+| ------ | -------- | ----------- |
+| uri    | _        | mongoDB uri |
 
 ## [mongodb]
 
