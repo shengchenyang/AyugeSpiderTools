@@ -17,7 +17,6 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from scrapy import Spider
     from scrapy.http.response import Response
 
     from ayugespidertools.common.typevars import AlterItem, OssConf
@@ -25,7 +24,7 @@ if TYPE_CHECKING:
 
 
 async def files_download_by_scrapy(
-    spider: "Spider", url: str
+    spider: "AyuSpider", url: str
 ) -> Tuple["Response", str]:
     request = scrapy.Request(url, callback=NO_CALLBACK)
     response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
