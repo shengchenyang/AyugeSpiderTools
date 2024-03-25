@@ -55,7 +55,8 @@ pip install ayugespidertools[database]
 pip install ayugespidertools[all]
 ```
 
-*Note: For detailed installation instructions, please see [Installation Guide](https://ayugespidertools.readthedocs.io/en/latest/intro/install.html).*
+*Note: For detailed installation instructions, please
+see [Installation Guide](https://ayugespidertools.readthedocs.io/en/latest/intro/install.html).*
 
 ## Usage
 
@@ -162,14 +163,19 @@ provided. Please fill in the required content for testing, then:
    want to modify or add custom functionality, such as removing unused modules or modifying the library name, you can
    modify it yourself and then build it.
 
-2. This library mainly promotes the functionality of the scrapy extension (i.e. the enhanced version of the custom
-   template). In theory, using this library should not affect your scrapy project and other components.
+2. This library mainly promotes the `scrapy` extension function. When using this library, it will not affect
+   your `scrapy` project and other components.
+
+   You can use this library to develop native `scrapy`, or you can use `scrapy` style to develop, but it is still
+   recommended to use the style recommended by this library for development. Will not cause excessive migration costs to
+   developers.
 
 3. Code test coverage is a bit low, should you consider increasing it?
 
-    Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
+   Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
 
-1. If you want to contribute to this project, please refer to the [example](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html) pull request.
+4. If you want to contribute to this project, please refer to
+   the [example](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html) pull request.
 
 ## Build Your Own Library
 
@@ -180,10 +186,10 @@ and modify any methods (e.g. you may need a different default log configuration 
 templates for your project scenario), and then package and use it by running `poetry build` or `make build` after
 modification.
 
-For example, if you need to update kafka-python in the dependency library to a new version `x.x.x`, you can simply install
-the existing dependencies with `poetry install`, and then install the target version with `poetry add kafka-python==x.x.x` (
-try not to use `poetry update kafka-python`). After ensuring that the test is working properly, you can package the modified
-library with `poetry build` for use.
+For example, if you need to update kafka-python in the dependency library to a new version `x.x.x`, you can simply
+install the existing dependencies with `poetry install`, and then install the target version
+with `poetry add kafka-python==x.x.x` (try not to use `poetry update kafka-python`). After ensuring that the test is
+working properly, you can package the modified library with `poetry build` for use.
 
 **I hope that this project can provide guidance for you when you encounter scenarios where you need to extend the
 functionality of Scrapy.**
@@ -191,50 +197,50 @@ functionality of Scrapy.**
 ## Features
 
 - [x] Scenarios for extending the functionality of Scrapy:
-    - [x] Scrapy script runtime information statistics and project dependency table collection statistics can be used
-      for logging and alerts.
-    - [x] Custom templates that generate template files suitable for this library when
-      using `ayuge startproject <projname>` and `ayuge genspider <spidername>`.
-    - [x] Get project configuration from remote application management service.
-        - [x] Get project configuration from `consul`.
-        - [x] Get project configuration from `nacos`(Note: Priority is lower than `consul`).
-    - [x] Proxy middleware (dedicated proxy, dynamic tunnel proxy).
-    - [x] Random User-Agent middleware.
-    - [x] Use the following tools to replace scrapy's Request for sending requests:
-        - [x] ~~`requests`: Using the synchronous library requests will reduce the efficiency of scrapy.~~（This feature
-          has been removed, and using aiohttp is now recommended instead.）
-        - [x] `aiohttp`: Integrated the coroutine method of replacing scrapy Request with aiohttp.
-    - [x] Adaptation for scenarios where storage is done in Mysql:
-        - [x] Automatically create the required databases, tables, field formats, and field comments for scenarios where
-          Mysql users need to be created.
-    - [x] Adaptation for scenarios where storage is done in MongoDB.
-    - [x] Adaptation for scenarios where storage is done in PostgreSQL.
-    - [x] Adaptation for scenarios where storage is done in ElasticSearch.
-    - [x] Adaptation for scenarios where storage is done in Oracle.
-    - [x] oss uploads scene adaptation.
-    - [x] Examples of asyncio syntax support and third-party library support for async:
-        - [x] Example of using asyncio and aiohttp in a spider script.
-        - [x] Example of using asyncio and aioMysql in a pipeline script.
-    - [x] Integration of data push functions for Kafka, RabbitMQ, etc.
+	- [x] Scrapy script runtime information statistics and project dependency table collection statistics can be used
+	  for logging and alerts.
+	- [x] Custom templates that generate template files suitable for this library when
+	  using `ayuge startproject <projname>` and `ayuge genspider <spidername>`.
+	- [x] Get project configuration from remote application management service.
+		- [x] Get project configuration from `consul`.
+		- [x] Get project configuration from `nacos`(Note: Priority is lower than `consul`).
+	- [x] Proxy middleware (dedicated proxy, dynamic tunnel proxy).
+	- [x] Random User-Agent middleware.
+	- [x] Use the following tools to replace scrapy's Request for sending requests:
+		- [x] ~~`requests`: Using the synchronous library requests will reduce the efficiency of scrapy.~~（This feature
+		  has been removed, and using aiohttp is now recommended instead.）
+		- [x] `aiohttp`: Integrated the coroutine method of replacing scrapy Request with aiohttp.
+	- [x] Adaptation for scenarios where storage is done in Mysql:
+		- [x] Automatically create the required databases, tables, field formats, and field comments for scenarios where
+		  Mysql users need to be created.
+	- [x] Adaptation for scenarios where storage is done in MongoDB.
+	- [x] Adaptation for scenarios where storage is done in PostgreSQL.
+	- [x] Adaptation for scenarios where storage is done in ElasticSearch.
+	- [x] Adaptation for scenarios where storage is done in Oracle.
+	- [x] oss uploads scene adaptation.
+	- [x] Examples of asyncio syntax support and third-party library support for async:
+		- [x] Example of using asyncio and aiohttp in a spider script.
+		- [x] Example of using asyncio and aioMysql in a pipeline script.
+	- [x] Integration of data push functions for Kafka, RabbitMQ, etc.
 - [x] Common development scenarios:
-    - [x] Concatenation of sql statements.
-    - [x] Formatting data processing, such as removing web page tags, removing unnecessary spaces, etc.
-    - [x] Methods for restoring font-encrypted text to its original form to bypass anti-spider measures:
-        - [x] Based on mapping of font files such as ttf and woff, or combined with css, etc.
-            - [x] For font files where the mapping relationship can be found directly in the xml file, you can export
-              the mapping using the [FontForge](https://github.com/fontforge/fontforge/releases) tool.
-            - [x] For font files where the mapping relationship cannot be found, OCR recognition (with less than 100%
-              accuracy) is generally used. First, each mapping is exported as a png using fontforge, and then various
-              methods are used for recognition.
-        - [x] Part of the font anti-crawling function has been migrated to the `FontMapster` project.
-    - [x] Processing of HTML data, including removal of tags, invisible characters, and conversion of special characters
-      to normal display, etc.
-    - [x] Common methods for processing image CAPTCHA:
-        - [x] Methods for recognizing the distance of the missing part of a slider captcha (with multiple implementation
-          options).
-        - [x] Methods for generating a trajectory array based on the distance of a slider.
-        - [x] Identification of the position and click order of click-based CAPTCHAs.
-        - [x] Example methods for restoring images that have been randomly disordered and mixed up.
+	- [x] Concatenation of sql statements.
+	- [x] Formatting data processing, such as removing web page tags, removing unnecessary spaces, etc.
+	- [x] Methods for restoring font-encrypted text to its original form to bypass anti-spider measures:
+		- [x] Based on mapping of font files such as ttf and woff, or combined with css, etc.
+			- [x] For font files where the mapping relationship can be found directly in the xml file, you can export
+			  the mapping using the [FontForge](https://github.com/fontforge/fontforge/releases) tool.
+			- [x] For font files where the mapping relationship cannot be found, OCR recognition (with less than 100%
+			  accuracy) is generally used. First, each mapping is exported as a png using fontforge, and then various
+			  methods are used for recognition.
+		- [x] Part of the font anti-crawling function has been migrated to the `FontMapster` project.
+	- [x] Processing of HTML data, including removal of tags, invisible characters, and conversion of special characters
+	  to normal display, etc.
+	- [x] Common methods for processing image CAPTCHA:
+		- [x] Methods for recognizing the distance of the missing part of a slider captcha (with multiple implementation
+		  options).
+		- [x] Methods for generating a trajectory array based on the distance of a slider.
+		- [x] Identification of the position and click order of click-based CAPTCHAs.
+		- [x] Example methods for restoring images that have been randomly disordered and mixed up.
 
 Notice: I will include the function demo in the [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/)
 documentation to avoid overwhelming this section with too much content.

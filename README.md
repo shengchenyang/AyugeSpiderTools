@@ -86,7 +86,7 @@ scrapy crawl <spider_name>
 ```
 
 具体的场景案例请在 [DemoSpider](https://github.com/shengchenyang/DemoSpider)
-项目中查看，也可以在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中查看教程。 目前已适配以下场景：
+项目中查看，也可以在 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中查看教程。目前已适配以下场景：
 
 ```diff
 + 0).以下场景全支持从 nacos 或 consul 中获取配置，不一一举例。
@@ -144,7 +144,6 @@ scrapy crawl <spider_name>
 前提：需要在 `tests` 的 `VIT` 目录下创建 `.conf` 文件，已给出示例文件，请填写测试所需内容，然后：
 
 - 可以直接使用 `tox` 来运行测试。
-
 - 本库以 [poetry](https://python-poetry.org/docs/) 开发，那么直接新环境下运行 `poetry install`
   后，手动运行目标测试或 `pytest` 命令来测试等皆可。
 - 也可以使用 `make` 工具，`make start` 然后 `make test` 即可。
@@ -153,14 +152,15 @@ scrapy crawl <spider_name>
 
 1. 若你觉得某些场景下的功能实现不太符合你的预期，想要修改或添加自定义功能，比如移除对你无用模块、修改库名等，你可以自行修改后 `build`。
 
-2. 本库主推 `scrapy` 扩展（即增强版的自定义模板）的功能，在使用本库时，理论上并不会影响你 `scrapy`
-   项目及其它组件。
+2. 本库主推 `scrapy` 扩展功能，在使用本库时，不会影响你 `scrapy` 项目及其它组件。
+
+   也就是说，可使用本库开发原生的 `scrapy`，也可用 `scrapy` 的风格来开发，但还是推荐使用本库推荐的风格开发。不会对开发者造成过多的迁移成本。
 
 3. 代码测试覆盖率有点低，考虑增加吗？
 
    不考虑，场景所依赖服务太多，且云服务等其它因素导致个人维护成本过高，但不必担心，我会和本地服务的自动化测试结合使用。
 
-4. 如果你想对此项目做出贡献，请参考[pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
+4. 如果你想对此项目做出贡献，请参考 [pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
 
 ## 构建你的专属库
 
@@ -179,43 +179,43 @@ scrapy crawl <spider_name>
 ## 功能
 
 - [x] `scrapy` 的扩展功能场景
-    - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
-    - [x] 自定义模板，在 `ayuge startproject <projname>` 和 `ayuge genspider <spidername>` 时生成适合本库的模板文件
-    - [x] 从远程应用管理服务中获取项目配置
-        - [x] 从 `consul` 获取项目配置
-        - [x] 从 `nacos` 获取项目配置（注意：优先级小于 `consul`）
-    - [x] 代理中间件（独享代理、动态隧道代理）
-    - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
-    - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求
-        - [x] ~~`requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率~~（已移除此功能，更推荐 `aiohttp`
-          的方式）
-        - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
-    - [x] `Mysql` 存储的场景下适配
-        - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
-    - [x] `MongoDB` 存储场景适配
-    - [x] `PostgreSQL` 存储场景适配
-    - [x] `ElasticSearch` 存储场景适配
-    - [x] `Oracle` 存储场景适配
-    - [x] `oss` 上传场景适配
-    - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
-        - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
-        - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
-    - [x] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
+  - [x] `scrapy` 脚本运行信息统计和项目依赖表采集量统计，可用于日志记录和预警
+  - [x] 自定义模板，在 `ayuge startproject <projname>` 和 `ayuge genspider <spidername>` 时生成适合本库的模板文件
+  - [x] 从远程应用管理服务中获取项目配置
+    - [x] 从 `consul` 获取项目配置
+    - [x] 从 `nacos` 获取项目配置（注意：优先级小于 `consul`）
+  - [x] 代理中间件（独享代理、动态隧道代理）
+  - [x] 随机请求头 `UA` 中间件，根据 `fake_useragent` 中的权重来随机
+  - [x] 使用以下工具来替换 `scrapy` 的 `Request` 来发送请求
+    - [x] ~~`requests`: 这个不推荐使用，`requests` 同步库会降低 `scrapy` 运行效率~~（已移除此功能，更推荐 `aiohttp`
+      的方式）
+    - [x] `aiohttp`: 集成将 `scrapy Request` 替换为 `aiohttp` 的协程方式
+  - [x] `Mysql` 存储的场景下适配
+    - [x] 自动创建 `Mysql` 用户场景下需要的数据库和数据表及字段格式，还有字段注释
+  - [x] `MongoDB` 存储场景适配
+  - [x] `PostgreSQL` 存储场景适配
+  - [x] `ElasticSearch` 存储场景适配
+  - [x] `Oracle` 存储场景适配
+  - [x] `oss` 上传场景适配
+  - [x] `asyncio` 语法支持与 `async` 第三方库支持示例
+    - [x] `spider` 中使用 `asyncio` 的 `aiohttp` 示例
+    - [x] `pipeline` 中使用 `asyncio` 的 `aioMysql` 示例
+  - [x] 集成 `Kafka`，`RabbitMQ` 等数据推送功能
 - [x] 常用开发场景
-    - [x] `sql` 语句拼接，只用于简单场景。
-    - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
-    - [x] 字体反爬还原方法
-        - [x] 基于 `ttf`，`woff` 之类的字体文件映射，或结合 `css` 等实现
-            - [x] 可以直接在字体文件 `xml`
-              中找到映射关系的：使用 [fontforge](https://github.com/fontforge/fontforge/releases) 工具导出映射即可。
-            - [x] 无法找到映射关系的，则一般使用 `ocr` 识别（准确率非百分百），通过 `fontforge` 导出每个映射的 `png`
-              ，后再通过各种方式识别。
-        - [x] 字体反爬部分功能迁移到 `FontMapster` 项目中。
-    - [x] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等
-    - [x] 添加常用的图片验证码中的处理方法
-        - [x] 滑块缺口距离的识别方法（多种实现方式）
-        - [x] 根据滑块距离生成轨迹数组的方法
-        - [x] 识别点选验证码位置及点击顺序
-        - [x] 图片乱序混淆的还原方法示例
+  - [x] `sql` 语句拼接，只用于简单场景。
+  - [x] 数据格式化处理，比如：去除网页标签，去除无效空格等
+  - [x] 字体反爬还原方法
+    - [x] 基于 `ttf`，`woff` 之类的字体文件映射，或结合 `css` 等实现
+      - [x] 可以直接在字体文件 `xml`
+        中找到映射关系的：使用 [fontforge](https://github.com/fontforge/fontforge/releases) 工具导出映射即可。
+      - [x] 无法找到映射关系的，则一般使用 `ocr` 识别（准确率非百分百），通过 `fontforge` 导出每个映射的 `png`
+        ，后再通过各种方式识别。
+    - [x] 字体反爬部分功能迁移到 `FontMapster` 项目中。
+  - [x] `html` 数据处理，去除标签，不可见字符，特殊字符改成正常显示等
+  - [x] 添加常用的图片验证码中的处理方法
+    - [x] 滑块缺口距离的识别方法（多种实现方式）
+    - [x] 根据滑块距离生成轨迹数组的方法
+    - [x] 识别点选验证码位置及点击顺序
+    - [x] 图片乱序混淆的还原方法示例
 
 注意：功能演示我将放入 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中，以防此部分内容过多。
