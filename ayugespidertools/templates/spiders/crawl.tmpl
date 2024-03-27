@@ -1,4 +1,3 @@
-import scrapy
 from scrapy.spiders import Rule
 from scrapy.linkextractors import LinkExtractor
 from ayugespidertools.items import AyuItem
@@ -18,19 +17,11 @@ class $classname(AyuCrawlSpider):
         },
     }
 
-    rules = (
-        # Rule(LinkExtractor(allow=r"Items/"), callback="parse_item", follow=True),
-        Rule(LinkExtractor(restrict_xpaths='//div[@class="rank_d_b_name"]/a'), callback="parse_item"),
-    )
+    rules = (Rule(LinkExtractor(allow=r"Items/"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
-        # 获取图书名称 - （获取的是详情页中的图书名称）
-        book_name_list = response.xpath('//div[@class="book-name"]//text()').extract()
-        book_name = "".join(book_name_list).strip()
-        self.slog.debug(f"book_name: {book_name}")
-
-        NovelInfoItem = AyuItem(
-            book_name=book_name,
-            _table="_article_info_list",
-        )
-        yield NovelInfoItem
+        self.slog.info("请查看 DemoSpider 中的 demo_crawl 示例")
+        # yield AyuItem(
+        #     url=response.url,
+        #     _table="_demo_crawl",
+        # )
