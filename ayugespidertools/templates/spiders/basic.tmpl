@@ -1,18 +1,7 @@
-import json
-from typing import TYPE_CHECKING, Union
-
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 from sqlalchemy import text
-
-if TYPE_CHECKING:
-    from scrapy.http import Response
-    from scrapy.http.response.html import HtmlResponse
-    from scrapy.http.response.text import TextResponse
-    from scrapy.http.response.xml import XmlResponse
-
-    ScrapyResponse = Union[TextResponse, XmlResponse, HtmlResponse, Response]
 
 
 class $classname(AyuSpider):
@@ -25,68 +14,53 @@ class $classname(AyuSpider):
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
         },
-        "DOWNLOADER_MIDDLEWARES": {
-            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
-        },
     }
 
     def start_requests(self):
-        """请求首页，获取项目列表数据"""
         yield Request(
-            url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
+            url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
-            headers={
-                "referer": "https://blog.csdn.net/rank/list",
-            },
-            cb_kwargs={
-                "curr_site": "csdn",
-            },
-            dont_filter=True
         )
 
-    def parse_first(self, response: "ScrapyResponse", curr_site: str):
-        self.slog.info(f"当前采集的站点为: {curr_site}")
-        _save_table = "_article_info_list"
+    def parse_first(self, response):
+        _save_table = "_octree_info"
 
-        data_list = json.loads(response.text)["data"]
-        for curr_data in data_list:
-            article_detail_url = curr_data.get("articleDetailUrl")
-            article_title = curr_data.get("articleTitle")
-            comment_count = curr_data.get("commentCount")
-            favor_count = curr_data.get("favorCount")
-            nick_name = curr_data.get("nickName")
+        li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
+        for curr_li in li_list:
+            octree_text = curr_li.xpath("a/text()").get()
+            octree_href = curr_li.xpath("a/@href").get()
+            octree_full_link = response.urljoin(octree_href)
 
-            article_item = AyuItem(
-                article_detail_url=article_detail_url,
-                article_title=article_title,
-                comment_count=comment_count,
-                favor_count=favor_count,
-                nick_name=nick_name,
+            octree_item = AyuItem(
+                octree_text=octree_text,
+                octree_href=octree_href,
+                octree_full_link=octree_full_link,
                 _table=_save_table,
-                # 可选参数：这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
-                _mongo_update_rule={"article_detail_url": article_detail_url},
+                # 可选参数：这里表示 MongoDB 存储场景以 octree_text 为去重规则，若存在则更新，不存在则新增
+                _mongo_update_rule={"octree_text": octree_text},
             )
-            self.slog.info(f"article_item: {article_item}")
+            self.slog.info(f"octree_item: {octree_item}")
 
             # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
             # 此时更适合：
             #    1.mysql 添加唯一索引去重（结合 odku_enable 配置，本库会根据 on duplicate key update 更新），
             #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
-            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
+            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择;
+            #    3.同时存储多个数据库场景更推荐使用第三方去重来统一管理，比如 scrapy-redis，布隆过滤等。
             # 这里只是为了介绍使用 mysql_engine_conn 来对 mysql 去重的方法。
             if self.mysql_engine_conn:
                 try:
                     _sql = text(
-                        f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+                        f"""select `id` from `{_save_table}` where `octree_text` = "{octree_text}" limit 1"""
                     )
                     result = self.mysql_engine_conn.execute(_sql).fetchone()
                     if not result:
                         self.mysql_engine_conn.rollback()
-                        yield article_item
+                        yield octree_item
                     else:
-                        self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
+                        self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
                 except Exception as e:
                     self.mysql_engine_conn.rollback()
-                    yield article_item
+                    yield octree_item
             else:
-                yield article_item
+                yield octree_item
