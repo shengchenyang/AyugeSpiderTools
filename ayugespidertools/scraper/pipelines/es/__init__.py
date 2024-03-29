@@ -5,7 +5,7 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 try:
     from elasticsearch_dsl import Document, connections
 except ImportError:
-    # pip install elasticsearch-dsl
+    # pip install ayugespidertools[database]
     pass
 
 __all__ = ["AyuESPipeline", "dynamic_es_document"]
