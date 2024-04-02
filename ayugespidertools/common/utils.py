@@ -1,15 +1,13 @@
 import json
 import random
+import urllib.request
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
-import requests
-
 from ayugespidertools.common.encryption import EncryptOperation
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.params import Param
 from ayugespidertools.config import logger
 from ayugespidertools.extras.ext import AppConfManageMixin
 from ayugespidertools.formatdata import DataHandle
@@ -60,29 +58,23 @@ class ToolsForAyu(AppConfManageMixin):
         Returns:
             1). 远程配置中 key_values 的详细信息
         """
-        headers = {"X-Consul-Token": token} if remote_type == "consul" else None
-        try:
-            r = requests.get(
-                url,
-                headers=headers,
-                verify=False,
-                timeout=(
-                    Param.requests_req_timeout,
-                    Param.requests_res_timeout,
-                ),
-            )
-        except (
-            requests.exceptions.ConnectionError,
-            requests.exceptions.ConnectTimeout,
-        ) as e:
-            raise ValueError(f"请求远程配置 {remote_type} api 超时!") from e
+        headers = (
+            {"X-Consul-Token": token}
+            if all([remote_type == "consul", token is not None])
+            else {}
+        )
+        req = urllib.request.Request(url=url, headers=headers)
+        r = urllib.request.urlopen(req)
+        data = r.read().decode(errors="ignore")
 
         url_params = urlparse(url).query
         if remote_type == "consul":
             if "raw" in url_params:
-                return r.text
-            return EncryptOperation.base64_decode(decode_data=r.json()[0]["Value"])
-        return r.text
+                return data
+
+            json_data = json.loads(data)
+            return EncryptOperation.base64_decode(decode_data=json_data[0]["Value"])
+        return data
 
     @classmethod
     def fetch_remote_conf(

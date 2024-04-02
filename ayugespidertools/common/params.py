@@ -1,5 +1,4 @@
 import platform
-import random
 
 __all__ = [
     "Param",
@@ -14,11 +13,6 @@ class Param:
     retry_time_max = 1000
     # stop_max_delay 限制最长重试时间
     stop_max_delay = 5000
-
-    requests_req_timeout = 3
-    requests_res_timeout = 5
-    requests_time_sleep_list = [x / 10 for x in range(5, 19)]
-    requests_time_sleep_random = random.choice(requests_time_sleep_list)
 
     aiohttp_retry_times_default = 3
 
