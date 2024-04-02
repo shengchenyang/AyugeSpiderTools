@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{ include = "ayugespidertools" }]
 repository = "https://github.com/shengchenyang/AyugeSpiderTools"
 documentation = "https://ayugespidertools.readthedocs.io/en/latest/"
-keywords = ["crawler", "scraping", "aiohttp", "asyncio", "scrapy"]
+keywords = ["crawler", "scraping", "scrapy-extension"]
 homepage = "https://www.ayuge.top/mkdocs-material/"
 
 [tool.poetry.dependencies]
@@ -115,6 +115,7 @@ omit = [
     "tests/VIT/*",
     "tests/conftest.py",
     "tests/**/__init__.py",
+    "ayugespidertools/request.py",
     "ayugespidertools/**/__init__.py",
     "ayugespidertools/utils/cmdline.py",
 ]
