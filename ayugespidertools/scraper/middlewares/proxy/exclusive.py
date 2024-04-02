@@ -37,8 +37,7 @@ class ExclusiveProxyDownloaderMiddleware:
     def get_proxy_ip(self, proxy_url: str, index: int) -> str:
         """获取独享代理接口的索引为 proxy_index 的代理信息"""
         try:
-            req = urllib.request.Request(url=proxy_url)
-            r = urllib.request.urlopen(req)
+            r = urllib.request.urlopen(url=proxy_url)
             content = r.read().decode(errors="ignore")
             proxy_list = json.loads(content).get("data").get("proxy_list")
             proxy_list.sort()
