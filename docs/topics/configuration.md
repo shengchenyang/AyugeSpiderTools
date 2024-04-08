@@ -16,10 +16,10 @@
 
 [nacos](https://nacos.io) 可用于远程配置管理服务，可以更敏捷和容易地管理微服务平台。
 
-| 参数名 | 参数备注                       | 描述                                                                                                    |
-| ------ | ------------------------------ |-------------------------------------------------------------------------------------------------------|
-| url    | _                              | nacos 服务对应的链接，若有鉴权参数请在 url 中构建。                                                                       |
-| format | Literal["json", "xml", "yaml"] | nacos url 配置中对应的格式解析方法，支持 json，xml，yaml 解析。请优先使用 json 和 xml 来解析，yaml 解析需要安装 ayugespidertools[all] 依赖。 |
+| 参数名 | 参数备注                 | 描述                                                         |
+| ------ | ------------------------ | ------------------------------------------------------------ |
+| url    | _                        | nacos 服务对应的链接，若有鉴权参数请在 url 中构建。          |
+| format | 参数可选 json, xml, yaml | nacos url 配置中对应的格式解析方法，支持 json，xml，yaml 解析。请优先使用 json 和 xml 来解析，yaml 解析需要安装 ayugespidertools[all] 依赖。 |
 
 ## [consul]
 
@@ -27,11 +27,11 @@
 
 不同的是配置中的鉴权 `token` 参数独立了出来。
 
-| 参数名 | 参数备注                              | 描述                                           |
-| ------ | ------------------------------------- |----------------------------------------------|
-| url    | _                                     | consul 服务对应的链接。                              |
-| format | Literal["json", "xml", "yaml", "hcl"] | consul url 配置中对应的格式解析方法，支持 json，xml，yaml 解析。 |
-| token  | 可选，默认空                          | consul token 参数。                             |
+| 参数名 | 参数备注                      | 描述                                                         |
+| ------ | ----------------------------- | ------------------------------------------------------------ |
+| url    | _                             | consul 服务对应的链接。                                      |
+| format | 参数可选 json, xml, yaml, hcl | consul url 配置中对应的格式解析方法，支持 json，xml，yaml，hcl 解析，推荐 json 解析格式。hcl 和 yaml 解析需要安装 ayugespidertools[all] 依赖。 |
+| token  | 可选，默认空                  | consul token 参数。                                          |
 
 ## [mysql]
 
@@ -51,7 +51,7 @@
 
 注：
 
-- `charset` 参数选择有 `Literal["utf8mb4", "gbk", "latin1", "utf16", "utf16le", "cp1251", "euckr", "greek"]`，`charset` 要与 `collate` 参数匹配。
+- `charset` 参数选择有 `utf8mb4`，`gbk`，`latin1`，`utf16`，`utf16le`，`cp1251`，`euckr`，`greek`，`charset` 要与 `collate` 参数匹配。
 - 其中 `engine`，`charset`，`collate` 为自动创建数据库和数据表时需要的参数，可随意配置或默认即可，也可提前手动创建好表，也可后续手动修改。
 
 ## [mongodb:uri]
@@ -159,7 +159,7 @@
 
 ## [kdl_exclusive_proxy]
 
-快代理动态代理配置参数。
+快代理独享代理配置参数。
 
 | 参数名   | 参数备注     | 描述                       |
 | -------- | ------------ | -------------------------- |
@@ -172,15 +172,15 @@
 
 上传到阿里云 oss 的配置参数。
 
-| 参数名                   | 参数备注              | 描述                                                |
-|-----------------------|-------------------|---------------------------------------------------|
-| access_key            | _                 | 阿里云 access_key_id                                 |
-| access_secret         | _                 | 阿里云账号对应的 access_key_secret                        |
-| endpoint              | _                 | 填写 Bucket 所在地域对应的 Endpoint                        |
-| bucket                | -                 | Bucket                                            |
-| doc                   | -                 | 需要操作的文件夹目录，比如 file/img，为可选参数。                     |
-| upload_fields_suffix  | 规则字段              | 上传到 oss 的字段规则，包含 upload_fields_suffix 后缀的字段会上传到 oss。 |
-| oss_fields_prefix     | 规则字段              | 上传到 oss 的字段生成的新字段规则，会在原字段添加 oss_fields_prefix 前缀。 |
-| full_link_enable      | 是否开启完整链接，默认 false | 为是否保存完整的 oss 文件链接，默认 false。                       |
+| 参数名               | 参数备注                     | 描述                                                         |
+| -------------------- | ---------------------------- | ------------------------------------------------------------ |
+| access_key           | _                            | 阿里云 access_key_id                                         |
+| access_secret        | _                            | 阿里云账号对应的 access_key_secret                           |
+| endpoint             | _                            | 填写 Bucket 所在地域对应的 Endpoint                          |
+| bucket               | -                            | Bucket                                                       |
+| doc                  | -                            | 需要操作的文件夹目录，比如 file/img，为可选参数。            |
+| upload_fields_suffix | 规则字段，默认为 _file_url   | 上传到 oss 的字段规则，包含 upload_fields_suffix 后缀的字段会上传到 oss。 |
+| oss_fields_prefix    | 规则字段，默认为 _           | 上传到 oss 的字段生成的新字段规则，会在原字段添加 oss_fields_prefix 前缀。 |
+| full_link_enable     | 是否开启完整链接，默认 false | 为是否保存完整的 oss 文件链接。                              |
 
-遵守规则时的 `oss` 上传逻辑时使用，但更推荐自行实现和构建 `AyuItem` 的方式。具体请看 `demo_oss` 和 `demo_oss_sec` 的场景示例。请自行选择可接受的风格。
+遵守规则时的 `oss` 上传逻辑时使用，更复杂的需求也可根据示例自行实现。具体请看 `demo_oss` 和 `demo_oss_sec` 的场景示例。请自行选择可接受的风格。
