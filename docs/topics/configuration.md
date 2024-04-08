@@ -96,7 +96,7 @@
 | 参数名                 | 参数备注                                  | 描述                                                         |
 | ---------------------- | ----------------------------------------- | ------------------------------------------------------------ |
 | hosts                  | _                                         | 若有多个，用逗号分隔，比如 https://x.x.x.x:9200,https://x.x.x.x:9201 |
-| index_class            | 默认 {"settings":{"number_of_shards": 2}} | es Document 中的配置，比如 {"settings":{"number_of_shards": 2}} |
+| index_class            | 默认 {"settings":{"number_of_shards": 2}} | es Document 中的配置                                         |
 | user                   | 默认 elastic                              | _                                                            |
 | password               | 默认 elastic                              | _                                                            |
 | init                   | 是否初始化 es Document，默认 false        | 是否创建 es 索引，此设置一般只在第一次运行项目时打开，或者选择手动创建并配置此参数永远为 false。 |
@@ -106,7 +106,10 @@
 | client_key             | 默认 None                                 | client_key 路径                                              |
 | ssl_assert_fingerprint | 默认 None                                 | es 启动中的 HTTP CA certificate SHA-256 fingerprint 参数     |
 
-注：`ca_certs`，`client_cert`，`client_key`，`ssl_assert_fingerprint` 中只用配置一个即可，若 `verify_certs` 设置为 `false` 则都不用配置以上参数，但推荐开启此参数。
+注：
+
+- `ca_certs`，`client_cert`，`client_key`，`ssl_assert_fingerprint` 中只用配置一个即可，若 `verify_certs` 设置为 `false` 则都不用配置以上参数，但推荐开启此参数。
+- `index_class` 配置中不建议包含 `name` 参数，而是通过 `AyuItem` 中的 `_table` 来设置，`AyuItem` 会覆盖 `index_class` 中的 `name` 配置。
 
 ## [mq]
 
