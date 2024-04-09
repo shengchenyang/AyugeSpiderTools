@@ -64,6 +64,9 @@
 本库将所有需要存储的字段直接在对应的 `Item` (`AyuItem`) 中赋值即可，其中 `_table` 参数为必须参数，也可以使用 `add_field` 方法动态添加字段。
 
 ```python
+_save_table = "_article_info_list"
+
+
 def parse(self, response):
     # 存储到 Mysql 场景时 Item 构建示例：
     article_mysql_item = AyuItem(
@@ -72,7 +75,7 @@ def parse(self, response):
         comment_count=comment_count,
         favor_count=favor_count,
         nick_name=nick_name,
-        _table="_article_info_list",
+        _table=_save_table,
     )
 
     # 存储到 MongoDB 场景时 Item 构建示例：
@@ -82,7 +85,7 @@ def parse(self, response):
         comment_count=comment_count,
         favor_count=favor_count,
         nick_name=nick_name,
-        _table="_article_info_list",
+        _table=_save_table,
         # 可选参数，此示例表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
         _mongo_update_rule={"article_detail_url": article_detail_url},
     )
@@ -103,7 +106,7 @@ def parse(self, response):
     )
 
 
-# 以上可以做到只赋值一次 AyuItem ，然后在 ITEM_PIPELINES 中激活对应的 pipelines 即可，这里是为了方便展示；
+# 具体不同的场景示例，请在 DemoSpider 项目中查看；
 # 如非场景需要，不推荐使用 DataItem 的方式构建 AyuItem，不太优雅。
 ```
 
