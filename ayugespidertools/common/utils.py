@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
 from urllib.parse import urlparse
 
-from ayugespidertools.common.encryption import EncryptOperation
+from ayugespidertools.common.encryption import Encrypt
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
 from ayugespidertools.extras.ext import AppConfManageMixin
@@ -73,7 +73,7 @@ class ToolsForAyu(AppConfManageMixin):
                 return data
 
             json_data = json.loads(data)
-            return EncryptOperation.base64_decode(decode_data=json_data[0]["Value"])
+            return Encrypt.base64_decode(decode_data=json_data[0]["Value"])
         return data
 
     @classmethod
@@ -268,10 +268,10 @@ class ToolsForAyu(AppConfManageMixin):
 
         if isinstance(data, str):
             data_bytes = Path(data).read_bytes()
-            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data_bytes)
+            data_base64_encoded = Encrypt.base64_encode(encode_data=data_bytes)
 
         else:
-            data_base64_encoded = EncryptOperation.base64_encode(encode_data=data)
+            data_base64_encoded = Encrypt.base64_encode(encode_data=data)
         return f"data:image/{mediatype};base64,{data_base64_encoded}"
 
     @staticmethod

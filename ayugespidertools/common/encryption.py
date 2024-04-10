@@ -6,15 +6,15 @@ from typing import Union
 from ayugespidertools.extras.ext import EncryptMixin
 
 __all__ = [
-    "EncryptOperation",
+    "Encrypt",
 ]
 
 
-class EncryptOperation(EncryptMixin):
+class Encrypt(EncryptMixin):
     """普通加密方法"""
 
-    @classmethod
-    def md5(cls, encrypt_data: str) -> str:
+    @staticmethod
+    def md5(encrypt_data: str) -> str:
         """md5 处理方法
 
         Args:
@@ -27,10 +27,8 @@ class EncryptOperation(EncryptMixin):
         hl.update(encrypt_data.encode(encoding="utf-8"))
         return hl.hexdigest()
 
-    @classmethod
-    def base64_encode(
-        cls, encode_data: Union[bytes, str], url_safe: bool = False
-    ) -> str:
+    @staticmethod
+    def base64_encode(encode_data: Union[bytes, str], url_safe: bool = False) -> str:
         """base64 编码
 
         Args:
@@ -46,8 +44,8 @@ class EncryptOperation(EncryptMixin):
             return str(base64.urlsafe_b64encode(encode_data), encoding="utf-8")
         return str(base64.b64encode(encode_data), encoding="utf-8")
 
-    @classmethod
-    def base64_decode(cls, decode_data: str, url_safe: bool = False) -> str:
+    @staticmethod
+    def base64_decode(decode_data: str, url_safe: bool = False) -> str:
         """base64 解码
 
         Args:

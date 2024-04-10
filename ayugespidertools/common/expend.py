@@ -165,8 +165,7 @@ class MysqlPipeEnhanceMixin:
             "start_time": text.get("start_time"),
             "finish_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "spend_minutes": round(
-                (_curr_utc_time - stats.get("start_time")).seconds / 60,
-                2,
+                (_curr_utc_time - stats.get("start_time")).seconds / 60, 2
             ),
             "crawl_time": crawl_time,
         }
