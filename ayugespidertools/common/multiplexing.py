@@ -286,8 +286,8 @@ class ReuseOperation:
                 break
         return ret
 
-    @classmethod
-    def is_dict_meet_min_limit(cls, dict_conf: dict, key_list: List[str]) -> bool:
+    @staticmethod
+    def is_dict_meet_min_limit(dict_conf: dict, key_list: List[str]) -> bool:
         """判断 dict_conf 是否满足 key_list 中的 key 值限定
 
         Args:
@@ -324,8 +324,8 @@ class ReuseOperation:
             else {}
         )
 
-    @classmethod
-    def get_items_except_keys(cls, dict_conf, keys: List[str]) -> dict:
+    @staticmethod
+    def get_items_except_keys(dict_conf, keys: List[str]) -> dict:
         """获取 dict_conf 中的不含有 keys 的 key 的字段
 
         Args:
@@ -337,8 +337,8 @@ class ReuseOperation:
         """
         return {k: dict_conf[k] for k in dict_conf if k not in keys}
 
-    @classmethod
-    def create_database(cls, db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
+    @staticmethod
+    def create_database(db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
         """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
         新建(不指定数据库)连接创建好所需数据库即可
 
@@ -438,8 +438,8 @@ class ReuseOperation:
             dict_conf=consul_conf_dict, keys=["token", "url", "format", "remote_type"]
         )
 
-    @classmethod
-    def judge_str_is_json(cls, judge_str: str) -> bool:
+    @staticmethod
+    def judge_str_is_json(judge_str: str) -> bool:
         """判断字符串是否为 json 格式
 
         Args:

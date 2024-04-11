@@ -67,8 +67,8 @@ class MongoDbBase:
             db = conn[database]
         return conn, db
 
-    @classmethod
-    def getFileMd5(cls, db, _id, collection):
+    @staticmethod
+    def getFileMd5(db, _id, collection):
         gridfs_col = GridFS(db, collection)
         gf = gridfs_col.get(_id)
         md5 = gf.md5

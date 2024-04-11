@@ -53,8 +53,8 @@ class CvnpilKit:
             img_cv = cv2.imread(img, flags)
         return img_cv
 
-    @classmethod
-    def clear_white(cls, img):
+    @staticmethod
+    def clear_white(img):
         """清除图片的空白区域，这里主要清除滑块的空白
 
         Args:
@@ -82,8 +82,8 @@ class CvnpilKit:
                     max_y = y
         return img[min_x:max_x, min_y:max_y]
 
-    @classmethod
-    def image_edge_detection(cls, img):
+    @staticmethod
+    def image_edge_detection(img):
         """图像边缘检测处理，识别图片边缘
 
         Args:
@@ -94,12 +94,9 @@ class CvnpilKit:
         """
         return cv2.Canny(img, 100, 200)
 
-    @classmethod
+    @staticmethod
     def _template_match(
-        cls,
-        bg: "MatLike",
-        slider: "MatLike",
-        out: Optional[str] = None,
+        bg: "MatLike", slider: "MatLike", out: Optional[str] = None
     ) -> int:
         """模板匹配找出滑块缺口的距离
 

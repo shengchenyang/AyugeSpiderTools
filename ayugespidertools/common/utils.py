@@ -40,10 +40,9 @@ RemoteConfNameStr = Literal[
 class ToolsForAyu(AppConfManageMixin):
     """这里用于存放框架所依赖的方法"""
 
-    @classmethod
+    @staticmethod
     @lru_cache(maxsize=16)
     def get_remote_kvs(
-        cls,
         url: str,
         remote_type: RemoteTypeStr = "consul",
         token: Optional[str] = None,
@@ -114,10 +113,9 @@ class ToolsForAyu(AppConfManageMixin):
             logger.info(f"远程配置 {remote_type} 中未设置 {conf_name}")
         return _conf
 
-    @classmethod
+    @staticmethod
     @DataHandle.simple_deal_for_extract
     def extract_with_css(
-        cls,
         response: "Response",
         query: str,
         get_all: bool = False,
@@ -141,10 +139,9 @@ class ToolsForAyu(AppConfManageMixin):
         else:
             return response.css(query).get(default="").strip()
 
-    @classmethod
+    @staticmethod
     @DataHandle.simple_deal_for_extract
     def extract_with_xpath(
-        cls,
         response: "Response",
         query: str,
         get_all: bool = False,
@@ -168,9 +165,9 @@ class ToolsForAyu(AppConfManageMixin):
         else:
             return response.xpath(query).get(default="").strip()
 
-    @classmethod
+    @staticmethod
     @DataHandle.simple_deal_for_extract
-    def extract_with_json(cls, json_data: dict, query: Union[str, List[str]]):
+    def extract_with_json(json_data: dict, query: Union[str, List[str]]):
         """scrapy 中提取 json 数据遇到的情况
 
         Args:
@@ -244,8 +241,8 @@ class ToolsForAyu(AppConfManageMixin):
             for b_key, b_value_list in dict(scrapy_headers).items()
         }
 
-    @classmethod
-    def get_data_urls_by_img(cls, mediatype: str, data: Union[bytes, str]) -> str:
+    @staticmethod
+    def get_data_urls_by_img(mediatype: str, data: Union[bytes, str]) -> str:
         """根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
         Data URLs 格式示例:
             data:image/png;base64,iVB...
