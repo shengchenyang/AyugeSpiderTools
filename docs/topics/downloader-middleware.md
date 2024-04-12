@@ -133,9 +133,6 @@ custom_settings = {
 yield AiohttpRequest(
     url="http://httpbin.org/get?get_args=1",
     callback=self.parse_get_fir,
-    meta={
-        "meta_data": "这是用来测试 parse_get_fir meta 的功能",
-    },
     args=AiohttpRequestArgs(
         method="GET",
         headers={
@@ -145,7 +142,6 @@ yield AiohttpRequest(
             "ck_key": "ck",
         },
     ),
-    dont_filter=True,
 )
 
 # 方式二：使用 scrapy 传统方式传值
@@ -158,10 +154,6 @@ yield AiohttpRequest(
     cookies={
         "ck_key": "ck",
     },
-    meta={
-        "meta_data": "这是用来测试 parse_get_fir meta 的功能",
-    },
-    dont_filter=True,
 )
 
 # 同样，发送 post 也可以选择两种方式
@@ -178,13 +170,6 @@ yield AiohttpRequest(
     cookies={
         "ck_key": "ck",
     },
-    meta={
-        "meta_data": "这是用来测试 parse_post_fir meta 的功能",
-    },
-    cb_kwargs={
-        "request_name": "normal_post1",
-    },
-    dont_filter=True,
 )
 # 测试 POST 请求示例一 - aiohttp args
 yield AiohttpRequest(
@@ -200,13 +185,6 @@ yield AiohttpRequest(
         },
         data=json.dumps(post_data),
     ),
-    meta={
-        "meta_data": "这是用来测试 parse_post_fir meta 的功能",
-    },
-    cb_kwargs={
-        "request_name": "aiohttp_post1",
-    },
-    dont_filter=True,
 )
 
 # 测试 POST 请求示例二 - normal
@@ -220,13 +198,6 @@ yield AiohttpFormRequest(
     },
     formdata=post_data,
     callback=self.parse_post_sec,
-    meta={
-        "meta_data": "这是用来测试 parse_post_sec meta 的功能",
-    },
-    cb_kwargs={
-        "request_name": "normal_post2",
-    },
-    dont_filter=True,
 )
 # 测试 POST 请求示例二 - aiohttp args
 yield AiohttpFormRequest(
@@ -242,12 +213,5 @@ yield AiohttpFormRequest(
         },
         data=post_data,
     ),
-    meta={
-        "meta_data": "这是用来测试 parse_post_sec meta 的功能",
-    },
-    cb_kwargs={
-        "request_name": "aiohttp_post2",
-    },
-    dont_filter=True,
 )
 ```

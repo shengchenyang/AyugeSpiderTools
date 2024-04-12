@@ -20,7 +20,6 @@ class $classname(AyuSpider):
                 yield Request(
                     url="https://myip.ipip.net",
                     callback=self.parse_first,
-                    dont_filter=True,
                 )
 
     async def parse_first(self, response):

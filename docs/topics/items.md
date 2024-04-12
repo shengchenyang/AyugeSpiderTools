@@ -203,7 +203,6 @@ import json
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
-from scrapy.http.response.text import TextResponse
 from sqlalchemy import text
 
 
@@ -239,11 +238,10 @@ class DemoOneSpider(AyuSpider):
             cb_kwargs={
                 "curr_site": "csdn",
             },
-            dont_filter=True,
         )
 
-    def parse_first(self, response: TextResponse, curr_site: str):
-        # 日志使用: scrapy 的 self.logger 或本库的 self.slog 或直接使用全局的 logger handle 也行（根据场景自行选择）
+    def parse_first(self, response, curr_site):
+        # 日志使用 scrapy 的 self.logger 或本库的 self.slog
         self.slog.info(f"当前采集的站点为: {curr_site}")
 
         _save_table = "_article_info_list"

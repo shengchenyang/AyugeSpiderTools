@@ -44,7 +44,6 @@ import json
 from ayugespidertools.items import DataItem, AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
-from scrapy.http.response.text import TextResponse
 from sqlalchemy import text
 
 
@@ -77,10 +76,9 @@ class DemoOneSpider(AyuSpider):
             headers={
                 "referer": "https://blog.csdn.net/rank/list",
             },
-            dont_filter=True,
         )
 
-    def parse_first(self, response: TextResponse):
+    def parse_first(self, response):
         _save_table = "demo_one"
         data_list = json.loads(response.text)["data"]
         for curr_data in data_list:
