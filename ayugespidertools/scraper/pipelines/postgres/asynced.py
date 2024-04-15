@@ -25,11 +25,9 @@ if TYPE_CHECKING:
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     postgres_conf: "PostgreSQLConf"
     pool: "AsyncConnectionPool"
-    running_tasks: set
 
     def open_spider(self, spider: "AyuSpider") -> "Deferred":
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
-        self.running_tasks = set()
         self.postgres_conf = spider.postgres_conf
         return deferred_from_coro(self._open_spider(spider))
 
