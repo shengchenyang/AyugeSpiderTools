@@ -82,10 +82,10 @@ class AbstractClass(ABC):
             cursor.execute(sql)
             lines = cursor.fetchall()
             if isinstance(lines, list):
-                # 注意，此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
+                # 此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
                 column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
             else:
-                # 注意，此处 AyuTwistedMysqlPipeline 返回的结构示例为：(('varchar(10)',),)
+                # 此处 AyuTwistedMysqlPipeline 返回的结构示例为：(('varchar(10)',),)
                 column_type = lines[0][0] if len(lines) == 1 else ""
 
         except Exception as e:

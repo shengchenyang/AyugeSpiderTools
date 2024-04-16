@@ -31,9 +31,9 @@ class KafkaProducerClient:
 
         Args:
             topic: kafka topic
-            value: message value. Must be type bytes, or be
-                serializable to bytes via configured value_serializer. If value
-                is None, key is required and message acts as a 'delete'.
+            value: message value. Must be type bytes, or be serializable to
+                bytes via configured value_serializer. If value is None, key is
+                required and message acts as a 'delete'.
             key: kafka key
         """
         # Asynchronous by default

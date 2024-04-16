@@ -230,7 +230,6 @@ class ReuseOperation:
             dict_conf=item_dict, keys=["_mongo_update_rule", "_table"]
         )
         judge_item = next(iter(insert_data.values()))
-        # 是 namedtuple 类型
         if cls.is_namedtuple_instance(judge_item):
             is_namedtuple = True
             _table_name = item_dict["_table"].key_value
@@ -239,7 +238,7 @@ class ReuseOperation:
             for key, value in insert_data.items():
                 new_item[key] = value.key_value
                 notes_dic[key] = value.notes
-        # 是普通的 dict 类型
+
         else:
             _table_name = item_dict["_table"]
             table_info = AlterItemTable(_table_name, "")
@@ -317,7 +316,6 @@ class ReuseOperation:
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
-        # 参数先要满足最小限定，然后再取出限定的参数值；否则返回空字典
         return (
             {k: dict_conf[k] for k in keys}
             if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=keys)
@@ -468,8 +466,6 @@ class ReuseOperation:
         Returns:
             1). 转化 dict 格式后的 ck
         """
-        # 也可以这样写，但不推荐
-        # dict(line.split("=", 1) for line in headers_ck_str.split("; "))
         return {
             x.split("=", 1)[0].strip(): x.split("=", 1)[1].strip()
             for x in headers_ck_str.split(";")

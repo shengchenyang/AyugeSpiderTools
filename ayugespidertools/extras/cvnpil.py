@@ -114,7 +114,6 @@ class CvnpilKit:
         # 左上角点的坐标
         tl = max_loc
 
-        # 是否要输出绘制图像
         if out:
             # 绘制方框
             th, tw = slider.shape[:2]
@@ -122,7 +121,6 @@ class CvnpilKit:
             br = (tl[0] + tw, tl[1] + th)
             cv2.rectangle(bg, tl, br, (0, 0, 255), 2)
             cv2.imwrite(out, bg)
-        # 返回缺口的X坐标
         return tl[0]
 
     @classmethod
@@ -150,7 +148,6 @@ class CvnpilKit:
         bg_img = cls.image_edge_detection(bg_cv)
         slider_img = cv2.cvtColor(slider_img, cv2.COLOR_GRAY2RGB)
         bg_img = cv2.cvtColor(bg_img, cv2.COLOR_GRAY2RGB)
-        # 输出横坐标, 即滑块在图片上的位置
         return cls._template_match(bg_img, slider_img, out)
 
     @classmethod
@@ -216,11 +213,10 @@ class CvnpilKit:
             if len(loc[1]) > 1:
                 rgt += (rgt - lft) / 2
             elif len(loc[1]) == 1:
-                # 找到目标区域起点x坐标为：loc[1][0]
+                # 找到目标区域起点 x 坐标为：loc[1][0]
                 break
             elif len(loc[1]) < 1:
                 rgt -= (rgt - lft) / 2
-        # 返回 x 坐标
         return loc[1][0]
 
     @staticmethod

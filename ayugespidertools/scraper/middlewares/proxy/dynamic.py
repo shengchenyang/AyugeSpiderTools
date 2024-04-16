@@ -30,8 +30,6 @@ class DynamicProxyDownloaderMiddleware:
         return s
 
     def process_request(self, request: "Request", spider: "AyuSpider") -> None:
-        # TODO: 根据权重来随机获取一个账号 DYNAMIC_PROXY_CONFIG
-        # account = ReuseOperation.random_weight(self.account_arr)
         if request.url.startswith("https://"):
             request.meta["proxy"] = (
                 f"https://{self.username}:{self.password}@{self.proxy_url}/"

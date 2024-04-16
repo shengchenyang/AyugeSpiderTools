@@ -67,14 +67,11 @@ class MysqlPipeEnhanceMixin:
                 logger.warning(
                     f"目标数据库：{mysql_conf.database} 不存在，尝试创建中..."
                 )
-                # 如果连接目标数据库报不存在的错误时，先创建出此目标数据库
                 ReuseOperation.create_database(db_conf=mysql_conf)
             else:
                 logger.error(f"connect to mysql failed: {e}")
         else:
-            # 连接没有问题就直接返回连接对象
             return conn
-        # 出现数据库不存在问题后，在创建数据库后，再次返回连接对象
         return pymysql.connect(**pymysql_conn_args)
 
     def _get_sql_by_item(

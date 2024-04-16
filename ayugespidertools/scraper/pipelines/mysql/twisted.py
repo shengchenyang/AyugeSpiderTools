@@ -25,7 +25,6 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
-        # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。
         self._connect(self.mysql_conf).close()
 
         _mysql_conf = {

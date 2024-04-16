@@ -25,7 +25,6 @@ class RandomRequestUaMiddleware:
         self.explorer_weights = None
 
     def get_random_ua_by_weight(self) -> str:
-        # 先按权重取出所需浏览器类型
         explorer_types = random.choices(
             self.explorer_types, weights=self.explorer_weights
         )
@@ -53,5 +52,4 @@ class RandomRequestUaMiddleware:
         )
 
     def process_request(self, request: "Request", spider: "AyuSpider") -> None:
-        # 根据权重来获取随机请求头 ua 信息
         request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())

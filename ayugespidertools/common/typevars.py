@@ -1,4 +1,4 @@
-# Define your TypeVar here
+# Define your Types here
 import threading
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, Union

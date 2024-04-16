@@ -36,11 +36,9 @@ class AbstractClass(ABC):
         )
         table_name = item_dict["_table"]
         judge_item = next(iter(insert_data.values()))
-        # 是 namedtuple 类型
         if ReuseOperation.is_namedtuple_instance(judge_item):
             insert_data = {v: insert_data[v].key_value for v in insert_data.keys()}
             table_name = item_dict["_table"].key_value
-        # 是普通的 dict 格式，则直接为 insert_data
         return insert_data, table_name
 
     def process_item_template(

@@ -43,16 +43,11 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
             self.pool_db_conf = {
                 "maxconnections": 5,
-                # 连接池中空闲连接的最大数量。默认 0，即无最大数量限制
                 "maxcached": 0,
-                # 连接的最大使用次数。默认 0，即无使用次数限制
                 "maxusage": 0,
-                # 连接数达到最大时，新连接是否可阻塞。默认False，即达到最大连接数时，再取新连接将会报错
                 "blocking": True,
             }
         self.mysql_conf = spider.mysql_conf
-
-        # 判断目标数据库是否连接正常。若连接目标数据库错误时，创建缺失的目标数据库。这个并不需要此连接对象，直接关闭即可
         self._connect(spider.mysql_conf).close()
 
         # 添加 PooledDB 的配置

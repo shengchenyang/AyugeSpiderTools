@@ -72,5 +72,4 @@ class Encrypt(EncryptMixin):
         """
         _uni = re.sub(r"^(0x|U\+|uni)", "", uni)
         unicode_value = int(_uni, 16)
-        # 使用 chr() 函数将整数值转换为字符
         return chr(unicode_value)

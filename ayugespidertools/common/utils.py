@@ -204,7 +204,6 @@ class ToolsForAyu(AppConfManageMixin):
         Returns:
             1). 提取的内容
         """
-        # 先判断层级，最多为 2 层
         depth_num = ReuseOperation.get_array_depth(query_rules)
         assert depth_num <= 2, "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
@@ -312,7 +311,7 @@ class ToolsForAyu(AppConfManageMixin):
         t_list = [random.randint(50, 160)]
         x_list = [random.randint(5, 11)]
         y_list = []
-        # 生成x坐标轨迹, 生成t坐标轨迹
+        # 生成 x 坐标轨迹, 生成 t 坐标轨迹
         for j in range(1, distance):
             x_list.append(x_list[j - 1] + random.randint(2, 4))
             if x_list[j] > distance:
@@ -326,7 +325,7 @@ class ToolsForAyu(AppConfManageMixin):
                 break
 
         length = len(x_list)
-        # 生成y坐标轨迹
+        # 生成 y 坐标轨迹
         for i in range(1, length + 1):
             if i < int(length * 0.4):
                 y_list.append(0)
@@ -340,7 +339,7 @@ class ToolsForAyu(AppConfManageMixin):
                 y_list.append(-4)
             t_list.append(t_list[i - 1] + random.randint(20, 80))
 
-        # 生成t的坐标
+        # 生成 t 的坐标
         xyt = list(zip(x_list, y_list, t_list))
         for j in range(length):
             xyt[j] = list(xyt[j])

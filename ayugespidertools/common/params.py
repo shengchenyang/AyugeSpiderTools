@@ -11,8 +11,6 @@ class Param:
     retry_num = 3
     retry_time_min = 200
     retry_time_max = 1000
-    # stop_max_delay 限制最长重试时间
-    stop_max_delay = 5000
 
     aiohttp_retry_times_default = 3
 
