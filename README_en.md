@@ -167,7 +167,7 @@ provided. Please fill in the required content for testing, then:
    your `scrapy` project and other components.
 
    You can use this library to develop native `scrapy`, or you can use `scrapy` style to develop, but it is still
-   recommended to use the style recommended by this library for development. Will not cause excessive migration costs to
+   recommended to use the style development in the `DemoSpider` example. Will not cause excessive migration costs to
    developers.
 
 3. Code test coverage is a bit low, should you consider increasing it?
