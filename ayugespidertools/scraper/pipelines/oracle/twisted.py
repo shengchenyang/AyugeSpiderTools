@@ -11,6 +11,7 @@ __all__ = [
 
 if TYPE_CHECKING:
     from oracledb.connection import Connection
+    from twisted.python.failure import Failure
 
     from ayugespidertools.common.typevars import OracleConf, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -42,10 +43,10 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         query = self.dbpool.runInteraction(self.db_create)
         query.addErrback(self.db_create_err)
 
-    def db_create(self, cursor):
+    def db_create(self, cursor: Any) -> None:
         pass
 
-    def db_create_err(self, failure):
+    def db_create_err(self, failure: "Failure") -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
     def process_item(self, item: Any, spider: "AyuSpider") -> Any:
@@ -54,7 +55,7 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         query.addErrback(self.handle_error, item)
         return item
 
-    def db_insert(self, cursor, item):
+    def db_insert(self, cursor: Any, item: Any) -> Any:
         alter_item = ReuseOperation.reshape_item(item)
         if not (new_item := alter_item.new_item):
             return
@@ -63,5 +64,5 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         cursor.execute(sql, tuple(new_item.values()))
         return item
 
-    def handle_error(self, failure, item):
+    def handle_error(self, failure: "Failure", item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

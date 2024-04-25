@@ -43,7 +43,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         self.insert_item(alter_item)
         return item
 
-    def insert_item(self, alter_item: "AlterItem"):
+    def insert_item(self, alter_item: "AlterItem") -> None:
         """通用插入数据
 
         Args:
