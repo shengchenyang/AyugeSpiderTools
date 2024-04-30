@@ -23,6 +23,6 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
             TwistedAsynchronous(),
             item_dict=item_dict,
             db=self.db,
-            sys_ver_low=self.sys_ver_low,
+            pymongo_ver_low=self.pymongo_ver_low,
         )
         reactor.callFromThread(out.callback, item_dict)

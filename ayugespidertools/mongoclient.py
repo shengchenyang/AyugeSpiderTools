@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Optional, Tuple
 
+import pymongo
 from gridfs import GridFS
 from pymongo import MongoClient
 
@@ -11,7 +12,6 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    import pymongo
     from pymongo import database
 
     from ayugespidertools.common.typevars import authMechanismStr
@@ -37,7 +37,7 @@ class MongoDbBase:
         authMechanism: "authMechanismStr" = "SCRAM-SHA-1",
         database: Optional[str] = None,
         uri: Optional[str] = None,
-    ) -> Tuple["pymongo.MongoClient", "database.Database"]:
+    ) -> Tuple[pymongo.MongoClient, "database.Database"]:
         """初始化 mongo 连接句柄
         可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
 
@@ -66,6 +66,11 @@ class MongoDbBase:
             )
             db = conn[database]
         return conn, db
+
+    @staticmethod
+    def ver_low() -> bool:
+        pymongo_ver = pymongo.version or pymongo.__version__
+        return pymongo_ver <= "3.13.0"
 
     @staticmethod
     def getFileMd5(db, _id, collection):
