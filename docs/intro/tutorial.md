@@ -35,15 +35,11 @@ DemoSpider/
 |   |   |-- error.log		# loguru 日志 error 规则输出文件
 |   |-- middlewares.py		# project middlewares definition file
 |   |-- pipelines.py		# project pipelines definition file
-|   |-- run.py			# scrapy 运行文件
-|   |-- run.sh			# 项目运行 shell，运行以上的 run.py，win 平台不会生成此文件
 |   |-- settings.py		# project settings definition file
 |   |-- spiders			# a directory where you'll later put your spiders
 |   |   |-- __init__.py
 |   `-- VIT
-|       `-- .conf        	# 配置文件，用于修改 Mysql, MongoDB 等配置
-|-- README.md			# 说明文档
-|-- requirements.txt		# 依赖文件
+|       `-- .conf        	# 配置文件，用于设置 Mysql, MongoDB 等配置
 `-- scrapy.cfg                  # deploy configuration file
 ```
 

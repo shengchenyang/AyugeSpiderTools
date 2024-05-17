@@ -25,16 +25,12 @@
 |   |   `-- error.log
 |   |-- middlewares.py
 |   |-- pipelines.py
-|   |-- run.py
-|   |-- run.sh
 |   |-- settings.py
 |   |-- spiders
 |   |   |-- __init__.py
 |   |   `-- spider1.py
 |   `-- VIT
 |       `-- .conf
-|-- README.md
-|-- requirements.txt
 `-- scrapy.cfg
 ```
 
