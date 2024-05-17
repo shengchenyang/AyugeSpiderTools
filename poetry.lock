@@ -700,6 +700,17 @@ files = [
 ]
 
 [[package]]
+name = "defusedxml"
+version = "0.7.1"
+description = "XML bomb protection for Python stdlib modules"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"},
+    {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.8"
 description = "Distribution utilities"
@@ -2819,18 +2830,19 @@ six = ">=1.7.0"
 
 [[package]]
 name = "scrapy"
-version = "2.11.1"
+version = "2.11.2"
 description = "A high-level Web Crawling and Web Scraping framework"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Scrapy-2.11.1-py2.py3-none-any.whl", hash = "sha256:f1edee0cd214512054c01a8d031a8d213dddb53492b02c9e66256e3efe90d175"},
-    {file = "Scrapy-2.11.1.tar.gz", hash = "sha256:733a039c7423e52b69bf2810b5332093d4e42a848460359c07b02ecff8f73ebe"},
+    {file = "Scrapy-2.11.2-py2.py3-none-any.whl", hash = "sha256:4be353d6abbb942a9f7e7614ca8b5f3d9037381176ac8d8859c8cac676e74fa0"},
+    {file = "scrapy-2.11.2.tar.gz", hash = "sha256:dfbd565384fc3fffeba121f5a3a2d0899ac1f756d41432ca0879933fbfb3401d"},
 ]
 
 [package.dependencies]
 cryptography = ">=36.0.0"
 cssselect = ">=0.9.1"
+defusedxml = ">=0.7.1"
 itemadapter = ">=0.1.0"
 itemloaders = ">=1.0.1"
 lxml = ">=4.4.1"
@@ -3618,4 +3630,4 @@ database = ["elasticsearch-dsl", "oracledb", "psycopg", "psycopg-binary", "psyco
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "233c9f54be153f6bbe05af7c2379d57446b69446186d52678eae8ddf6d7cc109"
+content-hash = "8d49fe450ec1dcd56260dc5b922a7818477f39223a912d5c7b439b1edd3ae3cc"
