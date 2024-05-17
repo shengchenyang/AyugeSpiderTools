@@ -236,7 +236,7 @@ class TestCrawlSpider(SpiderTest):
             rules = (Rule(LinkExtractor(), process_links="dummy_process_links"),)
 
             def dummy_process_links(self, links):
-                return links
+                yield from links
 
         spider = _CrawlSpider()
         output = list(spider._requests_to_follow(response))

@@ -1,30 +1,42 @@
+from __future__ import annotations
+
 import argparse
 import cProfile
 import inspect
 import os
 import sys
 from importlib.metadata import entry_points
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Tuple, Type
 
 from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import CrawlerProcess
 from scrapy.exceptions import UsageError
+from scrapy.settings import BaseSettings, Settings
 from scrapy.utils.misc import walk_modules
 from scrapy.utils.project import get_project_settings, inside_project
 from scrapy.utils.python import garbage_collect
 
 from ayugespidertools import __version__
 
+if TYPE_CHECKING:
+    # typing.ParamSpec requires Python 3.10
+    from typing_extensions import ParamSpec
+
+    _P = ParamSpec("_P")
+
 
 class ScrapyArgumentParser(argparse.ArgumentParser):
-    def _parse_optional(self, arg_string):
-        # if starts with -: it means that is a parameter not an argument
+    def _parse_optional(
+        self, arg_string: str
+    ) -> Optional[Tuple[Optional[argparse.Action], str, Optional[str]]]:
+        # if starts with -: it means that is a parameter not a argument
         if arg_string[:2] == "-:":
             return None
 
         return super()._parse_optional(arg_string)
 
 
-def _iter_command_classes(module_name):
+def _iter_command_classes(module_name: str) -> Iterable[Type[ScrapyCommand]]:
     # TODO: add `name` attribute to commands and merge this function with
     # scrapy.utils.spider.iter_spider_classes
     for module in walk_modules(module_name):
@@ -38,8 +50,8 @@ def _iter_command_classes(module_name):
                 yield obj
 
 
-def _get_commands_from_module(module, inproject):
-    d = {}
+def _get_commands_from_module(module: str, inproject: bool) -> Dict[str, ScrapyCommand]:
+    d: Dict[str, ScrapyCommand] = {}
     for cmd in _iter_command_classes(module):
         if inproject or not cmd.requires_project:
             cmdname = cmd.__module__.split(".")[-1]
@@ -47,8 +59,10 @@ def _get_commands_from_module(module, inproject):
     return d
 
 
-def _get_commands_from_entry_points(inproject, group="ayugespidertools.commands"):
-    cmds = {}
+def _get_commands_from_entry_points(
+    inproject: bool, group: str = "ayugespidertools.commands"
+) -> Dict[str, ScrapyCommand]:
+    cmds: Dict[str, ScrapyCommand] = {}
     if sys.version_info >= (3, 10):
         eps = entry_points(group=group)
     else:
@@ -62,7 +76,9 @@ def _get_commands_from_entry_points(inproject, group="ayugespidertools.commands"
     return cmds
 
 
-def _get_commands_dict(settings, inproject):
+def _get_commands_dict(
+    settings: BaseSettings, inproject: bool
+) -> Dict[str, ScrapyCommand]:
     cmds = _get_commands_from_module("ayugespidertools.commands", inproject)
     cmds.update(_get_commands_from_entry_points(inproject))
     cmds_module = settings["COMMANDS_MODULE"]
@@ -71,16 +87,17 @@ def _get_commands_dict(settings, inproject):
     return cmds
 
 
-def _pop_command_name(argv):
+def _pop_command_name(argv: List[str]) -> Optional[str]:
     i = 0
     for arg in argv[1:]:
         if not arg.startswith("-"):
             del argv[i]
             return arg
         i += 1
+    return None
 
 
-def _print_header(settings, inproject):
+def _print_header(settings: BaseSettings, inproject: bool) -> None:
     if inproject:
         print(
             f"AyugeSpiderTools {__version__} - active project: {settings['BOT_NAME']}\n"
@@ -89,7 +106,7 @@ def _print_header(settings, inproject):
         print(f"AyugeSpiderTools {__version__} - no active project\n")
 
 
-def _print_commands(settings, inproject):
+def _print_commands(settings: BaseSettings, inproject: bool) -> None:
     _print_header(settings, inproject)
     print("Usage:")
     print("  ayuge <command> [options] [args]\n")
@@ -104,13 +121,20 @@ def _print_commands(settings, inproject):
     print('Use "ayuge <command> -h" to see more info about a command')
 
 
-def _print_unknown_command(settings, cmdname, inproject):
+def _print_unknown_command(
+    settings: BaseSettings, cmdname: str, inproject: bool
+) -> None:
     _print_header(settings, inproject)
     print(f"Unknown command: {cmdname}\n")
     print('Use "ayuge" to see available commands')
 
 
-def _run_print_help(parser, func, *a, **kw):
+def _run_print_help(
+    parser: argparse.ArgumentParser,
+    func: Callable[_P, None],
+    *a: _P.args,
+    **kw: _P.kwargs,
+) -> None:
     try:
         func(*a, **kw)
     except UsageError as e:
@@ -121,7 +145,9 @@ def _run_print_help(parser, func, *a, **kw):
         sys.exit(2)
 
 
-def execute(argv=None, settings=None):
+def execute(
+    argv: Optional[List[str]] = None, settings: Optional[Settings] = None
+) -> None:
     if argv is None:
         argv = sys.argv
 
@@ -163,14 +189,16 @@ def execute(argv=None, settings=None):
     sys.exit(cmd.exitcode)
 
 
-def _run_command(cmd, args, opts):
+def _run_command(cmd: ScrapyCommand, args: List[str], opts: argparse.Namespace) -> None:
     if opts.profile:
         _run_command_profiled(cmd, args, opts)
     else:
         cmd.run(args, opts)
 
 
-def _run_command_profiled(cmd, args, opts):
+def _run_command_profiled(
+    cmd: ScrapyCommand, args: List[str], opts: argparse.Namespace
+) -> None:
     if opts.profile:
         sys.stderr.write(
             f"ayugespidertools: writing cProfile stats to {opts.profile!r}\n"

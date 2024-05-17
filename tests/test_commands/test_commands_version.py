@@ -1,3 +1,4 @@
+import argparse
 import sys
 from io import StringIO
 from pathlib import Path
@@ -15,8 +16,12 @@ ProcessTest.prefix = [sys.executable, "-m", "ayugespidertools.utils.cmdline"]
 
 def test_version():
     cmd = AyuCommand()
-    output = StringIO()
-    cmd.run([], {"stdout": output})
+    namespace = argparse.Namespace()
+    options = {"stdout": StringIO()}
+    for key, value in options.items():
+        setattr(namespace, key, value)
+
+    cmd.run([], namespace)
     assert cmd.short_desc() == "Print AyugeSpiderTools version"
 
 

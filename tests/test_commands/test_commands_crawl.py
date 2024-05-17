@@ -2,10 +2,9 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from shutil import rmtree
-from tempfile import mkdtemp
+from tempfile import TemporaryFile, mkdtemp
 from threading import Timer
 from typing import Optional, Union
 
@@ -28,7 +27,7 @@ class ProjectTest(unittest.TestCase):
         rmtree(self.temp_path)
 
     def call(self, *new_args, **kwargs):
-        with tempfile.TemporaryFile() as out:
+        with TemporaryFile() as out:
             args = (sys.executable, "-m", "ayugespidertools.utils.cmdline") + new_args
             return subprocess.call(
                 args, stdout=out, stderr=out, cwd=self.cwd, env=self.env, **kwargs

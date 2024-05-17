@@ -6,11 +6,10 @@ from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, 
 from sqlalchemy import create_engine
 
 if TYPE_CHECKING:
-    import logging
-
     from loguru import Logger
+    from scrapy.utils.log import SpiderLoggerAdapter
 
-    slogT = Union[Logger, logging.LoggerAdapter]
+    slogT = Union[Logger, SpiderLoggerAdapter]
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)
