@@ -6,7 +6,7 @@ from ayugespidertools.spiders import AyuSpider
 class $classname(AyuSpider):
     name = "$name"
     allowed_domains = ["$domain"]
-    start_urls = ["http://$domain/"]
+    start_urls = ["$url"]
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }

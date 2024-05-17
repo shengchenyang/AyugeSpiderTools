@@ -7,7 +7,7 @@ from sqlalchemy import text
 class $classname(AyuSpider):
     name = "$name"
     allowed_domains = ["$domain"]
-    start_urls = ["http://$domain/"]
+    start_urls = ["$url"]
     custom_settings = {
         "DATABASE_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
@@ -29,12 +29,10 @@ class $classname(AyuSpider):
         for curr_li in li_list:
             octree_text = curr_li.xpath("a/text()").get()
             octree_href = curr_li.xpath("a/@href").get()
-            octree_full_link = response.urljoin(octree_href)
 
             octree_item = AyuItem(
                 octree_text=octree_text,
                 octree_href=octree_href,
-                octree_full_link=octree_full_link,
                 _table=_save_table,
                 # 可选参数：这里表示 MongoDB 存储场景以 octree_text 为去重规则，若存在则更新，不存在则新增
                 _mongo_update_rule={"octree_text": octree_text},

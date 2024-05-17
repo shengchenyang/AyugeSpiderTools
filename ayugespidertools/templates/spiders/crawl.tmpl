@@ -7,7 +7,7 @@ from ayugespidertools.spiders import AyuCrawlSpider
 class $classname(AyuCrawlSpider):
     name = "$name"
     allowed_domains = ["$domain"]
-    start_urls = ["http://$domain/"]
+    start_urls = ["$url"]
     custom_settings = {
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
