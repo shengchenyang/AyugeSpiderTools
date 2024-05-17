@@ -1,24 +1,31 @@
 # Release notes
 
-## AyugeSpiderTools 3.9.8 (Preview: TBD)
+## AyugeSpiderTools 3.9.9 (Preview: TBD)
 
-这是预发布版本，部分内容还处于待定状态，和最终正式版可能会有所不同，不建议在生产环境中使用，可自行打包来提前测试和体验。
+此部分用于展示下一版本更新预览。
+
+这是预发布版本，部分内容还处于待定状态，和最终正式版可能会有所不同（包括版本号），不建议在生产环境中使用，可自行打包来提前测试和体验。
+
+打包参考教程请查看：[How-To-Build-Your-Own-Library](https://ayugespidertools.readthedocs.io/en/latest/diy/myself.html)
+
+... ...
+
+## AyugeSpiderTools 3.9.8 (2024-05-17)
 
 ### Deprecations
 
 - 删除新建项目中 `pyproject.toml` 模板。（[bb0adf3](https://github.com/shengchenyang/AyugeSpiderTools/commit/bb0adf3083cfdbeace76ddb96c9ac35a6dc4f76d)）
-- 删除新建项目中 `run.py`, `run.sh`, `README.md`, `requirements.txt` 模板的过度设计，不影响程序功能，按需自行添加。（[2a02faa](https://github.com/shengchenyang/AyugeSpiderTools/commit/2a02faa385069ac3a93194296c326dc31228c47b)）
+- 删除新建项目中 `run.py`, `run.sh`, `README.md`, `requirements.txt` 模板的过度设计，不影响程序功能，按需自行添加。（[2a02faa](https://github.com/shengchenyang/AyugeSpiderTools/commit/2a02faa385069ac3a93194296c326dc31228c47b), [cb1393f](https://github.com/shengchenyang/AyugeSpiderTools/commit/cb1393f70f49e4f956adecc4be5126871a97c3df)）
 - 更新 `spider` 模板内容，保证示例的稳定，为了通用性去除 `type hint`（请按需自行添加，`DemoSpider` 项目中有示例），并规避一些问题等。（[7dc45fd](https://github.com/shengchenyang/AyugeSpiderTools/commit/7dc45fda8af3270d713fc21d9feda3ca8d6ea739)）
 - `EncryptOperation` 改名为 `Encrypt`，不影响库的使用。（[5e529ca](https://github.com/shengchenyang/AyugeSpiderTools/commit/5e529ca3eb625637894712a3972ba95a612c1526)）
 - 删除库中未使用的 `get_files_from_path` 方法。（[e0d04d2](https://github.com/shengchenyang/AyugeSpiderTools/commit/e0d04d27a5b1a58eabe785485ed3402f0748c892)）
 
 补充：
 此弃用和变动并不影响项目中的功能，只涉及一些自动生成的多余配置文件，运行文件等，这些为过度设计（不应替用户强行决定，且未做到完美适配）。
-修改了 `.conf` 模板为英文，以解决中英文混编下的格式问题。
 
 ### New features
 
-- 无。
+- 同步更新 `scrapy` 依赖版本为 `2.11.2`。（[1618654](https://github.com/shengchenyang/AyugeSpiderTools/commit/1618654d4c2b9bd4032a52844e29abe17d2ee532)）
 
 ### Bug fixes
 
@@ -27,7 +34,7 @@
 ### Code optimizations
 
 - `requests` 相关代码更换为 `urllib` 方式。（[f014030](https://github.com/shengchenyang/AyugeSpiderTools/commit/f01403012bcebce0e49c27840dff446aa7ef70fd)，[5cd28cc](https://github.com/shengchenyang/AyugeSpiderTools/commit/5cd28ccd6f38d1a37b2d57cf7bc1306c13173d1e)）
-- `.conf` 模板格式整理。（[f6f0e43](https://github.com/shengchenyang/AyugeSpiderTools/commit/f6f0e43bd5fcced5f724882606941fd033a56156)，[01d02a1](https://github.com/shengchenyang/AyugeSpiderTools/commit/01d02a19ee275fe80c52d696dee39500d35c9581)，[8ded926](https://github.com/shengchenyang/AyugeSpiderTools/commit/8ded926de0a04680ce91fd07bfde36d478bfda5e)）
+- `.conf` 模板格式整理，修改模板为英文，以解决中英文混编下的格式问题。（[f6f0e43](https://github.com/shengchenyang/AyugeSpiderTools/commit/f6f0e43bd5fcced5f724882606941fd033a56156)，[01d02a1](https://github.com/shengchenyang/AyugeSpiderTools/commit/01d02a19ee275fe80c52d696dee39500d35c9581)，[8ded926](https://github.com/shengchenyang/AyugeSpiderTools/commit/8ded926de0a04680ce91fd07bfde36d478bfda5e)）
 - 添加 `.editorconfig` 配置。([d175c6e](https://github.com/shengchenyang/AyugeSpiderTools/commit/d175c6e0ddfaf3dcc105c62ada422c9f907388cb))
 - `poetry` 依赖更新。（[f783546](https://github.com/shengchenyang/AyugeSpiderTools/commit/f78354616c3e95d8e00238e8970fe332373a0273)）
 - 文档更新。
