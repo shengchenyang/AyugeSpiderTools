@@ -198,8 +198,6 @@ item = AyuItem(_table="ta")
 `AyuItem` 在 `spider` 中常用的基础使用方法示例，以本库模板中的 `basic.tmpl` 为例来作解释：
 
 ```python
-import json
-
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
@@ -208,8 +206,8 @@ from sqlalchemy import text
 
 class DemoOneSpider(AyuSpider):
     name = "demo_one"
-    allowed_domains = ["csdn.net"]
-    start_urls = ["https://www.csdn.net/"]
+    allowed_domains = ["readthedocs.io"]
+    start_urls = ["http://readthedocs.io/"]
     custom_settings = {
         # 数据库引擎开关，打开会有对应的 engine 和 engine_conn，可用于数据入库前去重判断
         "DATABASE_ENGINE_ENABLED": True,
@@ -219,75 +217,56 @@ class DemoOneSpider(AyuSpider):
             # 激活此项则数据会存储至 MongoDB
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
         },
-        "DOWNLOADER_MIDDLEWARES": {
-            # 随机请求头
-            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
-        },
     }
 
     def start_requests(self):
-        """
-        get 请求首页，获取项目列表数据
-        """
         yield Request(
-            url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
+            url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
-            headers={
-                "referer": "https://blog.csdn.net/rank/list",
-            },
-            cb_kwargs={
-                "curr_site": "csdn",
-            },
         )
 
-    def parse_first(self, response, curr_site):
-        # 日志使用 scrapy 的 self.logger 或本库的 self.slog
-        self.slog.info(f"当前采集的站点为: {curr_site}")
+    def parse_first(self, response):
+        _save_table = "_octree_info"
 
-        _save_table = "_article_info_list"
         # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
-        data_list = json.loads(response.text)["data"]
-        for curr_data in data_list:
-            article_detail_url = curr_data.get("articleDetailUrl")
-            article_title = curr_data.get("articleTitle")
-            comment_count = curr_data.get("commentCount")
-            favor_count = curr_data.get("favorCount")
-            nick_name = curr_data.get("nickName")
+        li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
+        for curr_li in li_list:
+            octree_text = curr_li.xpath("a/text()").get()
+            octree_href = curr_li.xpath("a/@href").get()
 
-            article_item = AyuItem(
-                article_detail_url=article_detail_url,
-                article_title=article_title,
-                comment_count=comment_count,
-                favor_count=favor_count,
-                nick_name=nick_name,
+            octree_item = AyuItem(
+                octree_text=octree_text,
+                octree_href=octree_href,
                 _table=_save_table,
-                # 这里表示 MongoDB 存储场景以 article_detail_url 为去重规则，若存在则更新，不存在则新增
-                _mongo_update_rule={"article_detail_url": article_detail_url},
+                # 可选参数：这里表示 MongoDB 存储场景以 octree_text 为去重规则，若存在则更新，不存在则新增
+                _mongo_update_rule={"octree_text": octree_text},
             )
-            self.slog.info(f"article_item: {article_item}")
+            # 日志使用 scrapy 的 self.logger 或本库的 self.slog
+            self.slog.info(f"octree_item: {octree_item}")
 
             # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
             # 此时更适合：
-            #    1.mysql 添加唯一索引去重（本库会根据 on duplicate key update 更新），
+            #    1.mysql 添加唯一索引去重（结合 odku_enable 配置，本库会根据 on duplicate key update 更新），
             #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
-            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择。
-            # 这里只是为了介绍使用 mysql_engine / mysql_engine_conn 来对 mysql 去重的方法。
+            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择;
+            #    3.同时存储多个数据库场景更推荐使用第三方去重来统一管理，比如 scrapy-redis，布隆过滤等。
+            # 这里只是为了介绍使用 mysql_engine_conn 来对 mysql 去重的方法。
             if self.mysql_engine_conn:
                 try:
                     _sql = text(
-                        f"""select `id` from `{_save_table}` where `article_detail_url` = "{article_detail_url}" limit 1"""
+                        f"""select `id` from `{_save_table}` where `octree_text` = "{octree_text}" limit 1"""
                     )
                     result = self.mysql_engine_conn.execute(_sql).fetchone()
                     if not result:
                         self.mysql_engine_conn.rollback()
-                        yield article_item
+                        yield octree_item
                     else:
-                        self.slog.debug(f'标题为 "{article_title}" 的数据已存在')
+                        self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
                 except Exception as e:
                     self.mysql_engine_conn.rollback()
-                    yield article_item
+                    yield octree_item
             else:
-                yield article_item
+                yield octree_item
 ```
 
 > 由上可知，本库中的 `Item` 使用方法还是很方便的。

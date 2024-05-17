@@ -2,7 +2,7 @@
 
 在本教程中，我们假设您的系统上已经安装了 `ayugespidertools`。
 
-> 我们要抓取 [blog.csdn.net](https://blog.csdn.net/)，这是一个知识问答社区的网站。
+> 我们要抓取 [ayugespidertools readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 的网页内容，这是本库的文档网站。
 >
 
 本教程将引导您完成这些任务：
@@ -49,20 +49,18 @@ DemoSpider/
 
 ## 我们的第一个 Spider
 
-这是我们第一个 `Spider` 的代码。`demo_one.py` 将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
+这是我们第一个 `Spider` 的代码 `demo_one.py` ，将其保存在项目目录下命名的文件 `DemoSpider/spiders`中：
 
 ```python
-import json
-
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
 
 
-class DemoEightSpider(AyuSpider):
-    name = "demo_eight"
-    allowed_domains = ["blog.csdn.net"]
-    start_urls = ["https://blog.csdn.net/"]
+class DemoOneSpider(AyuSpider):
+    name = "demo_one"
+    allowed_domains = ["readthedocs.io"]
+    start_urls = ["http://readthedocs.io/"]
     custom_settings = {
         # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
         "DATABASE_ENGINE_ENABLED": True,
@@ -72,53 +70,40 @@ class DemoEightSpider(AyuSpider):
             # 激活此项则数据会存储至 MongoDB
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
         },
-        "DOWNLOADER_MIDDLEWARES": {
-            # 随机请求头
-            "ayugespidertools.middlewares.RandomRequestUaMiddleware": 400,
-        },
     }
 
     def start_requests(self):
-        """
-        get 请求首页，获取项目列表数据
-        """
         yield Request(
-            url="https://blog.csdn.net/phoenix/web/blog/hot-rank?page=0&pageSize=25&type=",
+            url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
-            headers={
-                "referer": "https://blog.csdn.net/rank/list",
-            },
         )
 
     def parse_first(self, response):
-        data_list = json.loads(response.text)["data"]
-        for curr_data in data_list:
-            article_detail_url = curr_data.get("articleDetailUrl")
-            article_title = curr_data.get("articleTitle")
-            comment_count = curr_data.get("commentCount")
-            favor_count = curr_data.get("favorCount")
-            nick_name = curr_data.get("nickName")
+        _save_table = "_octree_info"
 
-            article_item = AyuItem(
-                article_detail_url=article_detail_url,
-                article_title=article_title,
-                comment_count=comment_count,
-                favor_count=favor_count,
-                nick_name=nick_name,
-                _table="_article_info_list",
+        li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
+        for curr_li in li_list:
+            octree_text = curr_li.xpath("a/text()").get()
+            octree_href = curr_li.xpath("a/@href").get()
+
+            octree_item = AyuItem(
+                octree_text=octree_text,
+                octree_href=octree_href,
+                _table=_save_table,
             )
-            yield article_item
+            self.slog.info(f"octree_item: {octree_item}")
+            yield octree_item
 ```
 
 如您所见，`Spider` 子类化 `AyuSpider` 并定义了一些属性和方法：
 
-- `name`: 标识蜘蛛。在一个项目中必须是唯一的，即不能为不同的Spiders设置相同的名字。
+- `name`: 标识蜘蛛。在一个项目中必须是唯一的，即不能为不同的 `Spiders` 设置相同的名字。
 - `start_requests()`: 必须返回一个可迭代的请求（你可以返回一个请求列表或编写一个生成器函数），蜘蛛将从中开始爬行。后续请求将从这些初始请求中依次生成。
-- `parse_first()`：将被调用以处理为每个请求下载的响应的方法。`response` 参数是 `TextResponse` 的一个实例，它保存页面内容，并有进一步的有用方法来处理它。该 `parse_first()` 方法通常解析响应，将抓取的数据提取为字典，并找到要遵循的新 URL 并从中创建新请求 ( `Request`)。
+- `parse_first()`：将被调用以处理为每个请求下载的响应的方法。`response` 参数是 `TextResponse` 的一个实例，它保存页面内容，并有进一步的有用方法来处理它。该 `parse_first()` 方法通常解析响应，将抓取的数据提取为字典，并找到要遵循的新 `URL` 并从中创建新请求 ( `Request`)。
 
 另外，一些其它注意事项：
 
-- 示例中的一些配置和一些功能并不是每个项目中都必须要编写和配置的，只是用于展示一些功能
+- 示例中的一些配置和一些功能并不是每个项目中都必须要编写和配置的，只是用于展示一些功能；
 - 据上条可知，可以写出很简洁的代码，删除你认为的无关配置和方法并将其配置成你自己的模板就更容易适配更多人的使用场景。
 
 
