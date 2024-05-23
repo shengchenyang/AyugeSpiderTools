@@ -10,6 +10,24 @@
 
 ... ...
 
+### Deprecations
+
+- 无。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 无。
+
+### Code optimizations
+
+- 升级 aiohttp 依赖版本。
+
+<hr>
+
 ## AyugeSpiderTools 3.9.8 (2024-05-17)
 
 ### Deprecations
@@ -38,6 +56,10 @@
 - 添加 `.editorconfig` 配置。([d175c6e](https://github.com/shengchenyang/AyugeSpiderTools/commit/d175c6e0ddfaf3dcc105c62ada422c9f907388cb))
 - `poetry` 依赖更新。（[f783546](https://github.com/shengchenyang/AyugeSpiderTools/commit/f78354616c3e95d8e00238e8970fe332373a0273)）
 - 文档更新。
+- `mongodb` 存储场景中 `pymongo` 依赖版本及应用场景的判定逻辑修改，由通过 `py` 版本来判定改为由 `pymongo` 依赖版本来判定。目前本库在 `py3.11` 及以上还是会安装 `^4.5.0` 版本的 `pymongo`，不影响旧项目功能。（[625ad1c](https://github.com/shengchenyang/AyugeSpiderTools/commit/625ad1cf3a16463aa77744b7ce4d46f94f056bab)）
+
+补充解释：若 `py 3.11` 及以上则使用 `^4.5.0` 版本的 `pymongo` 来支持 `3.6` 及以上版本的 `MongoDB` 来解决 `motor` 的异步存储问题；若 `py3.11` 以下则使用 `3.13.0` 的 `pymongo` 版本来与目前一致。 （[issue 11](https://github.com/shengchenyang/AyugeSpiderTools/issues/11)）
+
 
 <hr>
 
