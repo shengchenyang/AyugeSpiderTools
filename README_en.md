@@ -191,6 +191,10 @@ install the existing dependencies with `poetry install`, and then install the ta
 with `poetry add kafka-python==x.x.x` (try not to use `poetry update kafka-python`). After ensuring that the test is
 working properly, you can package the modified library with `poetry build` for use.
 
+> Other ways to customize scrapy projects
+
+The project can be customized through `cookiecutter`, please refer to the [LazyScraper](https:github.comshengchenyangLazyScraper) project.
+
 **I hope that this project can provide guidance for you when you encounter scenarios where you need to extend the
 functionality of Scrapy.**
 

@@ -174,7 +174,11 @@ scrapy crawl <spider_name>
 安装现有依赖后，再 `poetry add kafka-python==x.x.x` 安装目标版本（尽量不要使用 `poetry update kafka-python`
 ），确定测试正常了即可 `poetry build` 打包使用。
 
-**希望此项目能在你遇到扩展 scrapy 功能的场景时能对你有所指引。**
+> 其它自定义 scrapy 项目的方式
+
+也可以通过 `cookiecutter` 对项目个性化定制，可参考 [LazyScraper](https://github.com/shengchenyang/LazyScraper) 项目。
+
+**希望此项目能在你遇到扩展 scrapy 功能的场景时对你有所指引。**
 
 ## 功能
 
