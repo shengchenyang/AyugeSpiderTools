@@ -41,6 +41,8 @@
 补充：
 此弃用和变动并不影响项目中的功能，只涉及一些自动生成的多余配置文件，运行文件等，这些为过度设计（不应替用户强行决定，且未做到完美适配）。
 
+比较喜欢完整项目模版的开发者，则可选择通过 [LazyScraper](https://github.com/shengchenyang/LazyScraper) 项目来更方便地生成项目模版。
+
 ### New features
 
 - 同步更新 `scrapy` 依赖版本为 `2.11.2`。（[1618654](https://github.com/shengchenyang/AyugeSpiderTools/commit/1618654d4c2b9bd4032a52844e29abe17d2ee532)）
