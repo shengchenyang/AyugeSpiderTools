@@ -23,9 +23,11 @@ ROBOTSTXT_OBEY = False
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
+# Set .conf file path. Same as library default, commentable
 _ = Path(__file__).parent
 VIT_DIR = _ / "VIT"
 
+# Log configuration example
 LOG_LEVEL = "ERROR"
 LOG_FILE = _ / "logs/$project_name.log"
 logger.add(
