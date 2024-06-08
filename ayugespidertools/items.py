@@ -80,7 +80,7 @@ class ItemMeta(ABCMeta):
 
 @dataclass
 class AyuItem(MutableMapping, metaclass=ItemMeta):
-    """Used to create AyuItem and add fields dynamically,
+    """Used to create AyuItem, add fields dynamically,
     and provides methods to convert to dict and ScrapyItem.
 
     Examples:
