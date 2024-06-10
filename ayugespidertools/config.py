@@ -15,3 +15,4 @@ class NormalConfig:
     ROOT_DIR = CONFIG_DIR.parent
     COMMON_DIR = CONFIG_DIR / "common"
     VIT_DIR = CONFIG_DIR / "VIT"
+    DATA_DIR = CONFIG_DIR / "data"

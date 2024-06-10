@@ -1,9 +1,11 @@
+import json
 import random
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from scrapy import signals
 
-from ayugespidertools.common.params import Param
+from ayugespidertools.config import NormalConfig
 
 __all__ = [
     "RandomRequestUaMiddleware",
@@ -23,12 +25,14 @@ class RandomRequestUaMiddleware:
     def __init__(self):
         self.explorer_types = None
         self.explorer_weights = None
+        _ua_file = Path(NormalConfig.DATA_DIR, "browsers.json")
+        self.fake_ua_dict = json.loads(_ua_file.read_text(encoding="utf-8"))
 
     def get_random_ua_by_weight(self) -> str:
         explorer_types = random.choices(
             self.explorer_types, weights=self.explorer_weights
         )
-        return random.choice(Param.fake_useragent_dict[explorer_types[0]])
+        return random.choice(self.fake_ua_dict[explorer_types[0]])
 
     @classmethod
     def from_crawler(cls, crawler: "Crawler") -> "Self":
@@ -37,11 +41,10 @@ class RandomRequestUaMiddleware:
         return s
 
     def spider_opened(self, spider: "AyuSpider") -> None:
-        # 带权重的 ua 列表，这里是根据 fake_useragent 库中的打印信息来规划权重的。
+        # 带权重的 ua 列表
         ua_arr = [
-            {"explorer": "opera", "weight": 16},
             {"explorer": "safari", "weight": 32},
-            {"explorer": "internetexplorer", "weight": 41},
+            {"explorer": "edge", "weight": 41},
             {"explorer": "firefox", "weight": 124},
             {"explorer": "chrome", "weight": 772},
         ]
