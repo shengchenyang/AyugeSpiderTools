@@ -43,10 +43,10 @@ class RandomRequestUaMiddleware:
     def spider_opened(self, spider: "AyuSpider") -> None:
         # 带权重的 ua 列表
         ua_arr = [
-            {"explorer": "safari", "weight": 32},
-            {"explorer": "edge", "weight": 41},
-            {"explorer": "firefox", "weight": 124},
-            {"explorer": "chrome", "weight": 772},
+            {"explorer": "safari", "weight": 50},
+            {"explorer": "edge", "weight": 9},
+            {"explorer": "firefox", "weight": 50},
+            {"explorer": "chrome", "weight": 3},
         ]
         self.explorer_types = [x["explorer"] for x in ua_arr]
         self.explorer_weights = [x["weight"] for x in ua_arr]

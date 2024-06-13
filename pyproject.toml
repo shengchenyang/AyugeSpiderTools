@@ -117,6 +117,7 @@ omit = [
     "ayugespidertools/request.py",
     "ayugespidertools/**/__init__.py",
     "ayugespidertools/utils/cmdline.py",
+    "ayugespidertools/data/*",
 ]
 
 [tool.coverage.report]
