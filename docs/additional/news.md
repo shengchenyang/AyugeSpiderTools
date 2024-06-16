@@ -16,7 +16,7 @@
 
 ### New features
 
-- 无。
+- 升级 `ua` 数据为新版本，并且将其放入 `data` 中的 `browsers.json` 文件中，修改获取 `ua` 的方式。（[7d08f85](https://github.com/shengchenyang/AyugeSpiderTools/commit/7d08f853a7ca0ad9b860a8cc0e550c1b0b66e2f0)，[7a905a3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7a905a3403801bb6ed0d453d6d87698eb0fd4ce4)）
 
 ### Bug fixes
 
