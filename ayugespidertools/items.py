@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from collections.abc import MutableMapping
 from dataclasses import dataclass
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, Dict, Iterator, NamedTuple, NoReturn, Optional, Tuple, Union
 
 import scrapy
 from scrapy.item import Item
@@ -33,7 +33,9 @@ class DataItem(NamedTuple):
 
 
 class ItemMeta(ABCMeta):
-    def __new__(cls, class_name, bases, attrs):
+    def __new__(
+        cls, class_name: str, bases: Tuple[type, ...], attrs: Dict[str, Any]
+    ) -> "ItemMeta":
         def add_field(self, key: str, value: Any) -> None:
             """动态添加字段方法
 
@@ -113,7 +115,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         _table: Union[DataItem, str],
         _mongo_update_rule: Optional[Dict[str, Any]] = None,
         **kwargs,
-    ):
+    ) -> None:
         """初始化 AyuItem 实例
 
         Args:
@@ -131,49 +133,49 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
             setattr(self, key, value)
             self.__fields.add(key)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         return getattr(self, key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         if key not in self.__fields:
             setattr(self, key, value)
             self.__fields.add(key)
         else:
             setattr(self, key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         if key not in self.__fields:
             raise KeyError(f"{key} not found")
         delattr(self, key)
         self.__fields.discard(key)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> NoReturn:
         if name in self.__fields:
-            raise AttributeError(f"Try to use item[{name!r}] to get field value")
+            raise AttributeError(f"Use item[{name!r}] to get field value")
         raise AttributeError(name)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         super().__setattr__(name, value)
         self.__fields.add(name)
 
-    def __delattr__(self, name):
+    def __delattr__(self, name: str) -> None:
         super().__delattr__(name)
         self.__fields.discard(name)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.__fields)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__fields)
 
-    def __str__(self):
+    def __str__(self) -> str:
         # 与下方 __repr__ 一样，不返回 AyuItem(field=data) 的格式
         return f"{self.asdict()}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.asdict()}"
 
-    def fields(self):
+    def fields(self) -> set:
         self.__fields.discard("_AyuItem__fields")
         return self.__fields
 

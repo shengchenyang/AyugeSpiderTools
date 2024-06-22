@@ -129,7 +129,7 @@ class CvnpilKit:
         bg: Union[str, bytes],
         slider: Union[str, bytes],
         out: Optional[str] = None,
-    ):
+    ) -> int:
         """识别滑块缺口方法
 
         Args:
@@ -179,7 +179,7 @@ class CvnpilKit:
         return cls._template_match(bg_img, slider_img, out)
 
     @staticmethod
-    def match_gap(bg: Union[str, bytes], slider: Union[str, bytes]):
+    def match_gap(bg: Union[str, bytes], slider: Union[str, bytes]) -> Optional[int]:
         """滑块坐标定位方法
 
         Args:

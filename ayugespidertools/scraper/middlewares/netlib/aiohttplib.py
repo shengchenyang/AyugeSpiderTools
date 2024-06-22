@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Optional, Tuple, Union
 
 import aiohttp
 from itemadapter import ItemAdapter
@@ -29,8 +29,6 @@ if TYPE_CHECKING:
     from ayugespidertools.spiders import AyuSpider
 
     AyuRequest = Union[AiohttpRequest, Request]
-
-ItemAdapterT = TypeVar("ItemAdapterT", bound=ItemAdapter)
 
 
 class AiohttpDownloaderMiddleware:
@@ -139,7 +137,7 @@ class AiohttpDownloaderMiddleware:
 
     async def _request_by_aiohttp(
         self,
-        aio_request_args: ItemAdapterT,
+        aio_request_args: ItemAdapter,
     ) -> Tuple[int, str]:
         """使用 aiohttp 来请求
 
