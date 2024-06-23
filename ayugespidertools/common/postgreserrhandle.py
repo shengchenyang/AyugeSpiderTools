@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, TypeVar, Union
 
 from ayugespidertools.config import logger
 
@@ -28,7 +28,7 @@ class AbstractClass(ABC):
         cursor: Union["Cursor", "TwistedTransactionT"],
         table: str,
         table_notes: str,
-        note_dic: dict,
+        note_dic: Dict[str, str],
     ) -> None:
         """模板方法，用于处理 postgresql 存储场景的异常
 
@@ -49,7 +49,7 @@ class AbstractClass(ABC):
         elif f'relation "{table}" does not exist' in err_msg:
             sql = f"""
             CREATE TABLE IF NOT EXISTS {table} (id SERIAL NOT NULL PRIMARY KEY);
-            COMMENT ON TABLE {table} IS '{table_notes}';
+            COMMENT ON TABLE {table} IS {table_notes!r};
             COMMENT ON COLUMN {table}.id IS 'id';
             """
             self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err="创建表失败")
@@ -61,7 +61,7 @@ class AbstractClass(ABC):
             raise Exception(f"POSTGRES OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
-        self, err_msg: str, table: str, note_dic: dict
+        self, err_msg: str, table: str, note_dic: Dict[str, str]
     ) -> Tuple[str, str]:
         """解决 column "xxx" of relation "x" does not exist
 
@@ -81,7 +81,7 @@ class AbstractClass(ABC):
 
         sql = (
             f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {colum} VARCHAR(255) DEFAULT '';"
-            f"COMMENT ON COLUMN {table}.{colum} IS '{notes}'"
+            f"COMMENT ON COLUMN {table}.{colum} IS {notes!r}"
         )
         return sql, f"添加字段 {colum} 已存在"
 
@@ -142,7 +142,7 @@ def deal_postgres_err(
     cursor: Union["Cursor", "TwistedTransactionT"],
     table: str,
     table_notes: str,
-    note_dic: dict,
+    note_dic: Dict[str, str],
     conn: Optional["Connection"] = None,
 ) -> None:
     abstract_class.template_method(

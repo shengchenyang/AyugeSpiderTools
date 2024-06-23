@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Tuple
 
 import pymysql
 from retrying import retry
@@ -75,7 +75,7 @@ class MysqlPipeEnhanceMixin:
         return pymysql.connect(**pymysql_conn_args)
 
     def _get_sql_by_item(
-        self, table: str, item: dict, odku_enable: bool = True
+        self, table: str, item: Dict[str, Any], odku_enable: bool = True
     ) -> Tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
@@ -226,7 +226,7 @@ class PostgreSQLPipeEnhanceMixin:
             dbname=postgres_conf.database,
         )
 
-    def _get_sql_by_item(self, table: str, item: dict) -> str:
+    def _get_sql_by_item(self, table: str, item: Dict[str, Any]) -> str:
         """根据处理后的 item 生成 postgresql 插入语句
 
         Args:
@@ -273,7 +273,7 @@ class OraclePipeEnhanceMixin:
             encoding=oracle_conf.encoding,
         )
 
-    def _get_sql_by_item(self, table: str, item: dict) -> str:
+    def _get_sql_by_item(self, table: str, item: Dict[str, Any]) -> str:
         """根据处理后的 item 生成 oracle 插入语句
 
         Args:

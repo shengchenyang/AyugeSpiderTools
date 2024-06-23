@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, TypeVar, Union
 
 from ayugespidertools.config import logger
 
@@ -46,7 +46,7 @@ class AbstractClass(ABC):
         sql = (
             f"CREATE TABLE IF NOT EXISTS `{table_name}` (`id` int(32) NOT NULL"
             f" AUTO_INCREMENT COMMENT 'id', PRIMARY KEY (`id`)) ENGINE={engine}"
-            f" DEFAULT CHARSET={charset} COLLATE={collate} COMMENT='{table_notes}';"
+            f" DEFAULT CHARSET={charset} COLLATE={collate} COMMENT={table_notes!r};"
         )
 
         try:
@@ -74,8 +74,8 @@ class AbstractClass(ABC):
             column_type: 字段存储类型
         """
         sql = (
-            f"select COLUMN_TYPE from information_schema.columns where table_schema = '{database}'"
-            f" and table_name = '{table}' and COLUMN_NAME= '{column}';"
+            f"select COLUMN_TYPE from information_schema.columns where table_schema = {database!r}"
+            f" and table_name = {table!r} and COLUMN_NAME= {column!r};"
         )
         column_type = None
         try:
@@ -100,7 +100,7 @@ class AbstractClass(ABC):
         mysql_conf: "MysqlConf",
         table: str,
         table_notes: str,
-        note_dic: dict,
+        note_dic: Dict[str, str],
     ) -> None:
         """模板方法，用于处理 mysql 存储场景的异常
 
@@ -153,7 +153,7 @@ class AbstractClass(ABC):
             raise Exception(f"MYSQL OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
-        self, err_msg: str, table: str, note_dic: dict
+        self, err_msg: str, table: str, note_dic: Dict[str, str]
     ) -> Tuple[str, str]:
         """解决 1054, u"Unknown column 'xx' in 'field list'"
 
@@ -171,7 +171,7 @@ class AbstractClass(ABC):
         colum = text[0]
         notes = note_dic[colum]
 
-        sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(255) NULL DEFAULT '' COMMENT '{notes}';"
+        sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(255) NULL DEFAULT '' COMMENT {notes!r};"
         return sql, f"添加字段 {colum} 已存在"
 
     def deal_1406_error(
@@ -180,7 +180,7 @@ class AbstractClass(ABC):
         cursor: "Cursor",
         database: str,
         table: str,
-        note_dic: dict,
+        note_dic: Dict[str, str],
     ) -> Tuple[str, str]:
         """解决 1406, u"Data too long for 'xx' at ..."
 
@@ -206,7 +206,7 @@ class AbstractClass(ABC):
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = (
                 f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
-                f' {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";'
+                f" {change_colum_type} NULL DEFAULT NULL COMMENT {notes!r};"
             )
             return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
         raise Exception(f"未解决 Data too long 的问题，err: {err_msg}")
@@ -217,7 +217,7 @@ class AbstractClass(ABC):
         cursor: "Cursor",
         database: str,
         table: str,
-        note_dic: dict,
+        note_dic: Dict[str, str],
     ) -> Tuple[str, str]:
         """解决 1265, u"Data truncated for column 'xx' at ..."
 
@@ -243,7 +243,7 @@ class AbstractClass(ABC):
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = (
                 f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
-                f' {change_colum_type} NULL DEFAULT NULL COMMENT "{notes}";'
+                f" {change_colum_type} NULL DEFAULT NULL COMMENT {notes!r};"
             )
             return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
         raise Exception(f"未解决 Data truncated 问题，err: {err_msg}")
@@ -302,7 +302,7 @@ def deal_mysql_err(
     mysql_conf: "MysqlConf",
     table: str,
     table_notes: str,
-    note_dic: dict,
+    note_dic: Dict[str, str],
     conn: Optional["Connection[Cursor]"] = None,
 ) -> None:
     abstract_class.template_method(

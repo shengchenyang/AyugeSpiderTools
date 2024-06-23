@@ -1,7 +1,17 @@
 # Define your Types here
 import threading
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Literal, NamedTuple, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Literal,
+    NamedTuple,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 from sqlalchemy import create_engine
 
@@ -131,8 +141,8 @@ class AlterItemTable(NamedTuple):
 
 
 class AlterItem(NamedTuple):
-    new_item: dict
-    notes_dic: dict
+    new_item: Dict[str, Any]
+    notes_dic: Dict[str, str]
     table: AlterItemTable
     is_namedtuple: bool = False
 
