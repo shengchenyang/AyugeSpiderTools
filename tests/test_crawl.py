@@ -65,8 +65,8 @@ def test_table_exists(mysql_db_cursor):
     用于查看脚本运行情况统计是否正常建表入库。
     """
     sql_front = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = "
-    _script_coll_sql = f"{sql_front}'{script_coll_table}'"
-    _table_coll_sql = f"{sql_front}'{table_coll_table}'"
+    _script_coll_sql = f"{sql_front}{script_coll_table!r}"
+    _table_coll_sql = f"{sql_front}{table_coll_table!r}"
     mysql_db_cursor.execute(_script_coll_sql)
     _select_res = mysql_db_cursor.fetchone()
     assert _select_res[0] == 1
