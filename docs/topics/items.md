@@ -254,7 +254,7 @@ class DemoOneSpider(AyuSpider):
             if self.mysql_engine_conn:
                 try:
                     _sql = text(
-                        f"""select `id` from `{_save_table}` where `octree_text` = "{octree_text}" limit 1"""
+                        f"select `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
                     )
                     result = self.mysql_engine_conn.execute(_sql).fetchone()
                     if not result:
