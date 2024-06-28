@@ -81,6 +81,22 @@ pip install ayugespidertools[all]
   pip install ayugespidertools -i https://pypi.org/simple
   ```
 
+- 可能存在的兼容问题
+
+  特别是 `Apple Silicon MacOS` 的较新系统场景，若遇到安装问题，可先尝试单独安装 `Scrapy`，若问题依然存在则可排除本库的问题。
+
+  报错示例如下：
+
+  ```shell
+  ImportError: dlopen(/Users/runner/work/AyugeSpiderTools/AyugeSpiderTools/.tox/py/lib/python3.8/site-packages/lxml/etree.cpython-38-darwin.so, 0x0002): symbol not found in flat namespace '_exsltDateXpathCtxtRegister'
+  /Users/runner/work/AyugeSpiderTools/AyugeSpiderTools/.tox/py/lib/python3.8/site-packages/coverage/control.py:887: CoverageWarning: No data was collected. (no-data-collected)
+  ```
+
+  解决方法如下：
+
+  可能出现兼容问题的库有：`lxml`, `urllib3`, `twisted` 等，可通过手动安装未报错的依赖版本，或升级 `Python Patch` 版本来快速解决。
+
+  如遇到此类问题，请提 `issue` 反馈，我会更新依赖库版本。
 
 若遇到其它的各种问题，请提 [issues](https://github.com/shengchenyang/AyugeSpiderTools/issues/new/choose)。
 
