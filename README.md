@@ -160,8 +160,6 @@ scrapy crawl <spider_name>
 
    不考虑，场景所依赖服务太多，且云服务等其它因素导致个人维护成本过高，但不必担心，我会和本地服务的自动化测试结合使用。
 
-4. 如果你想对此项目做出贡献，请参考 [pull request 示例](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html)。
-
 ## 构建你的专属库
 
 > 具体内容请以 [poetry 官方文档](https://python-poetry.org/docs/) 为准。

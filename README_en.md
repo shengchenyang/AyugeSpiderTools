@@ -174,9 +174,6 @@ provided. Please fill in the required content for testing, then:
 
    Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
 
-4. If you want to contribute to this project, please refer to
-   the [example](https://ayugespidertools.readthedocs.io/en/latest/additional/contribute.html) pull request.
-
 ## Build Your Own Library
 
 > Please refer to the official documentation of [poetry](https://python-poetry.org/docs/) for specific content.
