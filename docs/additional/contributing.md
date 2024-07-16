@@ -7,7 +7,7 @@
 本指南假设您已拥有 `github` 账户，以及 `python3`，虚拟环境和 `git` 的安装配置。
 但不会限制你使用的工具，比如你可以使用 `virtualenv` 代替 `pyenv`。
 
-1. [fork](https://github.com/shengchenyang/AyugeSpiderTools/fork) AyugeSpiderTools
+1. [Fork](https://github.com/shengchenyang/AyugeSpiderTools/fork) AyugeSpiderTools
 
 2. Clone your forked repository
 
@@ -26,7 +26,7 @@
    pre-commit install
    ```
 
-4. run a test
+4. Run a test
 
    ```shell
    pytest tests/test_items.py
@@ -38,7 +38,7 @@
 
 注意：请完成以上前提准备，以下步骤皆在你的 `repo` 中操作。
 
-1. checkout the `feature` branch
+1. Checkout the `feature` branch
 
    ```shell
    git checkout feature
@@ -73,7 +73,3 @@
 6. [Create a pull request](https://help.github.com/articles/creating-a-pull-request/)
 
    完成上一步后，在你 `fork` 的 `github` 项目页面上就会有创建 `pull request` 合并的按钮了， 记得要从你 `repo` 的 `<new-branch>` 分支 `pull request` 到我 `repo` 的 `feature` 中，到此已完成整个流程。
-
-## 补充
-
-以上规则适用于绝大部分 `github` 开源软件的 `pull request`，但我的开源 `repo` （和绝大部分开源项目）也都允许贡献者以自己习惯的方式来操作，特别是像我一样 `Star` 关注度较少的项目，更不容易通过用户多次的贡献来形成 `pull request` 规则。所以，如果你有 `pull request` 的想法完全不用畏手畏脚。

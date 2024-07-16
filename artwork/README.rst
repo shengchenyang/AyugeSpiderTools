@@ -18,3 +18,8 @@ ayugespidertools-logo-stack.png
 ---------------
 
 AyugeSpiderTools 徽标的文字图标堆叠样式，PNG 格式。
+
+ayugespidertools-donating.jpg
+---------------
+
+微信赞赏码，JPG 格式。

@@ -127,7 +127,6 @@ Getting help
 
    diy/myself
    diy/mytemplate
-   additional/contribute
 
 :doc:`diy/myself`
     如何将本库构建成为你的专属库。
@@ -135,8 +134,29 @@ Getting help
 :doc:`diy/mytemplate`
     如何快速创建 ``AyugeSpiderTools`` 或 ``Scrapy`` 工程项目结构。
 
-:doc:`additional/contribute`
-    贡献指南。
+贡献指南
+==================================
+
+.. toctree::
+   :caption: 贡献指南
+   :hidden:
+
+   additional/contributing
+   additional/bug_reporting
+   additional/documentation
+   additional/donating
+
+:doc:`additional/contributing`
+    对项目做出贡献。
+
+:doc:`additional/bug_reporting`
+    错误报告。
+
+:doc:`additional/documentation`
+    完善文档。
+
+:doc:`additional/donating`
+    捐赠。
 
 补充说明
 ==================================
