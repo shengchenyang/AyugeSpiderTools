@@ -221,3 +221,9 @@ scrapy crawl <spider_name>
     - [x] 图片乱序混淆的还原方法示例
 
 注意：功能演示我将放入 [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/) 文档中，以防此部分内容过多。
+
+## 赞助
+
+如果此项目对你有所帮助，可以选择打赏作者。
+
+<img src="https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg" alt="微信赞赏码" style="zoom: 25%;" />

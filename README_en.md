@@ -245,3 +245,9 @@ functionality of Scrapy.**
 
 Notice: I will include the function demo in the [readthedocs](https://ayugespidertools.readthedocs.io/en/latest/)
 documentation to avoid overwhelming this section with too much content.
+
+## Sponsor
+
+If this project is helpful to you, you can choose to reward the author.
+
+<img src="https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg" alt="微信赞赏码" style="zoom: 25%;" />
