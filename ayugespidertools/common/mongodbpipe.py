@@ -32,7 +32,7 @@ class AbstractClass(ABC):
         """
         insert_data = ReuseOperation.get_items_except_keys(
             dict_conf=item_dict,
-            keys=["_table", "_mongo_update_rule"],
+            keys={"_table", "_mongo_update_rule"},
         )
         table_name = item_dict["_table"]
         judge_item = next(iter(insert_data.values()))

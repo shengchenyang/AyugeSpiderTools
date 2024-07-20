@@ -1,7 +1,7 @@
 import configparser
 import json
 import random
-from typing import TYPE_CHECKING, Any, Dict, List, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Set, Union
 
 import pymysql
 from itemadapter import ItemAdapter
@@ -227,7 +227,7 @@ class ReuseOperation:
         is_namedtuple = False
 
         insert_data = cls.get_items_except_keys(
-            dict_conf=item_dict, keys=["_mongo_update_rule", "_table"]
+            dict_conf=item_dict, keys={"_mongo_update_rule", "_table"}
         )
         judge_item = next(iter(insert_data.values()))
         if cls.is_namedtuple_instance(judge_item):
@@ -323,7 +323,7 @@ class ReuseOperation:
         )
 
     @staticmethod
-    def get_items_except_keys(dict_conf, keys: List[str]) -> dict:
+    def get_items_except_keys(dict_conf: Dict[str, Any], keys: Set[str]) -> dict:
         """获取 dict_conf 中的不含有 keys 的 key 的字段
 
         Args:
@@ -333,7 +333,7 @@ class ReuseOperation:
         Returns:
             1). dict_conf 排除 keys 中的键值后的值
         """
-        return {k: dict_conf[k] for k in dict_conf if k not in keys}
+        return {k: v for k, v in dict_conf.items() if k not in keys}
 
     @staticmethod
     def create_database(db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
