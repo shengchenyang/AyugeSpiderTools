@@ -24,7 +24,11 @@
 
 ### Code optimizations
 
-- 升级 aiohttp 依赖版本。
+- 升级 `aiohttp` 依赖版本。（[5b448e5](https://github.com/shengchenyang/AyugeSpiderTools/commit/5b448e5991cd7e26b6702cdbd1bfcacc9b3ebcce)）
+- `Makefile` 添加 `git` 相关的配置。（[6304b77](https://github.com/shengchenyang/AyugeSpiderTools/commit/6304b772b14daf0880b591e82ff182a66c77bd2e)）
+- 解决文档 `Edit on GitHub` 出现的链接不对的问题。（[6a79f61](https://github.com/shengchenyang/AyugeSpiderTools/commit/6a79f617eb8d0e6834f673199d1ab08f68681df3)）
+- 文档完善贡献部分。（[842300a](https://github.com/shengchenyang/AyugeSpiderTools/commit/842300ad38afd9169e70e2c839128d282a120508)）
+- 优化 `get_items_except_keys` 方法，提升效率。（[d218144](https://github.com/shengchenyang/AyugeSpiderTools/commit/d2181444982995421f34c406e51ca0a053f9db1f)）
 
 <hr>
 
