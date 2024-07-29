@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import List, Tuple
 
 import pytest
 from scrapy.http.request import Request
@@ -200,17 +201,18 @@ def test_get_dict_form_scrapy_req_headers():
 
 def test_bezier_track():
     """测试贝塞尔曲线生成轨迹方法"""
+
+    def get_x_and_y_lst(tracks: dict) -> Tuple[List[float], List[float]]:
+        x_lst = []
+        y_lst = []
+        for i in tracks["trackArray"]:
+            x_lst.append(i[0])
+            y_lst.append(i[1])
+        return x_lst, y_lst
+
     a = BezierTrajectory()
-    res = a.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, mode=2)
-    track = res["trackArray"]
-    print(track)
-    x_lst = []
-    y_lst = []
-    for i in res["trackArray"]:
-        x_lst.append(i[0])
-        y_lst.append(i[1])
-    print("x_lst:", x_lst)
-    print("y_lst:", y_lst)
+    tracks = a.gen_track(start=[50, 268], end=[367, 485], num=45, order=4, mode=2)
+    x_lst, y_lst = get_x_and_y_lst(tracks)
     assert all(
         [
             len(x_lst) == len(y_lst) == 45,
@@ -220,6 +222,12 @@ def test_bezier_track():
             int(y_lst[-1]) == 485,
         ]
     )
+
+    tracks = a.gen_track(
+        start=[50, 268], end=[367, 485], num=45, order=4, mode=2, shake_num=1, yhh=3
+    )
+    x_lst, y_lst = get_x_and_y_lst(tracks=tracks)
+    assert x_lst.index(max(x_lst)) < len(x_lst)
 
 
 def test_gen_selenium_track():
