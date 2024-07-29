@@ -405,7 +405,7 @@ class BezierTrajectory:
         fun = fun["equation"]
         if shake_num != 0:
             track_number = round(num * 0.2 / (shake_num + 1))
-            num -= num * (shake_num + 1)
+            num -= track_number * (shake_num + 1)
 
             x_track_array = self._type(mode, [start[0], end[0]], num)
             s.extend([i, fun(i)] for i in x_track_array)
