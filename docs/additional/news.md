@@ -53,7 +53,7 @@
 
 ### Bug fixes
 
-- 无。
+- 修复轨迹生成时关于抖动出错的问题。（[6ad6958](https://github.com/shengchenyang/AyugeSpiderTools/commit/6ad69583647fc3a4261f7a4ad4521c22580cc1ab)）
 
 ### Code optimizations
 
