@@ -90,7 +90,8 @@ class SpiderTest(unittest.TestCase):
         assert settings.get("TEST3") == "project"
 
     def test_slog(self):
-        slog_info = "this is a test log msg"
+        """测试 slog 的日志功能"""
+        slog_info = "this is a test log."
         # 创建一个 sink 对象来捕获日志消息
         sink = []
         # 配置 loguru 日志记录器

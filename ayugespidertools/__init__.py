@@ -1,3 +1,4 @@
+from ayugespidertools.config import logger
 from ayugespidertools.items import AyuItem
 from ayugespidertools.scraper.http.request import AiohttpRequest
 from ayugespidertools.scraper.http.request.form import AiohttpFormRequest
@@ -10,6 +11,7 @@ __all__ = [
     "AyuItem",
     "AyuSpider",
     "AyuCrawlSpider",
+    "logger",
     "__version__",
 ]
 
