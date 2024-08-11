@@ -1,5 +1,5 @@
 import hashlib
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any, Tuple, Union
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
@@ -58,7 +58,7 @@ class AyuAsyncOssPipeline:
         return filename
 
     def _add_oss_field(
-        self, is_namedtuple: bool, item: Any, key: str, filename: str
+        self, is_namedtuple: bool, item: Any, key: str, filename: Union[str, list]
     ) -> None:
         if not is_namedtuple:
             item[f"{self.oss_conf.oss_fields_prefix}{key}"] = filename
