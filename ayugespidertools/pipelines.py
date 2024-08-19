@@ -14,7 +14,7 @@ from ayugespidertools.scraper.pipelines.mysql.twisted import AyuTwistedMysqlPipe
 from ayugespidertools.scraper.pipelines.oracle.fantasy import AyuFtyOraclePipeline
 from ayugespidertools.scraper.pipelines.oracle.twisted import AyuTwistedOraclePipeline
 from ayugespidertools.scraper.pipelines.oss.ali import AyuAsyncOssPipeline
-from ayugespidertools.scraper.pipelines.oss.alimongo import AyuAsyncOssMongoPipeline
+from ayugespidertools.scraper.pipelines.oss.batch import AyuAsyncOssBatchPipeline
 from ayugespidertools.scraper.pipelines.postgres.asynced import AyuAsyncPostgresPipeline
 from ayugespidertools.scraper.pipelines.postgres.fantasy import AyuFtyPostgresPipeline
 from ayugespidertools.scraper.pipelines.postgres.twisted import (
@@ -38,7 +38,7 @@ __all__ = [
     "AyuFtyOraclePipeline",
     "AyuTwistedOraclePipeline",
     "AyuAsyncOssPipeline",
-    "AyuAsyncOssMongoPipeline",
+    "AyuAsyncOssBatchPipeline",
     "AyuAsyncPostgresPipeline",
     "AyuFtyPostgresPipeline",
     "AyuTwistedPostgresPipeline",

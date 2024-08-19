@@ -4,7 +4,7 @@ from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.scraper.pipelines.oss.ali import AyuAsyncOssPipeline
 
 __all__ = [
-    "AyuAsyncOssMongoPipeline",
+    "AyuAsyncOssBatchPipeline",
 ]
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ayugespidertools.spiders import AyuSpider
 
 
-class AyuAsyncOssMongoPipeline(AyuAsyncOssPipeline):
+class AyuAsyncOssBatchPipeline(AyuAsyncOssPipeline):
     """适用于 oss 上传时，对应的文件资源字段为列表类型的场景"""
 
     oss_bucket: AliOssBase
