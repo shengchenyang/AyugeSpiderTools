@@ -17,7 +17,7 @@
 ### New features
 
 - 升级 `ua` 数据为新版本，并且将其放入 `data` 中的 `browsers.json` 文件中，修改获取 `ua` 的方式。（[7d08f85](https://github.com/shengchenyang/AyugeSpiderTools/commit/7d08f853a7ca0ad9b860a8cc0e550c1b0b66e2f0)，[7a905a3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7a905a3403801bb6ed0d453d6d87698eb0fd4ce4)）
-- `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9)）
+- `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9), [e553152](https://github.com/shengchenyang/AyugeSpiderTools/commit/e553152773f9fe7aee1fdd118a9bb6327daf52ef)）
 
 注：其它存储场景的 `oss` 暂不支持列表形式，需自行实现，我会给出示例。
 
