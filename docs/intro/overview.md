@@ -1,12 +1,6 @@
 # AyugeSpiderTools 一目了然
 
-`AyugeSpiderTools` 是 `Scrapy` 的功能扩展模块，对其 `spider`，`item`，`middleware`，`pipeline` 等模块中的常用功能进行模板化生成和配置。比如生成常见的 `spider` ，运行 `sh` 和 `settings` 配置等脚本和固定项目文件结构；也对其不同模块进行功能扩展，比如给 `spider` 挂上 `Mysql engine` 的单例句柄可用于 `yield` 入库前的去重方式之一，给 `pipeline` 添加自动生成 `Mysql` 存储场景下所依赖的数据库、数据表、数据字段及注释，也可以解决常见的（字段编码，`Data too long`，存储字段不存在等等）错误场景。还有很多功能，请在其 `Github` 上查看。
-
-> `AyugeSpiderTools` 相关信息：
-
-```shell
- 1. 具体请查看对应链接：[AyugeSpiderTools](https://github.com/shengchenyang/AyugeSpiderTools)
-```
+[AyugeSpiderTools](https://github.com/shengchenyang/AyugeSpiderTools) 是 `Scrapy` 的功能扩展模块，对其 `spider`，`item`，`middleware`，`pipeline` 等模块中的常用功能进行模板化生成和配置。比如生成常见的 `spider` ，运行 `sh` 和 `settings` 配置等脚本和固定项目文件结构；也对其不同模块进行功能扩展，比如给 `spider` 挂上 `Mysql engine` 的单例句柄可用于 `yield` 入库前的去重方式之一，给 `pipeline` 添加自动生成 `Mysql` 存储场景下所依赖的数据库、数据表、数据字段及注释，也可以解决常见的（字段编码，`Data too long`，存储字段不存在等等）错误场景。还有很多功能，请在其 `Github` 上查看。
 
 ## 注意：
 
@@ -178,4 +172,4 @@ eg: ayuge gendpier -t async demom_async baidu.com
 
 ## 下一步是什么？
 
-接下来的步骤是 [安装 AyugeSpiderTools](https://docs.scrapy.org/en/latest/intro/install.html#intro-install)， [按照 Scrapy 的教程](https://docs.scrapy.org/en/latest/intro/tutorial.html#intro-tutorial)学习如何使用 `Scrapy` 并[加入 Scrapy 社区](https://scrapy.org/community/)。谢谢你的关注！
+接下来的步骤是[安装 AyugeSpiderTools](install.md)， 按照 [Scrapy 教程](https://docs.scrapy.org/en/latest/intro/tutorial.html#intro-tutorial)学习如何使用 `Scrapy` 并加入 [Scrapy 社区](https://scrapy.org/community/)。谢谢你的关注！

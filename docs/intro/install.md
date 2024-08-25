@@ -103,7 +103,7 @@ pip install ayugespidertools[all]
 ### 值得知道的事情
 
 - `ayugespidertools` 是依赖于 `Scrapy` 开发的，对其在爬虫开发中遇到的常用操作进行扩展。
-- 可以从最新源码中构建，构建方法请参考本文 `How-To-Build-Your-Own-Library` 部分。
+- 可以从最新源码中构建，构建方法请参考本文 [How-To-Build-Your-Own-Library](../diy/myself.md) 部分。
 
 ### 使用虚拟环境（推荐）
 

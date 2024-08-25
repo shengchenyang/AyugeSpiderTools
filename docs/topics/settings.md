@@ -2,7 +2,7 @@
 
 `AyugeSpiderTools` 设置允许您自定义所有 `Scrapy` 及 `AyugeSpiderTools` 组件的行为，包括核心、扩展、管道和蜘蛛本身。
 
-若您还不清楚 `Scrapy` 设置的知识，请跳转至 https://docs.scrapy.org/en/latest 查看教程。
+若您还不清楚 `Scrapy` 设置的知识，请跳转至 [Scrapy 文档](https://docs.scrapy.org/en/latest)查看教程。
 
 以下内容主要介绍本库在具体场景下的配置示例：
 
