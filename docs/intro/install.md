@@ -30,6 +30,13 @@ pip install ayugespidertools[all]
 
 强烈建议您将 `ayugespidertools` 安装在专用的 `virtualenv` 中，以避免与您的系统包发生冲突。
 
+4. 安装预发布(开发)版本，通过源码安装：
+
+```shell
+# 请注意，此源码方式安装的是开发版本，请勿在正式场景中使用！
+pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git
+```
+
 ### 可能遇到的问题
 
 > 在安装时可能会遇到以下问题：

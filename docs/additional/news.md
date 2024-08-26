@@ -8,6 +8,8 @@
 
 打包参考教程请查看：[How-To-Build-Your-Own-Library](https://ayugespidertools.readthedocs.io/en/latest/diy/myself.html)
 
+当然也可以直接 `pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git` 来安装预发布包。
+
 ... ...
 
 ### Deprecations
