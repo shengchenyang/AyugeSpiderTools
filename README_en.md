@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://ayugespidertools.readthedocs.io" target="_blank" rel="noopener noreferrer">
-        <img src="./artwork/ayugespidertools-logo.png" alt="ayugespidertools-logo">
+        <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/ayugespidertools-logo.png" alt="ayugespidertools-logo">
     </a>
 </p>
 <hr/>
@@ -15,7 +15,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads)
 ![codecov](https://codecov.io/gh/shengchenyang/AyugeSpiderTools/graph/badge.svg?token=1QLOEW2NTI)
 
-[简体中文](./README.md) | **English**
+[简体中文](https://github.com/shengchenyang/AyugeSpiderTools/blob/master/README.md) | **English**
 
 ## Overview
 
@@ -64,7 +64,7 @@ see [Installation Guide](https://ayugespidertools.readthedocs.io/en/latest/intro
 
 Here's an example of how to use it in a GIF:
 
-![ayugespidertools.gif](./examples/ayugespidertools-use.gif)
+![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-use.gif)
 
 The steps in the above GIF are explained as follows:
 

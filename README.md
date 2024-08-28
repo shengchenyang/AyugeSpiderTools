@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://ayugespidertools.readthedocs.io" target="_blank" rel="noopener noreferrer">
-        <img src="./artwork/ayugespidertools-logo.png" alt="ayugespidertools-logo">
+        <img src="https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/ayugespidertools-logo.png" alt="ayugespidertools-logo">
     </a>
 </p>
 <hr/>
@@ -15,7 +15,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads)
 ![codecov](https://codecov.io/gh/shengchenyang/AyugeSpiderTools/graph/badge.svg?token=1QLOEW2NTI)
 
-**简体中文** | [English](./README_en.md)
+**简体中文** | [English](https://github.com/shengchenyang/AyugeSpiderTools/blob/master/README_en.md)
 
 ## 概述
 
@@ -59,7 +59,7 @@ pip install ayugespidertools[all]
 
 使用方法示例 `GIF` 如下：
 
-![ayugespidertools.gif](./examples/ayugespidertools-use.gif)
+![ayugespidertools.gif](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-use.gif)
 
 对以上 `GIF` 中的步骤进行解释：
 
