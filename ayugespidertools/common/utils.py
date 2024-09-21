@@ -10,7 +10,6 @@ from ayugespidertools.common.encryption import Encrypt
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
 from ayugespidertools.extras.ext import AppConfManageMixin
-from ayugespidertools.formatdata import DataHandle
 
 __all__ = ["ToolsForAyu"]
 
@@ -114,7 +113,6 @@ class ToolsForAyu(AppConfManageMixin):
         return _conf
 
     @staticmethod
-    @DataHandle.simple_deal_for_extract
     def extract_with_css(
         response: "Response",
         query: str,
@@ -140,7 +138,6 @@ class ToolsForAyu(AppConfManageMixin):
             return response.css(query).get(default="").strip()
 
     @staticmethod
-    @DataHandle.simple_deal_for_extract
     def extract_with_xpath(
         response: "Response",
         query: str,
@@ -166,13 +163,15 @@ class ToolsForAyu(AppConfManageMixin):
             return response.xpath(query).get(default="").strip()
 
     @staticmethod
-    @DataHandle.simple_deal_for_extract
-    def extract_with_json(json_data: dict, query: Union[str, List[str]]):
+    def extract_with_json(
+        json_data: dict, query: Union[str, List[str]], ignore_err: bool = False
+    ):
         """scrapy 中提取 json 数据遇到的情况
 
         Args:
             json_data: scrapy response 响应内容中的 json 格式数据
             query: json 提取的规则
+            ignore_err: 是否忽略解析中的日志报错
 
         Returns:
             1). 提取的内容
@@ -187,19 +186,27 @@ class ToolsForAyu(AppConfManageMixin):
 
         # 循环取值时的处理
         for curr_q in query:
-            # 这里循环时不对 json_data 的类型做判断，如果此时 json_data 类型无 get 方法，不处理
-            json_data = json_data.get(curr_q, "")
-            if not json_data:
-                return json_data
+            # 这里循环时对 json_data 的类型做判断，如果此时 json_data 类型无 get 方法，则返回空
+            if not isinstance(json_data, dict):
+                if not ignore_err:
+                    logger.error(f"解析时出错，当前 query 为 {query}")
+                return None
+
+            json_data = json_data.get(curr_q, None)
+            if json_data is None:
+                return None
         return json_data
 
     @classmethod
-    def extract_with_json_rules(cls, json_data: dict, query_rules: List["Str_Lstr"]):
+    def extract_with_json_rules(
+        cls, json_data: dict, query_rules: List["Str_Lstr"], ignore_err: bool = False
+    ):
         """当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
 
         Args:
             json_data: scrapy response 响应内容中的 json 格式数据
             query_rules: json 提取的规则列表
+            ignore_err: 是否忽略解析中的日志报错
 
         Returns:
             1). 提取的内容
@@ -208,9 +215,12 @@ class ToolsForAyu(AppConfManageMixin):
         assert depth_num <= 2, "query_rules 参数错误，请输入深度最多为 2 的参数！"
 
         for query in query_rules:
-            if extract_res := cls.extract_with_json(json_data=json_data, query=query):
+            extract_res = cls.extract_with_json(
+                json_data=json_data, query=query, ignore_err=ignore_err
+            )
+            if extract_res is not None:
                 return extract_res
-        return ""
+        return None
 
     @staticmethod
     def first_not_none(data_lst: List[Any]) -> Any:

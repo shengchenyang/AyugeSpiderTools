@@ -39,7 +39,7 @@ json_data_example = {
             "private_message_who_me_follows": True,
             "announcement_digital": True,
             "email": True,
-            "announcement": True,
+            "announcement": False,
         },
         "edu_thumb_up": 0,
         "blink_thumb_up": 0,
@@ -51,7 +51,8 @@ json_data_example = {
         "system": 1,
         "comment": 0,
         "blink_comment": 0,
-        "gitChat_comment": 0,
+        "gitChat_comment": None,
+        "my_add_float": 3.14,
         "my_add_list": [],
         "my_add_dict": {},
     },
@@ -134,13 +135,13 @@ def test_extract_with_json():
     res = ToolsForAyu.extract_with_json(
         json_data=json_data_example, query=["data", "im"]
     )
-    assert res == "33", isinstance(res, str)
+    assert res == 33
 
     # 取不存在的字段时
     res = ToolsForAyu.extract_with_json(
         json_data=json_data_example, query=["data", "GlobalSwitch", "announcement_ayu"]
     )
-    assert res == ""
+    assert res is None
 
     res = ToolsForAyu.extract_with_json(
         json_data=json_data_example, query=["data", "my_add_list"]
@@ -152,12 +153,27 @@ def test_extract_with_json():
     )
     assert res == {}
 
+    res_is_false = ToolsForAyu.extract_with_json(
+        json_data=json_data_example, query=["data", "GlobalSwitch", "announcement"]
+    )
+    assert res_is_false is False
+
+    res_is_float = ToolsForAyu.extract_with_json(
+        json_data=json_data_example, query=["data", "my_add_float"]
+    )
+    assert res_is_float == 3.14
+
+    res_is_none = ToolsForAyu.extract_with_json(
+        json_data=json_data_example, query=["data", "gitChat_comment"]
+    )
+    assert res_is_none is None
+
 
 def test_extract_with_json_rules():
     res = ToolsForAyu.extract_with_json_rules(
         json_data=json_data_example, query_rules=[["data", "im"]]
     )
-    assert res == "33", isinstance(res, str)
+    assert res == 33
 
     # 参数层级大于 2 时，会报错
     with pytest.raises(AssertionError) as _assertion_err:
@@ -174,11 +190,13 @@ def test_extract_with_json_rules():
     assert res2 == "success"
 
     # 当 json 字段的值为 int, float, str, complex 或 list 等没有 get 方法的时候
-    with pytest.raises(AttributeError) as _attribute_err:
-        ToolsForAyu.extract_with_json_rules(
-            json_data=json_data_example, query_rules=[["data", "im", "cc"], "message"]
-        )
-    assert str(_attribute_err.value) == "'int' object has no attribute 'get'"
+    # 从 'int' object has no attribute 'get' 之类的报错改为返回 None
+    res = ToolsForAyu.extract_with_json_rules(
+        json_data=json_data_example,
+        query_rules=[["data", "im", "cc"], "message"],
+        ignore_err=True,
+    )
+    assert res == "success"
 
 
 def test_first_not_none():
