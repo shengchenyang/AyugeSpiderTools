@@ -20,12 +20,18 @@
 
 - 升级 `ua` 数据为新版本，并且将其放入 `data` 中的 `browsers.json` 文件中，修改获取 `ua` 的方式。（[7d08f85](https://github.com/shengchenyang/AyugeSpiderTools/commit/7d08f853a7ca0ad9b860a8cc0e550c1b0b66e2f0)，[7a905a3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7a905a3403801bb6ed0d453d6d87698eb0fd4ce4)）
 - `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9), [e553152](https://github.com/shengchenyang/AyugeSpiderTools/commit/e553152773f9fe7aee1fdd118a9bb6327daf52ef)）
+- 增加从 `VIT_DIR` 中 `.conf` 的 `ini` 配置解析方法 `get_cfg`，以方便配置统一存放管理和保护隐私。（[dd2485b](https://github.com/shengchenyang/AyugeSpiderTools/commit/dd2485bf28ddf4cc9a08b464f9baf7af39bf7587)）
 
-注：其它存储场景的 `oss` 暂不支持列表形式，需自行实现，我会给出示例。
+注：
+1. 其它存储场景的 `oss` 暂不支持列表形式，需自行实现，可自行按照示例添加自行打包。
 
 ### Bug fixes
 
 - 修复轨迹生成时关于抖动出错的问题。（[6ad6958](https://github.com/shengchenyang/AyugeSpiderTools/commit/6ad69583647fc3a4261f7a4ad4521c22580cc1ab)）
+- 修复自使用的 `json` 解析方法的错误。（[a1d7aac](https://github.com/shengchenyang/AyugeSpiderTools/commit/a1d7aac2c826807c4838e4fbd31de6e637cab963)）
+
+注：
+1. 这里的问题修复都是非框架主要功能，不影响 `scrapy` 的扩展功能使用。
 
 ### Code optimizations
 
