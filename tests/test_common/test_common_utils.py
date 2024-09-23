@@ -137,6 +137,16 @@ def test_extract_with_json():
     )
     assert res == 33
 
+    no_this_key = ToolsForAyu.extract_with_json(
+        json_data=json_data_example, query=["no_this_key"]
+    )
+    assert no_this_key is None
+
+    no_this_key = ToolsForAyu.extract_with_json(
+        json_data=json_data_example, query="no_this_key"
+    )
+    assert no_this_key is None
+
     # 取不存在的字段时
     res = ToolsForAyu.extract_with_json(
         json_data=json_data_example, query=["data", "GlobalSwitch", "announcement_ayu"]

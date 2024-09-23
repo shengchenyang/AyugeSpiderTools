@@ -181,8 +181,8 @@ class ToolsForAyu(AppConfManageMixin):
             [isinstance(query, str), all([isinstance(query, list), len(query) == 1])]
         ):
             if isinstance(query, str):
-                return json_data.get(query, "")
-            return json_data.get(query[0], "")
+                return json_data.get(query, None)
+            return json_data.get(query[0], None)
 
         # 循环取值时的处理
         for curr_q in query:
