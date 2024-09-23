@@ -251,7 +251,7 @@ class AbstractClass(ABC):
     @abstractmethod
     def _exec_sql(self, *args, **kwargs) -> None:
         """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
-        pass
+        raise NotImplementedError("Subclasses must implement the '_exec_sql' method")
 
 
 class Synchronize(AbstractClass):

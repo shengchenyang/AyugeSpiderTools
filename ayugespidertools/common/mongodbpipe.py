@@ -109,7 +109,9 @@ class AbstractClass(ABC):
             *args: 可变参数
             **kwargs:关键字参数
         """
-        pass
+        raise NotImplementedError(
+            "Subclasses must implement the '_data_storage_logic' method"
+        )
 
 
 class Synchronize(AbstractClass):

@@ -65,7 +65,9 @@ class Product(ABC, Generic[SpiderConf]):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[SpiderConf]:
         """获取各个工具链接配置信息"""
-        pass
+        raise NotImplementedError(
+            "Subclasses must implement the 'get_conn_conf' method"
+        )
 
     @abstractmethod
     def get_engine(
@@ -81,7 +83,9 @@ class Product(ABC, Generic[SpiderConf]):
 class Creator(ABC):
     @abstractmethod
     def create_product(self) -> Product:
-        pass
+        raise NotImplementedError(
+            "Subclasses must implement the 'create_product' method"
+        )
 
 
 class MysqlConfProduct(Product):
