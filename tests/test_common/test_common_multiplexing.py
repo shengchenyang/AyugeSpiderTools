@@ -141,7 +141,7 @@ def test_get_items_except_keys():
         "item_mode": "Mysql",
     }
     res = ReuseOperation.get_items_except_keys(
-        dict_conf=dict_conf, keys={"table", "item_mode"}
+        data=dict_conf, keys={"table", "item_mode"}
     )
     assert list(res.keys()) == ["alldata"], res["alldata"] == dict_conf["alldata"]
 
@@ -149,12 +149,12 @@ def test_get_items_except_keys():
 def test_is_dict_meet_min_limit():
     judge_dict = {"user": "admin", "age": 18, "height": 170}
     res = ReuseOperation.is_dict_meet_min_limit(
-        dict_conf=judge_dict,
-        key_list=["user", "age"],
+        data=judge_dict,
+        keys={"user", "age"},
     )
     res2 = ReuseOperation.is_dict_meet_min_limit(
-        dict_conf=judge_dict,
-        key_list=["user", "address"],
+        data=judge_dict,
+        keys={"user", "address"},
     )
     res3 = ReuseOperation.is_dict_meet_min_limit({}, ["user"])
     assert all([res is True, res2 is False, res3 is False])

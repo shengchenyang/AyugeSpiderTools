@@ -65,8 +65,8 @@ class AbuDynamicProxyDownloaderMiddleware:
         dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
-            dict_conf=dynamic_proxy_conf,
-            key_list=["proxy", "username", "password"],
+            data=dynamic_proxy_conf,
+            keys={"proxy", "username", "password"},
         )
         assert (
             is_match

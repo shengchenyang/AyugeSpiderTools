@@ -227,7 +227,7 @@ class ReuseOperation:
         is_namedtuple = False
 
         insert_data = cls.get_items_except_keys(
-            dict_conf=item_dict, keys={"_mongo_update_rule", "_table"}
+            data=item_dict, keys={"_mongo_update_rule", "_table"}
         )
         judge_item = next(iter(insert_data.values()))
         if cls.is_namedtuple_instance(judge_item):
@@ -286,54 +286,52 @@ class ReuseOperation:
         return ret
 
     @staticmethod
-    def is_dict_meet_min_limit(dict_conf: dict, key_list: List[str]) -> bool:
-        """判断 dict_conf 是否满足 key_list 中的 key 值限定
+    def is_dict_meet_min_limit(data: dict, keys: Union[Set[str], List[str]]) -> bool:
+        """判断 data 是否包含 keys 中所有的 key
 
         Args:
-            dict_conf: 需要判断的参数
-            key_list: dict_conf 中需要包含的 key 值列表，示例为：['proxy', 'username', 'password']
+            data: 需要判断的参数
+            keys: data 中需要包含的 key 值
 
         Returns:
             1). 是否满足 key 值限制
         """
-        if any([not dict_conf, not isinstance(dict_conf, dict)]):
+        if any([not data, not isinstance(data, dict)]):
             return False
 
-        return all(key in dict_conf for key in key_list)
+        return all(key in data for key in keys)
 
     @classmethod
     def get_items_by_keys(
         cls,
-        dict_conf: dict,
-        keys: List[str],
+        data: dict,
+        keys: Union[Set[str], List[str]],
     ) -> dict:
-        """获取 dict_conf 中的含有 keys 的 key 的字段
+        """获取 data 中的含有 keys 的 key 的字段
 
         Args:
-            dict_conf: 需要处理的参数
+            data: 需要处理的参数
             keys: 需要取的 key 值列表
 
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
-        return (
-            {k: dict_conf[k] for k in keys}
-            if cls.is_dict_meet_min_limit(dict_conf=dict_conf, key_list=keys)
-            else {}
-        )
+        return {k: v for k, v in data.items() if k in keys}
 
     @staticmethod
-    def get_items_except_keys(dict_conf: Dict[str, Any], keys: Set[str]) -> dict:
-        """获取 dict_conf 中的不含有 keys 的 key 的字段
+    def get_items_except_keys(
+        data: Dict[str, Any], keys: Union[Set[str], List[str]]
+    ) -> dict:
+        """获取 data 中的不含有 keys 的 key 的字段
 
         Args:
-            dict_conf: 需要处理的参数
+            data: 需要处理的参数
             keys: 需要排除的 key 值列表
 
         Returns:
-            1). dict_conf 排除 keys 中的键值后的值
+            1). data 排除 keys 中的键值后的值
         """
-        return {k: v for k, v in dict_conf.items() if k not in keys}
+        return {k: v for k, v in data.items() if k not in keys}
 
     @staticmethod
     def create_database(db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
@@ -431,9 +429,9 @@ class ReuseOperation:
         Returns:
             1). 满足最少要求的远程配置
         """
-        consul_conf_dict = settings.get("REMOTE_CONFIG", {})
+        remote_conf = settings.get("REMOTE_CONFIG", {})
         return cls.get_items_by_keys(
-            dict_conf=consul_conf_dict, keys=["token", "url", "format", "remote_type"]
+            data=remote_conf, keys={"token", "url", "format", "remote_type"}
         )
 
     @staticmethod

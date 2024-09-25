@@ -31,7 +31,7 @@ class AbstractClass(ABC):
             table_name: item_dict 对应的 table
         """
         insert_data = ReuseOperation.get_items_except_keys(
-            dict_conf=item_dict,
+            data=item_dict,
             keys={"_table", "_mongo_update_rule"},
         )
         table_name = item_dict["_table"]
