@@ -1,7 +1,7 @@
 import configparser
 import json
 import random
-from typing import TYPE_CHECKING, Any, Dict, List, Set, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Union
 
 import pymysql
 from itemadapter import ItemAdapter
@@ -286,7 +286,7 @@ class ReuseOperation:
         return ret
 
     @staticmethod
-    def is_dict_meet_min_limit(data: dict, keys: Union[Set[str], List[str]]) -> bool:
+    def is_dict_meet_min_limit(data: dict, keys: Iterable[str]) -> bool:
         """判断 data 是否包含 keys 中所有的 key
 
         Args:
@@ -305,7 +305,7 @@ class ReuseOperation:
     def get_items_by_keys(
         cls,
         data: dict,
-        keys: Union[Set[str], List[str]],
+        keys: Iterable[str],
     ) -> dict:
         """获取 data 中的含有 keys 的 key 的字段
 
@@ -319,9 +319,7 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if k in keys}
 
     @staticmethod
-    def get_items_except_keys(
-        data: Dict[str, Any], keys: Union[Set[str], List[str]]
-    ) -> dict:
+    def get_items_except_keys(data: Dict[str, Any], keys: Iterable[str]) -> dict:
         """获取 data 中的不含有 keys 的 key 的字段
 
         Args:
