@@ -332,6 +332,18 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if k not in keys}
 
     @staticmethod
+    def filter_none_value(data: Dict[str, Any]) -> dict:
+        """过滤掉 dict 中值为 None 的数据
+
+        Args:
+            data: 需要处理的参数
+
+        Returns:
+            1). data 过滤掉 dict 中值为 None 的数据
+        """
+        return {k: v for k, v in data.items() if v is not None}
+
+    @staticmethod
     def create_database(db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
         """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
         新建(不指定数据库)连接创建好所需数据库即可

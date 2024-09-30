@@ -2,8 +2,7 @@ import json
 
 from scrapy.http.response.text import TextResponse
 
-from ayugespidertools import AiohttpFormRequest, AiohttpRequest
-from ayugespidertools.common.typevars import AiohttpRequestArgs
+from ayugespidertools import AiohttpRequest
 from ayugespidertools.spiders import AyuSpider
 from tests.conftest import article_list_table
 
@@ -95,7 +94,6 @@ class DemoAiohttpSpider(SimpleSpider):
         },
         # scrapy Request 替换为 aiohttp 的配置示例
         "AIOHTTP_CONFIG": {
-            # "proxy": "http://127.0.0.1:7890",
             "sleep": 0,
             # 同时连接的总数
             "limit": 100,
@@ -120,26 +118,10 @@ class DemoAiohttpSpider(SimpleSpider):
         yield AiohttpRequest(
             url=self._get_url,
             callback=self.parse_get_fir,
-            # aiohttp 的中间件下，headers 和 cookies 参数中的 ck 值不会冲突，但是当两参数中的 key 值一样时，库中默认取 cookies 中的值。
-            # 所以此时，cookies 参数的优先级比较高
             headers={"Cookie": self._ar_headers_ck},
             cookies=self._ar_ck,
             meta={"meta_data": "get_normal"},
             cb_kwargs={"request_name": 1},
-            dont_filter=True,
-        )
-
-        # GET with aiohttp args 示例
-        yield AiohttpRequest(
-            url=self._get_url,
-            callback=self.parse_get_fir,
-            meta={"meta_data": "get_with_aiohttp_args"},
-            args=AiohttpRequestArgs(
-                method="GET",
-                headers={"Cookie": self._ar_headers_ck},
-                cookies=self._ar_ck,
-            ),
-            cb_kwargs={"request_name": 2},
             dont_filter=True,
         )
 
@@ -149,112 +131,18 @@ class DemoAiohttpSpider(SimpleSpider):
             method="POST",
             callback=self.parse_post_fir,
             headers={"Cookie": self._ar_headers_ck},
-            body=json.dumps(self._post_data),
             cookies=self._ar_ck,
             meta={"meta_data": "post_normal"},
             cb_kwargs={"request_name": 3},
             dont_filter=True,
         )
 
-        # POST with aiohttp args 示例
-        yield AiohttpRequest(
-            url="http://httpbin.org/post",
-            callback=self.parse_post_fir,
-            args=AiohttpRequestArgs(
-                method="POST",
-                headers={"Cookie": self._ar_headers_ck},
-                cookies=self._ar_ck,
-                data=json.dumps(self._post_data),
-            ),
-            meta={"meta_data": "post_with_aiohttp_args"},
-            cb_kwargs={"request_name": 4},
-            dont_filter=True,
-        )
-
-        # POST(FormRequest) 示例
-        yield AiohttpFormRequest(
-            url="http://httpbin.org/post",
-            headers={"Cookie": self._ar_headers_ck},
-            cookies=self._ar_ck,
-            formdata=self._post_data,
-            callback=self.parse_post_sec,
-            meta={"meta_data": "POST(FormRequest)"},
-            cb_kwargs={"request_name": 5},
-            dont_filter=True,
-        )
-
-        # POST(FormRequest) with aiohttp args 示例
-        yield AiohttpFormRequest(
-            url="http://httpbin.org/post",
-            callback=self.parse_post_sec,
-            args=AiohttpRequestArgs(
-                method="POST",
-                headers={"Cookie": self._ar_headers_ck},
-                cookies=self._ar_ck,
-                data=self._post_data,
-            ),
-            meta={"meta_data": "POST(FormRequest)_with_aiohttp_args"},
-            cb_kwargs={"request_name": 6},
-            dont_filter=True,
-        )
-
     def parse_get_fir(self, response: TextResponse, request_name: int):
-        aiohttp_arg = response.meta["aiohttp"]["args"]
-        if request_name == 1:
-            assert aiohttp_arg == {"url": self._get_url}
-        if request_name == 2:
-            assert aiohttp_arg == {
-                "url": None,
-                "headers": {"Cookie": self._ar_headers_ck},
-                "cookies": self._ar_ck,
-                "method": "GET",
-                "timeout": None,
-                "data": None,
-                "proxy": None,
-                "proxy_auth": None,
-                "proxy_headers": None,
-            }
         meta_data = response.meta.get("meta_data")
         self.logger.info(f"get meta_data: {meta_data}")
         Operations.parse_response_data(response_data=response.text, mark="GET FIRST")
 
     def parse_post_fir(self, response: TextResponse, request_name: int):
-        aiohttp_arg = response.meta["aiohttp"]["args"]
-        if request_name == 3:
-            assert aiohttp_arg == {"url": self._get_url}
-        if request_name == 4:
-            assert aiohttp_arg == {
-                "url": None,
-                "headers": {"Cookie": self._ar_headers_ck},
-                "cookies": {"ck_key": "ck"},
-                "method": "POST",
-                "timeout": None,
-                "data": json.dumps(self._post_data),
-                "proxy": None,
-                "proxy_auth": None,
-                "proxy_headers": None,
-            }
         meta_data = response.meta.get("meta_data")
         self.logger.info(f"post first meta_data: {meta_data}")
         Operations.parse_response_data(response_data=response.text, mark="POST FIRST")
-
-    def parse_post_sec(self, response: TextResponse, request_name: int):
-        aiohttp_arg = response.meta["aiohttp"]["args"]
-        if request_name == 5:
-            assert aiohttp_arg == {"url": self._get_url}
-        if request_name == 6:
-            assert aiohttp_arg == {
-                "url": None,
-                "headers": {"Cookie": self._ar_headers_ck},
-                "cookies": self._ar_ck,
-                "method": "POST",
-                "timeout": None,
-                "data": self._post_data,
-                "proxy": None,
-                "proxy_auth": None,
-                "proxy_headers": None,
-            }
-
-        meta_data = response.meta.get("meta_data")
-        self.logger.info(f"post second meta_data: {meta_data}")
-        Operations.parse_response_data(response_data=response.text, mark="POST SECOND")

@@ -1,7 +1,5 @@
-from ayugespidertools.scraper.http.request import AiohttpRequest
-from ayugespidertools.scraper.http.request.form import AiohttpFormRequest
+from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest
 
 __all__ = [
     "AiohttpRequest",
-    "AiohttpFormRequest",
 ]

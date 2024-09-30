@@ -1,6 +1,5 @@
 # Define your Types here
 import threading
-from dataclasses import dataclass, field
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -9,6 +8,7 @@ from typing import (
     Literal,
     NamedTuple,
     Optional,
+    Tuple,
     TypeVar,
     Union,
 )
@@ -16,6 +16,9 @@ from typing import (
 from sqlalchemy import create_engine
 
 if TYPE_CHECKING:
+    import asyncio
+    from ssl import SSLContext
+
     from loguru import Logger
     from scrapy.utils.log import SpiderLoggerAdapter
 
@@ -115,16 +118,27 @@ class OracleConf(NamedTuple):
 
 
 class AiohttpConf(NamedTuple):
-    sleep: int
-    proxy: str
-    proxy_auth: str
-    proxy_headers: dict
-    retry_times: int
-    limit: int
-    ssl: bool
-    verify_ssl: bool
-    limit_per_host: int
-    allow_redirects: bool
+    # 这些是对应 aiohttp.TCPConnector 中的配置
+    verify_ssl: Optional[bool] = None
+    fingerprint: Optional[bytes] = None
+    use_dns_cache: Optional[bool] = None
+    ttl_dns_cache: Optional[int] = None
+    family: Optional[int] = None
+    ssl_context: Optional["SSLContext"] = None
+    ssl: Optional[bool] = None
+    local_addr: Optional[Tuple[str, int]] = None
+    resolver: Optional[str] = None
+    keepalive_timeout: Optional[str] = None
+    force_close: Optional[bool] = None
+    limit: Optional[int] = None
+    limit_per_host: Optional[int] = None
+    enable_cleanup_closed: Optional[bool] = None
+    loop: Optional["asyncio.AbstractEventLoop"] = None
+    timeout_ceil_threshold: Optional[float] = None
+
+    # 这些是一些全局中需要的配置，其它的参数都在 ClientSession.request 中赋值
+    sleep: Optional[int] = None
+    retry_times: Optional[int] = None
     timeout: Optional[int] = None
 
 
@@ -145,19 +159,6 @@ class AlterItem(NamedTuple):
     notes_dic: Dict[str, str]
     table: AlterItemTable
     is_namedtuple: bool = False
-
-
-@dataclass
-class AiohttpRequestArgs:
-    url: Optional[str] = field(default=None)
-    headers: Union[dict, None] = field(default=None)
-    cookies: Union[dict, None] = field(default=None)
-    method: AiohttpRequestMethodStr = field(default="GET")
-    timeout: Union[int, None] = field(default=None)
-    data: Union[dict, str, None] = field(default=None)
-    proxy: Union[str, None] = field(default=None)
-    proxy_auth: Union[str, None] = field(default=None)
-    proxy_headers: Union[dict, None] = field(default=None)
 
 
 class MQConf(NamedTuple):

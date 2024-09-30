@@ -57,7 +57,6 @@ class TestCrawl(TestCase):
         log, _, stats = yield self._run_spider(DemoAiohttpSpider)
         self.assertIn("get meta_data: ", str(log))
         self.assertIn("post first meta_data: ", str(log))
-        self.assertIn("post second meta_data: ", str(log))
 
 
 def test_table_exists(mysql_db_cursor):
