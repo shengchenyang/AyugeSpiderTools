@@ -22,7 +22,7 @@
 
 注：
 1. 以上变动比较影响用户的是 `AiohttpRequest` 的部分，为不兼容的重构部分。其它部分如果未在项目中使用则完全不影响库的正常运行。
-2. `AiohttpRequest` 新功能介绍文档请在 `https://ayugespidertools.readthedocs.io/en/latest/topics/downloader-middleware.html#aiohttp` 中查看。
+2. `AiohttpRequest` 新功能介绍文档请在 [ayugespidertools aiohttp](https://ayugespidertools.readthedocs.io/en/latest/topics/downloader-middleware.html#aiohttp) 中查看。
 
 ### New features
 
