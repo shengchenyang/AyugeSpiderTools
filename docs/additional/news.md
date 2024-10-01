@@ -1,6 +1,6 @@
 # Release notes
 
-## AyugeSpiderTools 3.9.9 (Preview: TBD)
+## AyugeSpiderTools 3.10.1 (Preview: TBD)
 
 此部分用于展示下一版本更新预览。
 
@@ -12,15 +12,24 @@
 
 ... ...
 
+## AyugeSpiderTools 3.10.0 (2024-10-01)
+
 ### Deprecations
 
-- 无。
+- 将 `ayugespidertools.common.utils` 中 `ToolsForAyu` 修改为 `Tools`。（[73703a0](https://github.com/shengchenyang/AyugeSpiderTools/commit/73703a0cbf26e53813bb58db83e89fe55486a3e1)）
+- 删除 `AiohttpFormRequest`，`AiohttpRequestArgs`，改为更简洁的 `AiohttpRequest` 且与 `aiohttp` 请求参数一致。（[1a7b100](https://github.com/shengchenyang/AyugeSpiderTools/commit/1a7b1000fe32abe249007533a65f891bd989aee9)）
+- 整理并统一了 `ayugespidertools.common.multiplexing` 中 `ReuseOperation` 的函数参数名。（[1cad13a](https://github.com/shengchenyang/AyugeSpiderTools/commit/1cad13a94449dafa2f988fdd825fe282c2368dec)）
+
+注：
+1. 以上变动比较影响用户的是 `AiohttpRequest` 的部分，为不兼容的重构部分。其它部分如果未在项目中使用则完全不影响库的正常运行。
+2. `AiohttpRequest` 新功能介绍文档请在 `https://ayugespidertools.readthedocs.io/en/latest/topics/downloader-middleware.html#aiohttp` 中查看。
 
 ### New features
 
 - 升级 `ua` 数据为新版本，并且将其放入 `data` 中的 `browsers.json` 文件中，修改获取 `ua` 的方式。（[7d08f85](https://github.com/shengchenyang/AyugeSpiderTools/commit/7d08f853a7ca0ad9b860a8cc0e550c1b0b66e2f0)，[7a905a3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7a905a3403801bb6ed0d453d6d87698eb0fd4ce4)）
 - `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9), [e553152](https://github.com/shengchenyang/AyugeSpiderTools/commit/e553152773f9fe7aee1fdd118a9bb6327daf52ef)）
 - 增加从 `VIT_DIR` 中 `.conf` 的 `ini` 配置解析方法 `get_cfg`，以方便配置统一存放管理和保护隐私。（[dd2485b](https://github.com/shengchenyang/AyugeSpiderTools/commit/dd2485bf28ddf4cc9a08b464f9baf7af39bf7587)）
+- `aiohttp` 请求方式改为更人性化的，且与 `aiohttp` 请求参数保持一致的体验。以减少用户使用，理解和维护成本。（[1cad13a](https://github.com/shengchenyang/AyugeSpiderTools/commit/1cad13a94449dafa2f988fdd825fe282c2368dec)）
 
 注：
 1. 其它存储场景的 `oss` 暂不支持列表形式，需自行实现，可自行按照示例添加自行打包。
