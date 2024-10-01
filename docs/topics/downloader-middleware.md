@@ -102,8 +102,9 @@ custom_settings = {
         # 将 scrapy Request 替换为 aiohttp 方式
         "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
     },
-    # aiohttp.TCPConnector 的配置项
+    # scrapy Request 替换为 aiohttp 的配置示例
     "AIOHTTP_CONFIG": {
+        "proxy": "http://127.0.0.1:7890",
         "sleep": 1,
         # 同时连接的总数
         "limit": 100,
@@ -113,7 +114,7 @@ custom_settings = {
         "verify_ssl": False,
         "allow_redirects": False,
     },
-    # aiohttp 的超时时间也用这个配置
+    # aiohttp 的超时时间也用这个配置，统一管理且不允许修改
     "DOWNLOAD_TIMEOUT": 25,
 }
 ```
@@ -121,69 +122,96 @@ custom_settings = {
 注：
 
 - `TWISTED_REACTOR` 的配置在本库的 `settings` 中就默认打开的，这里配置是为了演示，不用再次配置的；
-- `AIOHTTP_CONFIG` 为 `aiohttp` 的全局配置，是构建 `aiohttp.ClientSession` 的 `connector` 时所需的参数；
+- `LOCAL_AIOHTTP_CONFIG` 为 aiohttp 的全局配置，一般可用来配置 `proxy`，`timeout`，`retry_times`， `sleep` 等全局的参数的；
 
-`AIOHTTP_CONFIG` 可配置的参数如下(其实就是 `aiohttp.TCPConnector` 中的参数):
+然后需要构造 `AiohttpRequest` 或 `AiohttpFormRequest` 请求对象，具体的 `aiohttp` 参数在 `args` 中配置：
 
-```python
-AIOHTTP_CONFIG = {
-    # 设置 aiohttp.TCPConnector 中的配置
-    "verify_ssl": None,
-    "fingerprint": None,
-    "use_dns_cache": None,
-    "ttl_dns_cache": None,
-    "family": None,
-    "ssl_context": None,
-    "ssl": None,
-    "local_addr": None,
-    "resolver": None,
-    "keepalive_timeout": None,
-    "force_close": None,
-    "limit": None,
-    "limit_per_host": None,
-    "enable_cleanup_closed": None,
-    "loop": None,
-    "timeout_ceil_threshold": None,
-    # 设置一些自定义的全局参数
-    "sleep": None,
-    "retry_times": None,
-}
-```
-
-目前版本简化了 `aiohttp` 在 `yield AiohttpRequest` 的操作，也删除了 `AiohttpFormRequest` 来简化流程，示例如下：
+具体使用习惯和方式看个人选择，如下：
 
 ```python
-from ayugespidertools.request import AiohttpRequest
-from scrapy.http.request import NO_CALLBACK
+# 方式一： 通过 args 参数传值
+yield AiohttpRequest(
+    url="http://httpbin.org/get?get_args=1",
+    callback=self.parse_get_fir,
+    args=AiohttpRequestArgs(
+        method="GET",
+        headers={
+            "Cookie": "headers_ck_key1=ck; headers_ck_key2=ck",
+        },
+        cookies={
+            "ck_key": "ck",
+        },
+    ),
+)
 
-_ar_headers_ck = "headers_ck_key=ck; headers_ck_key2=ck"
-_ar_ck = {"ck_key": "ck"}
+# 方式二：使用 scrapy 传统方式传值
+yield AiohttpRequest(
+    url="http://httpbin.org/get?get_args=1",
+    callback=self.parse_get_fir,
+    headers={
+        "Cookie": "headers_ck_key1=ck; headers_ck_key2=ck",
+    },
+    cookies={
+        "ck_key": "ck",
+    },
+)
 
-
-def request_example():
-    # 发送 get 请求示例：
-    yield AiohttpRequest(
-        url="http://httpbin.org/get?get_args=1",
-        callback=NO_CALLBACK,
-        headers={"Cookie": _ar_headers_ck},
-        cookies=_ar_ck,
-        cb_kwargs={"request_name": 1},
-    )
-
-    # 发送 post 请求示例：
-    post_data = {"post_key1": "post_value1", "post_key2": "post_value2"}
-    yield AiohttpRequest(
-        url="http://httpbin.org/post",
+# 同样，发送 post 也可以选择两种方式
+# 测试 POST 请求示例一 - normal
+post_data = {"post_key1": "post_value1", "post_key2": "post_value2"}
+yield AiohttpRequest(
+    url="http://httpbin.org/post",
+    method="POST",
+    callback=self.parse_post_fir,
+    headers={
+        "Cookie": "headers_ck_key=ck; headers_ck_key2=ck",
+    },
+    body=json.dumps(post_data),
+    cookies={
+        "ck_key": "ck",
+    },
+)
+# 测试 POST 请求示例一 - aiohttp args
+yield AiohttpRequest(
+    url="http://httpbin.org/post",
+    callback=self.parse_post_fir,
+    args=AiohttpRequestArgs(
         method="POST",
-        callback=NO_CALLBACK,
-        headers={"Cookie": _ar_headers_ck},
+        headers={
+            "Cookie": "headers_ck_key=ck; headers_ck_key2=ck",
+        },
+        cookies={
+            "ck_key": "ck",
+        },
+        data=json.dumps(post_data),
+    ),
+)
+
+# 测试 POST 请求示例二 - normal
+yield AiohttpFormRequest(
+    url="http://httpbin.org/post",
+    headers={
+        "Cookie": "headers_ck_key=ck; headers_ck_key2=ck",
+    },
+    cookies={
+        "ck_key": "ck",
+    },
+    formdata=post_data,
+    callback=self.parse_post_sec,
+)
+# 测试 POST 请求示例二 - aiohttp args
+yield AiohttpFormRequest(
+    url="http://httpbin.org/post",
+    callback=self.parse_post_sec,
+    args=AiohttpRequestArgs(
+        method="POST",
+        headers={
+            "Cookie": "headers_ck_key=ck; headers_ck_key2=ck",
+        },
+        cookies={
+            "ck_key": "ck",
+        },
         data=post_data,
-        cookies=_ar_ck,
-        cb_kwargs={"request_name": 2},
-        dont_filter=True,
-    )
-
-
-# 其中 AiohttpRequest 中的 params，json，data，proxy，ssl，timeout 等参数可按需求自定义设置。
+    ),
+)
 ```
-由于改成通过 `yield AiohttpRequest` 的统一接口发送请求，且此方法参数与 `aiohttp` 的请求参数一致，极大地减少用户使用成本和避免维护地狱。
