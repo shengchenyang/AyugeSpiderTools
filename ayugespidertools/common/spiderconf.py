@@ -16,7 +16,7 @@ from ayugespidertools.common.typevars import (
     OssConf,
     PostgreSQLConf,
 )
-from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.common.utils import Tools
 from ayugespidertools.config import logger
 
 try:
@@ -94,9 +94,7 @@ class MysqlConfProduct(Product):
     ) -> Optional[MysqlConf]:
         # 1). 优先从远程配置中取值
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
-                conf_name="mysql", **remote_option
-            )
+            remote_conf = Tools.fetch_remote_conf(conf_name="mysql", **remote_option)
             return MysqlConf(**remote_conf) if remote_conf else None
 
         # 2). 从本地参数中取值
@@ -127,10 +125,10 @@ class MongoDBConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MongoDBConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            uri_remote_conf = ToolsForAyu.fetch_remote_conf(
+            uri_remote_conf = Tools.fetch_remote_conf(
                 conf_name="mongodb:uri", **remote_option
             )
-            normal_remote_conf = ToolsForAyu.fetch_remote_conf(
+            normal_remote_conf = Tools.fetch_remote_conf(
                 conf_name="mongodb", **remote_option
             )
             remote_conf = uri_remote_conf or normal_remote_conf
@@ -148,7 +146,7 @@ class PostgreSQLConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[PostgreSQLConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
+            remote_conf = Tools.fetch_remote_conf(
                 conf_name="postgresql", **remote_option
             )
             return PostgreSQLConf(**remote_conf) if remote_conf else None
@@ -178,7 +176,7 @@ class ESConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[ESConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
+            remote_conf = Tools.fetch_remote_conf(
                 conf_name="elasticsearch", **remote_option
             )
             return ESConf(**remote_conf) if remote_conf else None
@@ -212,9 +210,7 @@ class OracleConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[OracleConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
-                conf_name="oracle", **remote_option
-            )
+            remote_conf = Tools.fetch_remote_conf(conf_name="oracle", **remote_option)
             return OracleConf(**remote_conf) if remote_conf else None
 
         local_conf = settings.get("ORACLE_CONFIG")
@@ -249,9 +245,7 @@ class MQConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[MQConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
-                conf_name="rabbitmq", **remote_option
-            )
+            remote_conf = Tools.fetch_remote_conf(conf_name="rabbitmq", **remote_option)
             return MQConf(**remote_conf) if remote_conf else None
 
         local_conf = settings.get("MQ_CONFIG")
@@ -266,9 +260,7 @@ class KafkaConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[KafkaConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
-                conf_name="kafka", **remote_option
-            )
+            remote_conf = Tools.fetch_remote_conf(conf_name="kafka", **remote_option)
             return KafkaConf(**remote_conf) if remote_conf else None
 
         local_conf = settings.get("KAFKA_CONFIG")
@@ -283,7 +275,7 @@ class DynamicProxyProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[DynamicProxyConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
+            remote_conf = Tools.fetch_remote_conf(
                 conf_name="dynamicproxy", **remote_option
             )
             return DynamicProxyConf(**remote_conf) if remote_conf else None
@@ -300,7 +292,7 @@ class ExclusiveProxyProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[ExclusiveProxyConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
+            remote_conf = Tools.fetch_remote_conf(
                 conf_name="exclusiveproxy", **remote_option
             )
             return ExclusiveProxyConf(**remote_conf) if remote_conf else None
@@ -317,9 +309,7 @@ class OssConfProduct(Product):
         self, settings: "Settings", remote_option: dict
     ) -> Optional[OssConf]:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = ToolsForAyu.fetch_remote_conf(
-                conf_name="oss:ali", **remote_option
-            )
+            remote_conf = Tools.fetch_remote_conf(conf_name="oss:ali", **remote_option)
             return OssConf(**remote_conf) if remote_conf else None
 
         local_conf = settings.get("OSS_CONFIG")

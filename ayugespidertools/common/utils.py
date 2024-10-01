@@ -11,7 +11,7 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
 from ayugespidertools.extras.ext import AppConfManageMixin
 
-__all__ = ["ToolsForAyu"]
+__all__ = ["Tools"]
 
 if TYPE_CHECKING:
     from scrapy.http import Response
@@ -36,7 +36,7 @@ RemoteConfNameStr = Literal[
 ]
 
 
-class ToolsForAyu(AppConfManageMixin):
+class Tools(AppConfManageMixin):
     """这里用于存放框架所依赖的方法"""
 
     @staticmethod

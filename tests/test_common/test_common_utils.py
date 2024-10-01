@@ -7,7 +7,7 @@ from scrapy.http.request import Request
 from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.common.utils import Tools
 from ayugespidertools.extras.cvnpil import BezierTrajectory
 from tests import CONSUL_CONFIG, tests_dir
 
@@ -64,7 +64,7 @@ _response = TextResponse(url="https://top.baidu.com", body=body, encoding="utf-8
 
 
 def test_get_remote_kvs():
-    res = ToolsForAyu.get_remote_kvs(
+    res = Tools.get_remote_kvs(
         url=CONSUL_CONFIG["url"],
     )
     _res = json.loads(res)
@@ -73,7 +73,7 @@ def test_get_remote_kvs():
 
 
 def test_fetch_remote_conf():
-    res = ToolsForAyu.fetch_remote_conf(
+    res = Tools.fetch_remote_conf(
         conf_name="mysql",
         url=CONSUL_CONFIG["url"],
         format="json",
@@ -82,23 +82,23 @@ def test_fetch_remote_conf():
 
 
 def test_extract_with_css():
-    content_type = ToolsForAyu.extract_with_css(
+    content_type = Tools.extract_with_css(
         response=_response,
         query="div.side-title_1wfo5.c-theme-color::text",
     )
     assert content_type == "热搜榜"
-    title_lst = ToolsForAyu.extract_with_css(
+    title_lst = Tools.extract_with_css(
         response=_response,
         query="div.c-single-text-ellipsis::text",
         get_all=True,
     )
     assert len(title_lst) == 31
-    no_div_element = ToolsForAyu.extract_with_css(
+    no_div_element = Tools.extract_with_css(
         response=_response,
         query="div.no-this-div::text",
     )
     assert no_div_element == ""
-    no_div_element_lst = ToolsForAyu.extract_with_css(
+    no_div_element_lst = Tools.extract_with_css(
         response=_response,
         query="div.no-this-div::text",
         get_all=True,
@@ -107,23 +107,23 @@ def test_extract_with_css():
 
 
 def test_extract_with_xpath():
-    content_type = ToolsForAyu.extract_with_xpath(
+    content_type = Tools.extract_with_xpath(
         response=_response,
         query="//div[@class='side-title_1wfo5 c-theme-color']/text()",
     )
     assert content_type == "热搜榜"
-    title_lst = ToolsForAyu.extract_with_xpath(
+    title_lst = Tools.extract_with_xpath(
         response=_response,
         query="//div[@class='c-single-text-ellipsis']/text()",
         get_all=True,
     )
     assert len(title_lst) == 31
-    no_div_element = ToolsForAyu.extract_with_xpath(
+    no_div_element = Tools.extract_with_xpath(
         response=_response,
         query="//div[@class='no-this-div']/text()",
     )
     assert no_div_element == ""
-    no_div_element_lst = ToolsForAyu.extract_with_xpath(
+    no_div_element_lst = Tools.extract_with_xpath(
         response=_response,
         query="//div[@class='no-this-div']/text()",
         get_all=True,
@@ -132,76 +132,74 @@ def test_extract_with_xpath():
 
 
 def test_extract_with_json():
-    res = ToolsForAyu.extract_with_json(
-        json_data=json_data_example, query=["data", "im"]
-    )
+    res = Tools.extract_with_json(json_data=json_data_example, query=["data", "im"])
     assert res == 33
 
-    no_this_key = ToolsForAyu.extract_with_json(
+    no_this_key = Tools.extract_with_json(
         json_data=json_data_example, query=["no_this_key"]
     )
     assert no_this_key is None
 
-    no_this_key = ToolsForAyu.extract_with_json(
+    no_this_key = Tools.extract_with_json(
         json_data=json_data_example, query="no_this_key"
     )
     assert no_this_key is None
 
     # 取不存在的字段时
-    res = ToolsForAyu.extract_with_json(
+    res = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "GlobalSwitch", "announcement_ayu"]
     )
     assert res is None
 
-    res = ToolsForAyu.extract_with_json(
+    res = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "my_add_list"]
     )
     assert res == []
 
-    res = ToolsForAyu.extract_with_json(
+    res = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "my_add_dict"]
     )
     assert res == {}
 
-    res_is_false = ToolsForAyu.extract_with_json(
+    res_is_false = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "GlobalSwitch", "announcement"]
     )
     assert res_is_false is False
 
-    res_is_float = ToolsForAyu.extract_with_json(
+    res_is_float = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "my_add_float"]
     )
     assert res_is_float == 3.14
 
-    res_is_none = ToolsForAyu.extract_with_json(
+    res_is_none = Tools.extract_with_json(
         json_data=json_data_example, query=["data", "gitChat_comment"]
     )
     assert res_is_none is None
 
 
 def test_extract_with_json_rules():
-    res = ToolsForAyu.extract_with_json_rules(
+    res = Tools.extract_with_json_rules(
         json_data=json_data_example, query_rules=[["data", "im"]]
     )
     assert res == 33
 
     # 参数层级大于 2 时，会报错
     with pytest.raises(AssertionError) as _assertion_err:
-        ToolsForAyu.extract_with_json_rules(
+        Tools.extract_with_json_rules(
             json_data=json_data_example, query_rules=[[["depth_to_big"], "data", "im"]]
         )
     assert (
         str(_assertion_err.value) == "query_rules 参数错误，请输入深度最多为 2 的参数！"
     )
 
-    res2 = ToolsForAyu.extract_with_json_rules(
+    res2 = Tools.extract_with_json_rules(
         json_data=json_data_example, query_rules=[["data", "yy"], "message"]
     )
     assert res2 == "success"
 
     # 当 json 字段的值为 int, float, str, complex 或 list 等没有 get 方法的时候
     # 从 'int' object has no attribute 'get' 之类的报错改为返回 None
-    res = ToolsForAyu.extract_with_json_rules(
+    res = Tools.extract_with_json_rules(
         json_data=json_data_example,
         query_rules=[["data", "im", "cc"], "message"],
         ignore_err=True,
@@ -211,7 +209,7 @@ def test_extract_with_json_rules():
 
 def test_first_not_none():
     data_lst = [None, "", False, "data"]
-    res = ToolsForAyu.first_not_none(data_lst)
+    res = Tools.first_not_none(data_lst)
     assert res == ""
 
 
@@ -223,7 +221,7 @@ def test_get_dict_form_scrapy_req_headers():
         "X-Requested-With": "XMLHttpRequest",
     }
     scrapy_headers = Request(url="https://www.baidu.com", headers=_headers).headers
-    res = ToolsForAyu.get_dict_form_scrapy_req_headers(scrapy_headers=scrapy_headers)
+    res = Tools.get_dict_form_scrapy_req_headers(scrapy_headers=scrapy_headers)
     assert res == _headers
 
 
@@ -259,12 +257,12 @@ def test_bezier_track():
 
 
 def test_gen_selenium_track():
-    tracks = ToolsForAyu.gen_selenium_track(distance=120)
+    tracks = Tools.gen_selenium_track(distance=120)
     print("生成的轨迹为：", tracks)
     assert tracks
 
 
 def test_gen_tracks():
-    tracks = ToolsForAyu.gen_tracks(distance=120)
+    tracks = Tools.gen_tracks(distance=120)
     print("生成的轨迹为：", tracks)
     assert tracks

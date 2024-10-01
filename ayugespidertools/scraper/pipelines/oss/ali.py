@@ -7,7 +7,7 @@ from scrapy.utils.defer import maybe_deferred_to_future
 from scrapy.utils.python import to_bytes
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import ToolsForAyu
+from ayugespidertools.common.utils import Tools
 from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.items import DataItem
 
@@ -28,7 +28,7 @@ async def files_download_by_scrapy(
 ) -> Tuple["Response", str]:
     request = scrapy.Request(url, callback=NO_CALLBACK)
     response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
-    headers_dict = ToolsForAyu.get_dict_form_scrapy_req_headers(
+    headers_dict = Tools.get_dict_form_scrapy_req_headers(
         scrapy_headers=response.headers
     )
     content_type = headers_dict.get("Content-Type")
