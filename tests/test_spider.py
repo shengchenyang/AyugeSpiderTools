@@ -189,7 +189,15 @@ class SpiderTest(unittest.TestCase):
         crawler = get_crawler(settings_dict=dict(settings))
         spider = self.spider_class.from_crawler(crawler, "example.com")
         assert hasattr(spider, "mongodb_conf")
-        assert spider.mongodb_conf._asdict() == local_mongodb_conf
+        _spider_mongodb_conf = spider.mongodb_conf._asdict()
+        # 如果配置了 mongodb:uri 则优先获取 uri 配置
+        if _spider_mongodb_conf.get("uri") is not None:
+            assert _spider_mongodb_conf["uri"] == local_mongodb_conf["uri"]
+        # 否则获取 MongoDBConf 除了 uri 的所有参数
+        else:
+            _spider_mongodb_conf.pop("uri", None)
+            local_mongodb_conf.pop("uri", None)
+            assert _spider_mongodb_conf == local_mongodb_conf
 
 
 class TestCrawlSpider(SpiderTest):
