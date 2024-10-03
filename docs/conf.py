@@ -70,3 +70,5 @@ source_parsers = {
 source_suffix = [".rst", ".md"]
 
 autodoc_mock_imports = ["ayugespidertools"]
+
+suppress_warnings = ["myst.xref_missing"]
