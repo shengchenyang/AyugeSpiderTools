@@ -137,6 +137,8 @@ scrapy crawl <spider_name>
 + 30).demo_file_sec: 自行实现的图片下载示例
 + 31).demo_oss: 使用本库 pipeline 上传到 oss 的示例
 + 32).demo_oss_sec: 自行实现的 oss 上传示例
++ 33).demo_oss_super: MongoDB 存储场景 oss 上传字段支持列表类型
++ 34).demo_conf: 支持从 .conf 中获取自定义配置
 ```
 
 ## 跑通测试

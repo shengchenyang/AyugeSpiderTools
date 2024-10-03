@@ -143,6 +143,8 @@ Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 + 30).demo_file_sec: Self-implemented image download example.
 + 31).demo_oss: Example of using this library pipeline to upload to oss.
 + 32).demo_oss_sec: Self-implemented oss upload example.
++ 33).demo_oss_super: MongoDB storage scenario oss upload field supports list type.
++ 34).demo_conf: Supports obtaining custom configuration from .conf.
 ```
 
 ## Run Through The Test
