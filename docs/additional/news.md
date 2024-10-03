@@ -27,8 +27,8 @@
 ### New features
 
 - 升级 `ua` 数据为新版本，并且将其放入 `data` 中的 `browsers.json` 文件中，修改获取 `ua` 的方式。（[7d08f85](https://github.com/shengchenyang/AyugeSpiderTools/commit/7d08f853a7ca0ad9b860a8cc0e550c1b0b66e2f0)，[7a905a3](https://github.com/shengchenyang/AyugeSpiderTools/commit/7a905a3403801bb6ed0d453d6d87698eb0fd4ce4)）
-- `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9), [e553152](https://github.com/shengchenyang/AyugeSpiderTools/commit/e553152773f9fe7aee1fdd118a9bb6327daf52ef)）
-- 增加从 `VIT_DIR` 中 `.conf` 的 `ini` 配置解析方法 `get_cfg`，以方便配置统一存放管理和保护隐私。（[dd2485b](https://github.com/shengchenyang/AyugeSpiderTools/commit/dd2485bf28ddf4cc9a08b464f9baf7af39bf7587)）
+- `oss` 上传文件资源场景支持列表类型，现在可通过 `mongodb` 存储场景将 `oss` 相关的 `AyuItem` 字段设置为列表类型，在 [demo_oss_super](https://github.com/shengchenyang/DemoSpider/blob/3.10.x/DemoSpider/spiders/demo_oss_super.py) 中查看示例。（[5946c54](https://github.com/shengchenyang/AyugeSpiderTools/commit/5946c54144f30503090d7f09ec6a88a0b66427f9), [e553152](https://github.com/shengchenyang/AyugeSpiderTools/commit/e553152773f9fe7aee1fdd118a9bb6327daf52ef)）
+- 增加从 `VIT_DIR` 中 `.conf` 的 `ini` 配置解析方法 `get_cfg`，以方便配置统一存放管理和保护隐私，在 [demo_conf](https://github.com/shengchenyang/DemoSpider/blob/3.10.x/DemoSpider/spiders/demo_conf.py) 中查看示例。（[dd2485b](https://github.com/shengchenyang/AyugeSpiderTools/commit/dd2485bf28ddf4cc9a08b464f9baf7af39bf7587)）
 - `aiohttp` 请求方式改为更人性化的，且与 `aiohttp` 请求参数保持一致的体验。以减少用户使用，理解和维护成本。（[1cad13a](https://github.com/shengchenyang/AyugeSpiderTools/commit/1cad13a94449dafa2f988fdd825fe282c2368dec)）
 
 注：
