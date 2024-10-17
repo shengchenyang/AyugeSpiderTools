@@ -69,7 +69,6 @@ class Product(ABC, Generic[SpiderConf]):
             "Subclasses must implement the 'get_conn_conf' method"
         )
 
-    @abstractmethod
     def get_engine(
         self, db_conf: SpiderConf, db_engine_enabled: bool
     ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
@@ -77,7 +76,7 @@ class Product(ABC, Generic[SpiderConf]):
         需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
         但其中 elasticsearch 不采用 sqlalchemy 的方式。
         """
-        pass
+        ...
 
 
 class Creator(ABC):
@@ -136,9 +135,6 @@ class MongoDBConfProduct(Product):
 
         local_conf = settings.get("MONGODB_CONFIG")
         return MongoDBConf(**local_conf) if local_conf else None
-
-    def get_engine(self, db_conf: MongoDBConf, db_engine_enabled: bool):
-        pass
 
 
 class PostgreSQLConfProduct(Product):
@@ -251,9 +247,6 @@ class MQConfProduct(Product):
         local_conf = settings.get("MQ_CONFIG")
         return MQConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: MQConf, db_engine_enabled: bool):
-        pass
-
 
 class KafkaConfProduct(Product):
     def get_conn_conf(
@@ -265,9 +258,6 @@ class KafkaConfProduct(Product):
 
         local_conf = settings.get("KAFKA_CONFIG")
         return KafkaConf(**local_conf) if local_conf else None
-
-    def get_engine(self, db_conf: KafkaConf, db_engine_enabled: bool):
-        pass
 
 
 class DynamicProxyProduct(Product):
@@ -283,9 +273,6 @@ class DynamicProxyProduct(Product):
         local_conf = settings.get("DYNAMIC_PROXY_CONFIG")
         return DynamicProxyConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: DynamicProxyConf, db_engine_enabled: bool):
-        pass
-
 
 class ExclusiveProxyProduct(Product):
     def get_conn_conf(
@@ -300,9 +287,6 @@ class ExclusiveProxyProduct(Product):
         local_conf = settings.get("EXCLUSIVE_PROXY_CONFIG")
         return ExclusiveProxyConf(**local_conf) if local_conf else None
 
-    def get_engine(self, db_conf: ExclusiveProxyConf, db_engine_enabled: bool):
-        pass
-
 
 class OssConfProduct(Product):
     def get_conn_conf(
@@ -314,9 +298,6 @@ class OssConfProduct(Product):
 
         local_conf = settings.get("OSS_CONFIG")
         return OssConf(**local_conf) if local_conf else None
-
-    def get_engine(self, db_conf: OssConf, db_engine_enabled: bool):
-        pass
 
 
 class MysqlConfCreator(Creator):

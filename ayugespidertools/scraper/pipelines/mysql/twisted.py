@@ -42,8 +42,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
         query = self.dbpool.runInteraction(self.db_create)
         query.addErrback(self.db_create_err)
 
-    def db_create(self, cursor: Any) -> None:
-        pass
+    def db_create(self, cursor: Any) -> None: ...
 
     def db_create_err(self, failure: "Failure") -> None:
         self.slog.error(f"创建数据表失败: {failure}")
