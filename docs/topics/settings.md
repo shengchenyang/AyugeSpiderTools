@@ -105,4 +105,4 @@ timeout_ceil_threshold: float = 5,
 
 使用 `aiohttp` 来发送请求时，这个 `AIOHTTP_CONFIG` 及其子项不是必须参数，按需设置即可。现可使用统一的 `yield AiohttpRequest` 方式，且与 `aiohttp` 一样的请求参数来更方便地开发。
 
-具体实例请查看 [downloader-middleware](downloader-middleware.md#3-发送请求方式改为-aiohttp) 的部分文档。
+具体示例请查看 [downloader-middleware](downloader-middleware.md#3-发送请求方式改为-aiohttp) 的部分文档。

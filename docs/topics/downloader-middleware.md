@@ -102,7 +102,7 @@ custom_settings = {
         # 将 scrapy Request 替换为 aiohttp 方式
         "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
     },
-    # aiohttp.TCPConnector 的配置项
+    # aiohttp.TCPConnector 的配置项，非必需项，按需配置
     "AIOHTTP_CONFIG": {
         "sleep": 1,
         # 同时连接的总数
@@ -121,6 +121,7 @@ custom_settings = {
 注：
 
 - `TWISTED_REACTOR` 的配置在本库的 `settings` 中就默认打开的，这里配置是为了演示，不用再次配置的；
+- 这里的 `scrapy DOWNLOAD_TIMEOUT` 同样也是 `aiohttp` 请求的超时设置参数；
 - `AIOHTTP_CONFIG` 为 `aiohttp` 的全局配置，是构建 `aiohttp.ClientSession` 的 `connector` 时所需的参数；
 
 `AIOHTTP_CONFIG` 可配置的参数如下(其实就是 `aiohttp.TCPConnector` 中的参数):
