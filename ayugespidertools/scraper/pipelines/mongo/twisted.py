@@ -19,10 +19,5 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
 
     def db_insert(self, item, out):
         item_dict = ReuseOperation.item_to_dict(item)
-        mongodb_pipe(
-            TwistedAsynchronous(),
-            item_dict=item_dict,
-            db=self.db,
-            pymongo_ver_low=self.pymongo_ver_low,
-        )
+        mongodb_pipe(TwistedAsynchronous(), item_dict=item_dict, db=self.db)
         reactor.callFromThread(out.callback, item_dict)

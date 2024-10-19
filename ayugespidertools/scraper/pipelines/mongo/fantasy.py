@@ -16,11 +16,9 @@ if TYPE_CHECKING:
 class AyuFtyMongoPipeline:
     conn: "pymongo.MongoClient"
     db: "database.Database"
-    pymongo_ver_low: bool
 
     def open_spider(self, spider: "AyuSpider") -> None:
         assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
-        self.pymongo_ver_low = MongoDbBase.ver_low()
         mongodb_conf_dict = spider.mongodb_conf._asdict()
         self.conn, self.db = MongoDbBase.connects(**mongodb_conf_dict)
 
@@ -36,12 +34,7 @@ class AyuFtyMongoPipeline:
             item: scrapy item
         """
         item_dict = ReuseOperation.item_to_dict(item)
-        mongodb_pipe(
-            Synchronize(),
-            item_dict=item_dict,
-            db=self.db,
-            pymongo_ver_low=self.pymongo_ver_low,
-        )
+        mongodb_pipe(Synchronize(), item_dict=item_dict, db=self.db)
         return item
 
     def close_spider(self, spider: "AyuSpider") -> None:

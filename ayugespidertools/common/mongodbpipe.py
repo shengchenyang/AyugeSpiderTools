@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Tuple, TypeVar
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -41,18 +41,12 @@ class AbstractClass(ABC):
             table_name = item_dict["_table"].key_value
         return insert_data, table_name
 
-    def process_item_template(
-        self,
-        item_dict: dict,
-        db: "PymongoDataBaseT",
-        pymongo_ver_low: Optional[bool] = None,
-    ):
+    def process_item_template(self, item_dict: dict, db: "PymongoDataBaseT"):
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
         Args:
             item_dict: item 的 dict 类型
             db: mongodb 数据库连接
-            pymongo_ver_low: pymongo 版本是否 4.0 以下
         """
         insert_data, table_name = self._get_insert_data(item_dict)
         self._data_storage_logic(
@@ -60,7 +54,6 @@ class AbstractClass(ABC):
             item_dict=item_dict,
             collection_name=table_name,
             insert_data=insert_data,
-            pymongo_ver_low=pymongo_ver_low,
         )
 
     def _default_storage(
@@ -69,23 +62,13 @@ class AbstractClass(ABC):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        pymongo_ver_low: Optional[bool] = None,
     ):
-        if pymongo_ver_low:
-            # 如果没有查重字段时，就直接插入数据（不去重）
-            if not item_dict.get("_mongo_update_rule"):
-                db[collection_name].insert(insert_data)
-            else:
-                db[collection_name].update(
-                    item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
-                )
+        if not item_dict.get("_mongo_update_rule"):
+            db[collection_name].insert_one(insert_data)
         else:
-            if not item_dict.get("_mongo_update_rule"):
-                db[collection_name].insert_one(insert_data)
-            else:
-                db[collection_name].update_one(
-                    item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
-                )
+            db[collection_name].update_one(
+                item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
+            )
 
     @abstractmethod
     def _data_storage_logic(
@@ -94,7 +77,6 @@ class AbstractClass(ABC):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        pymongo_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
@@ -105,7 +87,6 @@ class AbstractClass(ABC):
             item_dict: item 的 dict 类型
             collection_name: 集合名称
             insert_data: 要插入的数据
-            pymongo_ver_low: pymongo 版本是否小于 4.0
             *args: 可变参数
             **kwargs:关键字参数
         """
@@ -123,13 +104,10 @@ class Synchronize(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        pymongo_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
-        self._default_storage(
-            db, item_dict, collection_name, insert_data, pymongo_ver_low
-        )
+        self._default_storage(db, item_dict, collection_name, insert_data)
 
 
 class TwistedAsynchronous(AbstractClass):
@@ -141,13 +119,10 @@ class TwistedAsynchronous(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        pymongo_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> None:
-        self._default_storage(
-            db, item_dict, collection_name, insert_data, pymongo_ver_low
-        )
+        self._default_storage(db, item_dict, collection_name, insert_data)
 
 
 class AsyncioAsynchronous(AbstractClass):
@@ -159,7 +134,6 @@ class AsyncioAsynchronous(AbstractClass):
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
-        pymongo_ver_low: Optional[bool] = None,
         *args,
         **kwargs,
     ):  # @override to fix mypy [override] error.
@@ -170,12 +144,7 @@ class AsyncioAsynchronous(AbstractClass):
                 item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
             )
 
-    async def process_item_template(
-        self,
-        item_dict: dict,
-        db: "PymongoDataBaseT",
-        pymongo_ver_low: Optional[bool] = None,
-    ):
+    async def process_item_template(self, item_dict: dict, db: "PymongoDataBaseT"):
         insert_data, table_name = self._get_insert_data(item_dict)
         await self._data_storage_logic(
             db=db,
@@ -189,7 +158,6 @@ def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: dict,
     db: "PymongoDataBaseT",
-    pymongo_ver_low: bool = True,
 ) -> None:
     """mongodb pipeline 存储的通用调用方法"""
-    abstract_class.process_item_template(item_dict, db, pymongo_ver_low)
+    abstract_class.process_item_template(item_dict, db)
