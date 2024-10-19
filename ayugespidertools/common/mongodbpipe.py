@@ -83,7 +83,7 @@ class AbstractClass(ABC):
             if not item_dict.get("_mongo_update_rule"):
                 db[collection_name].insert_one(insert_data)
             else:
-                db[collection_name].update_many(
+                db[collection_name].update_one(
                     item_dict["_mongo_update_rule"], {"$set": insert_data}, True
                 )
 
@@ -166,7 +166,7 @@ class AsyncioAsynchronous(AbstractClass):
         if not item_dict.get("_mongo_update_rule"):
             await db[collection_name].insert_one(insert_data)
         else:
-            await db[collection_name].update_many(
+            await db[collection_name].update_one(
                 item_dict["_mongo_update_rule"], {"$set": insert_data}, True
             )
 
