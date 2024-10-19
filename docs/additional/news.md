@@ -1,6 +1,6 @@
 # Release notes
 
-## AyugeSpiderTools 3.10.1 (Preview: TBD)
+## AyugeSpiderTools 3.10.2 (Preview: TBD)
 
 此部分用于展示下一版本更新预览。
 
@@ -11,6 +11,29 @@
 当然也可以直接 `pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git` 来安装预发布包。
 
 ... ...
+
+## AyugeSpiderTools 3.10.1 (2024-10-19)
+
+### Deprecations
+
+- `mongodb` 场景统一存储相关的代码逻辑，且更新方式由之前 `update_many` 改为更正常的 `update_one` 的规则。（[8af915f](https://github.com/shengchenyang/AyugeSpiderTools/commit/8af915f65fa021a97b2eeaf9893167f511ce81b9)）
+
+注：
+1. 虽然此版本为 `patch` 升级，但还请在虚拟环境中自行测试后再确认是否升级。
+
+### New features
+
+- 无。
+
+### Bug fixes
+
+- 解决 `macOS` 低版本的依赖兼容问题，优化依赖管理；解决 `mongodb` 存储在 `py3.11` 及以上场景时 `motor` 和 `pymongo` 的版本冲突造成的运行报错。（[a52755f](https://github.com/shengchenyang/AyugeSpiderTools/commit/a52755fc1e3b75728f09a04017b5907afa161624)）
+
+### Code optimizations
+
+- 整理代码风格。（[c080c3c](https://github.com/shengchenyang/AyugeSpiderTools/commit/c080c3ccf0e0796c728dc8e25562b2d90f79e72d), [2130092](https://github.com/shengchenyang/AyugeSpiderTools/commit/213009271ab66ce6ec846462db0db0afe0f068dd)）
+
+<hr>
 
 ## AyugeSpiderTools 3.10.0 (2024-10-01)
 
