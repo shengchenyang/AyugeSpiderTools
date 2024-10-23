@@ -147,6 +147,12 @@ Scenario of storing data in Oracle(need to install ayugespidertools[database]):
 + 34).demo_conf: Supports obtaining custom configuration from .conf.
 ```
 
+## Awesome Demo
+
+An example of quickly realizing distributed development: `demo_s`. Please view the detailed introduction in the `DemoSpider` project. The running example picture is:
+
+![async-demo](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-async-demo.png)
+
 ## Run Through The Test
 
 Prerequisite: You need to create a `.conf` file in the `VIT` directory of the `tests`, and an example file has been

@@ -141,6 +141,11 @@ scrapy crawl <spider_name>
 + 34).demo_conf: 支持从 .conf 中获取自定义配置
 ```
 
+## 超级棒的示例
+简单、快速、优雅地实现分布式开发，部署及运行的示例：`demo_s`，具体介绍请在 `DemoSpider` 项目中查看，运行示例图为：
+
+![async-demo](https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-async-demo.png)
+
 ## 跑通测试
 
 前提：需要在 `tests` 的 `VIT` 目录下创建 `.conf` 文件，已给出示例文件，请填写测试所需内容，然后：
