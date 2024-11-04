@@ -185,10 +185,11 @@ item = AyuItem(_table="ta")
 
 ```shell
 >>> # 删除字段：
->>>
+>>> item.pop("num")
+10
 >>> del item["title"]
 >>> item
-{'_table': 'tab', 'num': 10}
+{'_table': 'tab'}
 ```
 
 ## 使用示例

@@ -92,7 +92,6 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         >>> # 获取字段
         >>> item["_table"]
         'ta'
-        >>>
         >>> # 添加 / 修改字段，不存在则创建，存在则修改
         >>> item["_table"] = "tab"
         >>> item["title"] = "tit"
@@ -100,14 +99,18 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         >>> item.add_field("num", 10)
         >>> [ item["_table"], item["title"], item["num"] ]
         ['tab', 'tit', 10]
-        >>> item.asdict()
-        {'title': 'tit', '_table': 'tab', 'num': 10}
-        >>> type(item.asitem())
-        <class 'ayugespidertools.items.ScrapyItem'>
+        >>> # 转换为 dict
+        >>> item.asdict() == {'title': 'tit', '_table': 'tab', 'num': 10}
+        True
+        >>> # 转换为 scrapy item
+        >>> item.asitem().__class__.__name__ == "ScrapyItem"
+        True
         >>> # 删除字段
+        >>> item.pop("num")
+        10
         >>> del item["title"]
         >>> item
-        {'_table': 'tab', 'num': 10}
+        {'_table': 'tab'}
     """
 
     def __init__(
