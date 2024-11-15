@@ -12,7 +12,7 @@ keywords = ["crawler", "scraping", "scrapy-extension"]
 homepage = "https://www.ayuge.top/mkdocs-material/"
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
+python = "^3.9"
 PyMySQL = "^1.0.2"
 loguru = "~0.7.0"
 Scrapy = "2.11.2"
@@ -142,7 +142,7 @@ line-length = 88
 profile = "black"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 disable_error_code = ["attr-defined", "arg-type", "union-attr"]
 
