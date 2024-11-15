@@ -14,7 +14,7 @@ cn: 对 bug 进行清晰地描述。
 **Versions (please complete the following information)/版本信息:**
  - **Device & OS:** [e.g. Windows 10 22H2 / MacOS Ventura 13.2.1 / Ubuntu 22.04.2 LTS]
  - **Version:** [e.g. ayugespidertools-3.4.0]
- - **Python:** [e.g. Python 3.8.5]
+ - **Python:** [e.g. Python 3.12.7]
 
 **To Reproduce/复现**
 Steps to reproduce the behavior/复现步骤:
