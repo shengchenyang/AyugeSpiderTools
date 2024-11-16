@@ -47,7 +47,6 @@ build_dist:
 	make clean
 	python setup.py sdist bdist_wheel
 	$(PIPINSTALL)
-	make test
 
 release:
 	poetry publish
@@ -65,6 +64,7 @@ pytest:
 
 check:
 	pre-commit run --all-files
+	mypy .
 
 git:
 	git config --global core.eol lf
