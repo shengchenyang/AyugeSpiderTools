@@ -76,7 +76,7 @@ class Product(ABC, Generic[SpiderConf]):
         需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
         但其中 elasticsearch 不采用 sqlalchemy 的方式。
         """
-        ...
+        return None, None
 
 
 class Creator(ABC):
