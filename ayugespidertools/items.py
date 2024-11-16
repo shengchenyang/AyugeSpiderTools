@@ -1,7 +1,7 @@
 from abc import ABCMeta
-from collections.abc import MutableMapping
+from collections.abc import Iterator, MutableMapping
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, NamedTuple, NoReturn, Optional, Tuple, Union
+from typing import Any, NamedTuple, NoReturn, Optional, Tuple, Union
 
 import scrapy
 from scrapy.item import Item
@@ -34,7 +34,7 @@ class DataItem(NamedTuple):
 
 class ItemMeta(ABCMeta):
     def __new__(
-        cls, class_name: str, bases: Tuple[type, ...], attrs: Dict[str, Any]
+        cls, class_name: str, bases: Tuple[type, ...], attrs: dict[str, Any]
     ) -> "ItemMeta":
         def add_field(self, key: str, value: Any) -> None:
             """动态添加字段方法
@@ -51,7 +51,7 @@ class ItemMeta(ABCMeta):
             setattr(self, key, value)
             self._AyuItem__fields.add(key)
 
-        def asdict(self) -> Dict[str, Any]:
+        def asdict(self) -> dict[str, Any]:
             """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
             _item_dict = {key: getattr(self, key) for key in self._AyuItem__fields}
@@ -116,7 +116,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
     def __init__(
         self,
         _table: Union[DataItem, str],
-        _mongo_update_rule: Optional[Dict[str, Any]] = None,
+        _mongo_update_rule: Optional[dict[str, Any]] = None,
         **kwargs,
     ) -> None:
         """初始化 AyuItem 实例
@@ -184,6 +184,6 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
 
     def add_field(self, key: str, value: Any) -> None: ...
 
-    def asdict(self) -> Dict[str, Any]: ...
+    def asdict(self) -> dict[str, Any]: ...
 
     def asitem(self, assignment: bool = True) -> ScrapyItem: ...

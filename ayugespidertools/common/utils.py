@@ -3,7 +3,7 @@ import random
 import urllib.request
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, List, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 from urllib.parse import urlparse
 
 from ayugespidertools.common.encryption import Encrypt
@@ -164,7 +164,7 @@ class Tools(AppConfManageMixin):
 
     @staticmethod
     def extract_with_json(
-        json_data: dict, query: Union[str, List[str]], ignore_err: bool = False
+        json_data: dict, query: Union[str, list[str]], ignore_err: bool = False
     ):
         """scrapy 中提取 json 数据遇到的情况
 
@@ -199,7 +199,7 @@ class Tools(AppConfManageMixin):
 
     @classmethod
     def extract_with_json_rules(
-        cls, json_data: dict, query_rules: List["Str_Lstr"], ignore_err: bool = False
+        cls, json_data: dict, query_rules: list["Str_Lstr"], ignore_err: bool = False
     ):
         """当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
 
@@ -223,7 +223,7 @@ class Tools(AppConfManageMixin):
         return None
 
     @staticmethod
-    def first_not_none(data_lst: List[Any]) -> Any:
+    def first_not_none(data_lst: list[Any]) -> Any:
         """获取列表中第一个不为 None 的值
 
         Args:

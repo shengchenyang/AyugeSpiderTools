@@ -1,19 +1,7 @@
 import copy
+from collections.abc import Awaitable, Callable, Iterable, Mapping
 from types import SimpleNamespace
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    AnyStr,
-    Awaitable,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, AnyStr, Optional, Tuple, Union
 
 from scrapy import Request
 
@@ -39,13 +27,13 @@ class AiohttpRequest(Request):
         callback: Optional[Callable] = None,
         method: str = "GET",
         headers: Union[Mapping[AnyStr, Any], Iterable[Tuple[AnyStr, Any]], None] = None,
-        cookies: Optional[Union[dict, List[dict]]] = None,
-        meta: Optional[Dict[str, Any]] = None,
+        cookies: Optional[Union[dict, list[dict]]] = None,
+        meta: Optional[dict[str, Any]] = None,
         encoding: str = "utf-8",
         priority: int = 0,
         dont_filter: bool = False,
         errback: Optional[Callable] = None,
-        flags: Optional[List[str]] = None,
+        flags: Optional[list[str]] = None,
         cb_kwargs: Optional[dict] = None,
         params: Optional[Mapping[str, str]] = None,
         data: Any = None,

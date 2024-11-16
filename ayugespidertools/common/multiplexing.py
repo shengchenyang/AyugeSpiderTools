@@ -1,7 +1,8 @@
 import configparser
 import json
 import random
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Union
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any, Union
 
 import pymysql
 from itemadapter import ItemAdapter
@@ -213,7 +214,7 @@ class ReuseOperation:
         )
 
     @classmethod
-    def reshape_item(cls, item_dict: Dict[str, Any]) -> AlterItem:
+    def reshape_item(cls, item_dict: dict[str, Any]) -> AlterItem:
         """重新整合 item
 
         Args:
@@ -319,7 +320,7 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if k in keys}
 
     @staticmethod
-    def get_items_except_keys(data: Dict[str, Any], keys: Iterable[str]) -> dict:
+    def get_items_except_keys(data: dict[str, Any], keys: Iterable[str]) -> dict:
         """获取 data 中的不含有 keys 的 key 的字段
 
         Args:
@@ -332,7 +333,7 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if k not in keys}
 
     @staticmethod
-    def filter_none_value(data: Dict[str, Any]) -> dict:
+    def filter_none_value(data: dict[str, Any]) -> dict:
         """过滤掉 dict 中值为 None 的数据
 
         Args:

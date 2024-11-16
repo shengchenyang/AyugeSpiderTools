@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Dict, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
 
 from ayugespidertools.config import logger
 
@@ -100,7 +100,7 @@ class AbstractClass(ABC):
         mysql_conf: "MysqlConf",
         table: str,
         table_notes: str,
-        note_dic: Dict[str, str],
+        note_dic: dict[str, str],
     ) -> None:
         """模板方法，用于处理 mysql 存储场景的异常
 
@@ -153,7 +153,7 @@ class AbstractClass(ABC):
             raise Exception(f"MYSQL OTHER ERROR: {err_msg}")
 
     def deal_1054_error(
-        self, err_msg: str, table: str, note_dic: Dict[str, str]
+        self, err_msg: str, table: str, note_dic: dict[str, str]
     ) -> Tuple[str, str]:
         """解决 1054, u"Unknown column 'xx' in 'field list'"
 
@@ -180,7 +180,7 @@ class AbstractClass(ABC):
         cursor: "Cursor",
         database: str,
         table: str,
-        note_dic: Dict[str, str],
+        note_dic: dict[str, str],
     ) -> Tuple[str, str]:
         """解决 1406, u"Data too long for 'xx' at ..."
 
@@ -217,7 +217,7 @@ class AbstractClass(ABC):
         cursor: "Cursor",
         database: str,
         table: str,
-        note_dic: Dict[str, str],
+        note_dic: dict[str, str],
     ) -> Tuple[str, str]:
         """解决 1265, u"Data truncated for column 'xx' at ..."
 
@@ -302,7 +302,7 @@ def deal_mysql_err(
     mysql_conf: "MysqlConf",
     table: str,
     table_notes: str,
-    note_dic: Dict[str, str],
+    note_dic: dict[str, str],
     conn: Optional["Connection[Cursor]"] = None,
 ) -> None:
     abstract_class.template_method(

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import Tuple
 
 import pytest
 from scrapy.http.request import Request
@@ -228,7 +228,7 @@ def test_get_dict_form_scrapy_req_headers():
 def test_bezier_track():
     """测试贝塞尔曲线生成轨迹方法"""
 
-    def get_x_and_y_lst(tracks: dict) -> Tuple[List[float], List[float]]:
+    def get_x_and_y_lst(tracks: dict) -> Tuple[list[float], list[float]]:
         x_lst = []
         y_lst = []
         for i in tracks["trackArray"]:

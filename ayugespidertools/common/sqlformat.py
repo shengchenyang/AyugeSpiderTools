@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal, Optional, Tuple, Union
+from typing import Any, Literal, Optional, Tuple, Union
 
 __all__ = [
     "AboutSql",
@@ -14,7 +14,7 @@ class AboutSql:
     def select_generate(
         db_table: str,
         key: list,
-        rule: Dict[str, Any],
+        rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: Optional[str] = None,
         limit: Union[bool, int] = False,
@@ -67,7 +67,7 @@ class AboutSql:
 
     @staticmethod
     def update_generate(
-        db_table: str, data: dict, rule: Dict[str, Any], base: SqlModeStr = "and"
+        db_table: str, data: dict, rule: dict[str, Any], base: SqlModeStr = "and"
     ) -> Tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 更新语句
 

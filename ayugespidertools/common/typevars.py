@@ -3,8 +3,6 @@ import threading
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
-    List,
     Literal,
     NamedTuple,
     Optional,
@@ -28,7 +26,7 @@ NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)
 B_Str = TypeVar("B_Str", bytes, str)
 I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
-Str_Lstr = TypeVar("Str_Lstr", str, List[str])
+Str_Lstr = TypeVar("Str_Lstr", str, list[str])
 
 AiohttpRequestMethodStr = Literal[
     "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"
@@ -155,8 +153,8 @@ class AlterItemTable(NamedTuple):
 
 
 class AlterItem(NamedTuple):
-    new_item: Dict[str, Any]
-    notes_dic: Dict[str, str]
+    new_item: dict[str, Any]
+    notes_dic: dict[str, str]
     table: AlterItemTable
     is_namedtuple: bool = False
 

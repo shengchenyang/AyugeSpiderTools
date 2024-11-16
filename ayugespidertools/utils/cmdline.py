@@ -5,8 +5,9 @@ import cProfile
 import inspect
 import os
 import sys
+from collections.abc import Callable, Iterable
 from importlib.metadata import entry_points
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Optional, Tuple, Type
 
 from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import CrawlerProcess
@@ -50,8 +51,8 @@ def _iter_command_classes(module_name: str) -> Iterable[Type[ScrapyCommand]]:
                 yield obj
 
 
-def _get_commands_from_module(module: str, inproject: bool) -> Dict[str, ScrapyCommand]:
-    d: Dict[str, ScrapyCommand] = {}
+def _get_commands_from_module(module: str, inproject: bool) -> dict[str, ScrapyCommand]:
+    d: dict[str, ScrapyCommand] = {}
     for cmd in _iter_command_classes(module):
         if inproject or not cmd.requires_project:
             cmdname = cmd.__module__.split(".")[-1]
@@ -61,8 +62,8 @@ def _get_commands_from_module(module: str, inproject: bool) -> Dict[str, ScrapyC
 
 def _get_commands_from_entry_points(
     inproject: bool, group: str = "ayugespidertools.commands"
-) -> Dict[str, ScrapyCommand]:
-    cmds: Dict[str, ScrapyCommand] = {}
+) -> dict[str, ScrapyCommand]:
+    cmds: dict[str, ScrapyCommand] = {}
     if sys.version_info >= (3, 10):
         eps = entry_points(group=group)
     else:
@@ -78,7 +79,7 @@ def _get_commands_from_entry_points(
 
 def _get_commands_dict(
     settings: BaseSettings, inproject: bool
-) -> Dict[str, ScrapyCommand]:
+) -> dict[str, ScrapyCommand]:
     cmds = _get_commands_from_module("ayugespidertools.commands", inproject)
     cmds.update(_get_commands_from_entry_points(inproject))
     cmds_module = settings["COMMANDS_MODULE"]
@@ -87,7 +88,7 @@ def _get_commands_dict(
     return cmds
 
 
-def _pop_command_name(argv: List[str]) -> Optional[str]:
+def _pop_command_name(argv: list[str]) -> Optional[str]:
     i = 0
     for arg in argv[1:]:
         if not arg.startswith("-"):
@@ -146,7 +147,7 @@ def _run_print_help(
 
 
 def execute(
-    argv: Optional[List[str]] = None, settings: Optional[Settings] = None
+    argv: Optional[list[str]] = None, settings: Optional[Settings] = None
 ) -> None:
     if argv is None:
         argv = sys.argv
@@ -189,7 +190,7 @@ def execute(
     sys.exit(cmd.exitcode)
 
 
-def _run_command(cmd: ScrapyCommand, args: List[str], opts: argparse.Namespace) -> None:
+def _run_command(cmd: ScrapyCommand, args: list[str], opts: argparse.Namespace) -> None:
     if opts.profile:
         _run_command_profiled(cmd, args, opts)
     else:
@@ -197,7 +198,7 @@ def _run_command(cmd: ScrapyCommand, args: List[str], opts: argparse.Namespace) 
 
 
 def _run_command_profiled(
-    cmd: ScrapyCommand, args: List[str], opts: argparse.Namespace
+    cmd: ScrapyCommand, args: list[str], opts: argparse.Namespace
 ) -> None:
     if opts.profile:
         sys.stderr.write(
