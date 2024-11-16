@@ -8,7 +8,7 @@
 # AyugeSpiderTools 介绍
 
 ![license](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python support](https://img.shields.io/badge/python-3.8%2B-blue)
+![python support](https://img.shields.io/badge/python-3.9%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -33,7 +33,7 @@
 
 ## 安装
 
-> `python 3.8+` 可以直接输入以下命令：
+> 可以直接输入以下命令：
 
 ```shell
 pip install ayugespidertools

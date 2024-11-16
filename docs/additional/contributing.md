@@ -19,7 +19,7 @@
 3. Create a virtual environment
 
    ```shell
-   pyenv virtualenv 3.8.5 venv
+   pyenv virtualenv 3.9.20 venv
    pyenv activate venv
    pip install poetry
    poetry install

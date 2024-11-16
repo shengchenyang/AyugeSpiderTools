@@ -22,7 +22,7 @@
 
 - Prepare: `clone` 项目并准备开发环境
 
-  将项目克隆到本地，创建 `python 3.8+` 虚拟环境并安装 `poetry`，然后在项目根目录下运行 `poetry install` 安装依赖即可。
+  将项目克隆到本地，创建 `python` 虚拟环境并安装 `poetry`，然后在项目根目录下运行 `poetry install` 安装依赖即可。
 
 - Make your changes: 自定义更改的内容
 

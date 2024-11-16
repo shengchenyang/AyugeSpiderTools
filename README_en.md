@@ -8,7 +8,7 @@
 # AyugeSpiderTools Introduce
 
 ![license](https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools)
-![python support](https://img.shields.io/badge/python-3.8%2B-blue)
+![python support](https://img.shields.io/badge/python-3.9%2B-blue)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main)
 ![Read the Docs](https://img.shields.io/readthedocs/ayugespidertools)
 ![GitHub all releases](https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads)
@@ -37,7 +37,7 @@ as field encoding, Data too long, and non-existent storage fields.
 
 ## Install
 
-> `python 3.8.1+` can directly enter the following command:
+> quick start:
 
 ```shell
 pip install ayugespidertools

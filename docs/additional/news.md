@@ -10,6 +10,14 @@
 
 当然也可以直接 `pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git` 来安装预发布包。
 
+### Deprecations
+
+- 移除对 `python3.8` 的支持。（[104a3fa](https://github.com/shengchenyang/AyugeSpiderTools/commit/104a3faa0877a72febd960d110d349ec9be22239)）
+
+### Code optimizations
+
+- 项目改为基于 `python 3.9` 开发，将涉及到的开发代码，`ci/cd`，测试等工具都改为 `3.9` 的特性。（[1e44c3f](https://github.com/shengchenyang/AyugeSpiderTools/commit/1e44c3f9f4fee29f305da929413b2aa1774e319b)）
+
 ... ...
 
 ## AyugeSpiderTools 3.10.1 (2024-10-19)
