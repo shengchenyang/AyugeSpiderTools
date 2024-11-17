@@ -85,7 +85,7 @@ class AiohttpDownloaderMiddleware:
         stats.inc_value(f"retry/reason_count/{reason}")
         return retry_req
 
-    def spider_opened(self, spider: "AyuSpider") -> None:
+    async def spider_opened(self, spider: "AyuSpider") -> None:
         self.slog = spider.slog
         settings = spider.crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
@@ -109,6 +109,8 @@ class AiohttpDownloaderMiddleware:
                 enable_cleanup_closed=_aiohttp_cfg.get("enable_cleanup_closed"),
                 loop=_aiohttp_cfg.get("loop"),
                 timeout_ceil_threshold=_aiohttp_cfg.get("timeout_ceil_threshold"),
+                happy_eyeballs_delay=_aiohttp_cfg.get("happy_eyeballs_delay"),
+                interleave=_aiohttp_cfg.get("interleave"),
                 # 设置一些自定义的全局参数
                 timeout=settings.get("DOWNLOAD_TIMEOUT"),
                 sleep=_aiohttp_cfg.get("sleep"),

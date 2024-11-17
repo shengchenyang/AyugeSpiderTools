@@ -126,13 +126,15 @@ class AiohttpConf(NamedTuple):
     ssl: Optional[bool] = None
     local_addr: Optional[Tuple[str, int]] = None
     resolver: Optional[str] = None
-    keepalive_timeout: Optional[str] = None
+    keepalive_timeout: Union[None, float, object] = None
     force_close: Optional[bool] = None
     limit: Optional[int] = None
     limit_per_host: Optional[int] = None
     enable_cleanup_closed: Optional[bool] = None
     loop: Optional["asyncio.AbstractEventLoop"] = None
     timeout_ceil_threshold: Optional[float] = None
+    happy_eyeballs_delay: Optional[float] = None
+    interleave: Optional[int] = None
 
     # 这些是一些全局中需要的配置，其它的参数都在 ClientSession.request 中赋值
     sleep: Optional[int] = None
