@@ -132,6 +132,7 @@ dmypy.json
 /.idea/
 **/__pycache__
 **/.pytest_cache
+poetry.lock
 /ayugespidertools/logs/
 /tests/VIT/.conf
 /tests/docs/keys/localhost.crt
