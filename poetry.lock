@@ -3741,10 +3741,10 @@ test = ["coverage[toml]", "zope.event", "zope.testing"]
 testing = ["coverage[toml]", "zope.event", "zope.testing"]
 
 [extras]
-all = ["Pillow", "elasticsearch-dsl", "mmh3", "numpy", "numpy", "opencv-python", "oracledb", "oss2", "psycopg", "psycopg-binary", "psycopg-pool", "pycryptodome", "python-hcl2", "pyyaml"]
+all = ["Pillow", "elasticsearch-dsl", "mmh3", "numpy", "opencv-python", "oracledb", "oss2", "psycopg", "psycopg-binary", "psycopg-pool", "pycryptodome", "python-hcl2", "pyyaml"]
 database = ["elasticsearch-dsl", "oracledb", "psycopg", "psycopg-binary", "psycopg-pool"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "b3b2347e9d636978d106ffa71bf19b8590055915e6d750f40ac5bf892cc86a6f"
+content-hash = "ced176a9ef37fc5db5e34d3d19569229c2c9ebed25c3059fa311e130d75a05aa"
