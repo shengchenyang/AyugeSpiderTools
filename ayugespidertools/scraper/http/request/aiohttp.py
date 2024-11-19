@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import copy
 from collections.abc import Awaitable, Callable, Iterable, Mapping
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, AnyStr, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, AnyStr, Optional, Tuple, TypedDict, Union
 
 from scrapy import Request
 
@@ -16,6 +18,21 @@ if TYPE_CHECKING:
     from aiohttp.client_reqrep import ClientResponse, Fingerprint
     from aiohttp.helpers import BasicAuth
     from aiohttp.typedefs import LooseHeaders
+    from scrapy.http import Response
+    from typing_extensions import Concatenate, NotRequired
+
+    CallbackT = Callable[Concatenate[Response, ...], Any]
+
+
+class VerboseCookie(TypedDict):
+    name: str
+    value: str
+    domain: NotRequired[str]
+    path: NotRequired[str]
+    secure: NotRequired[bool]
+
+
+CookiesT = Union[dict[str, str], list[VerboseCookie]]
 
 
 class AiohttpRequest(Request):
@@ -24,10 +41,10 @@ class AiohttpRequest(Request):
     def __init__(
         self,
         url: str,
-        callback: Optional[Callable] = None,
+        callback: Optional[CallbackT] = None,
         method: str = "GET",
         headers: Union[Mapping[AnyStr, Any], Iterable[Tuple[AnyStr, Any]], None] = None,
-        cookies: Optional[Union[dict, list[dict]]] = None,
+        cookies: Optional[CookiesT] = None,
         meta: Optional[dict[str, Any]] = None,
         encoding: str = "utf-8",
         priority: int = 0,
