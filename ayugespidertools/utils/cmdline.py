@@ -5,14 +5,12 @@ import cProfile
 import inspect
 import os
 import sys
-from collections.abc import Callable, Iterable
 from importlib.metadata import entry_points
-from typing import TYPE_CHECKING, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Optional
 
 from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import CrawlerProcess
 from scrapy.exceptions import UsageError
-from scrapy.settings import BaseSettings, Settings
 from scrapy.utils.misc import walk_modules
 from scrapy.utils.project import get_project_settings, inside_project
 from scrapy.utils.python import garbage_collect
@@ -20,6 +18,10 @@ from scrapy.utils.python import garbage_collect
 from ayugespidertools import __version__
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
+    from scrapy.settings import BaseSettings, Settings
+
     # typing.ParamSpec requires Python 3.10
     from typing_extensions import ParamSpec
 
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
 class ScrapyArgumentParser(argparse.ArgumentParser):
     def _parse_optional(
         self, arg_string: str
-    ) -> Optional[Tuple[Optional[argparse.Action], str, Optional[str]]]:
+    ) -> Optional[tuple[Optional[argparse.Action], str, Optional[str]]]:
         # if starts with -: it means that is a parameter not a argument
         if arg_string[:2] == "-:":
             return None
@@ -37,7 +39,7 @@ class ScrapyArgumentParser(argparse.ArgumentParser):
         return super()._parse_optional(arg_string)
 
 
-def _iter_command_classes(module_name: str) -> Iterable[Type[ScrapyCommand]]:
+def _iter_command_classes(module_name: str) -> Iterable[type[ScrapyCommand]]:
     # TODO: add `name` attribute to commands and merge this function with
     # scrapy.utils.spider.iter_spider_classes
     for module in walk_modules(module_name):
