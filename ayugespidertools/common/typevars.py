@@ -1,15 +1,8 @@
 # Define your Types here
+from __future__ import annotations
+
 import threading
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Literal,
-    NamedTuple,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar, Union
 
 from sqlalchemy import create_engine
 
@@ -77,10 +70,10 @@ class MongoDBConf(NamedTuple):
     port: int = 27017
     user: str = ""
     password: str = ""
-    database: Optional[str] = None
-    authsource: Optional[str] = None
+    database: str | None = None
+    authsource: str | None = None
     authMechanism: authMechanismStr = "SCRAM-SHA-1"
-    uri: Optional[str] = None
+    uri: str | None = None
 
 
 class PostgreSQLConf(NamedTuple):
@@ -88,15 +81,15 @@ class PostgreSQLConf(NamedTuple):
     port: int
     user: str
     password: str
-    database: Optional[str] = None
+    database: str | None = None
     charset: str = "UTF8"
 
 
 class ESConf(NamedTuple):
     hosts: str
     index_class: dict
-    user: Optional[str] = None
-    password: Optional[str] = None
+    user: str | None = None
+    password: str | None = None
     init: bool = False
     verify_certs: bool = False
     ca_certs: str = None
@@ -110,36 +103,36 @@ class OracleConf(NamedTuple):
     port: int
     user: str
     password: str
-    service_name: Optional[str] = None
+    service_name: str | None = None
     encoding: str = "utf8"
-    thick_lib_dir: Union[bool, str] = False
+    thick_lib_dir: bool | str = False
 
 
 class AiohttpConf(NamedTuple):
     # 这些是对应 aiohttp.TCPConnector 中的配置
-    verify_ssl: Optional[bool] = None
-    fingerprint: Optional[bytes] = None
-    use_dns_cache: Optional[bool] = None
-    ttl_dns_cache: Optional[int] = None
-    family: Optional[int] = None
-    ssl_context: Optional["SSLContext"] = None
-    ssl: Optional[bool] = None
-    local_addr: Optional[Tuple[str, int]] = None
-    resolver: Optional[str] = None
-    keepalive_timeout: Union[None, float, object] = None
-    force_close: Optional[bool] = None
-    limit: Optional[int] = None
-    limit_per_host: Optional[int] = None
-    enable_cleanup_closed: Optional[bool] = None
-    loop: Optional["asyncio.AbstractEventLoop"] = None
-    timeout_ceil_threshold: Optional[float] = None
-    happy_eyeballs_delay: Optional[float] = None
-    interleave: Optional[int] = None
+    verify_ssl: bool | None = None
+    fingerprint: bytes | None = None
+    use_dns_cache: bool | None = None
+    ttl_dns_cache: int | None = None
+    family: int | None = None
+    ssl_context: SSLContext | None = None
+    ssl: bool | None = None
+    local_addr: tuple[str, int] | None = None
+    resolver: str | None = None
+    keepalive_timeout: float | object | None = None
+    force_close: bool | None = None
+    limit: int | None = None
+    limit_per_host: int | None = None
+    enable_cleanup_closed: bool | None = None
+    loop: asyncio.AbstractEventLoop | None = None
+    timeout_ceil_threshold: float | None = None
+    happy_eyeballs_delay: float | None = None
+    interleave: int | None = None
 
     # 这些是一些全局中需要的配置，其它的参数都在 ClientSession.request 中赋值
-    sleep: Optional[int] = None
-    retry_times: Optional[int] = None
-    timeout: Optional[int] = None
+    sleep: int | None = None
+    retry_times: int | None = None
+    timeout: int | None = None
 
 
 class AlterItemTable(NamedTuple):
@@ -169,12 +162,12 @@ class MQConf(NamedTuple):
     virtualhost: str = "/"
     heartbeat: int = 0
     socket_timeout: int = 1
-    queue: Optional[str] = None
+    queue: str | None = None
     durable: bool = True
     exclusive: bool = False
     auto_delete: bool = False
-    exchange: Optional[str] = None
-    routing_key: Optional[str] = None
+    exchange: str | None = None
+    routing_key: str | None = None
     content_type: str = "text/plain"
     delivery_mode: int = 1
     mandatory: bool = True
@@ -204,7 +197,7 @@ class OssConf(NamedTuple):
     access_secret: str
     endpoint: str
     bucket: str
-    doc: Optional[str] = None
+    doc: str | None = None
     upload_fields_suffix: str = "_file_url"
     oss_fields_prefix: str = "_"
     full_link_enable: bool = False

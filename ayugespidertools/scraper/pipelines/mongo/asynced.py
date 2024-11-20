@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import urllib.parse
 from typing import TYPE_CHECKING, Any
@@ -16,10 +18,10 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncMongoPipeline:
-    client: "AgnosticClient"
-    db: "AgnosticDatabase"
+    client: AgnosticClient
+    db: AgnosticDatabase
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
         if spider.mongodb_conf.uri is not None:
             _mongo_uri = spider.mongodb_conf.uri
@@ -35,7 +37,7 @@ class AyuAsyncMongoPipeline:
         self.client = motor.motor_asyncio.AsyncIOMotorClient(_mongo_uri)
         self.db = self.client.get_database()
 
-    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         await asyncio.shield(
             AsyncioAsynchronous().process_item_template(
@@ -45,5 +47,5 @@ class AyuAsyncMongoPipeline:
         )
         return item
 
-    def close_spider(self, spider: "AyuSpider") -> None:
+    def close_spider(self, spider: AyuSpider) -> None:
         self.client.close()

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import asyncio
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from scrapy.utils.defer import deferred_from_coro
 
@@ -22,16 +24,16 @@ if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider
 
-    DocumentType = Union[Type[Document], type]
+    DocumentType = Union[type[Document], type]
 
 
 class AyuAsyncESPipeline:
-    es_conf: "ESConf"
-    client: "AsyncElasticsearch"
-    es_type: "DocumentType"
+    es_conf: ESConf
+    client: AsyncElasticsearch
+    es_type: DocumentType
     running_tasks: set
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
         self.running_tasks = set()
         self.es_conf = spider.es_conf
@@ -50,7 +52,7 @@ class AyuAsyncESPipeline:
             ssl_assert_fingerprint=self.es_conf.ssl_assert_fingerprint,
         )
 
-    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
@@ -83,5 +85,5 @@ class AyuAsyncESPipeline:
     async def _close_spider(self):
         await self.client.close()
 
-    def close_spider(self, spider: "AyuSpider") -> "Deferred":
+    def close_spider(self, spider: AyuSpider) -> Deferred:
         return deferred_from_coro(self._close_spider())

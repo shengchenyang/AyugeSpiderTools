@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import itertools
 import math
 import random
-from typing import TYPE_CHECKING, Any, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any
 
 try:
     import cv2
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 
 class CvnpilKit:
     @staticmethod
-    def get_array_dimension(array: Union[frozenset, list, set, tuple]) -> int:
+    def get_array_dimension(array: frozenset | list | set | tuple) -> int:
         """获取 array 的维度
 
         Args:
@@ -31,10 +33,7 @@ class CvnpilKit:
         return len(np.array(array).shape)
 
     @staticmethod
-    def read_image_data(
-        img: Union[bytes, str],
-        flags: int = cv2.IMREAD_COLOR,
-    ) -> np.ndarray:
+    def read_image_data(img: bytes | str, flags: int = cv2.IMREAD_COLOR) -> np.ndarray:
         """
         用 opencv 读取图片数据
         Args:
@@ -95,9 +94,7 @@ class CvnpilKit:
         return cv2.Canny(img, 100, 200)
 
     @staticmethod
-    def _template_match(
-        bg: "MatLike", slider: "MatLike", out: Optional[str] = None
-    ) -> int:
+    def _template_match(bg: MatLike, slider: MatLike, out: str | None = None) -> int:
         """模板匹配找出滑块缺口的距离
 
         Args:
@@ -125,10 +122,7 @@ class CvnpilKit:
 
     @classmethod
     def discern_gap(
-        cls,
-        bg: Union[str, bytes],
-        slider: Union[str, bytes],
-        out: Optional[str] = None,
+        cls, bg: str | bytes, slider: str | bytes, out: str | None = None
     ) -> int:
         """识别滑块缺口方法
 
@@ -152,10 +146,7 @@ class CvnpilKit:
 
     @classmethod
     def identify_gap(
-        cls,
-        bg: Union[bytes, str],
-        slider: Union[bytes, str],
-        out: Optional[str] = None,
+        cls, bg: bytes | str, slider: bytes | str, out: str | None = None
     ) -> int:
         """通过背景图片和缺口图片识别出滑块距离
 
@@ -179,7 +170,7 @@ class CvnpilKit:
         return cls._template_match(bg_img, slider_img, out)
 
     @staticmethod
-    def match_gap(bg: Union[str, bytes], slider: Union[str, bytes]) -> Optional[int]:
+    def match_gap(bg: str | bytes, slider: str | bytes) -> int | None:
         """滑块坐标定位方法
 
         Args:
@@ -200,7 +191,7 @@ class CvnpilKit:
         # 使用二分法查找阈值的精确值
         lft: float = 0.0
         rgt: float = 1.0
-        loc: Tuple[np.ndarray[Any, np.dtype[np.signedinteger[Any]]], ...] = ()
+        loc: tuple[np.ndarray[Any, np.dtype[np.signedinteger[Any]]], ...] = ()
         while run < 20:
             run += 1
             threshold = (rgt + lft) / 2
@@ -373,8 +364,8 @@ class BezierTrajectory:
 
     def gen_track(
         self,
-        start: Union[np.ndarray, list],
-        end: Union[np.ndarray, list],
+        start: np.ndarray | list,
+        end: np.ndarray | list,
         num: int,
         order: int = 1,
         deviation: int = 0,

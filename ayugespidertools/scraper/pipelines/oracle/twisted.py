@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from twisted.enterprise import adbapi
@@ -18,12 +20,12 @@ if TYPE_CHECKING:
 
 
 class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
-    oracle_conf: "OracleConf"
-    slog: "slogT"
-    conn: "Connection"
-    dbpool: "adbapi.ConnectionPool"
+    oracle_conf: OracleConf
+    slog: slogT
+    conn: Connection
+    dbpool: adbapi.ConnectionPool
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
         self.slog = spider.slog
         self.oracle_conf = spider.oracle_conf
@@ -45,10 +47,10 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
 
     def db_create(self, cursor: Any) -> None: ...
 
-    def db_create_err(self, failure: "Failure") -> None:
+    def db_create_err(self, failure: Failure) -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)
@@ -63,5 +65,5 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         cursor.execute(sql, tuple(new_item.values()))
         return item
 
-    def handle_error(self, failure: "Failure", item: Any) -> None:
+    def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

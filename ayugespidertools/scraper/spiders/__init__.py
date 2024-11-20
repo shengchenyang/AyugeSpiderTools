@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -49,30 +51,30 @@ if TYPE_CHECKING:
 
 
 class AyuSpider(Spider):
-    mysql_engine: "SqlalchemyEngineT"
-    mysql_engine_conn: "SqlalchemyConnectT"
-    postgres_engine: "SqlalchemyEngineT"
-    postgres_engine_conn: "SqlalchemyConnectT"
-    oracle_engine: "SqlalchemyEngineT"
-    oracle_engine_conn: "SqlalchemyConnectT"
-    es_engine: "Elasticsearch"
-    es_engine_conn: "Elasticsearch"
+    mysql_engine: SqlalchemyEngineT
+    mysql_engine_conn: SqlalchemyConnectT
+    postgres_engine: SqlalchemyEngineT
+    postgres_engine_conn: SqlalchemyConnectT
+    oracle_engine: SqlalchemyEngineT
+    oracle_engine_conn: SqlalchemyConnectT
+    es_engine: Elasticsearch
+    es_engine_conn: Elasticsearch
 
-    mysql_conf: "MysqlConf"
-    mongodb_conf: "MongoDBConf"
-    postgres_conf: "PostgreSQLConf"
-    es_conf: "ESConf"
-    oracle_conf: "OracleConf"
-    rabbitmq_conf: "MQConf"
-    kafka_conf: "KafkaConf"
-    dynamicproxy_conf: "DynamicProxyConf"
-    exclusiveproxy_conf: "ExclusiveProxyConf"
-    oss_conf: "OssConf"
+    mysql_conf: MysqlConf
+    mongodb_conf: MongoDBConf
+    postgres_conf: PostgreSQLConf
+    es_conf: ESConf
+    oracle_conf: OracleConf
+    rabbitmq_conf: MQConf
+    kafka_conf: KafkaConf
+    dynamicproxy_conf: DynamicProxyConf
+    exclusiveproxy_conf: ExclusiveProxyConf
+    oss_conf: OssConf
 
     SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
 
     @property
-    def slog(self) -> "slogT":
+    def slog(self) -> slogT:
         """本库的日志管理模块，使用 loguru 来管理日志
         Note:
             本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
@@ -83,7 +85,7 @@ class AyuSpider(Spider):
         return logger if loguru_enabled else super(AyuSpider, self).logger
 
     @classmethod
-    def update_settings(cls, settings: "BaseSettings") -> None:
+    def update_settings(cls, settings: BaseSettings) -> None:
         _normal_settings = {
             "ROBOTSTXT_OBEY": False,
             "TELNETCONSOLE_ENABLED": False,
@@ -109,7 +111,7 @@ class AyuSpider(Spider):
         settings.setdict(cls.custom_settings or {}, priority="spider")
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler", *args: Any, **kwargs: Any) -> "Self":
+    def from_crawler(cls, crawler: Crawler, *args: Any, **kwargs: Any) -> Self:
         spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
         _db_engine_enabled = crawler.settings.get("DATABASE_ENGINE_ENABLED", False)
 

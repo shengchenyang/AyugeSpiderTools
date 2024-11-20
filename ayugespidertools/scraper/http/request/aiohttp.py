@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 from collections.abc import Awaitable, Callable, Iterable, Mapping
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, AnyStr, Optional, Tuple, TypedDict, Union
+from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
 
 from scrapy import Request
 
@@ -41,45 +41,45 @@ class AiohttpRequest(Request):
     def __init__(
         self,
         url: str,
-        callback: Optional[CallbackT] = None,
+        callback: CallbackT | None = None,
         method: str = "GET",
-        headers: Union[Mapping[AnyStr, Any], Iterable[Tuple[AnyStr, Any]], None] = None,
-        cookies: Optional[CookiesT] = None,
-        meta: Optional[dict[str, Any]] = None,
+        headers: Mapping[AnyStr, Any] | Iterable[tuple[AnyStr, Any]] | None = None,
+        cookies: CookiesT | None = None,
+        meta: dict[str, Any] | None = None,
         encoding: str = "utf-8",
         priority: int = 0,
         dont_filter: bool = False,
-        errback: Optional[Callable] = None,
-        flags: Optional[list[str]] = None,
-        cb_kwargs: Optional[dict] = None,
-        params: Optional[Mapping[str, str]] = None,
+        errback: Callable | None = None,
+        flags: list[str] | None = None,
+        cb_kwargs: dict | None = None,
+        params: Mapping[str, str] | None = None,
         data: Any = None,
         json: Any = None,
-        skip_auto_headers: Optional[Iterable[str]] = None,
-        auth: Optional["BasicAuth"] = None,
-        allow_redirects: Optional[bool] = None,
-        max_redirects: Optional[int] = None,
-        compress: Optional[str] = None,
-        chunked: Optional[bool] = None,
-        expect100: Optional[bool] = None,
-        raise_for_status: Union[
-            None, bool, Callable[["ClientResponse"], Awaitable[None]]
-        ] = None,
-        read_until_eof: Optional[bool] = None,
-        proxy: Optional[str] = None,
-        proxy_auth: Optional["BasicAuth"] = None,
-        verify_ssl: Optional[bool] = None,
-        fingerprint: Optional[bytes] = None,
-        ssl_context: Optional["SSLContext"] = None,
-        ssl: Union["SSLContext", bool, "Fingerprint"] = True,
-        server_hostname: Optional[str] = None,
-        proxy_headers: Optional["LooseHeaders"] = None,
-        trace_request_ctx: Optional[SimpleNamespace] = None,
-        read_bufsize: Optional[int] = None,
-        auto_decompress: Optional[bool] = None,
-        max_line_size: Optional[int] = None,
-        max_field_size: Optional[int] = None,
-        timeout: Optional["ClientTimeout"] = None,
+        skip_auto_headers: Iterable[str] | None = None,
+        auth: BasicAuth | None = None,
+        allow_redirects: bool | None = None,
+        max_redirects: int | None = None,
+        compress: str | None = None,
+        chunked: bool | None = None,
+        expect100: bool | None = None,
+        raise_for_status: (
+            None | bool | Callable[[ClientResponse], Awaitable[None]]
+        ) = None,
+        read_until_eof: bool | None = None,
+        proxy: str | None = None,
+        proxy_auth: BasicAuth | None = None,
+        verify_ssl: bool | None = None,
+        fingerprint: bytes | None = None,
+        ssl_context: SSLContext | None = None,
+        ssl: SSLContext | bool | Fingerprint = True,
+        server_hostname: str | None = None,
+        proxy_headers: LooseHeaders | None = None,
+        trace_request_ctx: SimpleNamespace | None = None,
+        read_bufsize: int | None = None,
+        auto_decompress: bool | None = None,
+        max_line_size: int | None = None,
+        max_field_size: int | None = None,
+        timeout: ClientTimeout | None = None,
     ) -> None:
 
         aiohttp_req_args = {

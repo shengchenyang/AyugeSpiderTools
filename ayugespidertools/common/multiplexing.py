@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import configparser
 import json
 import random
@@ -37,7 +39,7 @@ class ReuseOperation:
     """用于存放经常复用的一些操作"""
 
     @staticmethod
-    def fetch_local_conf(vit_dir: Union[str, "Path"], inner_settings: dict) -> dict:
+    def fetch_local_conf(vit_dir: Union[str, Path], inner_settings: dict) -> dict:
         """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
 
         Args:
@@ -303,11 +305,7 @@ class ReuseOperation:
         return all(key in data for key in keys)
 
     @classmethod
-    def get_items_by_keys(
-        cls,
-        data: dict,
-        keys: Iterable[str],
-    ) -> dict:
+    def get_items_by_keys(cls, data: dict, keys: Iterable[str]) -> dict:
         """获取 data 中的含有 keys 的 key 的字段
 
         Args:
@@ -431,7 +429,7 @@ class ReuseOperation:
         return key_to_upper_dict
 
     @classmethod
-    def get_remote_option(cls, settings: "BaseSettings") -> dict:
+    def get_remote_option(cls, settings: BaseSettings) -> dict:
         """获取项目中 consul 或 nacos 的链接配置
 
         Args:

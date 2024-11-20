@@ -22,7 +22,7 @@ class NormalConfig:
     DATA_DIR = CONFIG_DIR / "data"
 
 
-def get_cfg() -> "configparser.ConfigParser":
+def get_cfg() -> configparser.ConfigParser:
     _cfg = get_config(use_closest=True)
     settings_default = _cfg.get("settings", "default")
     module = import_module(settings_default)

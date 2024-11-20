@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import pymysql
@@ -20,23 +22,23 @@ if TYPE_CHECKING:
 
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
-    mysql_conf: "MysqlConf"
-    conn: "Connection[Cursor]"
-    slog: "slogT"
-    cursor: "Cursor"
+    mysql_conf: MysqlConf
+    conn: Connection[Cursor]
+    slog: slogT
+    cursor: Cursor
     pool_db_conf: dict
 
     def __init__(self, pool_db_conf: dict) -> None:
         self.pool_db_conf = pool_db_conf
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler") -> "Self":
+    def from_crawler(cls, crawler: Crawler) -> Self:
         pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
         return cls(
             pool_db_conf=pool_db_conf,
         )
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         if not self.pool_db_conf:
@@ -59,6 +61,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
             port=self.mysql_conf.port,
             database=self.mysql_conf.database,
             charset=self.mysql_conf.charset,
-            **self.pool_db_conf
+            **self.pool_db_conf,
         ).connection()
         self.cursor = self.conn.cursor()

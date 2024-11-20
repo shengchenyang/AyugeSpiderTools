@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Optional, Tuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pymongo
 from gridfs import GridFS
@@ -29,15 +31,15 @@ class MongoDbBase:
 
     @staticmethod
     def connects(
-        user: Optional[str] = None,
-        password: Optional[str] = None,
+        user: str | None = None,
+        password: str | None = None,
         host: str = "localhost",
         port: int = 27017,
         authsource: str = "admin",
-        authMechanism: "authMechanismStr" = "SCRAM-SHA-1",
-        database: Optional[str] = None,
-        uri: Optional[str] = None,
-    ) -> Tuple[pymongo.MongoClient, "database.Database"]:
+        authMechanism: authMechanismStr = "SCRAM-SHA-1",
+        database: str | None = None,
+        uri: str | None = None,
+    ) -> tuple[pymongo.MongoClient, database.Database]:
         """初始化 mongo 连接句柄
         可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
 

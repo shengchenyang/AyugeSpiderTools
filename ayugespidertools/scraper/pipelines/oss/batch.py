@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from ayugespidertools.extras.oss import AliOssBase
@@ -16,12 +18,10 @@ class AyuAsyncOssBatchPipeline(AyuAsyncOssPipeline):
     """适用于 oss 上传时，对应的文件资源字段为列表类型的场景"""
 
     oss_bucket: AliOssBase
-    oss_conf: "OssConf"
+    oss_conf: OssConf
     full_link_enable: bool
 
-    async def _upload_file(
-        self, alter_item: "AlterItem", item: Any, spider: "AyuSpider"
-    ):
+    async def _upload_file(self, alter_item: AlterItem, item: Any, spider: AyuSpider):
         if not (new_item := alter_item.new_item):
             return
 

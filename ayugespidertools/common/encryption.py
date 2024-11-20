@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import base64
 import hashlib
 import re
-from typing import Union
 
 from ayugespidertools.extras.ext import EncryptMixin
 
@@ -28,7 +29,7 @@ class Encrypt(EncryptMixin):
         return hl.hexdigest()
 
     @staticmethod
-    def base64_encode(encode_data: Union[bytes, str], url_safe: bool = False) -> str:
+    def base64_encode(encode_data: bytes | str, url_safe: bool = False) -> str:
         """base64 编码
 
         Args:

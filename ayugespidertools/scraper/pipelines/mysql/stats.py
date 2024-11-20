@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any
 
 from retrying import retry
 
@@ -19,13 +21,13 @@ if TYPE_CHECKING:
 
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
-    mysql_conf: "MysqlConf"
-    conn: "Connection[Cursor]"
-    slog: "slogT"
-    cursor: "Cursor"
-    crawl_time: "datetime.date"
+    mysql_conf: MysqlConf
+    conn: Connection[Cursor]
+    slog: slogT
+    cursor: Cursor
+    crawl_time: datetime.date
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         self.crawl_time = datetime.date.today()
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
@@ -139,7 +141,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         )
         self._log_record(sql=sql, data=args)
 
-    def _log_record(self, sql: str, data: Tuple) -> None:
+    def _log_record(self, sql: str, data: tuple[Any]) -> None:
         """执行日志记录的 sql 语句
 
         Args:
@@ -153,7 +155,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             self.conn.rollback()
             self.slog.warning(f"日志记录存储错误: {e}")
 
-    def close_spider(self, spider: "AyuSpider") -> None:
+    def close_spider(self, spider: AyuSpider) -> None:
         log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
 
         # 运行脚本统计信息
@@ -167,5 +169,5 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         if self.conn:
             self.conn.close()
 
-    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    def process_item(self, item: Any, spider: AyuSpider) -> Any:
         return item

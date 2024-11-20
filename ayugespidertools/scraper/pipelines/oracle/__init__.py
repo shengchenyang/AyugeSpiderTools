@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
@@ -14,21 +16,21 @@ if TYPE_CHECKING:
 
 
 class AyuOraclePipeline(OraclePipeEnhanceMixin):
-    conn: "Connection"
-    cursor: "Cursor"
+    conn: Connection
+    cursor: Cursor
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
         self.conn = self._connect(spider.oracle_conf)
         self.cursor = self.conn.cursor()
 
-    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         self.insert_item(alter_item)
         return item
 
-    def insert_item(self, alter_item: "AlterItem") -> None:
+    def insert_item(self, alter_item: AlterItem) -> None:
         """通用插入数据
 
         Args:
@@ -41,5 +43,5 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
         self.cursor.execute(sql, tuple(new_item.values()))
         self.conn.commit()
 
-    def close_spider(self, spider: "AyuSpider") -> None:
+    def close_spider(self, spider: AyuSpider) -> None:
         self.conn.close()

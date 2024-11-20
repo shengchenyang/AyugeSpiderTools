@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import json
 import random
 import urllib.request
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal
 from urllib.parse import urlparse
 
 from ayugespidertools.common.encryption import Encrypt
@@ -44,7 +46,7 @@ class Tools(AppConfManageMixin):
     def get_remote_kvs(
         url: str,
         remote_type: RemoteTypeStr = "consul",
-        token: Optional[str] = None,
+        token: str | None = None,
     ) -> str:
         """获取远程配置中的 key_values 信息
 
@@ -81,7 +83,7 @@ class Tools(AppConfManageMixin):
         url: str,
         format: RemoteFormatStr = "json",
         remote_type: RemoteTypeStr = "consul",
-        token: Optional[str] = None,
+        token: str | None = None,
     ) -> dict:
         """获取远程中的项目配置信息
 
@@ -114,7 +116,7 @@ class Tools(AppConfManageMixin):
 
     @staticmethod
     def extract_with_css(
-        response: "Response",
+        response: Response,
         query: str,
         get_all: bool = False,
         return_selector: bool = False,
@@ -139,7 +141,7 @@ class Tools(AppConfManageMixin):
 
     @staticmethod
     def extract_with_xpath(
-        response: "Response",
+        response: Response,
         query: str,
         get_all: bool = False,
         return_selector: bool = False,
@@ -164,7 +166,7 @@ class Tools(AppConfManageMixin):
 
     @staticmethod
     def extract_with_json(
-        json_data: dict, query: Union[str, list[str]], ignore_err: bool = False
+        json_data: dict, query: str | list[str], ignore_err: bool = False
     ):
         """scrapy 中提取 json 数据遇到的情况
 
@@ -199,7 +201,7 @@ class Tools(AppConfManageMixin):
 
     @classmethod
     def extract_with_json_rules(
-        cls, json_data: dict, query_rules: list["Str_Lstr"], ignore_err: bool = False
+        cls, json_data: dict, query_rules: list[Str_Lstr], ignore_err: bool = False
     ):
         """当提取 json 某个数据时，可以在某些字段中取值，只要返回其中任意一个含有数据的值即可
 
@@ -236,7 +238,7 @@ class Tools(AppConfManageMixin):
         return _res[0] if _res else None
 
     @staticmethod
-    def get_dict_form_scrapy_req_headers(scrapy_headers: "Headers") -> dict:
+    def get_dict_form_scrapy_req_headers(scrapy_headers: Headers) -> dict:
         """根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
 
         Args:
@@ -251,7 +253,7 @@ class Tools(AppConfManageMixin):
         }
 
     @staticmethod
-    def get_data_urls_by_img(mediatype: str, data: Union[bytes, str]) -> str:
+    def get_data_urls_by_img(mediatype: str, data: bytes | str) -> str:
         """根据本地、远程或 bytes 内容的图片生成 Data URLs 格式的数据
         Data URLs 格式示例:
             data:image/png;base64,iVB...

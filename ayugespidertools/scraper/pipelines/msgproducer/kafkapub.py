@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import json
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
@@ -25,7 +27,7 @@ class KafkaProducerClient:
         self,
         topic: str,
         value: dict,
-        key: Optional[str] = None,
+        key: str | None = None,
     ) -> None:
         """发送数据
 
@@ -76,14 +78,14 @@ class KafkaProducerClient:
 class AyuKafkaPipeline:
     kp: KafkaProducerClient
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
         # 如果有多个 kafka 服务地址，用逗号分隔，会在此处拆分为列表
         _bts = spider.kafka_conf.bootstrap_servers
         bts_lst = _bts.split(",")
         self.kp = KafkaProducerClient(bootstrap_servers=bts_lst)
 
-    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         self.kp.sendmsg(
             topic=spider.kafka_conf.topic,
@@ -92,5 +94,5 @@ class AyuKafkaPipeline:
         )
         return item
 
-    def close_spider(self, spider: "AyuSpider") -> None:
+    def close_spider(self, spider: AyuSpider) -> None:
         self.kp.close_producer()

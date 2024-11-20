@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 from typing import TYPE_CHECKING, Any
 
@@ -19,17 +21,17 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
-    mysql_conf: "MysqlConf"
+    mysql_conf: MysqlConf
     pool: aiomysql.Pool
     running_tasks: set
 
-    def open_spider(self, spider: "AyuSpider") -> "Deferred":
+    def open_spider(self, spider: AyuSpider) -> Deferred:
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.running_tasks = set()
         self.mysql_conf = spider.mysql_conf
         return deferred_from_coro(self._open_spider(spider))
 
-    async def _open_spider(self, spider: "AyuSpider") -> None:
+    async def _open_spider(self, spider: AyuSpider) -> None:
         self.pool = await aiomysql.create_pool(
             host=self.mysql_conf.host,
             port=self.mysql_conf.port,
@@ -53,7 +55,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                 )
                 await cursor.execute(sql, args)
 
-    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         task = asyncio.create_task(self.insert_item(item_dict))
         self.running_tasks.add(task)
@@ -64,6 +66,6 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     async def _close_spider(self) -> None:
         await self.pool.wait_closed()
 
-    def close_spider(self, spider: "AyuSpider") -> "Deferred":
+    def close_spider(self, spider: AyuSpider) -> Deferred:
         self.pool.close()
         return deferred_from_coro(self._close_spider())

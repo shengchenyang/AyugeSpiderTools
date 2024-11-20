@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar
 
 from ayugespidertools.config import logger
 
@@ -24,8 +26,8 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: "Connection",
-        cursor: Union["Cursor", "TwistedTransactionT"],
+        conn: Connection,
+        cursor: Cursor | TwistedTransactionT,
         table: str,
         table_notes: str,
         note_dic: dict[str, str],
@@ -62,7 +64,7 @@ class AbstractClass(ABC):
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict[str, str]
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """解决 column "xxx" of relation "x" does not exist
 
         Args:
@@ -96,10 +98,10 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: "Connection",
-        cursor: "Cursor",
+        conn: Connection,
+        cursor: Cursor,
         sql: str,
-        possible_err: Optional[str] = None,
+        possible_err: str | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -119,9 +121,9 @@ class TwistedAsynchronous(AbstractClass):
 
     def _exec_sql(
         self,
-        cursor: "TwistedTransactionT",
+        cursor: TwistedTransactionT,
         sql: str,
-        possible_err: Optional[str] = None,
+        possible_err: str | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -139,11 +141,11 @@ class TwistedAsynchronous(AbstractClass):
 def deal_postgres_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: Union["Cursor", "TwistedTransactionT"],
+    cursor: Cursor | TwistedTransactionT,
     table: str,
     table_notes: str,
     note_dic: dict[str, str],
-    conn: Optional["Connection"] = None,
+    conn: Connection | None = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,

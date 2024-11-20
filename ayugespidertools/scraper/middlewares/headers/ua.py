@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import random
 from pathlib import Path
@@ -35,12 +37,12 @@ class RandomRequestUaMiddleware:
         return random.choice(self.fake_ua_dict[explorer_types[0]])
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler") -> "Self":
+    def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
-    def spider_opened(self, spider: "AyuSpider") -> None:
+    def spider_opened(self, spider: AyuSpider) -> None:
         # 带权重的 ua 列表
         ua_arr = [
             {"explorer": "safari", "weight": 50},
@@ -54,5 +56,5 @@ class RandomRequestUaMiddleware:
             f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}"
         )
 
-    def process_request(self, request: "Request", spider: "AyuSpider") -> None:
+    def process_request(self, request: Request, spider: AyuSpider) -> None:
         request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())

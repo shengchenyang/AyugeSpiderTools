@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -21,7 +23,7 @@ class FilesDownloadPipeline:
         self.file_path = file_path
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler") -> "Self":
+    def from_crawler(cls, crawler: Crawler) -> Self:
         _file_path = crawler.settings.get("FILES_STORE", None)
         assert _file_path is not None, "未配置 FILES_STORE 存储路径参数！"
 
@@ -31,7 +33,7 @@ class FilesDownloadPipeline:
         return cls(file_path=_file_path)
 
     async def _download_and_add_field(
-        self, alter_item: "AlterItem", item: Any, spider: "AyuSpider"
+        self, alter_item: AlterItem, item: Any, spider: AyuSpider
     ) -> None:
         if not (new_item := alter_item.new_item):
             return
@@ -51,7 +53,7 @@ class FilesDownloadPipeline:
                         key_value=filename, notes=f"{key} 文件存储路径"
                     )
 
-    async def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         await self._download_and_add_field(alter_item, item, spider)

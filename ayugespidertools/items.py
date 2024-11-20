@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from abc import ABCMeta
 from collections.abc import Iterator, MutableMapping
 from dataclasses import dataclass
-from typing import Any, NamedTuple, NoReturn, Optional, Tuple, Union
+from typing import Any, NamedTuple, NoReturn
 
 import scrapy
 from scrapy.item import Item
@@ -34,8 +36,8 @@ class DataItem(NamedTuple):
 
 class ItemMeta(ABCMeta):
     def __new__(
-        cls, class_name: str, bases: Tuple[type, ...], attrs: dict[str, Any]
-    ) -> "ItemMeta":
+        cls, class_name: str, bases: tuple[type, ...], attrs: dict[str, Any]
+    ) -> ItemMeta:
         def add_field(self, key: str, value: Any) -> None:
             """动态添加字段方法
 
@@ -115,8 +117,8 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
 
     def __init__(
         self,
-        _table: Union[DataItem, str],
-        _mongo_update_rule: Optional[dict[str, Any]] = None,
+        _table: DataItem | str,
+        _mongo_update_rule: dict[str, Any] | None = None,
         **kwargs,
     ) -> None:
         """初始化 AyuItem 实例

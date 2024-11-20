@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import asyncio
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Union
 
 import aiohttp
 from scrapy import signals
@@ -37,14 +39,14 @@ class AiohttpDownloaderMiddleware:
     priority_adjust: int
     aiohttp_cfg: AiohttpConf
     aiohttp_args: dict
-    slog: "slogT"
+    slog: slogT
 
     def _retry(
         self,
-        request: "AyuRequest",
+        request: AyuRequest,
         reason: int,
-        spider: "AyuSpider",
-    ) -> Optional["AyuRequest"]:
+        spider: AyuSpider,
+    ) -> AyuRequest | None:
         """重试请求
 
         Args:
@@ -53,7 +55,7 @@ class AiohttpDownloaderMiddleware:
             spider: AyuSpider
 
         Returns:
-            1). Optional["AyuRequest"]: 重试的 request 对象
+            1). AyuRequest | None: 重试的 request 对象
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -66,10 +68,10 @@ class AiohttpDownloaderMiddleware:
 
     def _retry_with_limit(
         self,
-        request: "AyuRequest",
+        request: AyuRequest,
         retries: int,
         reason: int,
-        stats: "StatsCollector",
+        stats: StatsCollector,
     ):
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
         retry_req = request.copy()
@@ -85,7 +87,7 @@ class AiohttpDownloaderMiddleware:
         stats.inc_value(f"retry/reason_count/{reason}")
         return retry_req
 
-    async def spider_opened(self, spider: "AyuSpider") -> None:
+    async def spider_opened(self, spider: AyuSpider) -> None:
         self.slog = spider.slog
         settings = spider.crawler.settings
         # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
@@ -131,7 +133,7 @@ class AiohttpDownloaderMiddleware:
             self.priority_adjust = settings.getint("RETRY_PRIORITY_ADJUST")
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler") -> "Self":
+    def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
@@ -139,8 +141,8 @@ class AiohttpDownloaderMiddleware:
 
     async def _request_by_aiohttp(
         self,
-        aio_request_args: Union["ItemAdapter", dict],
-    ) -> Tuple[int, str]:
+        aio_request_args: ItemAdapter | dict,
+    ) -> tuple[int, str]:
         """使用 aiohttp 来请求
 
         Args:
@@ -160,8 +162,8 @@ class AiohttpDownloaderMiddleware:
             return 504, ""
 
     async def process_request(
-        self, request: "AyuRequest", spider: "AyuSpider"
-    ) -> Union["AyuRequest", "Response", None]:
+        self, request: AyuRequest, spider: AyuSpider
+    ) -> AyuRequest | Response | None:
         aiohttp_options = request.meta.get("aiohttp")
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
@@ -189,5 +191,5 @@ class AiohttpDownloaderMiddleware:
             request=request,
         )
 
-    async def spider_closed(self, spider: "AyuSpider") -> None:
+    async def spider_closed(self, spider: AyuSpider) -> None:
         await self.session.close()

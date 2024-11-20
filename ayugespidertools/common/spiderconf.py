@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from sqlalchemy.exc import OperationalError
 
@@ -62,8 +64,8 @@ SpiderConf = TypeVar(
 class Product(ABC, Generic[SpiderConf]):
     @abstractmethod
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[SpiderConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> SpiderConf | None:
         """获取各个工具链接配置信息"""
         raise NotImplementedError(
             "Subclasses must implement the 'get_conn_conf' method"
@@ -71,7 +73,7 @@ class Product(ABC, Generic[SpiderConf]):
 
     def get_engine(
         self, db_conf: SpiderConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
         """获取各个工具中对应的 sqlalchemy db_engine 和 db_engine_conn。
         需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
         但其中 elasticsearch 不采用 sqlalchemy 的方式。
@@ -89,8 +91,8 @@ class Creator(ABC):
 
 class MysqlConfProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[MysqlConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> MysqlConf | None:
         # 1). 优先从远程配置中取值
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="mysql", **remote_option)
@@ -102,7 +104,7 @@ class MysqlConfProduct(Product):
 
     def get_engine(
         self, db_conf: MysqlConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
         mysql_engine = mysql_engine_conn = None
         if db_engine_enabled:
             mysql_url = (
@@ -121,8 +123,8 @@ class MysqlConfProduct(Product):
 
 class MongoDBConfProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[MongoDBConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> MongoDBConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             uri_remote_conf = Tools.fetch_remote_conf(
                 conf_name="mongodb:uri", **remote_option
@@ -139,8 +141,8 @@ class MongoDBConfProduct(Product):
 
 class PostgreSQLConfProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[PostgreSQLConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> PostgreSQLConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(
                 conf_name="postgresql", **remote_option
@@ -152,7 +154,7 @@ class PostgreSQLConfProduct(Product):
 
     def get_engine(
         self, db_conf: PostgreSQLConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
         postgres_engine = postgres_engine_conn = None
         if db_engine_enabled:
             postgres_url = (
@@ -168,9 +170,7 @@ class PostgreSQLConfProduct(Product):
 
 
 class ESConfProduct(Product):
-    def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[ESConf]:
+    def get_conn_conf(self, settings: Settings, remote_option: dict) -> ESConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(
                 conf_name="elasticsearch", **remote_option
@@ -182,7 +182,7 @@ class ESConfProduct(Product):
 
     def get_engine(  # type: ignore[override]
         self, db_conf: ESConf, db_engine_enabled: bool
-    ) -> Optional["Elasticsearch"]:  # @override to fix mypy [override] error.
+    ) -> Elasticsearch | None:  # @override to fix mypy [override] error.
         if db_engine_enabled:
             _hosts_lst = db_conf.hosts.split(",")
             if any([db_conf.user is not None, db_conf.password is not None]):
@@ -203,8 +203,8 @@ class ESConfProduct(Product):
 
 class OracleConfProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[OracleConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> OracleConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="oracle", **remote_option)
             return OracleConf(**remote_conf) if remote_conf else None
@@ -214,7 +214,7 @@ class OracleConfProduct(Product):
 
     def get_engine(
         self, db_conf: OracleConf, db_engine_enabled: bool
-    ) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
         oracle_engine = oracle_engine_conn = None
         if db_engine_enabled:
             oracle_url = (
@@ -237,9 +237,7 @@ class OracleConfProduct(Product):
 
 
 class MQConfProduct(Product):
-    def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[MQConf]:
+    def get_conn_conf(self, settings: Settings, remote_option: dict) -> MQConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="rabbitmq", **remote_option)
             return MQConf(**remote_conf) if remote_conf else None
@@ -250,8 +248,8 @@ class MQConfProduct(Product):
 
 class KafkaConfProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[KafkaConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> KafkaConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="kafka", **remote_option)
             return KafkaConf(**remote_conf) if remote_conf else None
@@ -262,8 +260,8 @@ class KafkaConfProduct(Product):
 
 class DynamicProxyProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[DynamicProxyConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> DynamicProxyConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(
                 conf_name="dynamicproxy", **remote_option
@@ -276,8 +274,8 @@ class DynamicProxyProduct(Product):
 
 class ExclusiveProxyProduct(Product):
     def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[ExclusiveProxyConf]:
+        self, settings: Settings, remote_option: dict
+    ) -> ExclusiveProxyConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(
                 conf_name="exclusiveproxy", **remote_option
@@ -289,9 +287,7 @@ class ExclusiveProxyProduct(Product):
 
 
 class OssConfProduct(Product):
-    def get_conn_conf(
-        self, settings: "Settings", remote_option: dict
-    ) -> Optional[OssConf]:
+    def get_conn_conf(self, settings: Settings, remote_option: dict) -> OssConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="oss:ali", **remote_option)
             return OssConf(**remote_conf) if remote_conf else None
@@ -351,8 +347,8 @@ class OssConfCreator(Creator):
 
 
 def get_spider_conf(
-    creator: Creator, settings: "Settings", remote_option: dict
-) -> Optional[SpiderConf]:
+    creator: Creator, settings: Settings, remote_option: dict
+) -> SpiderConf | None:
     product = creator.create_product()
     return product.get_conn_conf(settings, remote_option)
 
@@ -361,6 +357,6 @@ def get_sqlalchemy_conf(
     creator: Creator,
     db_conf: SpiderConf,
     db_engine_enabled: bool,
-) -> Tuple[Optional["SqlalchemyEngineT"], Optional["SqlalchemyConnectT"]]:
+) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
     product = creator.create_product()
     return product.get_engine(db_conf, db_engine_enabled)

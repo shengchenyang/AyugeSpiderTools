@@ -1,6 +1,8 @@
+from __future__ import annotations, print_function
+
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar
 
 from ayugespidertools.config import logger
 
@@ -26,7 +28,7 @@ class AbstractClass(ABC):
 
     def _create_table(
         self,
-        cursor: "Cursor",
+        cursor: Cursor,
         table_name: str,
         engine: str,
         charset: str,
@@ -57,11 +59,11 @@ class AbstractClass(ABC):
 
     def _get_column_type(
         self,
-        cursor: "Cursor",
+        cursor: Cursor,
         database: str,
         table: str,
         column: str,
-    ) -> Union[str, None]:
+    ) -> str | None:
         """获取数据字段存储类型
 
         Args:
@@ -95,9 +97,9 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: "Connection[Cursor]",
-        cursor: Union["Cursor", "TwistedTransactionT"],
-        mysql_conf: "MysqlConf",
+        conn: Connection[Cursor],
+        cursor: Cursor | TwistedTransactionT,
+        mysql_conf: MysqlConf,
         table: str,
         table_notes: str,
         note_dic: dict[str, str],
@@ -154,7 +156,7 @@ class AbstractClass(ABC):
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict[str, str]
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """解决 1054, u"Unknown column 'xx' in 'field list'"
 
         Args:
@@ -177,11 +179,11 @@ class AbstractClass(ABC):
     def deal_1406_error(
         self,
         err_msg: str,
-        cursor: "Cursor",
+        cursor: Cursor,
         database: str,
         table: str,
         note_dic: dict[str, str],
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """解决 1406, u"Data too long for 'xx' at ..."
 
         Args:
@@ -214,11 +216,11 @@ class AbstractClass(ABC):
     def deal_1265_error(
         self,
         err_msg: str,
-        cursor: "Cursor",
+        cursor: Cursor,
         database: str,
         table: str,
         note_dic: dict[str, str],
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """解决 1265, u"Data truncated for column 'xx' at ..."
 
         Args:
@@ -259,10 +261,10 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: "Connection[Cursor]",
-        cursor: "Cursor",
+        conn: Connection[Cursor],
+        cursor: Cursor,
         sql: str,
-        possible_err: Optional[str] = None,
+        possible_err: str | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -280,9 +282,9 @@ class TwistedAsynchronous(AbstractClass):
 
     def _exec_sql(
         self,
-        cursor: "TwistedTransactionT",
+        cursor: TwistedTransactionT,
         sql: str,
-        possible_err: Optional[str] = None,
+        possible_err: str | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -298,12 +300,12 @@ class TwistedAsynchronous(AbstractClass):
 def deal_mysql_err(
     abstract_class: AbstractClass,
     err_msg: str,
-    cursor: Union["Cursor", "TwistedTransactionT"],
-    mysql_conf: "MysqlConf",
+    cursor: Cursor | TwistedTransactionT,
+    mysql_conf: MysqlConf,
     table: str,
     table_notes: str,
     note_dic: dict[str, str],
-    conn: Optional["Connection[Cursor]"] = None,
+    conn: Connection[Cursor] | None = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,

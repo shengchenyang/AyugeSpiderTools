@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from twisted.enterprise import adbapi
@@ -19,11 +21,11 @@ if TYPE_CHECKING:
 
 
 class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
-    postgres_conf: "PostgreSQLConf"
-    dbpool: "adbapi.ConnectionPool"
-    slog: "slogT"
+    postgres_conf: PostgreSQLConf
+    dbpool: adbapi.ConnectionPool
+    slog: slogT
 
-    def open_spider(self, spider: "AyuSpider") -> None:
+    def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
@@ -44,10 +46,10 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def db_create(self, cursor: Any) -> None: ...
 
-    def db_create_err(self, failure: "Failure") -> None:
+    def db_create_err(self, failure: Failure) -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item: Any, spider: "AyuSpider") -> Any:
+    def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)
@@ -82,5 +84,5 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
             return self.db_insert(cursor, item)
         return item
 
-    def handle_error(self, failure: "Failure", item: Any) -> None:
+    def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

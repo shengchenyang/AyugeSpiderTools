@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any
 
 import pymysql
 from retrying import retry
@@ -37,10 +39,7 @@ class MysqlPipeEnhanceMixin:
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(
-        self,
-        mysql_conf: "MysqlConf",
-    ) -> "PymysqlConnection":
+    def _connect(self, mysql_conf: MysqlConf) -> PymysqlConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -76,7 +75,7 @@ class MysqlPipeEnhanceMixin:
 
     def _get_sql_by_item(
         self, table: str, item: dict[str, Any], odku_enable: bool = True
-    ) -> Tuple[str, tuple]:
+    ) -> tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
         Args:
@@ -184,10 +183,7 @@ class PostgreSQLPipeEnhanceMixin:
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(
-        self,
-        postgres_conf: "PostgreSQLConf",
-    ) -> "PsycopgConnection":
+    def _connect(self, postgres_conf: PostgreSQLConf) -> PsycopgConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -249,10 +245,7 @@ class OraclePipeEnhanceMixin:
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(
-        self,
-        oracle_conf: "OracleConf",
-    ) -> "OracleConnection":
+    def _connect(self, oracle_conf: OracleConf) -> OracleConnection:
         """链接数据库返回链接句柄
 
         Args:

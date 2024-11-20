@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Tuple, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 
@@ -20,7 +22,7 @@ if TYPE_CHECKING:
 class AbstractClass(ABC):
     """用于处理 mongodb pipeline 存储的模板方法类"""
 
-    def _get_insert_data(self, item_dict: dict) -> Tuple[dict, str]:
+    def _get_insert_data(self, item_dict: dict) -> tuple[dict, str]:
         """获取要插入的数据，将 item 中的存储数据提取出来
 
         Args:
@@ -41,7 +43,7 @@ class AbstractClass(ABC):
             table_name = item_dict["_table"].key_value
         return insert_data, table_name
 
-    def process_item_template(self, item_dict: dict, db: "PymongoDataBaseT"):
+    def process_item_template(self, item_dict: dict, db: PymongoDataBaseT):
         """模板方法，用于处理 mongodb pipeline 存储的模板方法类
 
         Args:
@@ -58,7 +60,7 @@ class AbstractClass(ABC):
 
     def _default_storage(
         self,
-        db: "PymongoDataBaseT",
+        db: PymongoDataBaseT,
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -73,7 +75,7 @@ class AbstractClass(ABC):
     @abstractmethod
     def _data_storage_logic(
         self,
-        db: "PymongoDataBaseT",
+        db: PymongoDataBaseT,
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -100,7 +102,7 @@ class Synchronize(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: "PymongoDataBaseT",
+        db: PymongoDataBaseT,
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -115,7 +117,7 @@ class TwistedAsynchronous(AbstractClass):
 
     def _data_storage_logic(
         self,
-        db: "PymongoDataBaseT",
+        db: PymongoDataBaseT,
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -130,7 +132,7 @@ class AsyncioAsynchronous(AbstractClass):
 
     async def _data_storage_logic(  # type: ignore[override]
         self,
-        db: "PymongoDataBaseT",
+        db: PymongoDataBaseT,
         item_dict: dict,
         collection_name: str,
         insert_data: dict,
@@ -144,7 +146,7 @@ class AsyncioAsynchronous(AbstractClass):
                 item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
             )
 
-    async def process_item_template(self, item_dict: dict, db: "PymongoDataBaseT"):
+    async def process_item_template(self, item_dict: dict, db: PymongoDataBaseT):
         insert_data, table_name = self._get_insert_data(item_dict)
         await self._data_storage_logic(
             db=db,
@@ -157,7 +159,7 @@ class AsyncioAsynchronous(AbstractClass):
 def mongodb_pipe(
     abstract_class: AbstractClass,
     item_dict: dict,
-    db: "PymongoDataBaseT",
+    db: PymongoDataBaseT,
 ) -> None:
     """mongodb pipeline 存储的通用调用方法"""
     abstract_class.process_item_template(item_dict, db)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import json
 import urllib.request
@@ -29,7 +31,7 @@ class ExclusiveProxyDownloaderMiddleware:
         self.proxy = None
 
     @classmethod
-    def from_crawler(cls, crawler: "Crawler") -> "Self":
+    def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
@@ -49,7 +51,7 @@ class ExclusiveProxyDownloaderMiddleware:
         except Exception:
             raise Exception("获取独享代理时失败，请查看独享配置及网络是否正常。")
 
-    def process_request(self, request: "Request", spider: "AyuSpider") -> None:
+    def process_request(self, request: Request, spider: AyuSpider) -> None:
         if request.url.startswith("https://"):
             request.meta["proxy"] = f"https://{self.proxy}"
         elif request.url.startswith("http://"):
@@ -63,7 +65,7 @@ class ExclusiveProxyDownloaderMiddleware:
         ).decode("utf8")
         request.headers["Proxy-Authorization"] = encoded_user_pass
 
-    def spider_opened(self, spider: "AyuSpider") -> None:
+    def spider_opened(self, spider: AyuSpider) -> None:
         spider.slog.info(
             f"独享代理中间件: ExclusiveProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
         )

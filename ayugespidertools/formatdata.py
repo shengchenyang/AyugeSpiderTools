@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import datetime
 import re
 import time
-from typing import Optional, Union
 from urllib.parse import urljoin
 
 from w3lib.html import remove_tags, replace_entities
@@ -113,7 +114,7 @@ class DataHandle:
     def normal_to_stamp(
         cls,
         normal_time: str,
-        _format_t: Optional[str] = None,
+        _format_t: str | None = None,
         date_is_full: bool = True,
         specific_date_conn: str = " ",
         hms_conn: str = ":",
@@ -157,7 +158,7 @@ class DataHandle:
         return int(stamp)
 
     @staticmethod
-    def timestamp_to_normal(timestamp: Union[int, str]) -> str:
+    def timestamp_to_normal(timestamp: int | str) -> str:
         """将时间戳转为正常时间 xxxx-xx-xx xx:xx:xx 的格式
 
         Args:

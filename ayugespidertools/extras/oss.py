@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import warnings
-from typing import Any, Optional
+from typing import Any
 
 from retrying import retry
 
@@ -32,7 +34,7 @@ class AliOssBase:
         access_secret: str,
         endpoint: str,
         bucket: str,
-        doc: Optional[str] = None,
+        doc: str | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
