@@ -70,7 +70,7 @@ class AiohttpDownloaderMiddleware:
         self,
         request: AyuRequest,
         retries: int,
-        reason: int,
+        reason: str,
         stats: StatsCollector,
     ):
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")

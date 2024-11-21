@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from scrapy.spiders import Spider
 
@@ -51,14 +51,14 @@ if TYPE_CHECKING:
 
 
 class AyuSpider(Spider):
-    mysql_engine: SqlalchemyEngineT
-    mysql_engine_conn: SqlalchemyConnectT
-    postgres_engine: SqlalchemyEngineT
-    postgres_engine_conn: SqlalchemyConnectT
-    oracle_engine: SqlalchemyEngineT
-    oracle_engine_conn: SqlalchemyConnectT
-    es_engine: Elasticsearch
-    es_engine_conn: Elasticsearch
+    mysql_engine: SqlalchemyEngineT | None
+    mysql_engine_conn: SqlalchemyConnectT | None
+    postgres_engine: SqlalchemyEngineT | None
+    postgres_engine_conn: SqlalchemyConnectT | None
+    oracle_engine: SqlalchemyEngineT | None
+    oracle_engine_conn: SqlalchemyConnectT | None
+    es_engine: Elasticsearch | None
+    es_engine_conn: Elasticsearch | None
 
     mysql_conf: MysqlConf
     mongodb_conf: MongoDBConf
@@ -130,12 +130,12 @@ class AyuSpider(Spider):
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
         ):
-            spider.mongodb_conf = mongodb_conf
+            spider.mongodb_conf = cast("MongoDBConf", mongodb_conf)
 
         if postgres_conf := get_spider_conf(
             PostgreSQLConfCreator(), crawler.settings, remote_option
         ):
-            spider.postgres_conf = postgres_conf
+            spider.postgres_conf = cast("PostgreSQLConf", postgres_conf)
             spider.postgres_engine, spider.postgres_engine_conn = get_sqlalchemy_conf(
                 creator=PostgreSQLConfCreator(),
                 db_conf=postgres_conf,
@@ -143,17 +143,18 @@ class AyuSpider(Spider):
             )
 
         if es_conf := get_spider_conf(ESConfCreator(), crawler.settings, remote_option):
-            spider.es_conf = es_conf
-            spider.es_engine = spider.es_engine_conn = get_sqlalchemy_conf(
+            spider.es_conf = cast("ESConf", es_conf)
+            _es_conn = get_sqlalchemy_conf(
                 creator=ESConfCreator(),
                 db_conf=es_conf,
                 db_engine_enabled=_db_engine_enabled,
             )
+            spider.es_engine = spider.es_engine_conn = cast("Elasticsearch", _es_conn)
 
         if oracle_conf := get_spider_conf(
             OracleConfCreator(), crawler.settings, remote_option
         ):
-            spider.oracle_conf = oracle_conf
+            spider.oracle_conf = cast("OracleConf", oracle_conf)
             spider.oracle_engine, spider.oracle_engine_conn = get_sqlalchemy_conf(
                 creator=OracleConfCreator(),
                 db_conf=oracle_conf,
@@ -163,25 +164,25 @@ class AyuSpider(Spider):
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
         ):
-            spider.rabbitmq_conf = rabbitmq_conf
+            spider.rabbitmq_conf = cast("MQConf", rabbitmq_conf)
 
         if kafka_conf := get_spider_conf(
             KafkaConfCreator(), crawler.settings, remote_option
         ):
-            spider.kafka_conf = kafka_conf
+            spider.kafka_conf = cast("KafkaConf", kafka_conf)
 
         if dynamicproxy_conf := get_spider_conf(
             DynamicProxyCreator(), crawler.settings, remote_option
         ):
-            spider.dynamicproxy_conf = dynamicproxy_conf
+            spider.dynamicproxy_conf = cast("DynamicProxyConf", dynamicproxy_conf)
 
         if exclusiveproxy_conf := get_spider_conf(
             ExclusiveProxyCreator(), crawler.settings, remote_option
         ):
-            spider.exclusiveproxy_conf = exclusiveproxy_conf
+            spider.exclusiveproxy_conf = cast("ExclusiveProxyConf", exclusiveproxy_conf)
 
         if oss_conf := get_spider_conf(
             OssConfCreator(), crawler.settings, remote_option
         ):
-            spider.oss_conf = oss_conf
+            spider.oss_conf = cast("OssConf", oss_conf)
         return spider

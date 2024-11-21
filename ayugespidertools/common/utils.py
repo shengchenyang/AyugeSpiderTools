@@ -18,6 +18,7 @@ __all__ = ["Tools"]
 if TYPE_CHECKING:
     from scrapy.http import Response
     from scrapy.http.headers import Headers
+    from scrapy.utils.datatypes import CaseInsensitiveDict
 
     from ayugespidertools.common.typevars import Str_Lstr
 
@@ -238,7 +239,9 @@ class Tools(AppConfManageMixin):
         return _res[0] if _res else None
 
     @staticmethod
-    def get_dict_form_scrapy_req_headers(scrapy_headers: Headers) -> dict:
+    def get_dict_form_scrapy_req_headers(
+        scrapy_headers: Headers,
+    ) -> CaseInsensitiveDict:
         """根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
 
         Args:
@@ -247,10 +250,7 @@ class Tools(AppConfManageMixin):
         Returns:
             1). 转化 dict 后的 headers 内容
         """
-        return {
-            str(b_key, encoding="utf-8"): str(b_value_list[0], encoding="utf-8")
-            for b_key, b_value_list in dict(scrapy_headers).items()
-        }
+        return scrapy_headers.to_unicode_dict()
 
     @staticmethod
     def get_data_urls_by_img(mediatype: str, data: bytes | str) -> str:

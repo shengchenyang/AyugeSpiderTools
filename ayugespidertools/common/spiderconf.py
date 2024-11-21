@@ -73,7 +73,7 @@ class Product(ABC, Generic[SpiderConf]):
 
     def get_engine(
         self, db_conf: SpiderConf, db_engine_enabled: bool
-    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
+    ) -> tuple[SqlalchemyEngineT | None, SqlalchemyConnectT | None]:
         """获取各个工具中对应的 sqlalchemy db_engine 和 db_engine_conn。
         需要此方法的工具有 mysql，postgresql，oracle，elasticsearch 其余的不需要。
         但其中 elasticsearch 不采用 sqlalchemy 的方式。
@@ -104,7 +104,7 @@ class MysqlConfProduct(Product):
 
     def get_engine(
         self, db_conf: MysqlConf, db_engine_enabled: bool
-    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
+    ) -> tuple[SqlalchemyEngineT | None, SqlalchemyConnectT | None]:
         mysql_engine = mysql_engine_conn = None
         if db_engine_enabled:
             mysql_url = (
@@ -154,7 +154,7 @@ class PostgreSQLConfProduct(Product):
 
     def get_engine(
         self, db_conf: PostgreSQLConf, db_engine_enabled: bool
-    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
+    ) -> tuple[SqlalchemyEngineT | None, SqlalchemyConnectT | None]:
         postgres_engine = postgres_engine_conn = None
         if db_engine_enabled:
             postgres_url = (
@@ -214,7 +214,7 @@ class OracleConfProduct(Product):
 
     def get_engine(
         self, db_conf: OracleConf, db_engine_enabled: bool
-    ) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
+    ) -> tuple[SqlalchemyEngineT | None, SqlalchemyConnectT | None]:
         oracle_engine = oracle_engine_conn = None
         if db_engine_enabled:
             oracle_url = (
@@ -357,6 +357,6 @@ def get_sqlalchemy_conf(
     creator: Creator,
     db_conf: SpiderConf,
     db_engine_enabled: bool,
-) -> tuple[SqlalchemyEngineT, SqlalchemyConnectT] | tuple[None, None]:
+) -> tuple[SqlalchemyEngineT | None, SqlalchemyConnectT | None]:
     product = creator.create_product()
     return product.get_engine(db_conf, db_engine_enabled)
