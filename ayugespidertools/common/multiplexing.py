@@ -4,7 +4,7 @@ import configparser
 import json
 import random
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pymysql
 from itemadapter import ItemAdapter
@@ -39,7 +39,7 @@ class ReuseOperation:
     """用于存放经常复用的一些操作"""
 
     @staticmethod
-    def fetch_local_conf(vit_dir: Union[str, Path], inner_settings: dict) -> dict:
+    def fetch_local_conf(vit_dir: str | Path, inner_settings: dict) -> dict:
         """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
 
         Args:
@@ -201,7 +201,7 @@ class ReuseOperation:
         return inner_settings
 
     @staticmethod
-    def item_to_dict(item: Union[AyuItem, dict]) -> dict:
+    def item_to_dict(item: AyuItem | dict) -> dict:
         """将 item 转换为 dict 类型；
         将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
 
@@ -343,7 +343,7 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if v is not None}
 
     @staticmethod
-    def create_database(db_conf: Union[MysqlConf, PostgreSQLConf]) -> None:
+    def create_database(db_conf: MysqlConf | PostgreSQLConf) -> None:
         """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
         新建(不指定数据库)连接创建好所需数据库即可
 

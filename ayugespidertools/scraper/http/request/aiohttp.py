@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from aiohttp.helpers import BasicAuth
     from aiohttp.typedefs import LooseHeaders
     from scrapy.http import Response
+    from twisted.python.failure import Failure
     from typing_extensions import Concatenate, NotRequired
 
     CallbackT = Callable[Concatenate[Response, ...], Any]
@@ -49,9 +50,9 @@ class AiohttpRequest(Request):
         encoding: str = "utf-8",
         priority: int = 0,
         dont_filter: bool = False,
-        errback: Callable | None = None,
+        errback: Callable[[Failure], Any] | None = None,
         flags: list[str] | None = None,
-        cb_kwargs: dict | None = None,
+        cb_kwargs: dict[str, Any] | None = None,
         params: Mapping[str, str] | None = None,
         data: Any = None,
         json: Any = None,

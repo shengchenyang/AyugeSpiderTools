@@ -6,7 +6,7 @@ import inspect
 import os
 import sys
 from importlib.metadata import entry_points
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import CrawlerProcess
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 class ScrapyArgumentParser(argparse.ArgumentParser):
     def _parse_optional(
         self, arg_string: str
-    ) -> Optional[tuple[Optional[argparse.Action], str, Optional[str]]]:
+    ) -> tuple[argparse.Action | None, str, str | None] | None:
         # if starts with -: it means that is a parameter not a argument
         if arg_string[:2] == "-:":
             return None
@@ -90,7 +90,7 @@ def _get_commands_dict(
     return cmds
 
 
-def _pop_command_name(argv: list[str]) -> Optional[str]:
+def _pop_command_name(argv: list[str]) -> str | None:
     i = 0
     for arg in argv[1:]:
         if not arg.startswith("-"):
@@ -148,9 +148,7 @@ def _run_print_help(
         sys.exit(2)
 
 
-def execute(
-    argv: Optional[list[str]] = None, settings: Optional[Settings] = None
-) -> None:
+def execute(argv: list[str] | None = None, settings: Settings | None = None) -> None:
     if argv is None:
         argv = sys.argv
 

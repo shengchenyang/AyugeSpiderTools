@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 class AiohttpDownloaderMiddleware:
     """Downloader middleware handling the requests with aiohttp"""
 
-    session: "aiohttp.ClientSession"
+    session: aiohttp.ClientSession
     priority_adjust: int
     aiohttp_cfg: AiohttpConf
     aiohttp_args: dict
