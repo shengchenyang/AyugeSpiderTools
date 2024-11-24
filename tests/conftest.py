@@ -22,7 +22,6 @@ class ForTestConfig:
 
     # scrapy 默认配置
     scrapy_default_settings = {
-        "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
         "FEED_EXPORT_ENCODING": "utf-8",
     }
 

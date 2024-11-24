@@ -36,10 +36,8 @@ class TestMongoDBPipe:
             db=mongodb_conn[mongodb_database],
         )
 
-        num = (
-            mongodb_conn[mongodb_database][test_table]
-            .find({"article_detail_url": "_article_detail_url"})
-            .count()
+        num = mongodb_conn[mongodb_database][test_table].count_documents(
+            {"article_detail_url": "_article_detail_url"}
         )
         assert num >= 1
 
@@ -56,10 +54,8 @@ class TestMongoDBPipe:
             db=mongodb_conn[mongodb_database],
         )
 
-        num = (
-            mongodb_conn[mongodb_database][test_table]
-            .find({"article_detail_url": "_article_detail_url"})
-            .count()
+        num = mongodb_conn[mongodb_database][test_table].count_documents(
+            {"article_detail_url": "_article_detail_url"}
         )
         assert num >= 1
 
@@ -81,10 +77,8 @@ class TestMongoDBPipe:
             db=mongodb_conn[mongodb_database],
         )
 
-        num = (
-            mongodb_conn[mongodb_database][test_table]
-            .find({"article_detail_url": "_article_detail_url"})
-            .count()
+        num = mongodb_conn[mongodb_database][test_table].count_documents(
+            {"article_detail_url": "_article_detail_url"}
         )
         assert num >= 1
 
@@ -112,9 +106,7 @@ class TestMongoDBPipe:
             db=mongodb_conn[mongodb_database],
         )
 
-        num = (
-            mongodb_conn[mongodb_database][test_table]
-            .find({"article_detail_url": "_article_detail_url"})
-            .count()
+        num = mongodb_conn[mongodb_database][test_table].count_documents(
+            {"article_detail_url": "_article_detail_url"}
         )
         assert num >= 2

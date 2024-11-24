@@ -53,15 +53,15 @@ def test_key_connect(mongodb_first_step):
     _mongo_conf = copy.deepcopy(MONGODB_CONFIG)
     _mongo_conf.pop("uri")
     conn, db = MongoDbBase.connects(**_mongo_conf)
-    select_res = db[test_table].find({"nick_name": "菜只因C"})
-    assert select_res.count() >= 1
+    select_res = db[test_table].count_documents({"nick_name": "菜只因C"})
+    assert select_res >= 1
 
 
 def test_uri_connect():
     """测试 mongoDB 的 uri 关键字链接方式"""
     conn, db = MongoDbBase.connects(uri=mongodb_uri)
-    select_res = db[test_table].find({"nick_name": "菜只因C"})
-    assert select_res.count() >= 1
+    select_res = db[test_table].count_documents({"nick_name": "菜只因C"})
+    assert select_res >= 1
 
 
 def test_insert_one():
@@ -108,7 +108,7 @@ def test_delete():
 def test_find():
     """测试 mongoDB 查询数据"""
     conn, db = MongoDBEngineClass(engine_url=mongodb_uri).engine
-    select_res = db[test_table].find({"favor_count": "46"}).count()
+    select_res = db[test_table].count_documents({"favor_count": "46"})
     assert select_res >= 1
 
     select_res = list(
