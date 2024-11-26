@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pymongo
 from gridfs import GridFS
 from pymongo import MongoClient
 
@@ -14,7 +13,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from pymongo import database
+    from pymongo.database import Database
 
     from ayugespidertools.common.typevars import authMechanismStr
 
@@ -39,7 +38,7 @@ class MongoDbBase:
         authMechanism: authMechanismStr = "SCRAM-SHA-1",
         database: str | None = None,
         uri: str | None = None,
-    ) -> tuple[pymongo.MongoClient, database.Database]:
+    ) -> tuple[MongoClient, Database]:
         """初始化 mongo 连接句柄
         可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
 
@@ -54,10 +53,15 @@ class MongoDbBase:
             uri: mongoDB uri，需要包含 database 参数， demo: 'mongodb://host/my_database'
         """
         if uri is not None:
-            conn = MongoClient(uri)
+            conn: MongoClient = MongoClient(uri)
             db = conn.get_database()
 
         else:
+            if database is None:
+                raise ValueError(
+                    "When URI is not provided, 'database' must be specified."
+                )
+
             conn = MongoClient(
                 host=host,
                 port=port,
@@ -68,11 +72,6 @@ class MongoDbBase:
             )
             db = conn[database]
         return conn, db
-
-    @staticmethod
-    def ver_low() -> bool:
-        pymongo_ver = pymongo.version or pymongo.__version__
-        return pymongo_ver <= "3.13.0"
 
     @staticmethod
     def getFileMd5(db, _id, collection):

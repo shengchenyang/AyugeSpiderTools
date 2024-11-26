@@ -23,7 +23,7 @@
 
 - 项目改为基于 `python 3.9` 开发，将涉及到的开发代码，`ci/cd`，测试等工具都改为 `3.9` 的特性。（[1e44c3f](https://github.com/shengchenyang/AyugeSpiderTools/commit/1e44c3f9f4fee29f305da929413b2aa1774e319b)）
 - 升级 `aiohttp` 依赖版本，解决升级后的兼容问题。（[9f6b68e](https://github.com/shengchenyang/AyugeSpiderTools/commit/9f6b68e77ffed45d6a2721678573b9fc9c63700e)，[62160a8](https://github.com/shengchenyang/AyugeSpiderTools/commit/62160a8e3b3eb355a429bbaedfc6d05e771368ab)）
-- 解决 `psycopg` 相关依赖可能存在的冲突问题。（[a267c03]()）
+- 解决 `psycopg` 相关依赖可能存在的冲突问题。（[a267c03](https://github.com/shengchenyang/AyugeSpiderTools/commit/a267c03aec55ed63a16926f90cf3d22e9ca20611)）
 
 ... ...
 
