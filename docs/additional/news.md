@@ -1,6 +1,6 @@
 # Release notes
 
-## AyugeSpiderTools 3.11.0 (Preview: TBD)
+## AyugeSpiderTools 3.11.1 (Preview: TBD)
 
 此部分用于展示下一版本更新预览。
 
@@ -10,20 +10,25 @@
 
 当然也可以直接 `pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git` 来安装预发布包。
 
-### New features
-
-- `scrapy` 依赖更新为最新的 `2.12.0`。（[c3cf229](https://github.com/shengchenyang/AyugeSpiderTools/commit/c3cf229179e86fab4b7800bbd8dacfb408382f83)）
+## AyugeSpiderTools 3.11.0
 
 ### Deprecations
 
 - 移除对 `python3.8` 的支持。（[104a3fa](https://github.com/shengchenyang/AyugeSpiderTools/commit/104a3faa0877a72febd960d110d349ec9be22239)）
 - 不再支持 `3.4` 及以下版本的 `mongodb` 的存储，（[2874aab](https://github.com/shengchenyang/AyugeSpiderTools/commit/2874aabadb5149cbc376aa78e78077555309084b)）
 
+### New features
+
+- `scrapy` 依赖更新为最新的 `2.12.0`。（[c3cf229](https://github.com/shengchenyang/AyugeSpiderTools/commit/c3cf229179e86fab4b7800bbd8dacfb408382f83)）
+- 升级 `aiohttp` 依赖版本，解决升级后的兼容问题。（[9f6b68e](https://github.com/shengchenyang/AyugeSpiderTools/commit/9f6b68e77ffed45d6a2721678573b9fc9c63700e)，[62160a8](https://github.com/shengchenyang/AyugeSpiderTools/commit/62160a8e3b3eb355a429bbaedfc6d05e771368ab)）
+
+### Bug fixes
+
+- 解决 `psycopg` 相关依赖可能存在的冲突问题。（[a267c03](https://github.com/shengchenyang/AyugeSpiderTools/commit/a267c03aec55ed63a16926f90cf3d22e9ca20611)）
+
 ### Code optimizations
 
 - 项目改为基于 `python 3.9` 开发，将涉及到的开发代码，`ci/cd`，测试等工具都改为 `3.9` 的特性。（[1e44c3f](https://github.com/shengchenyang/AyugeSpiderTools/commit/1e44c3f9f4fee29f305da929413b2aa1774e319b)）
-- 升级 `aiohttp` 依赖版本，解决升级后的兼容问题。（[9f6b68e](https://github.com/shengchenyang/AyugeSpiderTools/commit/9f6b68e77ffed45d6a2721678573b9fc9c63700e)，[62160a8](https://github.com/shengchenyang/AyugeSpiderTools/commit/62160a8e3b3eb355a429bbaedfc6d05e771368ab)）
-- 解决 `psycopg` 相关依赖可能存在的冲突问题。（[a267c03](https://github.com/shengchenyang/AyugeSpiderTools/commit/a267c03aec55ed63a16926f90cf3d22e9ca20611)）
 
 ... ...
 
