@@ -64,7 +64,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
                     "database": database,
                     "table_name": row[0],
                     "number": row[1],
-                    "crawl_time": str((row[2] or crawl_time)),
+                    "crawl_time": str(row[2] or crawl_time),
                 }
                 self.insert_table_statistics(table_statistics)
 

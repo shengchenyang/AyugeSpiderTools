@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -7,12 +9,12 @@ from pathlib import Path
 from shutil import rmtree
 from subprocess import PIPE, Popen
 from tempfile import mkdtemp
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
 from OpenSSL import SSL
 from scrapy.utils.python import to_bytes, to_unicode
 from twisted.internet import defer, reactor, ssl
-from twisted.internet.protocol import ServerFactory
 from twisted.internet.task import deferLater
 from twisted.names import dns, error
 from twisted.names.server import DNSServerFactory
@@ -20,6 +22,9 @@ from twisted.web import resource, server
 from twisted.web.server import NOT_DONE_YET, GzipEncoderFactory, Site
 from twisted.web.static import File
 from twisted.web.util import redirectTo
+
+if TYPE_CHECKING:
+    from twisted.internet.protocol import ServerFactory
 
 
 def getarg(request, name, default=None, type=None):
@@ -187,10 +192,10 @@ class Raw(LeafResource):
 class Echo(LeafResource):
     def render_GET(self, request):
         output = {
-            "headers": dict(
-                (to_unicode(k), [to_unicode(v) for v in vs])
+            "headers": {
+                to_unicode(k): [to_unicode(v) for v in vs]
                 for k, vs in request.requestHeaders.getAllRawHeaders()
-            ),
+            },
             "body": to_unicode(request.content.read()),
         }
         return to_bytes(json.dumps(output))
@@ -275,8 +280,8 @@ class MockServer:
             stdout=PIPE,
             env=get_mockserver_env(),
         )
-        http_address = self.proc.stdout.readline().strip().decode("utf-8")
-        https_address = self.proc.stdout.readline().strip().decode("utf-8")
+        http_address = self.proc.stdout.readline().strip().decode("ascii")
+        https_address = self.proc.stdout.readline().strip().decode("ascii")
 
         self.http_address = http_address
         self.https_address = https_address
@@ -357,9 +362,7 @@ class MockFTPServer:
 
 
 def ssl_context_factory(
-    keyfile="keys/localhost.key",
-    certfile="keys/localhost.crt",
-    cipher_string=None,
+    keyfile="keys/localhost.key", certfile="keys/localhost.crt", cipher_string=None
 ):
     factory = ssl.DefaultOpenSSLContextFactory(
         str(Path(__file__).parent / keyfile),

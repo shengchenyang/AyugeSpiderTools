@@ -1,4 +1,4 @@
-from __future__ import annotations, print_function
+from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod

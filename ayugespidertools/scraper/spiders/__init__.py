@@ -82,7 +82,7 @@ class AyuSpider(Spider):
         loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
         assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
 
-        return logger if loguru_enabled else super(AyuSpider, self).logger
+        return logger if loguru_enabled else super().logger
 
     @classmethod
     def update_settings(cls, settings: BaseSettings) -> None:
@@ -112,7 +112,7 @@ class AyuSpider(Spider):
 
     @classmethod
     def from_crawler(cls, crawler: Crawler, *args: Any, **kwargs: Any) -> Self:
-        spider = super(AyuSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super().from_crawler(crawler, *args, **kwargs)
         _db_engine_enabled = crawler.settings.get("DATABASE_ENGINE_ENABLED", False)
 
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)

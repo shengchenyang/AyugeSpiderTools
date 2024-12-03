@@ -120,7 +120,7 @@ class AiohttpRequest(Request):
         aiohttp_meta = meta.setdefault("aiohttp", {})
         aiohttp_meta["args"] = aiohttp_req_args
 
-        super(AiohttpRequest, self).__init__(
+        super().__init__(
             url=url,
             callback=callback,
             method=method,

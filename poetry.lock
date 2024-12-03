@@ -2729,6 +2729,20 @@ files = [
 lark = ">=1,<2"
 
 [[package]]
+name = "pyupgrade"
+version = "3.18.0"
+description = "A tool to automatically upgrade syntax for newer versions."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pyupgrade-3.18.0-py2.py3-none-any.whl", hash = "sha256:74dbca15f715342393d20e31575d846643fdeb32c6fe8d9598c41645bab3f762"},
+    {file = "pyupgrade-3.18.0.tar.gz", hash = "sha256:894cf4c64c17c020f86adaab55a82449a7add29b1ea4a1b9e659ed48c922d3ae"},
+]
+
+[package.dependencies]
+tokenize-rt = ">=5.2.0"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 description = "YAML parser and emitter for Python"
@@ -3293,6 +3307,17 @@ release = ["build", "twine"]
 testing = ["mypy", "pytest", "pytest-gitignore", "pytest-mock", "responses", "ruff", "syrupy", "tox", "tox-uv", "types-filelock", "types-requests"]
 
 [[package]]
+name = "tokenize-rt"
+version = "6.1.0"
+description = "A wrapper around the stdlib `tokenize` which roundtrips."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "tokenize_rt-6.1.0-py2.py3-none-any.whl", hash = "sha256:d706141cdec4aa5f358945abe36b911b8cbdc844545da99e811250c0cee9b6fc"},
+    {file = "tokenize_rt-6.1.0.tar.gz", hash = "sha256:e8ee836616c0877ab7c7b54776d2fefcc3bde714449a206762425ae114b53c86"},
+]
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -3636,4 +3661,4 @@ database = ["elasticsearch-dsl", "oracledb", "psycopg"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "5b4128513160d8370e452289688434771385a0dd94b1369a775b3c5388eac30f"
+content-hash = "a306cc77c11214dac7ab792eb6c957005bab032a4cb1cd82c471621080fdc3fb"

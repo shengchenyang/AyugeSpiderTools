@@ -9,8 +9,7 @@ from ayugespidertools.spiders import AyuSpider
 
 
 # 当前 spider 要继承 AyuSpider
-class DemoOneSpider(AyuSpider):
-    ...
+class DemoOneSpider(AyuSpider): ...
 ```
 
 ## 1. 随机UA
