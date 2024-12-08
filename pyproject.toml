@@ -4,7 +4,7 @@ version = "3.11.0"
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手。"
 authors = ["ayuge <ayugesheng@gmail.com>"]
 maintainers = ["ayuge <ayugesheng@gmail.com>"]
-readme = "README.md"
+readme = "README.rst"
 packages = [{ include = "ayugespidertools" }]
 repository = "https://github.com/shengchenyang/AyugeSpiderTools"
 documentation = "https://ayugespidertools.readthedocs.io/en/latest/"
