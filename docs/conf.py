@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "sphinx.ext.extlinks",
 ]
 
 templates_path = ["_templates"]
@@ -64,11 +65,44 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 html_static_path: list = []
 
-source_parsers = {
-    ".md": "sphinx_markdown_parser.parser.MySTParser",
-}
 source_suffix = [".rst", ".md"]
 
 autodoc_mock_imports = ["ayugespidertools"]
 
 suppress_warnings = ["myst.xref_missing"]
+
+# Options for sphinx-hoverxref options
+# ------------------------------------
+
+hoverxref_auto_ref = True
+hoverxref_role_types = {
+    "class": "tooltip",
+    "command": "tooltip",
+    "confval": "tooltip",
+    "hoverxref": "tooltip",
+    "mod": "tooltip",
+    "ref": "tooltip",
+    "reqmeta": "tooltip",
+    "setting": "tooltip",
+    "signal": "tooltip",
+}
+hoverxref_roles = ["command", "reqmeta", "setting", "signal"]
+
+extlinks = {
+    "commit": (
+        "https://github.com/shengchenyang/AyugeSpiderTools/commit/%s",
+        "commit %s",
+    ),
+    "issue": (
+        "https://github.com/shengchenyang/AyugeSpiderTools/issues/%s",
+        "issue %s",
+    ),
+    "raw": (
+        "https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/%s",
+        "raw %s",
+    ),
+    "blob": (
+        "https://github.com/shengchenyang/AyugeSpiderTools/blob/master/%s",
+        "blob %s",
+    ),
+}
