@@ -19,6 +19,13 @@ AyugeSpiderTools 3.11.1 (Preview: TBD)
 当然也可以直接 ``pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git`` 来\
 安装预发布包。
 
+Code optimizations
+------------------
+
+- 将文档格式由 md 转为 rst。
+
+  (:commit:`f78e4b89cd0bdacb2560b5be5f71681cd915cd7c`)
+
 ... ...
 
 AyugeSpiderTools 3.11.0 (2024-11-29)
