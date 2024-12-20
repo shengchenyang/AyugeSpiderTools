@@ -14,10 +14,6 @@ AyugeSpiderTools Introduce
    :target: https://pypi.org/pypi/Scrapy
    :alt: python support
 
-.. image:: https://img.shields.io/github/actions/workflow/status/shengchenyang/AyugeSpiderTools/codeql.yml?branch=main
-   :target: https://github.com/shengchenyang/AyugeSpiderTools/actions
-   :alt: GitHub Workflow Status (with branch)
-
 .. image:: https://img.shields.io/readthedocs/ayugespidertools
    :target: https://ayugespidertools.readthedocs.io/en/latest/
    :alt: Read the Docs
