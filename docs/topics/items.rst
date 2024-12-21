@@ -4,7 +4,8 @@
 Item
 ====
 
-演示在使用本库场景下 Item 的使用方法。
+演示在使用本库场景下 Item 的使用方法，文档中所有 item 也都是指本库的 AyuItem 模块，除非有特意标明为其\
+它库的 item。
 
 本教程将引导您完成这些任务：
 
@@ -124,6 +125,12 @@ value 为对应 key 所存储的值。
 
 当然，目前也支持动态赋值，但我还是推荐直接创建好 AyuItem ，方便管理：
 
+.. warning::
+
+   - 不允许 AyuItem 中字段值的类型（str 和 DataItem）混用，这里只是用于示例展示。
+   - 在使用 AyuItem 时，其中各字段值（除了 ``_mongo_update_rule``）的类型都要统一，比如要么都使用 \
+     str 类型，要么都使用 ``DataItem`` 类型。
+
 .. code-block:: python
 
    def parse(self, response):
@@ -133,12 +140,6 @@ value 为对应 key 所存储的值。
        mdi.add_field("add_field3", DataItem(key_value="value3", notes="add_field3值"))
        # _table 修改可通过以下方式，同样不推荐使用
        mdi["_table"] = "table1"
-
-
-   # 不允许 AyuItem 中字段值的类型（str 和 DataItem）混用，这里是用于示例展示。
-
-注：在使用 AyuItem 时，其中各字段值（除了 ``_mongo_update_rule``）的类型都要统一，比如要么都使用 str \
-类型，要么都使用 ``DataItem`` 类型。
 
 另外，本库的 item 提供类型转换，以方便后续的各种使用场景：
 
@@ -297,13 +298,15 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
 补充：其中 AyuItem 也可以改成 DataItem 的赋值方式，那么 mysql 场景下在表字段不存在时会添加字段注释，\
 mongodb 则没有影响。推荐直接赋值的方式，更明了。
 
+.. _topics-items-yield-item:
+
 yield item
 ==========
 
-这里解释下 item 的格式问题，虽说也是支持直接 ``yield dict`` ，scrapy 的 item 格式(即本库中的 \
-``ScrapyItem``)，还有就是本库推荐的 AyuItem 的形式。
+本库 item 也是支持直接 ``yield dict`` 和 scrapy 的 item 格式，但还是推荐使用 AyuItem 的形式，比较\
+方便且有不错的字段提示功能。
 
-这里介绍下 item 字段及其注释，以上所有 item 都有参数提示：
+这里介绍下 item 字段及其注释：
 
 .. csv-table::
     :header: "item 字段", "类型", "注释"
@@ -311,22 +314,33 @@ yield item
 
     "自定义字段", "DataItem，Any", "item 所有需要存储的字段，若有多个，请按规则自定义添加即可。"
     "_table", "DataItem, str", "存储至数据表或集合的名称。"
-    "_mongo_update-rule", "dict", "MongoDB item 场景下的查重规则。"
+    "_mongo_update_rule", "dict", "MongoDB item 场景下的查重规则。"
+
+.. note::
+
+   这里的 ``自定义字段`` 就是指用户可自定义赋值字段的部分，通过 ``AyuItem(key=value)`` 的形式直接动\
+   态赋值，即可自定义 ``key`` 的部分。
 
 一些规则：
 
 .. csv-table::
-    :header: "item 字段规则", "类型", "注释"
-    :widths: 10, 15, 30
+    :header: "item 字段规则", "类型", "默认值", "使用场景"
+    :widths: 45, 15, 15, 20
 
-    "后缀包含 _file_url", "str, DataItem", "文件下载 pipeline 中使用，当包含此规则的字段会下载此
-    字段资源到本地。生成的对应新字段会在原字段添加 _local 后缀。"
-    "前缀包含 upload_fields_suffix", "str", "oss 管道中使用，upload_fields_suffix 在 [oss:ali]
-    中配置，会上传此规则字段的资源到 oss。对应的新字段会在前缀添加 oss_fields_prefix。"
+    "后缀包含 ``_file_url`` 值", "str, DataItem", "不可配置",  "下载文件到本地"
+    "后缀包含 ``upload_fields_suffix`` 配置项", "str", "_file_url，可自定义", "上传资源到 oss"
+    "前缀包含 ``oss_fields_prefix`` 配置项", "str", "_，可自定义", "上传资源到 oss"
 
-注，对以上表格中内容进行扩充解释：
 
-- 一般不推荐使用规则的方式来使用 AyuItem，推荐自行构建 Ayuitem 的逻辑更清晰更易维护，这里只是给出代码示例。
+.. note::
+
+   - 在下载文件到本地的场景中，会把后缀包含 ``_file_url`` 的字段对应的资源文件下载到本地，生成的对应新\
+     字段会在原字段添加 ``_local`` 后缀来存放对应文件的指向，具体请查看 demo_file 中的示例；
+   - 在上传资源文件到 oss 的场景中，需要查看 .conf 中的 ``[oss:ali]`` 的配置项，会将后缀包含 \
+     ``upload_fields_suffix (默认参数值为 _file_url)`` 的字段对应的资源文件上传到 oss，生成的对应\
+     新字段会在原字段添加 ``oss_fields_prefix (默认参数值为 _)`` 前缀来存放对应文件的指向。其中 \
+     upload_fields_suffix 和 oss_fields_prefix 的值可自定义，具体请查看 demo_oss 及 demo_oss_super \
+     中的示例。
 
 自定义 Item 字段和实现 Item Loaders
 ====================================

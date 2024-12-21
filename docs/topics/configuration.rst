@@ -68,12 +68,12 @@ Introduction
    "charset", "可选，默认 utf8mb4", "自动创建数据库和数据表时需要的参数"
    "odku_enable", "可选，默认 false", "是否开启 ON DUPLICATE KEY UPDATE 功能"
 
-注：
+.. note::
 
-- charset 参数选择有 utf8mb4，gbk，latin1，utf16，utf16le，cp1251，euckr，greek，charset 要与\
-  collate 参数匹配。
-- 其中 engine，charset，collate 为自动创建数据库和数据表时需要的参数，可随意配置或默认即可，也可提前手\
-  动创建好表，也可后续手动修改。
+   - charset 参数选择有 utf8mb4，gbk，latin1，utf16，utf16le，cp1251，euckr，greek，charset \
+     要与 collate 参数匹配。
+   - 其中 engine，charset，collate 为自动创建数据库和数据表时需要的参数，可随意配置或默认即可，也可提\
+     前手动创建好表，也可后续手动修改。
 
 [mongodb:uri]
 =============
@@ -143,12 +143,12 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "client_key", "默认 None", "client_key 路径"
    "ssl_assert_fingerprint", "默认 None", "es 启动中的 HTTP CA certificate SHA-256 fingerprint 参数"
 
-注：
+.. note::
 
-- ca_certs，client_cert，client_key，ssl_assert_fingerprint 中只用配置一个即可，若 verify_certs \
-  设置为 false 则都不用配置以上参数，但推荐开启此参数。
-- index_class 配置中不建议包含 name 参数，而是通过 AyuItem 中的 _table 来设置，AyuItem 会覆盖 \
-  index_class 中的 name 配置。
+   - ca_certs，client_cert，client_key，ssl_assert_fingerprint 中只用配置一个即可，若 verify_certs \
+     设置为 false 则都不用配置以上参数，但推荐开启此参数。
+   - index_class 配置中不建议包含 name 参数，而是通过 AyuItem 中的 _table 来设置，AyuItem 会覆盖 \
+     index_class 中的 name 配置。
 
 [mq]
 ====
@@ -248,8 +248,9 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "full_link_enable", "是否开启完整链接，默认 false", "为是否保存完整的 oss 文件链接。"
 
 
-遵守规则时的 oss 上传逻辑时使用，更复杂的需求也可根据示例自行实现。具体请看 demo_oss 和 demo_oss_sec \
-的场景示例。请自行选择可接受的风格。
+遵守规则时的 oss 上传逻辑时使用，详细介绍请在 :ref:`item 的规则 <topics-items-yield-item>` 部分中\
+查看，更复杂的需求也可根据示例自行实现。具体请看 demo_oss，demo_oss_sec 和 demo_oss_super 的场景示\
+例。请自行选择可接受的风格。
 
 [custom_section]
 ================

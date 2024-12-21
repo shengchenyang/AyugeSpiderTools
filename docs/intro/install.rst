@@ -7,7 +7,11 @@
 支持的 Python 版本
 ===================
 
-AyugeSpiderTools 需要 Python 3.9+，在 AyugeSpiderTools 3.10.1 之后的版本不再支持 python 3.8。
+AyugeSpiderTools 需要 Python 3.9+。
+
+.. warning::
+
+   在 AyugeSpiderTools 3.10.1 之后的版本不再支持 python 3.8。
 
 安装 AyugeSpiderTools
 =======================
@@ -40,10 +44,12 @@ AyugeSpiderTools 需要 Python 3.9+，在 AyugeSpiderTools 3.10.1 之后的版�
    # 请注意，此源码方式安装的是开发版本，请勿在正式场景中使用！
    pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git
 
-注意：若你只需要 scrapy 扩展库的简单功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 extras\
-部分）若要使用，请使用完整安装。
+.. note::
 
-强烈建议您将 ayugespidertools 安装在专用的 virtualenv 中，以避免与您的系统包发生冲突。
+   若你只需要 scrapy 扩展库的简单功能，那么默认的简洁依赖安装即可；一些可选择的开发功能（都会放在 extras \
+   部分）若要使用，请使用完整安装。
+
+   强烈建议您将 ayugespidertools 安装在专用的 virtualenv 中，以避免与您的系统包发生冲突。
 
 可能遇到的问题
 ---------------
