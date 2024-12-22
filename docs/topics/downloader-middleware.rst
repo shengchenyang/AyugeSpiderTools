@@ -35,8 +35,10 @@ downloader-middleware
        },
    }
 
-若想查看是否正常运行，只需查看其 scrapy 的 debug 日志，或在 spider 中打印 response 信息然后查看其信\
-息即可。
+.. note::
+
+   若想查看是否正常运行，只需查看其 scrapy 的 debug 日志，或在 spider 中打印 response 信息然后查看\
+   其信息即可。
 
 2. 代理
 ==========
@@ -134,11 +136,12 @@ downloader-middleware
        "DOWNLOAD_TIMEOUT": 25,
    }
 
-注：
+.. note::
 
-- TWISTED_REACTOR 的配置在本库的 settings 中就默认打开的，这里配置是为了演示，不用再次配置的；
-- 这里的 scrapy DOWNLOAD_TIMEOUT 同样也是 aiohttp 请求的超时设置参数；
-- AIOHTTP_CONFIG 为 aiohttp 的全局配置，是构建 aiohttp.ClientSession 的 connector 时所需的参数；
+   - TWISTED_REACTOR 的配置在本库的 settings 中就默认打开的，这里配置是为了演示，不用再次配置的；
+   - 这里的 scrapy DOWNLOAD_TIMEOUT 同样也是 aiohttp 请求的超时设置参数；
+   - AIOHTTP_CONFIG 为 aiohttp 的全局配置，是构建 aiohttp.ClientSession 的 connector 时所需的\
+     参数；
 
 AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的参数):
 

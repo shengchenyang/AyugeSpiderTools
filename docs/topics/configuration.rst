@@ -247,18 +247,20 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    oss_fields_prefix 前缀。"
    "full_link_enable", "是否开启完整链接，默认 false", "为是否保存完整的 oss 文件链接。"
 
+.. note::
 
-遵守规则时的 oss 上传逻辑时使用，详细介绍请在 :ref:`item 的规则 <topics-items-yield-item>` 部分中\
-查看，更复杂的需求也可根据示例自行实现。具体请看 demo_oss，demo_oss_sec 和 demo_oss_super 的场景示\
-例。请自行选择可接受的风格。
+   遵守规则时的 oss 上传逻辑时使用，详细介绍请在 :ref:`item 的规则 <topics-items-yield-item>` 部\
+   分中查看，更复杂的需求也可根据示例自行实现。具体请看 demo_oss，demo_oss_sec 和 demo_oss_super 的\
+   场景示例。请自行选择可接受的风格。
 
 [custom_section]
 ================
 
 用于自定义配置：
 
-一些 scrapy 第三方扩展需要在 settings.py 中设置一些配置，涉及到 host，密码等隐私配置，直接展示在 \
-settings.py 里是不可接受的，这里提供一种方法来解决。
+.. note::
+   一些 scrapy 第三方扩展需要在 settings.py 中设置一些配置，涉及到 host，密码等隐私配置，直接展示在 \
+   settings.py 里是不可接受的，这里提供一种方法来解决。
 
 在 settings.py 或 spider 等脚本中赋值重要参数时，可以从 VIT_DIR 的 .conf 中获取自定义配置内容，来达\
 到隐藏隐私内容和保持配置内容统一存放的目的；比如在 .conf 中自定义配置以下内容：
