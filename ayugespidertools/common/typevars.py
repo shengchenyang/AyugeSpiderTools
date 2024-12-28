@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import threading
+from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar, Union
 
 from sqlalchemy import create_engine
@@ -18,8 +19,10 @@ if TYPE_CHECKING:
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)
 B_Str = TypeVar("B_Str", bytes, str)
-I_Str_N = TypeVar("I_Str_N", int, str, NoneType)
+I_Str_N = TypeVar("I_Str_N", int, str, None)
 Str_Lstr = TypeVar("Str_Lstr", str, list[str])
+_SENTINEL = Enum("_SENTINEL", "sentinel")
+sentinel = _SENTINEL.sentinel
 
 AiohttpRequestMethodStr = Literal[
     "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"

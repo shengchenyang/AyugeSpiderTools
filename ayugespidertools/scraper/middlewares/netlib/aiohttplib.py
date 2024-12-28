@@ -44,7 +44,7 @@ class AiohttpDownloaderMiddleware:
     def _retry(
         self,
         request: AyuRequest,
-        reason: int,
+        reason: str | int,
         spider: AyuSpider,
     ) -> AyuRequest | None:
         """重试请求
@@ -70,7 +70,7 @@ class AiohttpDownloaderMiddleware:
         self,
         request: AyuRequest,
         retries: int,
-        reason: str,
+        reason: str | int,
         stats: StatsCollector,
     ):
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")

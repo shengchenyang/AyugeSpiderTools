@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
 
 from scrapy import Request
 
+from ayugespidertools.common.typevars import _SENTINEL, sentinel
+from ayugespidertools.config import logger
+
 __all__ = [
     "AiohttpRequest",
 ]
@@ -45,6 +48,7 @@ class AiohttpRequest(Request):
         callback: CallbackT | None = None,
         method: str = "GET",
         headers: Mapping[AnyStr, Any] | Iterable[tuple[AnyStr, Any]] | None = None,
+        body: _SENTINEL = sentinel,
         cookies: CookiesT | None = None,
         meta: dict[str, Any] | None = None,
         encoding: str = "utf-8",
@@ -82,6 +86,10 @@ class AiohttpRequest(Request):
         max_field_size: int | None = None,
         timeout: ClientTimeout | None = None,
     ) -> None:
+        if body is not sentinel:
+            logger.error(
+                "parameter 'body' is deprecated, use 'json' or 'data' argument instead"
+            )
 
         aiohttp_req_args = {
             "method": method,
