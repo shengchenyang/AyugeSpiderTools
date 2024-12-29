@@ -52,7 +52,7 @@ language = "zh_CN"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_context = {
-    "display_github": True,
+    "display_github": False,
     "github_user": "shengchenyang",
     "github_repo": "AyugeSpiderTools",
     "github_version": "master",
