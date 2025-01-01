@@ -1,4 +1,4 @@
-.PHONY: start clean build install build_dist test release pytest git check
+.PHONY: help start clean build install build_dist pypi_token test release pytest git check
 
 refresh: clean build install
 
@@ -32,6 +32,25 @@ else
     endif
 endif
 
+help:
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@echo "  pypi_token       Set the poetry pypi-token, Run 'make pypi_token token=<token>' to set the poetry pypi_token"
+	@echo "  release          Publish package to PyPI:"
+	@echo "                     1. Run 'make release token=<token>'"
+	@echo "                     2. Run 'make release' if poetry pypi_token is already set"
+	@echo "  clean            Clean up test files, mypy cache and dist folders"
+	@echo "  git              Set git proxy and line separator"
+	@echo "  test             Code test and coverage report"
+	@echo "  start            Pre-development setup steps"
+	@echo "  build            poetry build"
+	@echo "  build_dist       setuptools build"
+	@echo "  install          install whl/tar.gz file from the dist folder"
+	@echo "  check            Code check"
+	@echo "  pytest           Code test"
+	@echo "  help             Show this help message"
+
 start:
 	pip install poetry
 	poetry install
@@ -46,10 +65,21 @@ install:
 build_dist:
 	make clean
 	python setup.py sdist bdist_wheel
-	$(PIPINSTALL)
+
+pypi_token:
+	@echo "==> Setting up the poetry pypi-token..."
+	@poetry config pypi-token.pypi $(token)
+	@echo ":) Poetry pypi_token set successfully!"
 
 release:
+	@if [ -n "$(token)" ]; then \
+		make pypi_token token=$(token); \
+	else \
+		echo "Please ensure the pypi-token is configured!"; \
+	fi
+	@echo "==> Publishing package to PyPI..."
 	poetry publish
+	@echo ":) Publish successfully"
 
 test:
 	poetry install -E "all"
@@ -67,9 +97,9 @@ check:
 	mypy .
 
 git:
-	git config --global core.eol lf
-	git config --global core.autocrlf input
-	git config --global core.safecrlf true
+	git config core.eol lf
+	git config core.autocrlf input
+	git config core.safecrlf true
 	git config --global http.proxy http://127.0.0.1:7897
 	git config --global https.proxy http://127.0.0.1:7897
 
