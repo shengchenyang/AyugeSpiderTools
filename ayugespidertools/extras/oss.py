@@ -66,9 +66,6 @@ class AliOssBase:
         Args:
             put_bytes: 需要上传的文件 bytes 内容或链接
             file: 需要上传的文件的名称
-
-        Returns:
-            None
         """
         assert isinstance(put_bytes, bytes), "put_bytes 需要是 bytes 格式"
 

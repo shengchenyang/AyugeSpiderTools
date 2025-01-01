@@ -390,7 +390,7 @@ class ReuseOperation:
             deal_dict: 需要处理的 dict
 
         Returns:
-            1).处理后的 dict 值
+            1). 处理后的 dict 值
         """
         key_to_lower_dict = {}
         for key, value in deal_dict.items():
@@ -413,7 +413,7 @@ class ReuseOperation:
             deal_dict: 需要处理的 dict
 
         Returns:
-            1).处理后的 dict 值
+            1). 处理后的 dict 值
         """
         key_to_upper_dict = {}
         for key, value in deal_dict.items():

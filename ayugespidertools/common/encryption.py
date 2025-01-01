@@ -22,7 +22,7 @@ class Encrypt(EncryptMixin):
             encrypt_data: 需要 md5 处理的参数
 
         Returns:
-            1): md5 处理后的参数
+            1). md5 处理后的参数
         """
         hl = hashlib.md5()
         hl.update(encrypt_data.encode(encoding="utf-8"))

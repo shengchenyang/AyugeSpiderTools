@@ -50,7 +50,7 @@ class DataHandle:
             local_time: 需要判断的时间参数，比如：Thu Jul 21 17:59:44 2022 或 Fri, 22 Jul 2022 01:43:06 +0800 等等
 
         Returns:
-            1): 是否为 utc 格式的数据
+            1). 是否为 utc 格式的数据
         """
         pattern = re.compile(r"""mon|tues|wed|thu|fri|sat|sun""")
         return bool(pattern.findall(local_time.lower()))
