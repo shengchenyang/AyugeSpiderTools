@@ -9,7 +9,7 @@
 
 from pathlib import Path
 
-from loguru import logger
+from ayugespidertools.config import logger
 
 BOT_NAME = "$project_name"
 
@@ -30,6 +30,7 @@ VIT_DIR = _ / "VIT"
 # Log configuration example
 LOG_LEVEL = "ERROR"
 LOG_FILE = _ / "logs/$project_name.log"
+logger.remove()
 logger.add(
     _ / "logs/error.log",
     level="ERROR",
