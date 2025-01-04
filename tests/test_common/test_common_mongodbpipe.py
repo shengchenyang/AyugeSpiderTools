@@ -64,8 +64,7 @@ class TestMongoDBPipe:
         item_dict = {
             **self._article_info_with_no_dataItem,
             "_table": test_table,
-            "item_mode": "MongoDB",
-            "mongo_update_rule": {
+            "_mongo_update_rule": {
                 "article_detail_url": "_article_detail_url",
             },
         }

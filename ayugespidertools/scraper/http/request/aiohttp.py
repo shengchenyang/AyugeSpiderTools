@@ -40,8 +40,6 @@ CookiesT = Union[dict[str, str], list[VerboseCookie]]
 
 
 class AiohttpRequest(Request):
-    """为 scrapy 的 Request 对象添加额外的参数"""
-
     def __init__(
         self,
         url: str,
