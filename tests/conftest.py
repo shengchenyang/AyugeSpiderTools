@@ -1,4 +1,6 @@
 import copy
+import random
+import string
 
 import pymysql
 import pytest
@@ -8,10 +10,17 @@ from scrapy.utils.reactor import install_reactor
 from tests import MONGODB_CONFIG, PYMYSQL_CONFIG
 from tests.keys import generate_keys
 
-test_table = "_test_article_info_table"
+
+def generate_random_code(length: int = 6) -> str:
+    characters = string.ascii_letters + string.digits
+    return "".join(random.choices(characters, k=length))
+
+
+unique_id = generate_random_code()
+test_table = f"_test_article_info_table_{unique_id}"
 script_coll_table = "script_collection_statistics"
 table_coll_table = "table_collection_statistics"
-article_list_table = "_article_info_list"
+article_list_table = f"_article_info_list_{unique_id}"
 mongodb_database = MONGODB_CONFIG["database"]
 
 
@@ -41,24 +50,24 @@ def mysql_db_cursor():
             yield cursor
 
             # 清理 mysql 测试产生的数据
-            # cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
+            cursor.execute(f"DROP TABLE IF EXISTS {test_table}")
             # cursor.execute(f"DROP TABLE IF EXISTS {script_coll_table}")
             # cursor.execute(f"DROP TABLE IF EXISTS {table_coll_table}")
-            # cursor.execute(f"DROP TABLE IF EXISTS {article_list_table}")
+            cursor.execute(f"DROP TABLE IF EXISTS {article_list_table}")
 
 
 @pytest.fixture(scope="session")
 def mongodb_conn():
     pymongo_conf = copy.deepcopy(MONGODB_CONFIG)
     pymongo_conf.pop("uri")
-    pymongo_conf.pop("database")
+    database = pymongo_conf.pop("database")
     pymongo_conf["username"] = pymongo_conf.pop("user")
     pymongo_conf["authSource"] = pymongo_conf.pop("authsource")
     with MongoClient(**pymongo_conf) as conn:
         yield conn
 
         # 清理 mongodb 测试产生的数据
-        # conn[database][test_table].drop()
+        conn[database][test_table].drop()
 
 
 def pytest_addoption(parser):

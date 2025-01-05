@@ -34,6 +34,7 @@ def mysql_first_step(mysql_db_cursor):
         with sql_file.open("r", encoding="utf-8") as f:
             for line in f:
                 if line.startswith("INSERT INTO"):
+                    line = line.replace("_test_article_info_table", test_table)
                     mysql_db_cursor.execute(line.strip())
 
 
