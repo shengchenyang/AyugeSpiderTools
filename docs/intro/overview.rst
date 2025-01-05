@@ -158,9 +158,12 @@ AyugeSpiderTools 一目了然
 刚刚发生了什么？
 ----------------
 
-刚刚使用 `ayugespidertools` 创建了项目，并生成了具体的爬虫脚本示例。其爬虫脚本中的各种依赖（比如项目目录结构，配置信息等）在创建项目后就正常产生了，一般所需的配置信息（比如 `Mysql`，`MongoDB` 等）在项目的 `VIT` 目录下 `.conf` 文件中修改，不需要配置的不用理会它即可。
+刚刚使用 `ayugespidertools` 创建了项目，并生成了具体的爬虫脚本示例。其爬虫脚本中的各种依赖（比如项目\
+目录结构，配置信息等）在创建项目后就正常产生了，一般所需的配置信息（比如 `Mysql`，`MongoDB` 等）在项目\
+的 `VIT` 目录下 `.conf` 文件中修改，不需要配置的不用理会它即可。
 
-只要配置好 `.conf` 信息，就可以跑通以上示例。如果修改为新的项目，只需要修改上面示例中的 `spdider` 解析规则即可。
+只要配置好 `.conf` 信息，就可以跑通以上示例。如果修改为新的项目，只需要修改上面示例中的 `spdider` 解析\
+规则即可。
 
 还有什么？
 ===========
@@ -189,8 +192,8 @@ ayugespidertools 根据 scrapy 的模板功能方便的创建示例脚本，比�
 下一步是什么？
 ==============
 
-接下来的步骤是 :ref:`安装 AyugeSpiderTools <intro-install>`， 按照 `Scrapy 教程`_ 学习如何使用 Scrapy 并加\
-入 `Scrapy 社区`_ 。谢谢你的关注！
+接下来的步骤是 :ref:`安装 AyugeSpiderTools <intro-install>`， 按照 `Scrapy 教程`_ 学习如何使用 \
+Scrapy 并加入 `Scrapy 社区`_ 。谢谢你的关注！
 
 .. _AyugeSpiderTools: https://github.com/shengchenyang/AyugeSpiderTools
 .. _Scrapy 教程: https://docs.scrapy.org/en/latest/intro/tutorial.html#intro-tutorial
