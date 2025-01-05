@@ -65,6 +65,7 @@ _response = TextResponse(url="https://top.baidu.com", body=body, encoding="utf-8
 def test_get_remote_kvs():
     res = Tools.get_remote_kvs(
         url=CONSUL_CONFIG["url"],
+        token=CONSUL_CONFIG["token"],
     )
     _res = json.loads(res)
     _res_lower = ReuseOperation.dict_keys_to_lower(_res)
@@ -76,6 +77,7 @@ def test_fetch_remote_conf():
         conf_name="mysql",
         url=CONSUL_CONFIG["url"],
         format="json",
+        token=CONSUL_CONFIG["token"],
     )
     assert res.get("host") is not None, res.get("port") is not None
 
