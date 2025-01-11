@@ -86,11 +86,7 @@ class AyuSpider(Spider):
 
     @classmethod
     def update_settings(cls, settings: BaseSettings) -> None:
-        _normal_settings = {
-            "ROBOTSTXT_OBEY": False,
-            "TELNETCONSOLE_ENABLED": False,
-            "DEPTH_PRIORITY": -1,
-        }
+        _normal_settings = {"TELNETCONSOLE_ENABLED": False, "DEPTH_PRIORITY": -1}
 
         if not (vit_dir := settings.get("VIT_DIR", None)):
             logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
