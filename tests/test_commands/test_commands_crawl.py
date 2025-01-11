@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 import subprocess
@@ -6,7 +8,6 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryFile, mkdtemp
 from threading import Timer
-from typing import Optional, Union
 
 from scrapy.utils.python import to_unicode
 from scrapy.utils.test import get_testenv
@@ -47,7 +48,7 @@ class ProjectTest(unittest.TestCase):
         def kill_proc():
             p.kill()
             p.communicate()
-            assert False, "Command took too much time to complete"
+            raise AssertionError("Command took too much time to complete")
 
         timer = Timer(15, kill_proc)
         try:
@@ -59,9 +60,7 @@ class ProjectTest(unittest.TestCase):
 
         return p, to_unicode(stdout), to_unicode(stderr)
 
-    def find_in_file(
-        self, filename: Union[str, os.PathLike], regex
-    ) -> Optional[re.Match]:
+    def find_in_file(self, filename: str | os.PathLike, regex) -> re.Match | None:
         """Find first pattern occurrence in file"""
         pattern = re.compile(regex)
         with Path(filename).open("r", encoding="utf-8") as f:

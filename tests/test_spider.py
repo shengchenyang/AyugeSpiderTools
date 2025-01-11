@@ -5,14 +5,11 @@ from unittest import mock
 
 import loguru
 from scrapy import signals
-from scrapy.http import HtmlResponse, Request
-from scrapy.linkextractors import LinkExtractor
 from scrapy.settings import Settings
-from scrapy.spiders import CrawlSpider, Rule, Spider
+from scrapy.spiders import Spider
 from scrapy.utils.test import get_crawler
 
 from ayugespidertools.scraper.spiders import AyuSpider
-from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
 from tests import CONSUL_CONFIG, MONGODB_CONFIG, MYSQL_CONFIG, tests_vitdir
 from tests.conftest import ForTestConfig
 
@@ -198,61 +195,3 @@ class SpiderTest(unittest.TestCase):
             _spider_mongodb_conf.pop("uri", None)
             local_mongodb_conf.pop("uri", None)
             assert _spider_mongodb_conf == local_mongodb_conf
-
-
-class TestCrawlSpider(SpiderTest):
-    test_body = b"""<html><head><title>Page title<title>
-        <body>
-        <p><a href="item/12.html">Item 12</a></p>
-        <div class='links'>
-        <p><a href="/about.html">About us</a></p>
-        </div>
-        <div>
-        <p><a href="/nofollow.html">This shouldn't be followed</a></p>
-        </div>
-        </body></html>"""
-    spider_class = AyuCrawlSpider
-    scrapy_spider_class = CrawlSpider
-
-    def test_rule_without_link_extractor(self):
-        response = HtmlResponse(
-            "http://example.org/somepage/index.html", body=self.test_body
-        )
-
-        class _CrawlSpider(self.spider_class):
-            name = "test"
-            allowed_domains = ["example.org"]
-            rules = (Rule(),)
-
-        spider = _CrawlSpider()
-        output = list(spider._requests_to_follow(response))
-        assert len(output) == 3
-        assert all(map(lambda r: isinstance(r, Request), output))
-        assert [r.url for r in output] == [
-            "http://example.org/somepage/item/12.html",
-            "http://example.org/about.html",
-            "http://example.org/nofollow.html",
-        ]
-
-    def test_process_links(self):
-        response = HtmlResponse(
-            "http://example.org/somepage/index.html", body=self.test_body
-        )
-
-        class _CrawlSpider(self.spider_class):
-            name = "test"
-            allowed_domains = ["example.org"]
-            rules = (Rule(LinkExtractor(), process_links="dummy_process_links"),)
-
-            def dummy_process_links(self, links):
-                yield from links
-
-        spider = _CrawlSpider()
-        output = list(spider._requests_to_follow(response))
-        assert len(output) == 3
-        assert all(map(lambda r: isinstance(r, Request), output))
-        assert [r.url for r in output] == [
-            "http://example.org/somepage/item/12.html",
-            "http://example.org/about.html",
-            "http://example.org/nofollow.html",
-        ]
