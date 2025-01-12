@@ -5,12 +5,16 @@ import math
 import random
 from typing import TYPE_CHECKING, Any
 
+from ayugespidertools.exceptions import NotConfigured
+
 try:
     import cv2
     import numpy as np
 except ImportError:
-    # pip install ayugespidertools[all]
-    pass
+    raise NotConfigured(
+        "missing opencv-python(cv2) or numpy library, please install it. "
+        "install command: pip install ayugespidertools[all]"
+    )
 
 __all__ = ["CvnpilKit", "BezierTrajectory"]
 

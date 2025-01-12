@@ -6,14 +6,17 @@ from typing import Any
 from retrying import retry
 
 from ayugespidertools.common.params import Param
+from ayugespidertools.exceptions import NotConfigured
 
 try:
     import oss2
 except ImportError:
-    # pip install ayugespidertools[all]
-    pass
+    raise NotConfigured(
+        "missing oss2 library, please install it. "
+        "install command: pip install ayugespidertools[all]"
+    )
 
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", module="oss2")
 
 __all__ = [
     "AliOssBase",

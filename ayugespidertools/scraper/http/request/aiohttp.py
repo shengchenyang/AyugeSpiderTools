@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import warnings
 from collections.abc import Awaitable, Callable, Iterable, Mapping
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
@@ -8,7 +9,7 @@ from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
 from scrapy import Request
 
 from ayugespidertools.common.typevars import _SENTINEL, sentinel
-from ayugespidertools.config import logger
+from ayugespidertools.exceptions import AyugeSpiderToolsDeprecationWarning
 
 __all__ = [
     "AiohttpRequest",
@@ -85,8 +86,10 @@ class AiohttpRequest(Request):
         timeout: ClientTimeout | None = None,
     ) -> None:
         if body is not sentinel:
-            logger.error(
-                "parameter 'body' is deprecated, use 'json' or 'data' argument instead"
+            warnings.warn(
+                "parameter 'body' is deprecated, use 'json' or 'data' argument instead",
+                category=AyugeSpiderToolsDeprecationWarning,
+                stacklevel=2,
             )
 
         aiohttp_req_args = {

@@ -8,7 +8,7 @@ from typing import Any, NamedTuple, NoReturn
 import scrapy
 from scrapy.item import Item
 
-from ayugespidertools.common.typevars import EmptyKeyError, FieldAlreadyExistsError
+from ayugespidertools.exceptions import EmptyKeyError, FieldAlreadyExistsError
 
 __all__ = [
     "DataItem",

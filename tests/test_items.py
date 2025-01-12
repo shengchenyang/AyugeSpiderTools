@@ -5,7 +5,7 @@ from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
 from scrapy.loader import ItemLoader
 
-from ayugespidertools.common.typevars import EmptyKeyError, FieldAlreadyExistsError
+from ayugespidertools.exceptions import EmptyKeyError, FieldAlreadyExistsError
 from ayugespidertools.items import AyuItem, DataItem, ScrapyItem
 
 cur_item = AyuItem(
