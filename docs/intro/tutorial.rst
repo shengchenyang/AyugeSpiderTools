@@ -114,17 +114,29 @@ AyugeSpiderTools 教程
 如何运行我们的蜘蛛
 ------------------
 
+.. note::
+
+   - 适配 scrapy 支持执行的任何形式，具体请查看 scrapy 文档；
+   - 这里提供一些代表性的运行方式，以 `DemoSpider`_ 项目为例。
+
 要让我们的蜘蛛工作，请转到项目的顶级目录并运行：
 ::
 
-   # 本身就是 scrapy 的项目，所以可以使用 scrapy 可以执行的任何形式即可
+   # 使用 crawl 等命令方式：
    scrapy crawl demo_one
 
    # 或者执行项目根目录下的 run.py(需要编辑自己需要执行的脚本)
    python run.py
 
    # 或者执行项目根目录下的 run.sh，其实它也是通过调用 run.py 来执行的。只不过 shell 文件中包含了虚拟
-   # 环境的 activate 了而已
+   # 环境的 activate 了而已。
    sh run.sh
 
+   # 也可以使用 docker 的方式
+   通过编写 Dockerfile 的方式来适配你的工作流。
+
+   # 结合爬虫管理平台
+   支持 scrapydweb，crawlab 等平台来管理项目。
+
 .. _ayugespidertools readthedocs: https://ayugespidertools.readthedocs.io/en/latest/
+.. _DemoSpider: https://github.com/shengchenyang/DemoSpider
