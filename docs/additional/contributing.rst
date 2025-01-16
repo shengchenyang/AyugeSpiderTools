@@ -25,11 +25,8 @@
 
 .. code:: bash
 
-   pyenv virtualenv 3.9.20 venv
-   pyenv activate venv
-   pip install poetry
-   poetry install
-   pre-commit install
+   pyenv local 3.9.20
+   make start
 
 4. Run a test
 

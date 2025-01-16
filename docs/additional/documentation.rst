@@ -26,13 +26,12 @@
 
 1. Create a virtual environment
 
+同样地，你可以选择自己喜欢的工具来创建当前项目的虚拟开发环境，这里以 pyenv 为例：
+
 .. code:: bash
 
-   pyenv virtualenv 3.9.20 venv
-   pyenv activate venv
-   pip install poetry
-   poetry install
-   pre-commit install
+   pyenv local 3.9.20
+   make start
 
 
 2. Make changes
