@@ -52,8 +52,10 @@ help:
 	@echo "  help             Show this help message"
 
 start:
-	pip install poetry
-	poetry install
+	pip install poetry==1.8.4
+	poetry config virtualenvs.in-project true
+	poetry shell
+	poetry install -E "all"
 	pre-commit install
 
 build:
