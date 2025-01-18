@@ -60,8 +60,7 @@ ayugespidertools 会在 ``startproject`` 后默认在 settings 中添加一个�
 
 .. code-block:: python
 
-   # project_name 为当前所在的 scrapy 项目名称
-   from project_name.settings import logger
+   from ayugespidertools import logger
 
    logger.warning("This is a warning")
 
