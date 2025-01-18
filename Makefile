@@ -52,11 +52,11 @@ help:
 	@echo "  help             Show this help message"
 
 start:
-	pip install poetry==1.8.4
+	pip install poetry==2.0.1
 	poetry config virtualenvs.in-project true
-	poetry shell
+	poetry env use python
 	poetry install -E "all"
-	pre-commit install
+	poetry run pre-commit install
 
 build:
 	poetry build
@@ -85,17 +85,17 @@ release:
 
 test:
 	poetry install -E "all"
-	coverage run -m pytest
-	coverage combine
-	coverage report
+	poetry run coverage run -m pytest
+	poetry run coverage combine
+	poetry run coverage report
 
 pytest:
-	poetry install
-	pytest -W ignore::DeprecationWarning
+	poetry install -E "all"
+	poetry run pytest -W ignore::DeprecationWarning
 
 check:
-	pre-commit run --all-files
-	mypy .
+	poetry run pre-commit run --all-files
+	poetry run mypy .
 
 git:
 	git config core.eol lf
