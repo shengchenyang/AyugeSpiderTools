@@ -54,6 +54,7 @@ help:
 start:
 	pip install poetry==2.0.1
 	poetry config virtualenvs.in-project true
+	poetry self add poetry-bumpversion
 	poetry env use python
 	poetry install -E "all"
 	poetry run pre-commit install
@@ -96,6 +97,7 @@ pytest:
 check:
 	poetry run pre-commit run --all-files
 	poetry run mypy .
+	poetry check
 
 git:
 	git config core.eol lf

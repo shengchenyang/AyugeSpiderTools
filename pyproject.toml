@@ -101,6 +101,13 @@ name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple"
 priority = "supplemental"
 
+[tool.poetry.requires-plugins]
+poetry-bumpversion = "==0.3.3"
+
+[tool.poetry_bumpversion.file."ayugespidertools/__init__.py"]
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
 [tool.pytest.ini_options]
 xfail_strict = true
 python_files = "test_*.py __init__.py"
