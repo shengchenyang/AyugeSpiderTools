@@ -2376,6 +2376,7 @@ files = [
 
 [package.dependencies]
 psycopg-binary = {version = "3.1.13", optional = true, markers = "extra == \"binary\""}
+psycopg-pool = {version = "*", optional = true, markers = "extra == \"pool\""}
 typing-extensions = ">=4.1"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
@@ -2461,6 +2462,21 @@ files = [
     {file = "psycopg_binary-3.1.13-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:6a9545c5c9ccbb6ba0c45deb28f4626aade88a8ace36260324b7673965e7df64"},
     {file = "psycopg_binary-3.1.13-cp39-cp39-win_amd64.whl", hash = "sha256:cd9550cfaf47db9eb44207278b9d418de0076df87cf3a2ea99bc123bd8d379c7"},
 ]
+
+[[package]]
+name = "psycopg-pool"
+version = "3.2.4"
+description = "Connection Pool for Psycopg"
+optional = true
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "psycopg_pool-3.2.4-py3-none-any.whl", hash = "sha256:f6a22cff0f21f06d72fb2f5cb48c618946777c49385358e0c88d062c59cbd224"},
+    {file = "psycopg_pool-3.2.4.tar.gz", hash = "sha256:61774b5bbf23e8d22bedc7504707135aaf744679f8ef9b3fe29942920746a6ed"},
+]
+
+[package.dependencies]
+typing-extensions = ">=4.6"
 
 [[package]]
 name = "pyasn1"
@@ -3794,10 +3810,10 @@ test = ["coverage[toml]", "zope.event", "zope.testing"]
 testing = ["coverage[toml]", "zope.event", "zope.testing"]
 
 [extras]
-all = ["Pillow", "elasticsearch-dsl", "mmh3", "numpy", "opencv-python", "oracledb", "oss2", "psycopg", "psycopg", "pycryptodome", "python-hcl2", "pyyaml"]
-database = ["elasticsearch-dsl", "oracledb", "psycopg", "psycopg"]
+all = ["elasticsearch-dsl", "mmh3", "numpy", "opencv-python", "oracledb", "oss2", "pillow", "psycopg", "pycryptodome", "python-hcl2", "pyyaml"]
+database = ["elasticsearch-dsl", "oracledb", "psycopg"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "899b0e69346ad9eec5529105d8f61d0f5f0793023b7be3df846caa58c929a587"
+content-hash = "9497d48a1d84c941cf92b52a90a6ad126508fbc742e43f828a582e2d7db049c7"
