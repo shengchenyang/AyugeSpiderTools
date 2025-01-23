@@ -77,7 +77,11 @@ class SpiderTest(unittest.TestCase):
 
     def test_update_settings(self):
         spider_settings = {"TEST1": "spider", "TEST2": "spider"}
-        project_settings = {"TEST1": "project", "TEST3": "project"}
+        project_settings = {
+            "TEST1": "project",
+            "TEST3": "project",
+            "VIT_DIR": tests_vitdir,
+        }
         self.spider_class.custom_settings = spider_settings
         settings = Settings(project_settings, priority="project")
 

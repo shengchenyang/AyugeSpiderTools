@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -22,6 +23,7 @@ from ayugespidertools.common.spiderconf import (
     get_sqlalchemy_conf,
 )
 from ayugespidertools.config import logger
+from ayugespidertools.exceptions import NotConfigured
 
 __all__ = [
     "AyuSpider",
@@ -86,19 +88,21 @@ class AyuSpider(Spider):
 
     @classmethod
     def update_settings(cls, settings: BaseSettings) -> None:
-        _normal_settings = {"TELNETCONSOLE_ENABLED": False, "DEPTH_PRIORITY": -1}
+        _normal_settings: dict[str, Any] = {
+            "TELNETCONSOLE_ENABLED": False,
+            "DEPTH_PRIORITY": -1,
+        }
 
         if not (vit_dir := settings.get("VIT_DIR", None)):
             logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
-            exec_path = Path().resolve()
-            _parts = exec_path.parts[-2:]
-            assert len(_parts) >= 2, "执行脚本的路径可能存在问题！"
-            vit_dir = (
-                exec_path / "VIT"
-                if _parts[0] == _parts[1]
-                else exec_path / settings["BOT_NAME"] / "VIT"
-            )
-            _normal_settings["VIT_DIR"] = vit_dir
+            if module_spec := importlib.util.find_spec(settings["BOT_NAME"]):
+                submodule_paths = module_spec.submodule_search_locations
+                assert (
+                    submodule_paths and len(submodule_paths) == 1
+                ), "please change your project name"
+                _normal_settings["VIT_DIR"] = Path(*submodule_paths) / "VIT"
+            else:
+                raise NotConfigured("you must define the VIT_DIR parameter")
 
         inner_settings = ReuseOperation.fetch_local_conf(
             vit_dir=vit_dir, inner_settings=_normal_settings
