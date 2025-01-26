@@ -1,4 +1,5 @@
-.PHONY: help start clean build install build_dist pypi_token test release pytest git check
+.PHONY: help start clean build install build_dist pypi_token test release pytest git check \
+version patch minor major
 
 refresh: clean build install
 
@@ -40,6 +41,7 @@ help:
 	@echo "  release          Publish package to PyPI:"
 	@echo "                     1. Run 'make release token=<token>'"
 	@echo "                     2. Run 'make release' if poetry pypi_token is already set"
+	@echo "  version          Shows the version of the project or bumps it when a valid bump rule is provided."
 	@echo "  clean            Clean up test files, mypy cache and dist folders"
 	@echo "  git              Set git proxy and line separator"
 	@echo "  test             Code test and coverage report"
@@ -98,6 +100,23 @@ check:
 	poetry run pre-commit run --all-files
 	poetry run mypy .
 	poetry check
+
+version:
+	@if [ "$(filter patch minor major,$(MAKECMDGOALS))" = "" ]; then \
+		poetry version; \
+		echo "Usage: make version [patch|minor|major]"; \
+	else \
+		poetry version $(filter patch minor major,$(MAKECMDGOALS)); \
+	fi
+
+patch:
+	@:
+
+minor:
+	@:
+
+major:
+	@:
 
 git:
 	git config core.eol lf
