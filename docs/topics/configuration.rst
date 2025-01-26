@@ -4,8 +4,15 @@
 Configuration
 =============
 
-AyugeSpiderTools 将项目中所依赖的敏感配置信息放入了当前项目的 VIT 下的 .conf 文件中独立管理。当然，你\
-也可以在项目中自定义 VIT_DIR 参数来决定配置文件 .conf 的路径。
+AyugeSpiderTools 将项目中所依赖的敏感配置信息放入了当前项目 ``<project_dir>/<project_name>`` 的 \
+VIT 下的 .conf 文件中独立管理。当然，你也可以在项目中自定义 VIT_DIR 参数来决定配置文件 .conf 的路径。
+
+.. note::
+
+   - VIT 是 very import things 的意思，VIT_DIR 路径下的 .conf 用于保存一些项目运行所依赖的重要配置\
+     和自定义配置内容；
+   - 虽然 VIT_DIR 参数可以自定义，但是 VIT_DIR 是指项目依赖的 .conf 文件所在的 VIT 路径，所以这个路\
+     径参数是一定要以 VIT 结尾的，且此文件夹中的 .conf 文件不支持修改和自定义文件名。
 
 若你有很多的 Scrapy 项目需要统一管理，可以选择以下方式：
 
@@ -259,8 +266,10 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 用于自定义配置：
 
 .. note::
-   一些 scrapy 第三方扩展需要在 settings.py 中设置一些配置，涉及到 host，密码等隐私配置，直接展示在 \
-   settings.py 里是不可接受的，这里提供一种方法来解决。
+
+   - 一些 scrapy 第三方扩展需要在 settings.py 中设置一些配置，涉及到 host，密码等隐私配置，直接展示\
+     在 settings.py 里是不可接受的，这里提供一种方法来解决；
+   - 注意：你可以在 .conf 中配置多个自定义部分来满足不同场景。
 
 在 settings.py 或 spider 等脚本中赋值重要参数时，可以从 VIT_DIR 的 .conf 中获取自定义配置内容，来达\
 到隐藏隐私内容和保持配置内容统一存放的目的；比如在 .conf 中自定义配置以下内容：
