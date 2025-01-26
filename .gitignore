@@ -128,6 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# AyugeSpiderTools
 /.git/
 /.idea/
 **/__pycache__
@@ -138,3 +139,6 @@ dmypy.json
 /tests/docs/keys/localhost.key
 /tests/keys/localhost.crt
 /tests/keys/localhost.key
+
+# poetry
+.poetry
