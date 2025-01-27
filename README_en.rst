@@ -205,7 +205,19 @@ Things You Might Care About
    but it is still recommended to use the style development in the `DemoSpider`_ example.\
    Will not cause excessive migration costs to developers.
 
-3. Code test coverage is a bit low, should you consider increasing it?
+3. You have complex storage requirements for (media) resource fields in your item! Or do \
+   you need support for other types of object cloud storage? How can I implement this easily?
+
+   1. If you are familiar with this project and the Poetry packaging and building process, \
+      it is recommended to add the required functionality following the project's example \
+      style, then build and install it yourself. This approach ensures ease of use for \
+      future requirements.
+   2. Since this is a Scrapy project, it is more advisable to use standard storage scenarios \
+      in combination with a custom Scrapy pipeline to handle resource upload fields in your \
+      item. This retains the library's generality and convenience while achieving flexibility \
+      for your specific needs.
+
+4. Code test coverage is a bit low, should you consider increasing it?
 
    Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
 
