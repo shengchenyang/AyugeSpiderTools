@@ -1,19 +1,18 @@
-from ayugespidertools.scraper.middlewares.headers.ua import RandomRequestUaMiddleware
-from ayugespidertools.scraper.middlewares.netlib.aiohttplib import (
-    AiohttpDownloaderMiddleware,
-)
-from ayugespidertools.scraper.middlewares.proxy.dynamic import (
-    AbuDynamicProxyDownloaderMiddleware,
-    DynamicProxyDownloaderMiddleware,
-)
-from ayugespidertools.scraper.middlewares.proxy.exclusive import (
-    ExclusiveProxyDownloaderMiddleware,
-)
+from ayugespidertools.config import setup_lazy_import
 
-__all__ = [
-    "RandomRequestUaMiddleware",
-    "AiohttpDownloaderMiddleware",
-    "AbuDynamicProxyDownloaderMiddleware",
-    "DynamicProxyDownloaderMiddleware",
-    "ExclusiveProxyDownloaderMiddleware",
-]
+_MODULES = {
+    "headers.ua": ["RandomRequestUaMiddleware"],
+    "netlib.aiohttplib": ["AiohttpDownloaderMiddleware"],
+    "proxy.dynamic": [
+        "AbuDynamicProxyDownloaderMiddleware",
+        "DynamicProxyDownloaderMiddleware",
+    ],
+    "proxy.exclusive": ["ExclusiveProxyDownloaderMiddleware"],
+}
+
+
+setup_lazy_import(
+    modules_map=_MODULES,
+    base_package="ayugespidertools.scraper.middlewares",
+    globals_dict=globals(),
+)
