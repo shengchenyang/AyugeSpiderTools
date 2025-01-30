@@ -46,11 +46,6 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         return item
 
     def insert_item(self, alter_item: AlterItem) -> None:
-        """通用插入数据
-
-        Args:
-            alter_item: 经过转变后的 item
-        """
         if not (new_item := alter_item.new_item):
             return
 

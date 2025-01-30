@@ -40,7 +40,7 @@ RemoteConfNameStr = Literal[
 
 
 class Tools(AppConfManageMixin):
-    """这里用于存放框架所依赖的方法"""
+    """存放框架所依赖的方法"""
 
     @staticmethod
     @lru_cache(maxsize=16)

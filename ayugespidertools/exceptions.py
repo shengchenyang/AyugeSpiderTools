@@ -15,10 +15,10 @@ class EmptyKeyError(Exception):
 class NotConfigured(Exception):
     """Indicates a missing configuration situation"""
 
-    pass
+    ...
 
 
 class AyugeSpiderToolsDeprecationWarning(Warning):
     """Warning category for deprecated features"""
 
-    pass
+    ...

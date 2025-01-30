@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 
 class ReuseOperation:
-    """用于存放经常复用的一些操作"""
+    """存放常用的复用方法"""
 
     @staticmethod
     def fetch_local_conf(vit_dir: str | Path, inner_settings: dict) -> dict:

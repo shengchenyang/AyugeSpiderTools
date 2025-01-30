@@ -17,7 +17,7 @@ __all__ = [
 
 
 class NormalConfig:
-    """用于存放此项目的通用配置"""
+    """store the general configuration"""
 
     CONFIG_DIR = Path(__file__).parent
     ROOT_DIR = CONFIG_DIR.parent
@@ -37,7 +37,7 @@ def get_cfg() -> configparser.ConfigParser:
 
 
 def setup_lazy_import(modules_map, base_package, globals_dict):
-    """lazy import about middlewares and pipelines"""
+    """lazy import for middlewares and pipelines"""
     class_map = {}
     for submodule, classes in modules_map.items():
         for cls in classes:
