@@ -100,7 +100,8 @@ class AyuSpider(Spider):
                 assert (
                     submodule_paths and len(submodule_paths) == 1
                 ), "please change your project name"
-                _normal_settings["VIT_DIR"] = Path(*submodule_paths) / "VIT"
+                vit_dir = Path(*submodule_paths) / "VIT"
+                _normal_settings["VIT_DIR"] = vit_dir
             else:
                 raise NotConfigured("you must define the VIT_DIR parameter")
 
