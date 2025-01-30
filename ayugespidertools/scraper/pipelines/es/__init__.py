@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.exceptions import NotConfigured
 
 try:
     from elasticsearch_dsl import Document, connections
 except ImportError:
-    # pip install ayugespidertools[database]
-    pass
+    raise NotConfigured(
+        "missing elasticsearch_dsl library, please install it. "
+        "install command: pip install ayugespidertools[database]"
+    )
 
 __all__ = ["AyuESPipeline", "dynamic_es_document"]
 

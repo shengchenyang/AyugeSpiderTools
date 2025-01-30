@@ -6,14 +6,17 @@ from typing import TYPE_CHECKING, Any, Union
 from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.scraper.pipelines.es import dynamic_es_document
 
 try:
     from elasticsearch import AsyncElasticsearch
     from elasticsearch.helpers import async_bulk
 except ImportError:
-    # pip install ayugespidertools[database]
-    pass
+    raise NotConfigured(
+        "missing elasticsearch library, please install it. "
+        "install command: pip install ayugespidertools[database]"
+    )
 
 __all__ = ["AyuAsyncESPipeline"]
 

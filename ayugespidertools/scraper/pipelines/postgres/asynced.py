@@ -6,12 +6,15 @@ from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.exceptions import NotConfigured
 
 try:
     from psycopg_pool import AsyncConnectionPool
 except ImportError:
-    # pip install ayugespidertools[database]
-    pass
+    raise NotConfigured(
+        "missing psycopg_pool library, please install it. "
+        "install command: pip install ayugespidertools[database]"
+    )
 
 __all__ = [
     "AyuAsyncPostgresPipeline",
