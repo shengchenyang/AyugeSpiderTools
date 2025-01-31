@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.11.1 (Preview: TBD)
+AyugeSpiderTools 3.11.2 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -19,14 +19,49 @@ AyugeSpiderTools 3.11.1 (Preview: TBD)
 当然也可以直接 ``pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git`` 来\
 安装预发布包。
 
+... ...
+
+AyugeSpiderTools 3.11.1 (2025-01-31)
+====================================
+
+Deprecations
+------------
+
+- 删除 ROBOTSTXT_OBEY 模式配置。
+
+  (:commit:`04ebb6759cc15ef921eb778a7be6d39bb6c3b468`)
+
+
 Code optimizations
 ------------------
 
+- 生成模版中添加日志 remove 示例。
+
+  (:commit:`974b2dd973998fbd2795305c827ebe14a750d007`)
+- 添加 AiohttpRequest 参数弃用警告。
+
+  (:commit:`3d34e9913529683bb7d4295b240f1bc0bf529f7a`)
+- 完善 poetry 开发流程。
+
+  (:commit:`8c82a6bb020f124751e088cfb2c150059b31df0f`)
+- 优化 VIT_DIR 的获取方式。
+
+  (:commit:`9a978e7dbd68e0b54cf06d97e22f3027fcd49fd2`)
+
+  (:commit:`ecbdbb0c860c14292769a100a6f7e55f4a909edd`)
+- middlewares 和 pipelines 模块添加延迟加载功能。
+
+  (:commit:`37ba57bca3d813f6e6f5aa93f40871c4e0dd8900`)
 - 将文档格式由 md 转为 rst。
 
   (:commit:`f78e4b89cd0bdacb2560b5be5f71681cd915cd7c`)
+- 添加和优化 pyupgrade，Makefile，exception 模块。
 
-... ...
+  (:commit:`b84d6b9ccaa865c669056420c0e275714a60854a`)
+
+  (:commit:`4251401f6e761e189cceeb74608360d151547208`)
+
+  (:commit:`9e266c0551bf2e0d1e84faebbf04209d04ff2def`)
 
 AyugeSpiderTools 3.11.0 (2024-11-29)
 ====================================
