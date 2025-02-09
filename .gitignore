@@ -129,10 +129,8 @@ dmypy.json
 .pyre/
 
 # AyugeSpiderTools
-/.git/
-/.idea/
-**/__pycache__
-**/.pytest_cache
+.git/
+.idea/
 /ayugespidertools/logs/
 /tests/VIT/.conf
 /tests/docs/keys/localhost.crt
