@@ -33,7 +33,7 @@ AyugeSpiderTools 介绍
 **简体中文** | English_
 
 概述
-====
+=======
 
    一句话介绍：用于扩展 Scrapy 功能来解放双手。
 
@@ -276,6 +276,11 @@ poetry add kafka-python==x.x.x 安装目标版本（尽量不要使用 poetry up
 
 注意：功能演示我将放入 `readthedocs`_ 文档中，以防此部分内容过多。
 
+感谢
+=======
+
+- `scrapy`_
+
 赞助
 =======
 
@@ -292,3 +297,4 @@ poetry add kafka-python==x.x.x 安装目标版本（尽量不要使用 poetry up
 .. _poetry: https://python-poetry.org/docs/
 .. _LazyScraper: https://github.com/shengchenyang/LazyScraper
 .. _fontforge: https://github.com/fontforge/fontforge/releases
+.. _scrapy: https://github.com/scrapy/scrapy

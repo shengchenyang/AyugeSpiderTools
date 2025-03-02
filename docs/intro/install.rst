@@ -97,8 +97,9 @@ AyugeSpiderTools 需要 Python 3.9+。
 解决方法如下：
 ::
 
+   # 使用优质国内源安装：
    pip install ayugespidertools -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
-   # 或者使用官方源：
+   # 或者使用官方源安装：
    pip install ayugespidertools -i https://pypi.org/simple
 
 - 可能存在的兼容问题
@@ -115,8 +116,8 @@ AyugeSpiderTools 需要 Python 3.9+。
 解决方法如下：
 ::
 
-   可能出现兼容问题的库有：lxml, urllib3, twisted 等，可通过手动安装未报错的依赖版本，或升级 Python\
-   Patch 版本来快速解决。
+   可能出现兼容问题的库有：lxml, urllib3, twisted 等，可通过手动安装未报错的依赖版本；
+   也可尝试升级 Python Patch 版本来快速解决。
 
 若遇到其它的各种问题，请提 `issues`_ 反馈。
 

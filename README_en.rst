@@ -305,6 +305,11 @@ Features
 Notice: I will include the function demo in the `readthedocs`_ documentation to avoid\
 overwhelming this section with too much content.
 
+Thanks
+======
+
+- `scrapy`_
+
 Sponsor
 =======
 
@@ -321,3 +326,4 @@ If this project is helpful to you, you can choose to reward the author.
 .. _poetry: https://python-poetry.org/docs/
 .. _LazyScraper: https://github.com/shengchenyang/LazyScraper
 .. _fontforge: https://github.com/fontforge/fontforge/releases
+.. _scrapy: https://github.com/scrapy/scrapy
