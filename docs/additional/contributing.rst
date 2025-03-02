@@ -9,8 +9,7 @@
 前提准备
 ==========
 
-本指南假设您已拥有 github 账户，以及 python3，虚拟环境和 git 的安装配置。但不会限制你使用的工具，比如\
-你可以使用 virtualenv 代替 pyenv。
+本指南假设您已拥有 github 账户，以及 pyenv 和 git 的安装配置。
 
 1. `Fork <https://github.com/shengchenyang/AyugeSpiderTools/fork>`_ AyugeSpiderTools
 
@@ -25,7 +24,6 @@
 
 .. code:: bash
 
-   pyenv local 3.9.20
    make start
 
 4. Run a test

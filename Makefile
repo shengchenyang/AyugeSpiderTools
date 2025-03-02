@@ -54,7 +54,8 @@ help:
 	@echo "  help             Show this help message"
 
 start:
-	pip install poetry==2.0.1
+	pyenv local 3.9.20
+	pip install poetry==2.1.1
 	poetry config virtualenvs.in-project true
 	poetry self add poetry-bumpversion
 	poetry env use python

@@ -26,11 +26,10 @@
 
 1. Create a virtual environment
 
-同样地，你可以选择自己喜欢的工具来创建当前项目的虚拟开发环境，这里以 pyenv 为例：
+配置开发环境需要先安装 pyenv，然后在项目根目录中输入以下命令来快速完成环境准备工作：
 
 .. code:: bash
 
-   pyenv local 3.9.20
    make start
 
 
