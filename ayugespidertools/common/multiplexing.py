@@ -157,6 +157,7 @@ class ReuseOperation:
             }
         if "mq" in cfg:
             mq_section = cfg["mq"]
+            _queue = mq_section.get("queue", None)
             inner_settings["MQ_CONFIG"] = {
                 "host": mq_section.get("host", "localhost"),
                 "port": mq_section.getint("port", 5672),
@@ -165,12 +166,12 @@ class ReuseOperation:
                 "virtualhost": mq_section.get("virtualhost", "/"),
                 "heartbeat": mq_section.getint("heartbeat", 0),
                 "socket_timeout": mq_section.getint("socket_timeout", 1),
-                "queue": mq_section.get("queue", None),
+                "queue": _queue,
                 "durable": mq_section.getboolean("durable", True),
                 "exclusive": mq_section.getboolean("exclusive", False),
                 "auto_delete": mq_section.getboolean("auto_delete", False),
-                "exchange": mq_section.get("exchange", None),
-                "routing_key": mq_section.get("routing_key", None),
+                "exchange": mq_section.get("exchange", ""),
+                "routing_key": mq_section.get("routing_key", _queue),
                 "content_type": mq_section.getint("content_type", "text/plain"),
                 "delivery_mode": mq_section.getint("delivery_mode", 1),
                 "mandatory": mq_section.getboolean("mandatory", True),
