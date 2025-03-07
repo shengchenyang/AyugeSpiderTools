@@ -23,7 +23,7 @@ VIT 下的 .conf 文件中独立管理。当然，你也可以在项目中自定
 Introduction
 ============
 
-配置格式使用 ini。
+.conf 文件配置格式使用 ini，具有易编写易解析易维护的优点，python 也有方便且成熟的自带库 `configparser`_ 支持。
 
 [nacos]
 =======
@@ -174,6 +174,58 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "host", "可选，默认 localhost", "_"
    "port", "可选，默认 5672", "_"
 
+.. note::
+
+   以上内容是在标准场景下的配置，但是有时候用户只想推送到 queue 中而不关心或不绑定到 exchange，那么就存\
+   在两种情况，接下来分别介绍这两种场景。
+
+如果是标准场景，推送的 queue 有绑定的 exchange，那么你需要完整地配置他们，示例如下：
+
+.. code-block:: ini
+
+   [mq]
+   virtualhost=这里填入 virtualhost
+   queue=这里填入推送到的 queue
+   exchange=这里填入推送到的 queue 所绑定的 exchange
+   routing_key=这里填入绑定时的 routing_key
+   username=guest
+   password=guest
+   host=localhost
+   port=5672
+
+当不需要绑定 exchange 时，这时候需要注意，如果 ayugespidertools 版本在 3.11.1 及以下，需要的配置示例\
+如下：
+
+.. code-block:: ini
+
+   ; 需要将 exchange 设置为空，routing_key 设置与 queue 值一致。
+   [mq]
+   virtualhost=ayuge
+   queue=ayuge_sec_queue
+   exchange=
+   routing_key=ayuge_sec_queue
+   username=guest
+   password=guest
+   host=localhost
+   port=5672
+
+如果 ayugespidertools 版本在 3.11.1 以上，需要的配置更简约，示例如下：
+
+.. code-block:: ini
+
+   ; 不需要的 exchange 和 routing_key 参数可以移除了，或者注释掉它们。
+   [mq]
+   virtualhost=这里填入 virtualhost
+   queue=ayuge_sec_queue
+   username=guest
+   password=guest
+   host=localhost
+   port=5672
+
+.. note::
+
+   旧写法依然适用于最新的版本，只是最新的写法更加易维护，不必担心兼容问题。
+
 [oracle]
 ========
 
@@ -293,6 +345,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    custom_bool = _my_cfg["custom_section"].getboolean("custom_bool", False)
    custom_float = _my_cfg["custom_section"].getfloat("custom_float", 3.14)
 
+.. _configparser: https://docs.python.org/3/library/configparser.html
 .. _Nacos: https://nacos.io
 .. _Consul: https://consul.io
 .. _pika: https://pika.readthedocs.io/en/stable/
