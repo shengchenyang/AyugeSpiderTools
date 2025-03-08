@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING, Any
 
 import pika
 
-from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.items import AyuItem
+from ayugespidertools.common.expend import RabbitMqEnhanceMixin
 
 __all__ = [
     "AyuMQPipeline",
@@ -19,15 +17,9 @@ if TYPE_CHECKING:
     from ayugespidertools.spiders import AyuSpider
 
 
-class AyuMQPipeline:
+class AyuMQPipeline(RabbitMqEnhanceMixin):
     channel: BlockingChannel
     conn: BlockingConnection
-
-    @staticmethod
-    def _dict_to_bytes(item: AyuItem | dict) -> bytes:
-        item_dict = ReuseOperation.item_to_dict(item)
-        item_json_str = json.dumps(item_dict)
-        return bytes(item_json_str, encoding="utf-8")
 
     def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
@@ -54,7 +46,7 @@ class AyuMQPipeline:
         self.channel.basic_publish(
             exchange=spider.rabbitmq_conf.exchange,
             routing_key=spider.rabbitmq_conf.routing_key,
-            body=self._dict_to_bytes(item),
+            body=self.item_to_bytes(item),
             properties=pika.BasicProperties(
                 content_type=spider.rabbitmq_conf.content_type,
                 delivery_mode=spider.rabbitmq_conf.delivery_mode,

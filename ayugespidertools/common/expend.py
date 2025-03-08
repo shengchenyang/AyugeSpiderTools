@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 from typing import TYPE_CHECKING, Any
 
 import pymysql
@@ -21,6 +22,7 @@ __all__ = [
     "MysqlPipeEnhanceMixin",
     "PostgreSQLPipeEnhanceMixin",
     "OraclePipeEnhanceMixin",
+    "RabbitMqEnhanceMixin",
 ]
 
 if TYPE_CHECKING:
@@ -29,6 +31,7 @@ if TYPE_CHECKING:
     from pymysql.connections import Connection as PymysqlConnection
 
     from ayugespidertools.common.typevars import MysqlConf, OracleConf, PostgreSQLConf
+    from ayugespidertools.items import AyuItem
 
 
 class MysqlPipeEnhanceMixin:
@@ -279,3 +282,10 @@ class OraclePipeEnhanceMixin:
         keys = f""":{", :".join(item.keys())}"""
         table_keys = ", ".join(map(lambda key: f'"{key}"', item.keys()))
         return f'INSERT INTO "{table}" ({table_keys}) values ({keys})'
+
+
+class RabbitMqEnhanceMixin:
+    @staticmethod
+    def item_to_bytes(item: AyuItem | dict) -> bytes:
+        item_dict = ReuseOperation.item_to_dict(item)
+        return json.dumps(item_dict).encode()
