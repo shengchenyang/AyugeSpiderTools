@@ -9,6 +9,7 @@ _MODULES = {
     "mongo.twisted": ["AyuTwistedMongoPipeline"],
     "msgproducer.kafkapub": ["AyuKafkaPipeline"],
     "msgproducer.mqpub": ["AyuMQPipeline"],
+    "msgproducer.mqasyncpub": ["AyuAsyncMQPipeline"],
     "mysql.asynced": ["AyuAsyncMysqlPipeline"],
     "mysql.fantasy": ["AyuFtyMysqlPipeline"],
     "mysql.stats": ["AyuStatisticsMysqlPipeline"],

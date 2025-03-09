@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Any
 
 import pika
 
-from ayugespidertools.common.expend import RabbitMqEnhanceMixin
+from ayugespidertools.common.multiplexing import ReuseOperation
 
 __all__ = [
     "AyuMQPipeline",
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
     from ayugespidertools.spiders import AyuSpider
 
 
-class AyuMQPipeline(RabbitMqEnhanceMixin):
+class AyuMQPipeline:
     channel: BlockingChannel
     conn: BlockingConnection
 
@@ -43,10 +44,12 @@ class AyuMQPipeline(RabbitMqEnhanceMixin):
         self.conn.close()
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
+        item_dict = ReuseOperation.item_to_dict(item)
+        publish_data = json.dumps(item_dict).encode()
         self.channel.basic_publish(
             exchange=spider.rabbitmq_conf.exchange,
             routing_key=spider.rabbitmq_conf.routing_key,
-            body=self.item_to_bytes(item),
+            body=publish_data,
             properties=pika.BasicProperties(
                 content_type=spider.rabbitmq_conf.content_type,
                 delivery_mode=spider.rabbitmq_conf.delivery_mode,
