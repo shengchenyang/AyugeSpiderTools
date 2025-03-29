@@ -25,12 +25,24 @@ class AyuMQPipeline:
     def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
         _mq_conf: MQConf = spider.rabbitmq_conf
-        mq_conn_param = pika.URLParameters(
-            f"amqp://{_mq_conf.username}:{_mq_conf.password}"
-            f"@{_mq_conf.host}:{_mq_conf.port}/{_mq_conf.virtualhost}"
-            f"?heartbeat={_mq_conf.heartbeat}&socket_timeout={_mq_conf.socket_timeout}"
-        )
-        self.conn = pika.BlockingConnection(parameters=mq_conn_param)
+        cluster_hosts = [h.strip() for h in _mq_conf.host.split(",")]
+        parameters = [
+            pika.ConnectionParameters(
+                host=host,
+                port=_mq_conf.port,
+                virtual_host=_mq_conf.virtualhost,
+                credentials=pika.PlainCredentials(
+                    username=_mq_conf.username, password=_mq_conf.password
+                ),
+                heartbeat=_mq_conf.heartbeat,
+                socket_timeout=_mq_conf.socket_timeout,
+                connection_attempts=3,
+                retry_delay=1,
+            )
+            for host in cluster_hosts
+        ]
+
+        self.conn = pika.BlockingConnection(parameters=parameters)
         self.channel = self.conn.channel()
         self.channel.queue_declare(
             queue=_mq_conf.queue,
