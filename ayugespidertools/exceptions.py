@@ -2,13 +2,13 @@
 class FieldAlreadyExistsError(Exception):
     def __init__(self, field_name: str):
         self.field_name = field_name
-        self.message = f"字段 {field_name} 已存在！"
+        self.message = f"Field {field_name} already exists"
         super().__init__(self.message)
 
 
 class EmptyKeyError(Exception):
     def __init__(self):
-        self.message = "字段名不能为空！"
+        self.message = "The field name cannot be empty"
         super().__init__(self.message)
 
 
