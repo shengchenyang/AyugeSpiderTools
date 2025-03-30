@@ -153,6 +153,7 @@ AyugeSpiderTools 介绍
    - 16).demo_item_loader_two: 已删除，可查看 demo_item_loader，可方便的使用 Item Loaders 了
 
    + 18).demo_mq: 数据存入 rabbitmq 的模板示例
+   + 35).demo_mq_async: 数据存入 rabbitmq 的异步模板示例
    + 19).demo_kafka: 数据存入 kafka 的模板示例
    + 20).demo_file: 使用本库 pipeline 下载图片等文件到本地的示例
    + 30).demo_file_sec: 自行实现的图片下载示例

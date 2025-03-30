@@ -163,6 +163,7 @@ following scenarios are currently supported:
    - 16).demo_item_loader_two: Deleted, you can view demo_item_loader, it is very convenient to use Item Loaders.
 
    + 18).demo_mq: Template example of storing data in RabbitMQ.
+   + 35).demo_mq_async: Asynchronous template example of storing data in RabbitMQ.
    + 19).demo_kafka: Template example of storing data in Kafka.
    + 20).demo_file: Example of using this library pipeline to download images and other files to local.
    + 30).demo_file_sec: Self-implemented image download example.

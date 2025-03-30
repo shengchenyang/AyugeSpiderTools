@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.11.2 (Preview: TBD)
+AyugeSpiderTools 3.11.3 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,32 @@ AyugeSpiderTools 3.11.2 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.11.2 (2025-03-30)
+====================================
+
+New features
+------------
+
+- 添加 mq(aio-pika) 的 async 管道模版示例。请在 DemoSpider 中 demo_mq_async 或文档中查看具体使用方法。
+
+  (:commit:`674bee7e0cdf18bf4259d4565cd4eaa291b49584`)
+
+- 添加 mq(pika) 管道的集群支持。
+
+  (:commit:`1519296eef3df55d2c2a3b9a1273e50500afc075`)
+
+
+Code optimizations
+------------------
+
+- mq pipeline 场景下的 .conf [mq] 部分配置更清晰。
+
+  (:commit:`5298b94973721a6ce984e54c35f9c21316d6168e`)
+
+- 固定 ci 的依赖库版本，使测试更稳定。
+
+  (:commit:`ba0ed58dc783c8bf210edaa03b1fdc8c16b3e911`)
 
 AyugeSpiderTools 3.11.1 (2025-01-31)
 ====================================
