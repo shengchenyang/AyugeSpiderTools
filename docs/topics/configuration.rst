@@ -159,7 +159,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 [mq]
 ====
 
-推送到 RabbitMQ 场景所需的参数。以下配置参数与 `pika`_ 中一致，请自行对照查看。
+推送到 RabbitMQ 场景所需的参数。以下配置参数与 `pika`_ 和 `aio-pika`_ 中一致，请自行对照查看。
 
 .. csv-table::
    :header: "参数名", "参数备注", "描述"
@@ -171,8 +171,15 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "routing_key", "_", "_"
    "username", "可选，默认 guest", "_"
    "password", "可选，默认 guest", "_"
-   "host", "可选，默认 localhost", "_"
+   "host", "可选，默认 localhost", "若有多个，用逗号分隔。比如 x.x.x.x,y.y.y.y"
    "port", "可选，默认 5672", "_"
+
+.. warning::
+
+   在 ayugespidertools 版本 3.11.2 及以上，只有 AyuMQPipeline (pika) 才支持 host 通过 , 分割来\
+   适配集群模式；而 AyuAsyncMQPipeline (aio-pika) 的场景不支持以逗号分隔的 host 参数，若需要集群支\
+   持请查看 aio-pika 文档。为了通用性，你可以将 AyuMQPipeline 的集群模式设置的和 AyuAsyncMQPipeline \
+   一样。
 
 .. note::
 
@@ -209,7 +216,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    host=localhost
    port=5672
 
-如果 ayugespidertools 版本在 3.11.1 以上，需要的配置更简约，示例如下：
+如果 ayugespidertools 版本在 3.11.2 及以上，需要的配置更简约，示例如下：
 
 .. code-block:: ini
 
@@ -349,4 +356,5 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 .. _Nacos: https://nacos.io
 .. _Consul: https://consul.io
 .. _pika: https://pika.readthedocs.io/en/stable/
+.. _aio-pika: https://docs.aio-pika.com/
 .. _kafka-python: https://kafka-python.readthedocs.io/en/master/
