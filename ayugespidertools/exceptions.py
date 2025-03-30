@@ -18,6 +18,12 @@ class NotConfigured(Exception):
     ...
 
 
+class UnsupportedError(Exception):
+    """Unsupported operation or configuration"""
+
+    ...
+
+
 class AyugeSpiderToolsDeprecationWarning(Warning):
     """Warning category for deprecated features"""
 

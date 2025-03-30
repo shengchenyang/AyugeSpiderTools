@@ -7,6 +7,7 @@ import aio_pika
 from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.exceptions import UnsupportedError
 
 __all__ = [
     "AyuAsyncMQPipeline",
@@ -34,6 +35,11 @@ class AyuAsyncMQPipeline:
         return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider: AyuSpider) -> None:
+        if "," in self.mq_conf.host:
+            raise UnsupportedError(
+                "The host parameter in AyuAsyncMQPipeline cannot contain commas. "
+                "Modify the host parameter in the [mq] section of the .conf file."
+            )
         self.connection = await aio_pika.connect_robust(
             host=self.mq_conf.host,
             port=self.mq_conf.port,
