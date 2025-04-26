@@ -34,12 +34,13 @@ if TYPE_CHECKING:
 class MysqlPipeEnhanceMixin:
     """扩展 mysql pipelines 的功能"""
 
+    @staticmethod
     @retry(
         stop_max_attempt_number=Param.retry_num,
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(self, mysql_conf: MysqlConf) -> PymysqlConnection:
+    def _connect(mysql_conf: MysqlConf) -> PymysqlConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -73,8 +74,9 @@ class MysqlPipeEnhanceMixin:
             return conn
         return pymysql.connect(**pymysql_conn_args)
 
+    @staticmethod
     def _get_sql_by_item(
-        self, table: str, item: dict[str, Any], odku_enable: bool = True
+        table: str, item: dict[str, Any], odku_enable: bool = True
     ) -> tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
@@ -98,7 +100,8 @@ class MysqlPipeEnhanceMixin:
             args = tuple(item.values())
         return sql, args
 
-    def _get_log_by_spider(self, spider, crawl_time):
+    @staticmethod
+    def _get_log_by_spider(spider, crawl_time):
         """获取 spider 的运行日志情况
 
         Args:
@@ -178,12 +181,13 @@ class MysqlPipeEnhanceMixin:
 class PostgreSQLPipeEnhanceMixin:
     """扩展 postgresql pipelines 的功能"""
 
+    @staticmethod
     @retry(
         stop_max_attempt_number=Param.retry_num,
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(self, postgres_conf: PostgreSQLConf) -> PsycopgConnection:
+    def _connect(postgres_conf: PostgreSQLConf) -> PsycopgConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
             2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
@@ -222,7 +226,8 @@ class PostgreSQLPipeEnhanceMixin:
             dbname=postgres_conf.database,
         )
 
-    def _get_sql_by_item(self, table: str, item: dict[str, Any]) -> str:
+    @staticmethod
+    def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
         """根据处理后的 item 生成 postgresql 插入语句
 
         Args:
@@ -240,12 +245,13 @@ class PostgreSQLPipeEnhanceMixin:
 class OraclePipeEnhanceMixin:
     """扩展 oracle pipelines 的功能"""
 
+    @staticmethod
     @retry(
         stop_max_attempt_number=Param.retry_num,
         wait_random_min=Param.retry_time_min,
         wait_random_max=Param.retry_time_max,
     )
-    def _connect(self, oracle_conf: OracleConf) -> OracleConnection:
+    def _connect(oracle_conf: OracleConf) -> OracleConnection:
         """链接数据库返回链接句柄
 
         Args:
@@ -266,7 +272,8 @@ class OraclePipeEnhanceMixin:
             encoding=oracle_conf.encoding,
         )
 
-    def _get_sql_by_item(self, table: str, item: dict[str, Any]) -> str:
+    @staticmethod
+    def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
         """根据处理后的 item 生成 oracle 插入语句
 
         Args:
