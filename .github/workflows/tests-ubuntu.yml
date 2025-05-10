@@ -20,11 +20,11 @@ jobs:
         RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
       run: |
         sudo apt-get update
-        sudo apt-get install libxml2-dev libxslt-dev
+        sudo apt-get install libxml2-dev libxslt-dev libjpeg-dev
         pip install -U poetry tox
         tox
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
