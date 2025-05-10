@@ -47,13 +47,15 @@ all = [
     "oracledb (>=1.4.2,<2.0.0)",
     "elasticsearch-dsl (>=8.11.0,<9.0.0)",
     "oss2 (>=2.18.4,<3.0.0)",
-    "aio-pika (==9.4.2)"
+    "aio-pika (==9.4.2)",
+    "redis (==5.2.1)"
 ]
 database = [
     "psycopg[binary,pool] (<=3.1.13)",
     "oracledb (>=1.4.2,<2.0.0)",
     "elasticsearch-dsl (>=8.11.0,<9.0.0)",
-    "aio-pika (==9.4.2)"
+    "aio-pika (==9.4.2)",
+    "redis (==5.2.1)"
 ]
 
 [tool.poetry]
@@ -113,13 +115,18 @@ replace = '__version__ = "{new_version}"'
 
 [tool.pytest.ini_options]
 xfail_strict = true
-python_files = "test_*.py __init__.py"
-python_classes = "Test*"
+python_files = ["test_*.py", "__init__.py"]
+python_classes = ["Test*"]
 testpaths = [
     "tests",
 ]
 norecursedirs = ["dist", "build", "docs", "examples"]
-addopts = "--assert=plain --doctest-modules --reactor=asyncio"
+addopts = [
+    "--assert=plain",
+    "--doctest-modules",
+    "--reactor=asyncio",
+    "--ignore=docs",
+]
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore:scrapy.downloadermiddlewares.decompression is deprecated",

@@ -7,7 +7,7 @@ description = "Wrapper around the aiormq for asyncio and humans"
 optional = true
 python-versions = "<4.0,>=3.8"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and extra == \"database\""
+markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\""
 files = [
     {file = "aio_pika-9.4.2-py3-none-any.whl", hash = "sha256:22e5fa27d10a3817dd24c031cc477953aaf7c3be5f4f25d2582a55ec229adc4c"},
     {file = "aio_pika-9.4.2.tar.gz", hash = "sha256:d1217dc28d09be9dff96c06cdf2e82c92599a34f154e8932bf35373157f3424d"},
@@ -171,7 +171,7 @@ description = "Pure python AMQP asynchronous client library"
 optional = true
 python-versions = "<4.0,>=3.8"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and extra == \"database\""
+markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\""
 files = [
     {file = "aiormq-6.8.1-py3-none-any.whl", hash = "sha256:5da896c8624193708f9409ffad0b20395010e2747f22aa4150593837f40aa017"},
     {file = "aiormq-6.8.1.tar.gz", hash = "sha256:a964ab09634be1da1f9298ce225b310859763d5cf83ef3a7eae1a6dc6bd1da1a"},
@@ -249,7 +249,7 @@ description = "Timeout context manager for asyncio programs"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.9\" or python_version == \"3.10\" or platform_system == \"Linux\" and python_version <= \"3.10\" and platform_machine == \"aarch64\""
+markers = "python_version == \"3.9\" or extra == \"all\" and python_full_version < \"3.11.3\" or python_version == \"3.10\" or platform_system == \"Linux\" and python_version <= \"3.10\" and platform_machine == \"aarch64\""
 files = [
     {file = "async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c"},
     {file = "async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3"},
@@ -2185,7 +2185,7 @@ description = "RabbitMQ Focused AMQP low-level library"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and extra == \"database\""
+markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\""
 files = [
     {file = "pamqp-3.3.0-py2.py3-none-any.whl", hash = "sha256:c901a684794157ae39b52cbf700db8c9aae7a470f13528b9d7b4e5f7202f8eb0"},
     {file = "pamqp-3.3.0.tar.gz", hash = "sha256:40b8795bd4efcf2b0f8821c1de83d12ca16d5760f4507836267fd7a02b06763b"},
@@ -3043,6 +3043,26 @@ files = [
     {file = "queuelib-1.7.0-py2.py3-none-any.whl", hash = "sha256:b07aaa2410caac3a0021ee4f4026acdac992b0fb9a2cbeb34a918617df3c12a7"},
     {file = "queuelib-1.7.0.tar.gz", hash = "sha256:2855162096cf0230510890b354379ea1c0ff19d105d3147d349d2433bb222b08"},
 ]
+
+[[package]]
+name = "redis"
+version = "5.2.1"
+description = "Python client for Redis database and key-value store"
+optional = true
+python-versions = ">=3.8"
+groups = ["main"]
+markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\" and extra == \"all\""
+files = [
+    {file = "redis-5.2.1-py3-none-any.whl", hash = "sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4"},
+    {file = "redis-5.2.1.tar.gz", hash = "sha256:16f2e22dff21d5125e8481515e386711a34cbec50f0e44413dd7d9c060a54e0f"},
+]
+
+[package.dependencies]
+async-timeout = {version = ">=4.0.3", markers = "python_full_version < \"3.11.3\""}
+
+[package.extras]
+hiredis = ["hiredis (>=3.0.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==23.2.1)", "requests (>=2.31.0)"]
 
 [[package]]
 name = "requests"
@@ -3988,10 +4008,10 @@ test = ["coverage[toml]", "zope.event", "zope.testing"]
 testing = ["coverage[toml]", "zope.event", "zope.testing"]
 
 [extras]
-all = ["aio-pika", "elasticsearch-dsl", "mmh3", "numpy", "opencv-python", "oracledb", "oss2", "pillow", "psycopg", "pycryptodome", "python-hcl2", "pyyaml"]
-database = ["aio-pika", "elasticsearch-dsl", "oracledb", "psycopg"]
+all = ["aio-pika", "elasticsearch-dsl", "mmh3", "numpy", "opencv-python", "oracledb", "oss2", "pillow", "psycopg", "pycryptodome", "python-hcl2", "pyyaml", "redis"]
+database = ["aio-pika", "elasticsearch-dsl", "oracledb", "psycopg", "redis"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "26301afb89c36a7915666a0f6d5ced90ea21d9af425520b55d414fd11c58667d"
+content-hash = "cb0a7c84a5ff32729ed28ef94cb5100a1975a1b505dc23b5c45a45f31608296c"
