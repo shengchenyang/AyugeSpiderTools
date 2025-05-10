@@ -14,7 +14,7 @@ from scrapy.utils.test import get_testenv
 from twisted.trial import unittest
 
 
-class ProjectTest(unittest.TestCase):
+class TestProjectBase(unittest.TestCase):
     project_name = "testproject"
 
     def setUp(self):
@@ -71,7 +71,7 @@ class ProjectTest(unittest.TestCase):
         return None
 
 
-class CommandTest(ProjectTest):
+class TestCommandBase(TestProjectBase):
     def setUp(self):
         super().setUp()
         self.call("startproject", self.project_name)
@@ -79,7 +79,7 @@ class CommandTest(ProjectTest):
         self.env["SCRAPY_SETTINGS_MODULE"] = f"{self.project_name}.settings"
 
 
-class CrawlCommandTest(CommandTest):
+class TestCrawlCommand(TestCommandBase):
     def crawl(self, code, args=()):
         Path(self.proj_mod_path, "spiders", "myspider.py").write_text(
             code, encoding="utf-8"
@@ -103,9 +103,10 @@ class MySpider(AyuSpider):
         "LOG_FILE": None,
     }
 
-    def start_requests(self):
+    async def start(self):
         self.logger.debug("It works!")
-        return []
+        return
+        yield
 """
         log = self.get_log(spider_code)
-        self.assertIn("[myspider] DEBUG: It works!", log)
+        assert "[myspider] DEBUG: It works!" in log

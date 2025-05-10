@@ -1,9 +1,9 @@
-import inspect
 import unittest
 import warnings
 from unittest import mock
 
 import loguru
+import pytest
 from scrapy import signals
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
@@ -29,21 +29,18 @@ class SpiderTest(unittest.TestCase):
         assert spider.name == "example.com"
         assert spider.start_urls == []
 
-    def test_start_requests(self):
-        spider = self.spider_class("example.com")
-        start_requests = spider.start_requests()
-        self.assertTrue(inspect.isgenerator(start_requests))
-        self.assertEqual(list(start_requests), [])
-
     def test_spider_args(self):
         """``__init__`` method arguments are assigned to spider attributes"""
         spider = self.spider_class("example.com", foo="bar")
-        self.assertEqual(spider.foo, "bar")
+        assert spider.foo == "bar"
 
     def test_spider_without_name(self):
         """``__init__`` method arguments are assigned to spider attributes"""
-        self.assertRaises(ValueError, self.spider_class)
-        self.assertRaises(ValueError, self.spider_class, somearg="foo")
+        msg = "must have a name"
+        with pytest.raises(ValueError, match=msg):
+            self.spider_class()
+        with pytest.raises(ValueError, match=msg):
+            self.spider_class(somearg="foo")
 
     def test_from_crawler_crawler_and_settings_population(self):
         crawler = get_crawler()

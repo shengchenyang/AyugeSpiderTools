@@ -113,7 +113,7 @@ class DemoAiohttpSpider(SimpleSpider):
     _ar_ck = {"ck_key": "ck"}
     _post_data = {"post_key1": "post_value1", "post_key2": "post_value2"}
 
-    def start_requests(self):
+    async def start(self):
         # GET normal 示例
         yield AiohttpRequest(
             url=self._get_url,

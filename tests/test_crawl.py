@@ -16,12 +16,14 @@ class TestCrawl(TestCase):
     spider_class = AyuSpider
     scrapy_spider_class = Spider
 
-    def setUp(self):
-        self.mockserver = MockServer()
-        self.mockserver.__enter__()
+    @classmethod
+    def setUpClass(cls):
+        cls.mockserver = MockServer()
+        cls.mockserver.__enter__()
 
-    def tearDown(self):
-        self.mockserver.__exit__(None, None, None)
+    @classmethod
+    def tearDownClass(cls):
+        cls.mockserver.__exit__(None, None, None)
 
     @defer.inlineCallbacks
     def _run_spider(self, spider_cls):
@@ -48,14 +50,14 @@ class TestCrawl(TestCase):
         """测试从爬虫 AyugeSpider(即 spider) 中记录日志到 mysql 的方法"""
         log, _, stats = yield self._run_spider(RecordLogToMysqlSpider)
         # 此测试会经过 test_table_exists 检测目标数据表是否已存在
-        self.assertIn("Got response 200", str(log))
+        assert "Got response 200" in str(log)
 
     @defer.inlineCallbacks
     def test_DemoAiohttpSpider(self):
         """测试 DemoAiohttpSpider 的 aiohttp 下载器功能"""
         log, _, stats = yield self._run_spider(DemoAiohttpSpider)
-        self.assertIn("get meta_data: ", str(log))
-        self.assertIn("post first meta_data: ", str(log))
+        assert "get meta_data: " in str(log)
+        assert "post first meta_data: " in str(log)
 
 
 def test_table_exists(mysql_db_cursor):

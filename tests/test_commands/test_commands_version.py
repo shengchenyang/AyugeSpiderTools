@@ -4,12 +4,12 @@ from io import StringIO
 from pathlib import Path
 
 import toml
-from scrapy.utils.testproc import ProcessTest
 from twisted.internet import defer
 from twisted.trial import unittest
 
 from ayugespidertools.commands.version import AyuCommand
 from ayugespidertools.config import NormalConfig
+from tests.utils.testproc import ProcessTest
 
 ProcessTest.prefix = [sys.executable, "-m", "ayugespidertools.utils.cmdline"]
 
@@ -25,7 +25,7 @@ def test_version():
     assert cmd.short_desc() == "Print AyugeSpiderTools version"
 
 
-class VersionTest(ProcessTest, unittest.TestCase):
+class TestVersionCommand(ProcessTest, unittest.TestCase):
     command = "version"
 
     @staticmethod
@@ -38,7 +38,4 @@ class VersionTest(ProcessTest, unittest.TestCase):
     def test_output(self):
         encoding = getattr(sys.stdout, "encoding") or "utf-8"
         _, out, _ = yield self.execute([])
-        self.assertEqual(
-            out.strip().decode(encoding),
-            f"AyugeSpiderTools {self._version()}",
-        )
+        assert out.strip().decode(encoding) == f"AyugeSpiderTools {self._version()}"

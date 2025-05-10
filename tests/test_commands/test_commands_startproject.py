@@ -2,15 +2,15 @@ import sys
 from pathlib import Path
 from tempfile import mkdtemp
 
-from tests.test_commands.test_commands_crawl import ProjectTest
+from tests.test_commands.test_commands_crawl import TestProjectBase
 
 
-class StartprojectTest(ProjectTest):
+class TestStartprojectCommand(TestProjectBase):
     def test_startproject(self):
         p, out, err = self.proc("startproject", self.project_name)
         print(out)
         print(err, file=sys.stderr)
-        self.assertEqual(p.returncode, 0)
+        assert p.returncode == 0
 
         assert Path(self.proj_path, "scrapy.cfg").exists()
         assert Path(self.proj_path, "testproject").exists()
@@ -20,13 +20,13 @@ class StartprojectTest(ProjectTest):
         assert Path(self.proj_mod_path, "settings.py").exists()
         assert Path(self.proj_mod_path, "spiders", "__init__.py").exists()
 
-        self.assertEqual(1, self.call("startproject", self.project_name))
-        self.assertEqual(1, self.call("startproject", "wrong---project---name"))
-        self.assertEqual(1, self.call("startproject", "sys"))
+        assert self.call("startproject", self.project_name) == 1
+        assert self.call("startproject", "wrong---project---name") == 1
+        assert self.call("startproject", "sys") == 1
 
     def test_startproject_with_project_dir(self):
         project_dir = mkdtemp()
-        self.assertEqual(0, self.call("startproject", self.project_name, project_dir))
+        assert self.call("startproject", self.project_name, project_dir) == 0
 
         assert Path(project_dir, "scrapy.cfg").exists()
         assert Path(project_dir, "testproject").exists()
@@ -36,20 +36,16 @@ class StartprojectTest(ProjectTest):
         assert Path(project_dir, self.project_name, "settings.py").exists()
         assert Path(project_dir, self.project_name, "spiders", "__init__.py").exists()
 
-        self.assertEqual(
-            0, self.call("startproject", self.project_name, project_dir + "2")
-        )
+        assert self.call("startproject", self.project_name, project_dir + "2") == 0
 
-        self.assertEqual(1, self.call("startproject", self.project_name, project_dir))
-        self.assertEqual(
-            1, self.call("startproject", self.project_name + "2", project_dir)
-        )
-        self.assertEqual(1, self.call("startproject", "wrong---project---name"))
-        self.assertEqual(1, self.call("startproject", "sys"))
-        self.assertEqual(2, self.call("startproject"))
-        self.assertEqual(
-            2,
-            self.call("startproject", self.project_name, project_dir, "another_params"),
+        assert self.call("startproject", self.project_name, project_dir) == 1
+        assert self.call("startproject", self.project_name + "2", project_dir) == 1
+        assert self.call("startproject", "wrong---project---name") == 1
+        assert self.call("startproject", "sys") == 1
+        assert self.call("startproject") == 2
+        assert (
+            self.call("startproject", self.project_name, project_dir, "another_params")
+            == 2
         )
 
     def test_existing_project_dir(self):
@@ -61,7 +57,7 @@ class StartprojectTest(ProjectTest):
         p, out, err = self.proc("startproject", project_name, cwd=project_dir)
         print(out)
         print(err, file=sys.stderr)
-        self.assertEqual(p.returncode, 0)
+        assert p.returncode == 0
 
         assert Path(project_path, "scrapy.cfg").exists()
         assert Path(project_path, project_name).exists()
@@ -76,4 +72,4 @@ class StartprojectTest(ProjectTest):
         p, out, err = self.proc("startproject", project_name)
         print(out)
         print(err, file=sys.stderr)
-        self.assertEqual(p.returncode, 1)
+        assert p.returncode == 1
