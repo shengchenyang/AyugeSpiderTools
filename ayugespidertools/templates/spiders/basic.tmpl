@@ -1,28 +1,41 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
+from ayugespidertools.utils.database import MysqlAsyncPortal
 from scrapy.http import Request
-from sqlalchemy import text
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from aiomysql import Pool
+    from scrapy.http.response import Response
 
 
 class $classname(AyuSpider):
+    # 可用于入库前查询使用等场景
+    mysql_conn_pool: Pool
+
     name = "$name"
     allowed_domains = ["$domain"]
     start_urls = ["$url"]
     custom_settings = {
-        "DATABASE_ENGINE_ENABLED": True,
         "ITEM_PIPELINES": {
             "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
             "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
         },
     }
 
-    def start_requests(self):
+    async def start(self) -> AsyncIterator[Any]:
+        self.mysql_conn_pool = await MysqlAsyncPortal(db_conf=self.mysql_conf).connect()
         yield Request(
             url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
         )
 
-    def parse_first(self, response):
+    async def parse_first(self, response: Response) -> Any:
         _save_table = "_octree_info"
 
         li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
@@ -39,26 +52,13 @@ class $classname(AyuSpider):
             )
             self.slog.info(f"octree_item: {octree_item}")
 
-            # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
-            # 此时更适合：
-            #    1.mysql 添加唯一索引去重（结合 odku_enable 配置，本库会根据 on duplicate key update 更新），
-            #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
-            #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择;
-            #    3.同时存储多个数据库场景更推荐使用第三方去重来统一管理，比如 scrapy-redis，布隆过滤等。
-            # 这里只是为了介绍使用 mysql_engine_conn 来对 mysql 去重的方法。
-            if self.mysql_engine_conn:
-                try:
-                    _sql = text(
-                        f"select `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
+            # 使用此方法时需要提前建库建表
+            async with self.mysql_conn_pool.acquire() as conn:
+                async with conn.cursor() as cursor:
+                    exists = await cursor.execute(
+                        f"SELECT `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
                     )
-                    result = self.mysql_engine_conn.execute(_sql).fetchone()
-                    if not result:
-                        self.mysql_engine_conn.rollback()
+                    if not exists:
                         yield octree_item
                     else:
                         self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
-                except Exception as e:
-                    self.mysql_engine_conn.rollback()
-                    yield octree_item
-            else:
-                yield octree_item
