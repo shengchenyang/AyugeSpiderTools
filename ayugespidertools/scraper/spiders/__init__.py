@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import time
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -23,7 +24,10 @@ from ayugespidertools.common.spiderconf import (
     get_sqlalchemy_conf,
 )
 from ayugespidertools.config import logger
-from ayugespidertools.exceptions import NotConfigured
+from ayugespidertools.exceptions import (
+    AyugeSpiderToolsDeprecationWarning,
+    NotConfigured,
+)
 
 __all__ = [
     "AyuSpider",
@@ -115,6 +119,12 @@ class AyuSpider(Spider):
     def from_crawler(cls, crawler: Crawler, *args: Any, **kwargs: Any) -> Self:
         spider = super().from_crawler(crawler, *args, **kwargs)
         _db_engine_enabled = crawler.settings.get("DATABASE_ENGINE_ENABLED", False)
+        if _db_engine_enabled:
+            warnings.warn(
+                "parameter 'DATABASE_ENGINE_ENABLED' is deprecated, use 'ayugespidertools.utils.database' instead",
+                category=AyugeSpiderToolsDeprecationWarning,
+                stacklevel=2,
+            )
 
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
         # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
