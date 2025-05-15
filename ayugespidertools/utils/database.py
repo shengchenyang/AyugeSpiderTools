@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import threading
+import urllib.parse
 from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar
 
 import aiomysql
@@ -24,6 +25,7 @@ from ayugespidertools.mongoclient import MongoDbBase
 try:
     import oracledb
     import psycopg
+    from motor.motor_asyncio import AsyncIOMotorClient
 except ImportError:
     # pip install ayugespidertools[database]
     pass
@@ -32,6 +34,7 @@ __all__ = [
     "MysqlPortal",
     "MysqlAsyncPortal",
     "MongoDBPortal",
+    "MongoDBAsyncPortal",
     "OraclePortal",
     "PostgreSQLPortal",
     "PostgreSQLAsyncPortal",
@@ -40,6 +43,7 @@ __all__ = [
 
 if TYPE_CHECKING:
     from aiomysql import Pool
+    from motor.motor_asyncio import AsyncIOMotorDatabase
 
 DataBaseConf = TypeVar(
     "DataBaseConf",
@@ -52,6 +56,8 @@ DataBaseConf = TypeVar(
     OssConf,
     PostgreSQLConf,
 )
+
+T = TypeVar("T")
 
 
 def unique_key(data: dict | NamedTuple, referer: str, tag) -> str:
@@ -69,16 +75,18 @@ def unique_key(data: dict | NamedTuple, referer: str, tag) -> str:
     return hashlib.sha1(final_str.encode("utf-8")).hexdigest()
 
 
-class PortalSingletonMeta(type, Generic[DataBaseConf]):
-    _instances: dict[str, DataBaseConf] = {}
+class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
+    _instances: dict[str, T] = {}
     _lock = threading.Lock()
 
-    def __call__(cls, db_conf: DataBaseConf, tag: str = "default", *args, **kwargs):
+    def __call__(
+        cls: type[T], db_conf: DataBaseConf, tag: str = "default", *args, **kwargs
+    ) -> T:
         unique_id = unique_key(data=db_conf, referer=cls.__name__, tag=tag)
         if unique_id not in cls._instances:
             with cls._lock:
                 if unique_id not in cls._instances:
-                    instance = super().__call__(db_conf, *args, **kwargs)
+                    instance = super().__call__(db_conf, tag, *args, **kwargs)  # type: ignore[misc]
                     cls._instances[unique_id] = instance
         return cls._instances[unique_id]
 
@@ -139,6 +147,24 @@ class MongoDBPortal(metaclass=PortalSingletonMeta):
 
     def connect(self):
         return self.conn
+
+
+class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
+    def __init__(self, db_conf: MongoDBConf, tag: str = "default"):
+        if db_conf.uri is not None:
+            _mongo_uri = db_conf.uri
+        else:
+            _encoded_pwd = urllib.parse.quote_plus(db_conf.password)
+            _mongo_uri = (
+                f"mongodb://{db_conf.user}:{_encoded_pwd}@{db_conf.host}:{db_conf.port}/"
+                f"{db_conf.database}?authSource={db_conf.authsource}"
+                f"&authMechanism={db_conf.authMechanism}"
+            )
+        self.client: AsyncIOMotorClient = AsyncIOMotorClient(_mongo_uri)
+        self.db: AsyncIOMotorDatabase = self.client.get_database()
+
+    def connect(self) -> AsyncIOMotorClient:
+        return self.client
 
 
 class RabbitMQPortal(metaclass=PortalSingletonMeta):
