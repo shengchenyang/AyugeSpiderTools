@@ -3,16 +3,15 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-import pymysql
 from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
 from ayugespidertools.config import logger
+from ayugespidertools.utils.database import MysqlPortal, PostgreSQLPortal
 
 try:
     import oracledb
-    import psycopg
 except ImportError:
     # pip install ayugespidertools[database]
     pass
@@ -51,16 +50,8 @@ class MysqlPipeEnhanceMixin:
         Returns:
             1). mysql 链接句柄
         """
-        pymysql_conn_args = {
-            "user": mysql_conf.user,
-            "password": mysql_conf.password,
-            "host": mysql_conf.host,
-            "port": mysql_conf.port,
-            "database": mysql_conf.database,
-            "charset": mysql_conf.charset,
-        }
         try:
-            conn = pymysql.connect(**pymysql_conn_args)
+            conn = MysqlPortal(db_conf=mysql_conf, tag="ayuge").connect()
         except Exception as e:
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
@@ -72,7 +63,7 @@ class MysqlPipeEnhanceMixin:
                 logger.error(f"connect to mysql failed: {e}")
         else:
             return conn
-        return pymysql.connect(**pymysql_conn_args)
+        return MysqlPortal(db_conf=mysql_conf, tag="ayuge").connect()
 
     @staticmethod
     def _get_sql_by_item(
@@ -199,13 +190,7 @@ class PostgreSQLPipeEnhanceMixin:
             1). postgresql 链接句柄
         """
         try:
-            conn = psycopg.connect(
-                user=postgres_conf.user,
-                password=postgres_conf.password,
-                host=postgres_conf.host,
-                port=postgres_conf.port,
-                dbname=postgres_conf.database,
-            )
+            conn = PostgreSQLPortal(db_conf=postgres_conf, tag="ayuge").connect()
         except Exception as e:
             # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
             if "failed" in str(e).lower():
@@ -217,14 +202,7 @@ class PostgreSQLPipeEnhanceMixin:
                 logger.error(f"connect to postgresql failed: {e}")
         else:
             return conn
-
-        return psycopg.connect(
-            user=postgres_conf.user,
-            password=postgres_conf.password,
-            host=postgres_conf.host,
-            port=postgres_conf.port,
-            dbname=postgres_conf.database,
-        )
+        return PostgreSQLPortal(db_conf=postgres_conf, tag="ayuge").connect()
 
     @staticmethod
     def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
