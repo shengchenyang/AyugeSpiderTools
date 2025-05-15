@@ -27,11 +27,11 @@ class AyuAsyncMongoPipeline:
             _mongo_uri = spider.mongodb_conf.uri
         else:
             _encoded_pwd = urllib.parse.quote_plus(spider.mongodb_conf.password)
-            _mongo_uri = (  # type: ignore
+            _mongo_uri = (
                 f"mongodb://{spider.mongodb_conf.user}:{_encoded_pwd}"
                 f"@{spider.mongodb_conf.host}:{spider.mongodb_conf.port}/"
                 f"{spider.mongodb_conf.database}?authSource={spider.mongodb_conf.authsource}"
-                f"&authMechanism={spider.mongodb_conf.authMechanism}",
+                f"&authMechanism={spider.mongodb_conf.authMechanism}"
             )
 
         self.client = motor.motor_asyncio.AsyncIOMotorClient(_mongo_uri)

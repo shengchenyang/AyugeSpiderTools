@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar
 
 import aiomysql
 import pymysql
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import (
@@ -25,7 +26,6 @@ from ayugespidertools.mongoclient import MongoDbBase
 try:
     import oracledb
     import psycopg
-    from motor.motor_asyncio import AsyncIOMotorClient
 except ImportError:
     # pip install ayugespidertools[database]
     pass
