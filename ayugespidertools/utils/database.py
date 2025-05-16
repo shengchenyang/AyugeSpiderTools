@@ -45,6 +45,7 @@ __all__ = [
 if TYPE_CHECKING:
     from aiomysql import Pool
     from motor.motor_asyncio import AsyncIOMotorDatabase
+    from pymongo import MongoClient, database
 
 DataBaseConf = TypeVar(
     "DataBaseConf",
@@ -148,10 +149,13 @@ class ElasticSearchPortal(metaclass=PortalSingletonMeta):
 
 class MongoDBPortal(metaclass=PortalSingletonMeta):
     def __init__(self, db_conf: MongoDBConf, tag: PortalTag = PortalTag.DEFAULT):
-        self.conn, self.db = MongoDbBase.connects(**db_conf._asdict())
+        self.client, self.db = MongoDbBase.connects(**db_conf._asdict())
 
-    def connect(self):
-        return self.conn
+    def get_client(self) -> MongoClient:
+        return self.client
+
+    def connect(self) -> database.Database:
+        return self.db
 
 
 class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
@@ -168,8 +172,11 @@ class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
         self.client: AsyncIOMotorClient = AsyncIOMotorClient(_mongo_uri)
         self.db: AsyncIOMotorDatabase = self.client.get_database()
 
-    def connect(self) -> AsyncIOMotorClient:
+    def get_client(self) -> AsyncIOMotorClient:
         return self.client
+
+    def connect(self) -> AsyncIOMotorDatabase:
+        return self.db
 
 
 class RabbitMQPortal(metaclass=PortalSingletonMeta):
