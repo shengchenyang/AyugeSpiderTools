@@ -7,6 +7,7 @@ from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
+from ayugespidertools.common.typevars import PortalTag
 from ayugespidertools.config import logger
 from ayugespidertools.utils.database import MysqlPortal, PostgreSQLPortal
 
@@ -51,7 +52,7 @@ class MysqlPipeEnhanceMixin:
             1). mysql 链接句柄
         """
         try:
-            conn = MysqlPortal(db_conf=mysql_conf, tag="ayuge").connect()
+            conn = MysqlPortal(db_conf=mysql_conf, tag=PortalTag.LIBRARY).connect()
         except Exception as e:
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
@@ -63,7 +64,7 @@ class MysqlPipeEnhanceMixin:
                 logger.error(f"connect to mysql failed: {e}")
         else:
             return conn
-        return MysqlPortal(db_conf=mysql_conf, tag="ayuge").connect()
+        return MysqlPortal(db_conf=mysql_conf, tag=PortalTag.LIBRARY).connect()
 
     @staticmethod
     def _get_sql_by_item(
@@ -190,7 +191,9 @@ class PostgreSQLPipeEnhanceMixin:
             1). postgresql 链接句柄
         """
         try:
-            conn = PostgreSQLPortal(db_conf=postgres_conf, tag="ayuge").connect()
+            conn = PostgreSQLPortal(
+                db_conf=postgres_conf, tag=PortalTag.LIBRARY
+            ).connect()
         except Exception as e:
             # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
             if "failed" in str(e).lower():
@@ -202,7 +205,7 @@ class PostgreSQLPipeEnhanceMixin:
                 logger.error(f"connect to postgresql failed: {e}")
         else:
             return conn
-        return PostgreSQLPortal(db_conf=postgres_conf, tag="ayuge").connect()
+        return PostgreSQLPortal(db_conf=postgres_conf, tag=PortalTag.LIBRARY).connect()
 
     @staticmethod
     def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:

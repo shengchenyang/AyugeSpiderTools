@@ -8,6 +8,8 @@ from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.typevars import PortalTag
+from ayugespidertools.utils.database import MysqlAsyncPortal
 
 __all__ = [
     "AyuAsyncMysqlPipeline",
@@ -32,16 +34,9 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
         return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider: AyuSpider) -> None:
-        self.pool = await aiomysql.create_pool(
-            host=self.mysql_conf.host,
-            port=self.mysql_conf.port,
-            user=self.mysql_conf.user,
-            password=self.mysql_conf.password,
-            db=self.mysql_conf.database,
-            charset=self.mysql_conf.charset,
-            cursorclass=aiomysql.DictCursor,
-            autocommit=True,
-        )
+        self.pool = await MysqlAsyncPortal(
+            db_conf=self.mysql_conf, tag=PortalTag.LIBRARY
+        ).connect()
 
     async def insert_item(self, item_dict: dict) -> None:
         async with self.pool.acquire() as conn:

@@ -34,6 +34,13 @@ MysqlEngineStr = Literal["InnoDB", "MyISAM", "MEMORY", "NDB", "ARCHIVE"]
 DataItemModeStr = Literal["normal", "namedtuple", "dict"]
 
 
+class PortalTag(str, Enum):
+    LIBRARY = "ayuge"
+    SCRAPY = "scrapy"
+    DEFAULT = "default"
+    OTHER = "other"
+
+
 class DatabaseSingletonMeta(type):
     _instances = {}
     _lock = threading.Lock()

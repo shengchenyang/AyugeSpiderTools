@@ -19,6 +19,7 @@ from ayugespidertools.common.typevars import (
     MysqlConf,
     OracleConf,
     OssConf,
+    PortalTag,
     PostgreSQLConf,
 )
 from ayugespidertools.mongoclient import MongoDbBase
@@ -60,7 +61,7 @@ DataBaseConf = TypeVar(
 T = TypeVar("T")
 
 
-def unique_key(data: dict | NamedTuple, referer: str, tag) -> str:
+def unique_key(data: dict | NamedTuple, referer: str, tag: PortalTag) -> str:
     if ReuseOperation.is_namedtuple_instance(data):
         data_dct = data._asdict()
         items = data_dct.items()
@@ -80,7 +81,11 @@ class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
     _lock = threading.Lock()
 
     def __call__(
-        cls: type[T], db_conf: DataBaseConf, tag: str = "default", *args, **kwargs
+        cls: type[T],
+        db_conf: DataBaseConf,
+        tag: PortalTag = PortalTag.DEFAULT,
+        *args,
+        **kwargs,
     ) -> T:
         unique_id = unique_key(data=db_conf, referer=cls.__name__, tag=tag)
         if unique_id not in cls._instances:
@@ -92,7 +97,7 @@ class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
 
 
 class MysqlPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: MysqlConf, tag: str = "default"):
+    def __init__(self, db_conf: MysqlConf, tag: PortalTag = PortalTag.DEFAULT):
         pymysql_conn_args = {
             "user": db_conf.user,
             "password": db_conf.password,
@@ -108,7 +113,7 @@ class MysqlPortal(metaclass=PortalSingletonMeta):
 
 
 class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: MysqlConf, tag: str = "default"):
+    def __init__(self, db_conf: MysqlConf, tag: PortalTag = PortalTag.DEFAULT):
         self.db_conf = db_conf
         self._pool: Pool | None = None
         self._lock = asyncio.Lock()
@@ -136,13 +141,13 @@ class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
 
 
 class ElasticSearchPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: ESConf, tag: str = "default"): ...
+    def __init__(self, db_conf: ESConf, tag: PortalTag = PortalTag.DEFAULT): ...
 
     def connect(self): ...
 
 
 class MongoDBPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: MongoDBConf, tag: str = "default"):
+    def __init__(self, db_conf: MongoDBConf, tag: PortalTag = PortalTag.DEFAULT):
         self.conn, self.db = MongoDbBase.connects(**db_conf._asdict())
 
     def connect(self):
@@ -150,7 +155,7 @@ class MongoDBPortal(metaclass=PortalSingletonMeta):
 
 
 class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: MongoDBConf, tag: str = "default"):
+    def __init__(self, db_conf: MongoDBConf, tag: PortalTag = PortalTag.DEFAULT):
         if db_conf.uri is not None:
             _mongo_uri = db_conf.uri
         else:
@@ -168,19 +173,19 @@ class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
 
 
 class RabbitMQPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: MQConf, tag: str = "default"): ...
+    def __init__(self, db_conf: MQConf, tag: PortalTag = PortalTag.DEFAULT): ...
 
     def connect(self): ...
 
 
 class KafkaPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: KafkaConf, tag: str = "default"): ...
+    def __init__(self, db_conf: KafkaConf, tag: PortalTag = PortalTag.DEFAULT): ...
 
     def connect(self): ...
 
 
 class OraclePortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: OracleConf, tag: str = "default"):
+    def __init__(self, db_conf: OracleConf, tag: PortalTag = PortalTag.DEFAULT):
         if oracle_thick_lib_dir := db_conf.thick_lib_dir:
             oracledb.init_oracle_client(oracle_thick_lib_dir)
 
@@ -198,13 +203,13 @@ class OraclePortal(metaclass=PortalSingletonMeta):
 
 
 class OSSPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: OssConf, tag: str = "default"): ...
+    def __init__(self, db_conf: OssConf, tag: PortalTag = PortalTag.DEFAULT): ...
 
     def connect(self): ...
 
 
 class PostgreSQLPortal(metaclass=PortalSingletonMeta):
-    def __init__(self, db_conf: PostgreSQLConf, tag: str = "default"):
+    def __init__(self, db_conf: PostgreSQLConf, tag: PortalTag = PortalTag.DEFAULT):
         self.conn = psycopg.connect(
             user=db_conf.user,
             password=db_conf.password,
