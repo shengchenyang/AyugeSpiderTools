@@ -135,21 +135,28 @@ class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
         self.db_conf = db_conf
         self._pool: Pool | None = None
         self._lock = asyncio.Lock()
+        self.singleton = singleton
+
+    async def _create_pool(self):
+        return await aiomysql.create_pool(
+            host=self.db_conf.host,
+            port=self.db_conf.port,
+            user=self.db_conf.user,
+            password=self.db_conf.password,
+            db=self.db_conf.database,
+            charset=self.db_conf.charset,
+            cursorclass=aiomysql.DictCursor,
+            autocommit=True,
+        )
 
     async def connect(self) -> Pool:
+        if not self.singleton:
+            return await self._create_pool()
+
         if self._pool is None:
             async with self._lock:
                 if self._pool is None:
-                    self._pool = await aiomysql.create_pool(
-                        host=self.db_conf.host,
-                        port=self.db_conf.port,
-                        user=self.db_conf.user,
-                        password=self.db_conf.password,
-                        db=self.db_conf.database,
-                        charset=self.db_conf.charset,
-                        cursorclass=aiomysql.DictCursor,
-                        autocommit=True,
-                    )
+                    self._pool = await self._create_pool()
         return self._pool
 
     async def close(self) -> None:

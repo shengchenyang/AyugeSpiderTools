@@ -35,10 +35,10 @@ DataItemModeStr = Literal["normal", "namedtuple", "dict"]
 
 
 class PortalTag(str, Enum):
-    LIBRARY = "ayuge"
-    SCRAPY = "scrapy"
-    DEFAULT = "default"
-    OTHER = "other"
+    LIBRARY = "Ayuge"
+    THIRD_PARTY = "ThirdParty"
+    DEFAULT = "Default"
+    OTHER = "Other"
 
 
 class DatabaseSingletonMeta(type):
