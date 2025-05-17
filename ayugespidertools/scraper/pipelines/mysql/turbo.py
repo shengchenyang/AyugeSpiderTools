@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     mysql_conf: MysqlConf
-    conn: Connection[Cursor]
+    conn: Connection
     slog: slogT
     cursor: Cursor
     pool_db_conf: dict

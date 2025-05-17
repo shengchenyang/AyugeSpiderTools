@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     mysql_conf: MysqlConf
-    conn: Connection[Cursor]
+    conn: Connection
     slog: slogT
     cursor: Cursor
 

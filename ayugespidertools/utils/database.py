@@ -27,6 +27,7 @@ from ayugespidertools.mongoclient import MongoDbBase
 try:
     import oracledb
     import psycopg
+    from psycopg_pool import AsyncConnectionPool
 except ImportError:
     # pip install ayugespidertools[database]
     pass
@@ -45,7 +46,9 @@ __all__ = [
 if TYPE_CHECKING:
     from aiomysql import Pool
     from motor.motor_asyncio import AsyncIOMotorDatabase
+    from psycopg.connection import Connection as PsycopgConnection
     from pymongo import MongoClient, database
+    from pymysql.connections import Connection as PymysqlConnection
 
 DataBaseConf = TypeVar(
     "DataBaseConf",
@@ -109,7 +112,7 @@ class MysqlPortal(metaclass=PortalSingletonMeta):
         }
         self.conn = pymysql.connect(**pymysql_conn_args)
 
-    def connect(self):
+    def connect(self) -> PymysqlConnection:
         return self.conn
 
 
@@ -135,7 +138,7 @@ class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
                     )
         return self._pool
 
-    async def close(self):
+    async def close(self) -> None:
         if self._pool:
             self._pool.close()
             await self._pool.wait_closed()
@@ -225,8 +228,20 @@ class PostgreSQLPortal(metaclass=PortalSingletonMeta):
             dbname=db_conf.database,
         )
 
-    def connect(self):
+    def connect(self) -> PsycopgConnection:
         return self.conn
 
 
-class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta): ...
+class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
+    def __init__(self, db_conf: PostgreSQLConf, tag: PortalTag = PortalTag.DEFAULT):
+        self.pool = AsyncConnectionPool(
+            f"dbname={db_conf.database} "
+            f"user={db_conf.user} "
+            f"host={db_conf.host} "
+            f"port={db_conf.port} "
+            f"password={db_conf.password}",
+            open=False,
+        )
+
+    def connect(self) -> AsyncConnectionPool:
+        return self.pool

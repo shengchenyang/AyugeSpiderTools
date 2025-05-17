@@ -97,7 +97,7 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: Connection[Cursor],
+        conn: Connection,
         cursor: Cursor | TwistedTransactionT,
         mysql_conf: MysqlConf,
         table: str,
@@ -261,7 +261,7 @@ class Synchronize(AbstractClass):
 
     def _exec_sql(
         self,
-        conn: Connection[Cursor],
+        conn: Connection,
         cursor: Cursor,
         sql: str,
         possible_err: str | None = None,
@@ -305,7 +305,7 @@ def deal_mysql_err(
     table: str,
     table_notes: str,
     note_dic: dict[str, str],
-    conn: Connection[Cursor] | None = None,
+    conn: Connection | None = None,
 ) -> None:
     abstract_class.template_method(
         err_msg,

@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     mysql_conf: MysqlConf
-    conn: Connection[Cursor]
+    conn: Connection
     slog: slogT
     cursor: Cursor
     crawl_time: datetime.date
