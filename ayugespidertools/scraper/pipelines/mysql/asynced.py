@@ -47,6 +47,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                     table=alter_item.table.name,
                     item=new_item,
                     odku_enable=self.mysql_conf.odku_enable,
+                    insert_prefix=self.mysql_conf.insert_prefix,
                 )
                 await cursor.execute(sql, args)
 

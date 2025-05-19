@@ -67,6 +67,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
             table=_table_name,
             item=new_item,
             odku_enable=self.mysql_conf.odku_enable,
+            insert_prefix=self.mysql_conf.insert_prefix,
         )
 
         try:

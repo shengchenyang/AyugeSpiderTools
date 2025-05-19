@@ -33,6 +33,7 @@ MYSQL_CONFIG = {
     "engine": mysql_conf.get("engine", "InnoDB"),
     "collate": mysql_conf.get("collate", "utf8mb4_general_ci"),
     "odku_enable": mysql_conf.getboolean("odku_enable", False),
+    "insert_ignore": mysql_conf.getboolean("insert_ignore", False),
 }
 MYSQL_CONFIG.update(PYMYSQL_CONFIG)
 

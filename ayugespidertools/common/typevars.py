@@ -24,6 +24,7 @@ Str_Lstr = TypeVar("Str_Lstr", str, list[str])
 _SENTINEL = Enum("_SENTINEL", "sentinel")
 sentinel = _SENTINEL.sentinel
 
+InsertPrefixStr = Literal["INSERT IGNORE", "INSERT"]
 AiohttpRequestMethodStr = Literal[
     "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"
 ]
@@ -73,6 +74,11 @@ class MysqlConf(NamedTuple):
     charset: str = "utf8mb4"
     collate: str = "utf8mb4_general_ci"
     odku_enable: bool = False
+    insert_ignore: bool = False
+
+    @property
+    def insert_prefix(self) -> InsertPrefixStr:
+        return "INSERT IGNORE" if self.insert_ignore else "INSERT"
 
 
 class MongoDBConf(NamedTuple):

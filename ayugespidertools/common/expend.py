@@ -7,7 +7,7 @@ from retrying import retry
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
-from ayugespidertools.common.typevars import PortalTag
+from ayugespidertools.common.typevars import InsertPrefixStr, PortalTag
 from ayugespidertools.config import logger
 from ayugespidertools.utils.database import MysqlPortal, PostgreSQLPortal
 
@@ -68,7 +68,10 @@ class MysqlPipeEnhanceMixin:
 
     @staticmethod
     def _get_sql_by_item(
-        table: str, item: dict[str, Any], odku_enable: bool = True
+        table: str,
+        item: dict[str, Any],
+        odku_enable: bool = True,
+        insert_prefix: InsertPrefixStr = "INSERT",
     ) -> tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
@@ -76,6 +79,7 @@ class MysqlPipeEnhanceMixin:
             table: 数据库表名
             item: 处理后的 item
             odku_enable: 是否开启 ON DUPLICATE KEY UPDATE
+            insert_prefix: INSERT 语句前缀设置: INSERT IGNORE or INSERT
 
         Returns:
             1). sql 插入语句
@@ -85,10 +89,10 @@ class MysqlPipeEnhanceMixin:
         values = ", ".join(["%s"] * len(item))
         if odku_enable:
             update = ",".join([f" `{key}` = %s" for key in item])
-            sql = f"INSERT INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+            sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
             args = tuple(item.values()) * 2
         else:
-            sql = f"INSERT INTO `{table}` ({keys}) values ({values})"
+            sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
             args = tuple(item.values())
         return sql, args
 
