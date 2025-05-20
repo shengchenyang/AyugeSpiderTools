@@ -4,7 +4,7 @@ sphinx-autobuild==2024.10.3
 sphinx_markdown_tables==0.0.17
 sphinx-hoverxref==1.4.2
 sphinx-notfound-page==1.0.4
-myst-parser==1.0.0
+myst-parser==3.0.0
 docutils==0.20.1
 urllib3==1.26.15
 ayugespidertools
