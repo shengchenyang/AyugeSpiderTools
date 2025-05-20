@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.11.3 (Preview: TBD)
+AyugeSpiderTools 3.12.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,41 @@ AyugeSpiderTools 3.11.3 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.12.0 (2025-05-20)
+====================================
+
+New features
+------------
+
+- scrapy 依赖更新为最新的 2.13.0。
+
+  (:commit:`a8dd8d306c3bdc9cfd1e1019fbbc552243311b4a`)
+
+- 生成的模版修改为 scrapy 新版本推荐的风格写法。
+
+  (:commit:`c7929064c5fcf5076e6a9eaec3aed57a23b4f0f6`)
+
+- 添加 Mysql, MongoDB，PostgreSQL 的链接管理，方便创建和使用当前配置中的数据库链接。
+
+  (:commit:`1430dfaa9e06335eaf3d237d777e1ed84f14b7a6`)
+
+- 添加根据 redis 查询去重的基础方法。
+
+  (:commit:`ae657fc7ba50d758fe3f773f4357252fd132ce70`)
+
+- 添加 Mysql INSERT IGNORE 的配置选项，默认与旧版本保持一致。
+
+  (:commit:`84004430f619a6d9dbe08c54774773833bf2fd4c`)
+
+Code optimizations
+------------------
+
+- 更新 ci/cd 依赖库版本，文档依赖及版本。
+
+  (:commit:`42e8e699f327bb65d64e4d1346b0b19fdfbcdb66`)
+
+- 解决一些 type hint, mypy check 和文档的问题。
 
 AyugeSpiderTools 3.11.2 (2025-03-30)
 ====================================
