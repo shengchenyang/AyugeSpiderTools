@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
 
 class $classname(AyuSpider):
-    # 可用于入库前查询使用等场景
     mysql_conn_pool: Pool
 
     name = "$name"
@@ -23,8 +22,8 @@ class $classname(AyuSpider):
     start_urls = ["$url"]
     custom_settings = {
         "ITEM_PIPELINES": {
-            "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
-            "ayugespidertools.pipelines.AyuFtyMongoPipeline": 301,
+            "ayugespidertools.pipelines.AyuAsyncMysqlPipeline": 300,
+            "ayugespidertools.pipelines.AyuAsyncMongoPipeline": 301,
         },
     }
 
@@ -33,11 +32,11 @@ class $classname(AyuSpider):
         yield Request(
             url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
+            dont_filter=True,
         )
 
     async def parse_first(self, response: Response) -> Any:
         _save_table = "_octree_info"
-
         li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
         for curr_li in li_list:
             octree_text = curr_li.xpath("a/text()").get()
@@ -52,7 +51,7 @@ class $classname(AyuSpider):
             )
             self.slog.info(f"octree_item: {octree_item}")
 
-            # 使用此方法时需要提前建库建表
+            # 数据入库前去重逻辑: 使用此方法时需要提前建库建表
             async with self.mysql_conn_pool.acquire() as conn:
                 async with conn.cursor() as cursor:
                     exists = await cursor.execute(

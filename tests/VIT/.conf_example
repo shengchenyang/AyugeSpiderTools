@@ -10,6 +10,7 @@ password=***
 database=***
 charset=***
 odku_enable=false
+insert_ignore=false
 
 [mongodb:uri]
 uri=mongodb://user:password@host:port/database?authSource=*&authMechanism=*

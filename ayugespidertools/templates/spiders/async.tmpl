@@ -1,6 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import aiohttp
 from ayugespidertools.spiders import AyuSpider
 from scrapy.http import Request
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from scrapy.http.response import Response
 
 
 class $classname(AyuSpider):
@@ -8,16 +17,17 @@ class $classname(AyuSpider):
     allowed_domains = ["$domain"]
     start_urls = ["$url"]
 
-    async def start(self):
+    async def start(self) -> AsyncIterator[Any]:
         self.slog.info("starting ...")
         async with aiohttp.ClientSession() as session:
             async with session.get("https://myip.ipip.net") as additional_response:
                 additional_data = await additional_response.text()
-                self.slog.debug(f"parse 响应内容: {additional_data}")
+                self.slog.debug(f"start 响应内容: {additional_data}")
                 yield Request(
                     url="https://myip.ipip.net",
                     callback=self.parse,
+                    dont_filter=True,
                 )
 
-    async def parse(self, response, **kwargs):
+    async def parse(self, response: Response, **kwargs: Any) -> Any:
         self.slog.debug(f"parse 响应内容: {response.text}")
