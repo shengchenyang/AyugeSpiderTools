@@ -24,6 +24,14 @@ AyugeSpiderTools 3.12.1 (Preview: TBD)
 AyugeSpiderTools 3.12.0 (2025-05-20)
 ====================================
 
+Deprecations
+------------
+
+- DATABASE_ENGINE_ENABLED 配置项弃用声明，我将在新方法 ayugespidertools.utils.database 稳定后的\
+  下一个 major 版本（且在至少半年之后）才会考虑删除它。
+
+  (:commit:`1430dfaa9e06335eaf3d237d777e1ed84f14b7a6`)
+
 New features
 ------------
 
