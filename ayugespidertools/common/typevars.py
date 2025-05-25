@@ -25,6 +25,17 @@ _SENTINEL = Enum("_SENTINEL", "sentinel")
 sentinel = _SENTINEL.sentinel
 
 InsertPrefixStr = Literal["INSERT IGNORE", "INSERT"]
+OracleAuthenticationModesStr = Literal[
+    "DEFAULT",
+    "PRELIM",
+    "SYSASM",
+    "SYSBKP",
+    "SYSDBA",
+    "SYSDGD",
+    "SYSKMT",
+    "SYSOPER",
+    "SYSRAC",
+]
 AiohttpRequestMethodStr = Literal[
     "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"
 ]
@@ -122,6 +133,7 @@ class OracleConf(NamedTuple):
     service_name: str | None = None
     encoding: str = "utf8"
     thick_lib_dir: bool | str = False
+    authentication_mode: OracleAuthenticationModesStr = "DEFAULT"
 
 
 class AiohttpConf(NamedTuple):

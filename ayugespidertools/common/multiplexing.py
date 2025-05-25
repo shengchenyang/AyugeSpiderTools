@@ -124,6 +124,9 @@ class ReuseOperation:
                 "service_name": oracle_section.get("service_name", None),
                 "encoding": oracle_section.get("encoding", "utf8"),
                 "thick_lib_dir": oracle_section.get("thick_lib_dir", False),
+                "authentication_mode": oracle_section.get(
+                    "authentication_mode", "DEFAULT"
+                ),
             }
         if "consul" in cfg:
             consul_section = cfg["consul"]

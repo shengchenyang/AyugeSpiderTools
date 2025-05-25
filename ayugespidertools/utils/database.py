@@ -247,6 +247,22 @@ class OraclePortal(metaclass=PortalSingletonMeta):
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
     ):
+        if db_conf.authentication_mode not in {
+            "DEFAULT",
+            "PRELIM",
+            "SYSASM",
+            "SYSBKP",
+            "SYSDBA",
+            "SYSDGD",
+            "SYSKMT",
+            "SYSOPER",
+            "SYSRAC",
+        }:
+            raise ValueError("OracleDB requires the authentication modes parameter.")
+
+        oracle_authentication_mode = getattr(
+            oracledb, f"AUTH_MODE_{db_conf.authentication_mode}", 0
+        )
         if oracle_thick_lib_dir := db_conf.thick_lib_dir:
             oracledb.init_oracle_client(oracle_thick_lib_dir)
 
@@ -257,6 +273,7 @@ class OraclePortal(metaclass=PortalSingletonMeta):
             port=db_conf.port,
             service_name=db_conf.service_name,
             encoding=db_conf.encoding,
+            mode=oracle_authentication_mode,
         )
 
     def connect(self):

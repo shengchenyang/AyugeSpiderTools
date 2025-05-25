@@ -9,13 +9,7 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.params import Param
 from ayugespidertools.common.typevars import InsertPrefixStr, PortalTag
 from ayugespidertools.config import logger
-from ayugespidertools.utils.database import MysqlPortal, PostgreSQLPortal
-
-try:
-    import oracledb
-except ImportError:
-    # pip install ayugespidertools[database]
-    pass
+from ayugespidertools.utils.database import MysqlPortal, OraclePortal, PostgreSQLPortal
 
 __all__ = [
     "MysqlPipeEnhanceMixin",
@@ -245,17 +239,7 @@ class OraclePipeEnhanceMixin:
         Returns:
             1). oracle 链接句柄
         """
-        if oracle_thick_lib_dir := oracle_conf.thick_lib_dir:
-            oracledb.init_oracle_client(oracle_thick_lib_dir)
-
-        return oracledb.connect(
-            user=oracle_conf.user,
-            password=oracle_conf.password,
-            host=oracle_conf.host,
-            port=oracle_conf.port,
-            service_name=oracle_conf.service_name,
-            encoding=oracle_conf.encoding,
-        )
+        return OraclePortal(db_conf=oracle_conf, tag=PortalTag.LIBRARY).connect()
 
     @staticmethod
     def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
