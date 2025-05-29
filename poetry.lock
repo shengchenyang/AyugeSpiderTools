@@ -4015,4 +4015,4 @@ database = ["aio-pika", "elasticsearch-dsl", "oracledb", "psycopg", "redis"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "a99fc43b4cbba46e49480d3d859a44627036028f8e764e8625670cc14d2f16b3"
+content-hash = "4ee0ef86141f4f460507ccda8a16d07dd2eadaee60f6ef9b181f74157452fcf9"
