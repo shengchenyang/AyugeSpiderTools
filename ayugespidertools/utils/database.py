@@ -217,6 +217,9 @@ class MongoDBAsyncPortal(metaclass=PortalSingletonMeta):
     def connect(self) -> AsyncIOMotorDatabase:
         return self.db
 
+    def close(self):
+        self.client.close()
+
 
 class RabbitMQPortal(metaclass=PortalSingletonMeta):
     def __init__(
@@ -309,6 +312,9 @@ class PostgreSQLPortal(metaclass=PortalSingletonMeta):
     def connect(self) -> PsycopgConnection:
         return self.conn
 
+    def close(self):
+        self.conn.close()
+
 
 class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
     def __init__(
@@ -326,5 +332,11 @@ class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
             open=False,
         )
 
+    async def open(self):
+        await self.pool.open()
+
     def connect(self) -> AsyncConnectionPool:
         return self.pool
+
+    def close(self):
+        self.pool.close()
