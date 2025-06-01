@@ -49,10 +49,19 @@ AyugeSpiderTools 一目了然
 
 .. code-block:: python
 
+   from __future__ import annotations
+
+   from typing import TYPE_CHECKING, Any
+
    from ayugespidertools.items import DataItem, AyuItem
    from ayugespidertools.spiders import AyuSpider
    from scrapy.http import Request
    from sqlalchemy import text
+
+   if TYPE_CHECKING:
+       from collections.abc import AsyncIterator
+
+       from scrapy.http import Response
 
 
    class DemoOneSpider(AyuSpider):
@@ -60,8 +69,6 @@ AyugeSpiderTools 一目了然
        allowed_domains = ["readthedocs.io"]
        start_urls = ["http://readthedocs.io/"]
        custom_settings = {
-           # 数据库引擎开关，打开会有对应的 engine 和 engine_conn，可用于数据入库前去重判断
-           "DATABASE_ENGINE_ENABLED": True,
            "ITEM_PIPELINES": {
                # 激活此项则数据会存储至 Mysql
                "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -70,13 +77,13 @@ AyugeSpiderTools 一目了然
            },
        }
 
-       def start_requests(self):
+       async def start(self) -> AsyncIterator[Any]:
            yield Request(
                url="https://ayugespidertools.readthedocs.io/en/latest/",
                callback=self.parse_first,
            )
 
-       def parse_first(self, response):
+       def parse_first(self, response: Response) -> Any:
            _save_table = "_octree_info"
 
            li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
@@ -112,48 +119,7 @@ AyugeSpiderTools 一目了然
                }
                """
                self.slog.info(f"octree_item: {octree_item}")
-
-               # 数据入库逻辑 -> 测试 mysql_engine / mysql_engine_conn 的去重功能。
-               # 场景对应的 engine 和 engine_conn 也已经给你了，你可自行实现。以下给出示例：
-
-               # 示例一：比如使用 sqlalchemy2 来实现查询如下：
-               if self.mysql_engine_conn:
-                   try:
-                       _sql = text(
-                           f"select `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
-                       )
-                       result = self.mysql_engine_conn.execute(_sql).fetchone()
-                       if not result:
-                           self.mysql_engine_conn.rollback()
-                           yield octree_item
-                       else:
-                           self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
-                   except Exception:
-                       self.mysql_engine_conn.rollback()
-                       yield octree_item
-               else:
-                   yield octree_item
-
-               # 示例二：使用 pandas 来实现查询如下：
-               """
-               try:
-                   sql = f"select `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
-                   df = pandas.read_sql(sql, self.mysql_engine)
-
-                   # 如果为空，说明此数据不存在于数据库，则新增
-                   if df.empty:
-                       yield octree_item
-
-                   # 如果已存在，1). 若需要更新，请自定义更新数据结构和更新逻辑；2). 若不用更新，则跳过即可。
-                   else:
-                       self.slog.debug(f"标题为 ”{octree_text}“ 的数据已存在")
-
-               except Exception as e:
-                   if any(["1146" in str(e), "1054" in str(e), "doesn't exist" in str(e)]):
-                       yield octree_item
-                   else:
-                       self.slog.error(f"请查看数据库链接或网络是否通畅！Error: {e}")
-               """
+               yield octree_item
 
 刚刚发生了什么？
 ----------------
@@ -164,6 +130,21 @@ AyugeSpiderTools 一目了然
 
 只要配置好 `.conf` 信息，就可以跑通以上示例。如果修改为新的项目，只需要修改上面示例中的 `spdider` 解析\
 规则即可。
+
+.. note::
+
+   本库中提供了 sqlalchemy 来对 spider 中 mysql，postgresql 和 oracle 的入库前的去重查询，但是未\
+   提供支持异步场景。这里只是用于简单场景的使用，如果你需要更加自定义的复杂场景，那么你需要在 spider 中\
+   直接只使用 ``self.mysql_conf``，``self.postgres_conf``，``self.oracle_conf`` 等，或者结合\
+   `custom_section`_ 的自定义配置创建对应的数据库连接来达到入库前去重的场景，这样你就可以选择自己喜欢\
+   的工具，不再局限于 sqlalchemy。
+
+   本库不会增加 sqlalchemy 的异步支持了，会使得项目臃肿，``self.mysql_conf`` 和 ``custom_section`` \
+   的方式已经可以很简单优雅地实现你想要的去重要求了。或者你可以考虑基于文件的去重、``scrapy-redis`` 库或 \
+   ``rabbitmq`` 的任务分发等方式来解决去重方式。
+
+   本库在 3.12.0 版本添加了链接到各种数据库的方法，以方便用户创建对应数据库场景的链接来自定义去重功能。\
+   具体使用方法请在 `DemoSpider`_ 中查看。
 
 还有什么？
 ===========
@@ -197,4 +178,6 @@ Scrapy 并加入 `Scrapy 社区`_ 。谢谢你的关注！
 
 .. _AyugeSpiderTools: https://github.com/shengchenyang/AyugeSpiderTools
 .. _Scrapy 教程: https://docs.scrapy.org/en/latest/intro/tutorial.html#intro-tutorial
+.. _DemoSpider: https://github.com/shengchenyang/DemoSpider
+.. _custom_section: https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
 .. _Scrapy 社区: https://scrapy.org/community/

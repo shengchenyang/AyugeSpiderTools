@@ -92,9 +92,13 @@ Getting help
    :hidden:
 
    topics/logging
+   topics/deduplicate
 
 :doc:`topics/logging`
     在 ``ayugespidertools`` 上学习如何使用日志。
+
+:doc:`topics/deduplicate`
+    在 ``ayugespidertools`` 上的去重方式介绍。
 
 扩展 scrapy
 ==================================
