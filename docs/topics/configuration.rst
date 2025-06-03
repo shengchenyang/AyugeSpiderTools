@@ -73,6 +73,7 @@ Introduction
    "collate", "可选，默认 utf8mb4_general_ci", "自动创建数据库和数据表时需要的参数"
    "charset", "可选，默认 utf8mb4", "自动创建数据库和数据表时需要的参数"
    "odku_enable", "可选，默认 false", "是否开启 ON DUPLICATE KEY UPDATE 功能"
+   "insert_ignore", "可选，默认 false", "是否开启 INSERT IGNORE 功能"
 
 .. note::
 
