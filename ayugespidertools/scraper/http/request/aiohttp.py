@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
 
 from scrapy import Request
 
-from ayugespidertools.common.typevars import _SENTINEL, sentinel
+from ayugespidertools.common.typevars import _SENTINEL, URL, sentinel
 from ayugespidertools.exceptions import AyugeSpiderToolsDeprecationWarning
 
 __all__ = [
@@ -130,6 +130,9 @@ class AiohttpRequest(Request):
         meta = copy.deepcopy(meta) or {}
         aiohttp_meta = meta.setdefault("aiohttp", {})
         aiohttp_meta["args"] = aiohttp_req_args
+
+        if isinstance(url, URL):
+            url = str(url)
 
         super().__init__(
             url=url,
