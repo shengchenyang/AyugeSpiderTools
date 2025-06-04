@@ -13,8 +13,10 @@ if TYPE_CHECKING:
 
     from loguru import Logger
     from scrapy.utils.log import SpiderLoggerAdapter
+    from yarl import URL
 
     slogT = Union[Logger, SpiderLoggerAdapter]
+    StrOrURL = Union[str, URL]
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)

@@ -26,6 +26,8 @@ if TYPE_CHECKING:
     from twisted.python.failure import Failure
     from typing_extensions import Concatenate, NotRequired
 
+    from ayugespidertools.common.typevars import StrOrURL
+
     CallbackT = Callable[Concatenate[Response, ...], Any]
 
 
@@ -43,7 +45,7 @@ CookiesT = Union[dict[str, str], list[VerboseCookie]]
 class AiohttpRequest(Request):
     def __init__(
         self,
-        url: str,
+        url: StrOrURL,
         callback: CallbackT | None = None,
         method: str = "GET",
         headers: Mapping[AnyStr, Any] | Iterable[tuple[AnyStr, Any]] | None = None,
