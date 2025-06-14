@@ -44,7 +44,8 @@ class FilesDownloadPipeline:
         _is_namedtuple = alter_item.is_namedtuple
         for key, url in file_url_keys.items():
             if all([isinstance(url, str), url]):
-                _, filename = await files_download_by_scrapy(spider, url)
+                r, filename = await files_download_by_scrapy(spider, url)
+                Path(f"{self.file_path}/{filename}").write_bytes(r.body)
                 # Store file in item
                 if not _is_namedtuple:
                     item[f"{key}_local"] = filename
