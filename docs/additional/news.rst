@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.12.1 (Preview: TBD)
+AyugeSpiderTools 3.12.2 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,31 @@ AyugeSpiderTools 3.12.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.12.1 (2025-06-15)
+====================================
+
+New features
+------------
+
+- oracle 存储场景添加 authentication_mode 的配置参数，默认 DEFAULT 与旧版本保持一致。
+
+  (:commit:`511821177288cd7e2499dd3f87943399388e1bf7`)
+
+- aiohttp 请求的场景支持 yarl.URL 类型参数。
+
+  (:commit:`8727d69f58bd6b59d9e1dc9e3d80ed2575d38a39`)
+
+- scrapy 依赖更新为最新的 2.13.2。
+
+ (:commit:`50e2a23a3715fbdb8318b457d8162590f3f2ce27`)
+
+Bug fixes
+---------
+
+- 解决文件下载本地的场景未保存的问题。
+
+  (:commit:`614f3d670718badd27618b134e66d6c783ca114a`)
 
 AyugeSpiderTools 3.12.0 (2025-05-20)
 ====================================
