@@ -6,10 +6,10 @@ from tests.test_commands.test_commands_crawl import TestProjectBase
 
 
 class TestCommandBase(TestProjectBase):
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
         self.call("startproject", self.project_name)
-        self.cwd = Path(self.temp_path, self.project_name)
+        self.cwd = self.proj_path
         self.env["SCRAPY_SETTINGS_MODULE"] = f"{self.project_name}.settings"
 
 

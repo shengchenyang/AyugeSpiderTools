@@ -14,7 +14,7 @@ from urllib.parse import urlencode
 
 from OpenSSL import SSL
 from scrapy.utils.python import to_bytes, to_unicode
-from twisted.internet import defer, reactor, ssl
+from twisted.internet import defer, ssl
 from twisted.internet.task import deferLater
 from twisted.names import dns, error
 from twisted.names.server import DNSServerFactory
@@ -113,6 +113,8 @@ class LeafResource(resource.Resource):
     isLeaf = True
 
     def deferRequest(self, request, delay, f, *a, **kw):
+        from twisted.internet import reactor
+
         def _cancelrequest(_):
             # silence CancelledError
             d.addErrback(lambda _: None)
@@ -377,6 +379,8 @@ def ssl_context_factory(
 
 
 if __name__ == "__main__":
+    from twisted.internet import reactor
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-t", "--type", type=str, choices=("http", "dns"), default="http"

@@ -781,15 +781,15 @@ files = [
 
 [[package]]
 name = "dbutils"
-version = "3.1.0"
+version = "3.1.1"
 description = "Database connections for multi-threaded environments."
 optional = false
-python-versions = ">3.7"
+python-versions = ">=3.7"
 groups = ["main"]
 markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\""
 files = [
-    {file = "DBUtils-3.1.0-py3-none-any.whl", hash = "sha256:4afca4c7f5b037cd44dd71933904c756e041a755841b1cf62431f1011ba29234"},
-    {file = "DBUtils-3.1.0.tar.gz", hash = "sha256:ea528ba11063240eea82345ebc6f7cc9324c06e42e9420b00bcd245a95bfcc24"},
+    {file = "dbutils-3.1.1-py3-none-any.whl", hash = "sha256:edc8ebd8445094c335d52e2bcbcf9f7dcc54d7a294adf7d01a8baf21924317f5"},
+    {file = "dbutils-3.1.1.tar.gz", hash = "sha256:ade79fbc5786d7496d4138722fbca24340cf7c73b5d66df05296f656ff086bbf"},
 ]
 
 [package.extras]
@@ -3122,15 +3122,15 @@ six = ">=1.7.0"
 
 [[package]]
 name = "scrapy"
-version = "2.13.0"
+version = "2.13.2"
 description = "A high-level Web Crawling and Web Scraping framework"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "platform_system == \"Linux\" and platform_machine == \"aarch64\""
 files = [
-    {file = "scrapy-2.13.0-py3-none-any.whl", hash = "sha256:8ebc28d14e7e603fa29f76d4144c0908398ff51e23b3389e17c62c339adc5ac6"},
-    {file = "scrapy-2.13.0.tar.gz", hash = "sha256:9661629805ff0e43054cc1306d9b13236c6bb9565d8d8e303a332c8da045d90f"},
+    {file = "scrapy-2.13.2-py3-none-any.whl", hash = "sha256:6f29826da4f11ba9528336c698e6979e6a0861d6f897d0553f687cfe403d279e"},
+    {file = "scrapy-2.13.2.tar.gz", hash = "sha256:19d984e82847ab08efa150dc329fa615c71f8e99bb97fd97a64a5c29e9a2d5d7"},
 ]
 
 [package.dependencies]
@@ -4015,4 +4015,4 @@ database = ["aio-pika", "elasticsearch-dsl", "oracledb", "psycopg", "redis"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "4ee0ef86141f4f460507ccda8a16d07dd2eadaee60f6ef9b181f74157452fcf9"
+content-hash = "e6f1ca64fba047b382733f22ccb7bb672824fdfb7614c1f0b9e70803849ce453"
