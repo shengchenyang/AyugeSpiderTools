@@ -252,6 +252,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "port", "可选，默认 1521", "_"
    "encoding", "可选，默认 utf8", "oracledb 的链接参数。"
    "thick_lib_dir", "可选，默认 false", "oracledb 的 thick_mode 所需参数，按需配置。"
+   "authentication_mode", "可选，默认 DEFAULT", "oracledb 的 authentication_mode 所需参数，按需配置。"
 
 [kafka]
 =======
