@@ -1,7 +1,9 @@
-.PHONY: help start clean build install build_dist pypi_token test release pytest git check \
-version patch minor major
+.PHONY: help start clean build install build_dist pypi_token test release tag pytest git \
+check version patch minor major
 
 refresh: clean build install
+
+PROJECT_NAME = ayugespidertools
 
 ifeq ($(OS),Windows_NT)
     RM = cmd.exe /C del /F /Q
@@ -39,9 +41,12 @@ help:
 	@echo "Targets:"
 	@echo "  pypi_token       Set the poetry pypi-token, Run 'make pypi_token token=<token>' to set the poetry pypi_token"
 	@echo "  release          Publish package to PyPI:"
+	@echo "  tag              Push a Git tag to trigger the publish action"
 	@echo "                     1. Run 'make release token=<token>'"
 	@echo "                     2. Run 'make release' if poetry pypi_token is already set"
-	@echo "  version          Shows the version of the project or bumps it when a valid bump rule is provided."
+	@echo "  version          Shows the version of the project or bumps it when a valid bump rule is provided"
+	@echo "                     1. Run 'make version' to get current project version"
+	@echo "                     2. Run 'make version [patch|minor|major]' to bump version"
 	@echo "  clean            Clean up test files, mypy cache and dist folders"
 	@echo "  git              Set git proxy and line separator"
 	@echo "  test             Code test and coverage report"
@@ -87,6 +92,13 @@ release:
 	poetry publish
 	@echo ":) Publish successfully"
 
+tag:
+	@PKG_VER=$(shell poetry version --short); \
+	TAG_NAME="$(PROJECT_NAME)-$${PKG_VER}"; \
+	echo "==> Creating tag $$TAG_NAME"; \
+	git tag $$TAG_NAME; \
+	git push origin $$TAG_NAME
+
 test:
 	poetry install -E "all"
 	poetry run coverage run -m pytest
@@ -105,7 +117,6 @@ check:
 version:
 	@if [ "$(filter patch minor major,$(MAKECMDGOALS))" = "" ]; then \
 		poetry version; \
-		echo "Usage: make version [patch|minor|major]"; \
 	else \
 		poetry version $(filter patch minor major,$(MAKECMDGOALS)); \
 	fi
@@ -143,4 +154,4 @@ clean:
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
 	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.crt)
 	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.key)
-	pip uninstall -y ayugespidertools
+	pip uninstall -y $(PROJECT_NAME)
