@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.12.2 (Preview: TBD)
+AyugeSpiderTools 3.12.3 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,23 @@ AyugeSpiderTools 3.12.2 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.12.2 (2025-06-22)
+====================================
+
+New features
+------------
+
+- python 3.13 support。
+
+  (:commit:`1a221d90061addc68f6feed98043e83267c95cbd`)
+
+Code optimizations
+------------------
+
+- 添加 github action 打包上传的流程。
+
+  (:commit:`1a221d90061addc68f6feed98043e83267c95cbd`)
 
 AyugeSpiderTools 3.12.1 (2025-06-15)
 ====================================
