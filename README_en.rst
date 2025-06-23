@@ -1,32 +1,32 @@
-.. image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/ayugespidertools-logo.png
+|logo|
+
+.. |logo| image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/ayugespidertools-logo.png
    :target: https://ayugespidertools.readthedocs.io/en/latest/
    :alt: ayugespidertools-logo
 
-==========================
-AyugeSpiderTools Introduce
-==========================
+|license| |python_support| |docs| |releases_downloads| |pypi_downloads| |codecov|
 
-.. image:: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
+.. |license| image:: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :target: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :alt: license
 
-.. image:: https://img.shields.io/badge/python-3.9%2B-blue
-   :target: https://pypi.org/pypi/Scrapy
+.. |python_support| image:: https://img.shields.io/badge/python-3.9%2B-blue
+   :target: https://pypi.org/pypi/AyugeSpiderTools
    :alt: python support
 
-.. image:: https://img.shields.io/readthedocs/ayugespidertools
+.. |docs| image:: https://img.shields.io/readthedocs/ayugespidertools
    :target: https://ayugespidertools.readthedocs.io/en/latest/
    :alt: Read the Docs
 
-.. image:: https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads
+.. |releases_downloads| image:: https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads
    :target: https://github.com/shengchenyang/AyugeSpiderTools/releases
    :alt: GitHub all releases
 
-.. image:: https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads
+.. |pypi_downloads| image:: https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads
    :target: https://pypistats.org/packages/ayugespidertools
    :alt: PyPI - Downloads
 
-.. image:: https://codecov.io/gh/shengchenyang/AyugeSpiderTools/graph/badge.svg?token=1QLOEW2NTI
+.. |codecov| image:: https://codecov.io/gh/shengchenyang/AyugeSpiderTools/graph/badge.svg?token=1QLOEW2NTI
    :target: https://app.codecov.io/gh/shengchenyang/AyugeSpiderTools
    :alt: codecov
 
