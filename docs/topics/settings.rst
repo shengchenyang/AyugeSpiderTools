@@ -50,6 +50,11 @@ DATABASE_ENGINE_ENABLED
 
 Default: ``False``
 
+.. warning::
+
+   - 即将删除 ``DATABASE_ENGINE_ENABLED`` 的配置，请使用 ``ayugespidertools.utils.database`` 来代替。
+   - 将会在下一 ``Major`` 的 ``3.13`` 版本且在半年之后才会移除它。
+
 是否打开 database 引擎开关，用于数据入库前更新逻辑判断。如果是 mysql 场景，打开此项会激活 \
 ``mysql_engine`` 和 ``mysql_engine_conn``；如果是 ``postgresql`` 场景，打开此项会激活 \
 ``postgres_engine`` 和 ``postgres_engine_conn``;

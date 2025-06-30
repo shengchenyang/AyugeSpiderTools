@@ -63,8 +63,6 @@ AyugeSpiderTools 教程
        allowed_domains = ["readthedocs.io"]
        start_urls = ["http://readthedocs.io/"]
        custom_settings = {
-           # 打开 mysql 引擎开关，用于数据入库前更新逻辑判断
-           "DATABASE_ENGINE_ENABLED": True,
            "ITEM_PIPELINES": {
                # 激活此项则数据会存储至 Mysql
                "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,

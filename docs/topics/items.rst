@@ -218,10 +218,20 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
 
 .. code-block:: python
 
+   from __future__ import annotations
+
+   from typing import TYPE_CHECKING, Any
+
    from ayugespidertools.items import AyuItem
    from ayugespidertools.spiders import AyuSpider
    from scrapy.http import Request
    from sqlalchemy import text
+
+   if TYPE_CHECKING:
+       from collections.abc import AsyncIterator
+
+       from aiomysql import Pool
+       from scrapy.http import Response
 
 
    class DemoOneSpider(AyuSpider):
@@ -229,8 +239,6 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
        allowed_domains = ["readthedocs.io"]
        start_urls = ["http://readthedocs.io/"]
        custom_settings = {
-           # 数据库引擎开关，打开会有对应的 engine 和 engine_conn，可用于数据入库前去重判断
-           "DATABASE_ENGINE_ENABLED": True,
            "ITEM_PIPELINES": {
                # 激活此项则数据会存储至 Mysql
                "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
@@ -239,15 +247,21 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
            },
        }
 
-       def start_requests(self):
+       # 可用于入库前查询使用等场景，名称可自定义
+       mysql_conn_pool: Pool
+
+       async def start(self) -> AsyncIterator[Any]:
+           # self.mysql_conf 为 .conf 中的 [mysql] 内容
+           # 当然你也可以自定义，请查看:
+           # https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
+           self.mysql_conn_pool = await MysqlAsyncPortal(db_conf=self.mysql_conf).connect()
            yield Request(
                url="https://ayugespidertools.readthedocs.io/en/latest/",
                callback=self.parse_first,
            )
 
-       def parse_first(self, response):
+       def parse_first(self, response: Response) -> Any:
            _save_table = "_octree_info"
-
            # 你可以自定义解析规则，使用 lxml 还是 response.css response.xpath 等等都可以。
            li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
            for curr_li in li_list:
@@ -264,29 +278,18 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
                # 日志使用 scrapy 的 self.logger 或本库的 self.slog
                self.slog.info(f"octree_item: {octree_item}")
 
-               # 注意：同时存储至 mysql 和 mongodb 时，不建议使用以下去重方法，会互相影响。
-               # 此时更适合：
-               #    1.mysql 添加唯一索引去重（结合 odku_enable 配置，本库会根据 on duplicate key update 更新），
-               #      mongoDB 场景下设置 _mongo_update_rule 参数即可；
-               #    2.或者添加爬取时间字段并每次新增的场景，即不去重，请根据使用场景自行选择;
-               #    3.同时存储多个数据库场景更推荐使用第三方去重来统一管理，比如 scrapy-redis，布隆过滤等。
-               # 这里只是为了介绍使用 mysql_engine_conn 来对 mysql 去重的方法。
-               if self.mysql_engine_conn:
-                   try:
-                       _sql = text(
-                           f"select `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
+               # 使用 ayugespidertools.utils.database 来入库查询，使用此方法时需要提前建库建表
+               # 具体使用方法和更多示例，请查看:
+               # https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
+               async with self.mysql_conn_pool.acquire() as conn:
+                   async with conn.cursor() as cursor:
+                       exists = await cursor.execute(
+                           f"SELECT `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
                        )
-                       result = self.mysql_engine_conn.execute(_sql).fetchone()
-                       if not result:
-                           self.mysql_engine_conn.rollback()
+                       if not exists:
                            yield octree_item
                        else:
                            self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
-                   except Exception as e:
-                       self.mysql_engine_conn.rollback()
-                       yield octree_item
-               else:
-                   yield octree_item
 
 由上可知，本库中的 Item 使用方法还是很方便的。
 
