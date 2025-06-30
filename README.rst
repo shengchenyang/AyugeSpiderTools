@@ -3,7 +3,7 @@
 .. |logo| image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/ayugespidertools-logo.svg
    :target: https://ayugespidertools.readthedocs.io/en/latest/
    :alt: ayugespidertools-logo
-   :width: 280px
+   :width: 480px
 
 |license| |python_support| |docs| |releases_downloads| |pypi_downloads| |codecov|
 
