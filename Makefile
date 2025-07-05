@@ -1,5 +1,5 @@
 .PHONY: build build_dist check clean git help install patch pypi_token pytest major minor \
-release start tag test version
+release start tag tag_remove test version
 
 refresh: clean build install
 
@@ -90,6 +90,7 @@ help:
 	@echo "                     2. Run 'make release' if poetry pypi_token is already set"
 	@echo "  start            Pre-development setup steps"
 	@echo "  tag              Push a Git tag to trigger the publish action"
+	@echo "  tag_remove       Delete current (Git and Local) tag if the publish Action fails"
 	@echo "  test             Code test and coverage report"
 	@echo "  version          Shows the version of the project or bumps it when a valid bump rule is provided"
 	@echo "                     1. Run 'make version' to get current project version"
@@ -132,6 +133,13 @@ tag:
 	echo "==> Creating tag $$TAG_NAME"; \
 	git tag $$TAG_NAME; \
 	git push origin $$TAG_NAME
+
+tag_remove:
+	@PKG_VER=$(shell poetry version --short); \
+	TAG_NAME="$(PROJECT_NAME)-$${PKG_VER}"; \
+	echo "==> Deleting tag $$TAG_NAME"; \
+	git tag -d $$TAG_NAME; \
+	git push origin :refs/tags/$$TAG_NAME
 
 test:
 	poetry install -E "all"
