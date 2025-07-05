@@ -3,10 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from retrying import retry
-
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
-from ayugespidertools.common.params import Param
 
 __all__ = [
     "AyuStatisticsMysqlPipeline",
@@ -97,11 +94,6 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         )
         self._log_record(sql=sql, data=args)
 
-    @retry(
-        stop_max_attempt_number=Param.retry_num,
-        wait_random_min=Param.retry_time_min,
-        wait_random_max=Param.retry_time_max,
-    )
     def insert_script_statistics(
         self, data: dict, table: str = "script_collection_statistics"
     ) -> None:

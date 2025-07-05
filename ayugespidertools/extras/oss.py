@@ -3,9 +3,6 @@ from __future__ import annotations
 import warnings
 from typing import Any
 
-from retrying import retry
-
-from ayugespidertools.common.params import Param
 from ayugespidertools.exceptions import NotConfigured
 
 try:
@@ -58,7 +55,6 @@ class AliOssBase:
         self.bucket = oss2.Bucket(self.auth, f"{self.endpoint}/", bucket)
         self.headers = {"Connection": "close"}
 
-    @retry(stop_max_attempt_number=Param.retry_num)
     def put_oss(
         self,
         put_bytes: bytes,

@@ -3,10 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from retrying import retry
-
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.params import Param
 from ayugespidertools.common.typevars import InsertPrefixStr, PortalTag
 from ayugespidertools.config import logger
 from ayugespidertools.utils.database import MysqlPortal, OraclePortal, PostgreSQLPortal
@@ -29,11 +26,6 @@ class MysqlPipeEnhanceMixin:
     """扩展 mysql pipelines 的功能"""
 
     @staticmethod
-    @retry(
-        stop_max_attempt_number=Param.retry_num,
-        wait_random_min=Param.retry_time_min,
-        wait_random_max=Param.retry_time_max,
-    )
     def _connect(mysql_conf: MysqlConf) -> PymysqlConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
@@ -172,11 +164,6 @@ class PostgreSQLPipeEnhanceMixin:
     """扩展 postgresql pipelines 的功能"""
 
     @staticmethod
-    @retry(
-        stop_max_attempt_number=Param.retry_num,
-        wait_random_min=Param.retry_time_min,
-        wait_random_max=Param.retry_time_max,
-    )
     def _connect(postgres_conf: PostgreSQLConf) -> PsycopgConnection:
         """链接数据库操作：
             1.如果链接正常，则返回链接句柄；
@@ -225,11 +212,6 @@ class OraclePipeEnhanceMixin:
     """扩展 oracle pipelines 的功能"""
 
     @staticmethod
-    @retry(
-        stop_max_attempt_number=Param.retry_num,
-        wait_random_min=Param.retry_time_min,
-        wait_random_max=Param.retry_time_max,
-    )
     def _connect(oracle_conf: OracleConf) -> OracleConnection:
         """链接数据库返回链接句柄
 
