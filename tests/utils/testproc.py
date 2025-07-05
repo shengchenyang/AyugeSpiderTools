@@ -5,12 +5,12 @@ import sys
 from typing import TYPE_CHECKING, cast
 
 from twisted.internet.defer import Deferred
-from twisted.internet.error import ProcessTerminated
 from twisted.internet.protocol import ProcessProtocol
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from twisted.internet.error import ProcessTerminated
     from twisted.python.failure import Failure
 
 
@@ -46,7 +46,7 @@ class ProcessTest:
             msg += "\n"
             msg += f"\n>>> stderr <<<\n{pp.err.decode()}"
             raise RuntimeError(msg)
-        return cast(int, pp.exitcode), pp.out, pp.err
+        return cast("int", pp.exitcode), pp.out, pp.err
 
 
 class TestProcessProtocol(ProcessProtocol):
@@ -63,5 +63,5 @@ class TestProcessProtocol(ProcessProtocol):
         self.err += data
 
     def processEnded(self, status: Failure) -> None:
-        self.exitcode = cast(ProcessTerminated, status.value).exitCode
+        self.exitcode = cast("ProcessTerminated", status.value).exitCode
         self.deferred.callback(self)

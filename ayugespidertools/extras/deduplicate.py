@@ -20,7 +20,7 @@ class Deduplicate:
         self.name = name
 
     def add(self, key: str) -> int:
-        return cast(int, self.redis_client.sadd(self.name, key))
+        return cast("int", self.redis_client.sadd(self.name, key))
 
     def get(self, key: str):
         return self.redis_client.sismember(self.name, key)
@@ -34,4 +34,4 @@ class Deduplicate:
             return 0
         end
         """
-        return cast(int, self.redis_client.eval(lua_script, 1, self.name, key))
+        return cast("int", self.redis_client.eval(lua_script, 1, self.name, key))
