@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.12.3 (Preview: TBD)
+AyugeSpiderTools 3.12.4 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,23 @@ AyugeSpiderTools 3.12.3 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.12.3 (2025-07-06)
+====================================
+
+New features
+------------
+
+- scrapy 依赖更新为最新的 2.13.3。
+
+  (:commit:`2315301f5ea1dd2fc48162c86837085a1cc71661`)
+
+Code optimizations
+------------------
+
+- 去除多余的依赖。
+
+  (:commit:`2315301f5ea1dd2fc48162c86837085a1cc71661`)
 
 AyugeSpiderTools 3.12.2 (2025-06-22)
 ====================================
