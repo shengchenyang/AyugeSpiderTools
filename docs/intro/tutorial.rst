@@ -71,7 +71,7 @@ AyugeSpiderTools 教程
            },
        }
 
-       def start_requests(self):
+       async def start(self):
            yield Request(
                url="https://ayugespidertools.readthedocs.io/en/latest/",
                callback=self.parse_first,
@@ -96,7 +96,7 @@ AyugeSpiderTools 教程
 如您所见，Spider 子类化 AyuSpider 并定义了一些属性和方法：
 
 - name: 标识蜘蛛。在一个项目中必须是唯一的，即不能为不同的 Spiders 设置相同的名字。
-- start_requests(): 必须返回一个可迭代的请求（你可以返回一个请求列表或编写一个生成器函数），蜘蛛将从中\
+- start(): 必须返回一个可迭代的请求（你可以返回一个请求列表或编写一个生成器函数），蜘蛛将从中\
   开始爬行。后续请求将从这些初始请求中依次生成。
 - parse_first()：将被调用以处理为每个请求下载的响应的方法。response 参数是 TextResponse 的一个实例，\
   它保存页面内容，并有进一步的有用方法来处理它。该 parse_first() 方法通常解析响应，将抓取的数据提取为字\
@@ -106,7 +106,9 @@ AyugeSpiderTools 教程
 
    - 示例中的一些配置和一些功能并不是每个项目中都必须要编写和配置的，只是用于展示一些功能；
    - 据上条可知，可以写出很简洁的代码，删除你认为的无关配置和方法并将其配置成你自己的模板就更容易适配更多\
-     人的使用场景。
+     人的使用场景；
+   - 示例中的 AyuFtyMysqlPipeline 和 AyuFtyMongoPipeline 只是为了方便快速复现，其实更推荐使用 \
+     AyuAsyncMysqlPipeline 和 AyuAsyncMongoPipeline 来代替，会更高效。
 
 
 如何运行我们的蜘蛛
