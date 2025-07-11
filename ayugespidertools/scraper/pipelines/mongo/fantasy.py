@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
+from ayugespidertools.common.mongodbpipe import SyncStorageHandler, store_process
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import PortalTag
 from ayugespidertools.utils.database import MongoDBPortal
@@ -38,7 +38,7 @@ class AyuFtyMongoPipeline:
             item: scrapy item
         """
         item_dict = ReuseOperation.item_to_dict(item)
-        mongodb_pipe(Synchronize(), item_dict=item_dict, db=self.db)
+        store_process(item_dict=item_dict, db=self.db, handler=SyncStorageHandler)
         return item
 
     def close_spider(self, spider: AyuSpider) -> None:

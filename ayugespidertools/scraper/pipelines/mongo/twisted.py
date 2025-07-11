@@ -1,6 +1,6 @@
 from twisted.internet import defer, reactor
 
-from ayugespidertools.common.mongodbpipe import TwistedAsynchronous, mongodb_pipe
+from ayugespidertools.common.mongodbpipe import SyncStorageHandler, store_process
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.scraper.pipelines.mongo.fantasy import AyuFtyMongoPipeline
 
@@ -19,5 +19,5 @@ class AyuTwistedMongoPipeline(AyuFtyMongoPipeline):
 
     def db_insert(self, item, out):
         item_dict = ReuseOperation.item_to_dict(item)
-        mongodb_pipe(TwistedAsynchronous(), item_dict=item_dict, db=self.db)
+        store_process(item_dict=item_dict, db=self.db, handler=SyncStorageHandler)
         reactor.callFromThread(out.callback, item_dict)

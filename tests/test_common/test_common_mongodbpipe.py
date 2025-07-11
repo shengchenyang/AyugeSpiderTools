@@ -1,6 +1,6 @@
 import pytest
 
-from ayugespidertools.common.mongodbpipe import Synchronize, mongodb_pipe
+from ayugespidertools.common.mongodbpipe import SyncStorageHandler, store_process
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.items import AyuItem, DataItem
 from tests.conftest import mongodb_database, test_table
@@ -30,10 +30,10 @@ class TestMongoDBPipe:
             _table=DataItem(test_table, "文章信息表"),
         )
         item_dict = ReuseOperation.item_to_dict(item_normal)
-        mongodb_pipe(
-            Synchronize(),
+        store_process(
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
+            handler=SyncStorageHandler,
         )
 
         num = mongodb_conn[mongodb_database][test_table].count_documents(
@@ -48,10 +48,10 @@ class TestMongoDBPipe:
         )
 
         item_dict = ReuseOperation.item_to_dict(item_with_mongo_update_rule)
-        mongodb_pipe(
-            Synchronize(),
+        store_process(
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
+            handler=SyncStorageHandler,
         )
 
         num = mongodb_conn[mongodb_database][test_table].count_documents(
@@ -70,10 +70,10 @@ class TestMongoDBPipe:
         }
 
         item_dict = ReuseOperation.item_to_dict(item_dict)
-        mongodb_pipe(
-            Synchronize(),
+        store_process(
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
+            handler=SyncStorageHandler,
         )
 
         num = mongodb_conn[mongodb_database][test_table].count_documents(
@@ -99,10 +99,10 @@ class TestMongoDBPipe:
         )
 
         item_dict = ReuseOperation.item_to_dict(item_dict)
-        mongodb_pipe(
-            Synchronize(),
+        store_process(
             item_dict=item_dict,
             db=mongodb_conn[mongodb_database],
+            handler=SyncStorageHandler,
         )
 
         num = mongodb_conn[mongodb_database][test_table].count_documents(
