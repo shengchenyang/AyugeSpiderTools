@@ -230,31 +230,23 @@ class ReuseOperation:
         Returns:
             1). 整合后的 item
         """
-        new_item = {}
-        notes_dic = {}
-        is_namedtuple = False
-
         insert_data = cls.get_items_except_keys(
             data=item_dict, keys={"_mongo_update_rule", "_table"}
         )
         judge_item = next(iter(insert_data.values()))
         if cls.is_namedtuple_instance(judge_item):
-            is_namedtuple = True
             _table_name = item_dict["_table"].key_value
             _table_notes = item_dict["_table"].notes
             table_info = AlterItemTable(_table_name, _table_notes)
-            for key, value in insert_data.items():
-                new_item[key] = value.key_value
-                notes_dic[key] = value.notes
+            new_item = {k: v.key_value for k, v in insert_data.items()}
+            notes_dic = {k: v.notes for k, v in insert_data.items()}
+            return AlterItem(new_item, notes_dic, table_info, True)
 
         else:
             _table_name = item_dict["_table"]
             table_info = AlterItemTable(_table_name, "")
-            for key, value in insert_data.items():
-                new_item[key] = value
-                notes_dic[key] = ""
-
-        return AlterItem(new_item, notes_dic, table_info, is_namedtuple)
+            notes_dic = {k: "" for k in insert_data}
+            return AlterItem(insert_data, notes_dic, table_info, False)
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
