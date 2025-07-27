@@ -2,6 +2,7 @@ import configparser
 import importlib
 from importlib import import_module
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 from scrapy.utils.conf import get_config
@@ -36,7 +37,11 @@ def get_cfg() -> configparser.ConfigParser:
     return cfg
 
 
-def setup_lazy_import(modules_map, base_package, globals_dict):
+def setup_lazy_import(
+    modules_map: dict[str, list[str]],
+    base_package: str,
+    globals_dict: dict[str, Any],
+):
     """lazy import for middlewares and pipelines"""
     class_map = {}
     for submodule, classes in modules_map.items():
