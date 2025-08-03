@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.items import AyuItem
 
 __all__ = [
     "get_insert_data",
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
 def get_insert_data(item_dict: dict) -> tuple[dict, str]:
     insert_data = ReuseOperation.get_items_except_keys(
-        item_dict, keys={"_table", "_mongo_update_rule"}
+        item_dict, keys=AyuItem._except_keys
     )
     table_name = item_dict["_table"]
     judge_item = next(iter(insert_data.values()))
@@ -60,12 +61,35 @@ class SyncStorageHandler:
     def store(
         db: Database, item_dict: dict, collection: str, insert_data: dict
     ) -> None:
-        if not item_dict.get("_mongo_update_rule"):
-            db[collection].insert_one(insert_data)
-        else:
-            db[collection].update_one(
-                item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
+        update_rule = item_dict.get("_update_rule") or item_dict.get(
+            "_mongo_update_rule"
+        )
+        if update_rule:
+            query_key = update_rule.keys()
+            mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
+                "_mongo_update_keys"
             )
+            if mongo_update_keys:
+                set_data = ReuseOperation.get_items_by_keys(
+                    data=insert_data, keys=mongo_update_keys
+                )
+            else:
+                set_data = ReuseOperation.get_items_except_keys(
+                    data=insert_data, keys=set(query_key).union({"_id"})
+                )
+            set_insert_data = ReuseOperation.get_items_except_keys(
+                data=insert_data, keys=set_data
+            )
+            db[collection].find_one_and_update(
+                filter=update_rule,
+                update={
+                    "$set": set_data,
+                    "$setOnInsert": set_insert_data,
+                },
+                upsert=True,
+            )
+        else:
+            db[collection].insert_one(insert_data)
 
 
 class AsyncStorageHandler:
@@ -73,9 +97,32 @@ class AsyncStorageHandler:
     async def store(
         db: AgnosticDatabase, item_dict: dict, collection: str, insert_data: dict
     ) -> None:
-        if not item_dict.get("_mongo_update_rule"):
-            await db[collection].insert_one(insert_data)
-        else:
-            await db[collection].update_one(
-                item_dict["_mongo_update_rule"], {"$set": insert_data}, upsert=True
+        update_rule = item_dict.get("_update_rule") or item_dict.get(
+            "_mongo_update_rule"
+        )
+        if update_rule:
+            query_key = update_rule.keys()
+            mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
+                "_mongo_update_keys"
             )
+            if mongo_update_keys:
+                set_data = ReuseOperation.get_items_by_keys(
+                    data=insert_data, keys=mongo_update_keys
+                )
+            else:
+                set_data = ReuseOperation.get_items_except_keys(
+                    data=insert_data, keys=set(query_key).union({"_id"})
+                )
+            set_insert_data = ReuseOperation.get_items_except_keys(
+                data=insert_data, keys=set_data
+            )
+            await db[collection].find_one_and_update(
+                filter=update_rule,
+                update={
+                    "$set": set_data,
+                    "$setOnInsert": set_insert_data,
+                },
+                upsert=True,
+            )
+        else:
+            await db[collection].insert_one(insert_data)

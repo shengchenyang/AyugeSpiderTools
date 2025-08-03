@@ -231,7 +231,7 @@ class ReuseOperation:
             1). 整合后的 item
         """
         insert_data = cls.get_items_except_keys(
-            data=item_dict, keys={"_mongo_update_rule", "_table"}
+            data=item_dict, keys=AyuItem._except_keys
         )
         judge_item = next(iter(insert_data.values()))
         if cls.is_namedtuple_instance(judge_item):
@@ -312,6 +312,8 @@ class ReuseOperation:
         Returns:
             1). 取值后的 dict，或不满足请求的 False 值
         """
+        if not keys:
+            return {}
         return {k: v for k, v in data.items() if k in keys}
 
     @staticmethod
@@ -325,6 +327,8 @@ class ReuseOperation:
         Returns:
             1). data 排除 keys 中的键值后的值
         """
+        if not keys:
+            return data
         return {k: v for k, v in data.items() if k not in keys}
 
     @staticmethod

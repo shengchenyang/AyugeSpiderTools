@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABCMeta
 from collections.abc import Iterator, MutableMapping
 from dataclasses import dataclass
-from typing import Any, NamedTuple, NoReturn
+from typing import Any, ClassVar, NamedTuple, NoReturn
 
 import scrapy
 from scrapy.item import Item
@@ -115,10 +115,21 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         {'_table': 'tab'}
     """
 
+    _except_keys: ClassVar[set[str]] = {
+        "_table",
+        "_mongo_update_rule",
+        "_mongo_update_keys",
+        "_update_rule",
+        "_update_keys",
+    }
+
     def __init__(
         self,
         _table: DataItem | str,
         _mongo_update_rule: dict[str, Any] | None = None,
+        _update_rule: dict[str, Any] | None = None,
+        _mongo_update_keys: set | None = None,
+        _update_keys: set | None = None,
         **kwargs,
     ) -> None:
         """初始化 AyuItem 实例
@@ -126,6 +137,9 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         Args:
             _table: 数据库表名。
             _mongo_update_rule: MongoDB 存储场景下可能需要的查重条件，默认为 None。
+            _update_rule: 将代替 _mongo_update_rule，适配 mongo mysql postgresql 等场景。
+            _mongo_update_keys: MongoDB 更新场景下的需要更新的字段，默认为 None。
+            _update_keys: 将代替 _mongo_update_keys，适配 mongo mysql postgresql 等场景。
         """
         self.__fields = set()
         if _table:
@@ -134,6 +148,15 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         if _mongo_update_rule:
             self.__fields.add("_mongo_update_rule")
             setattr(self, "_mongo_update_rule", _mongo_update_rule)
+        if _mongo_update_keys:
+            self.__fields.add("_mongo_update_keys")
+            setattr(self, "_mongo_update_keys", _mongo_update_keys)
+        if _update_rule:
+            self.__fields.add("_update_rule")
+            setattr(self, "_update_rule", _update_rule)
+        if _update_keys:
+            self.__fields.add("_update_keys")
+            setattr(self, "_update_keys", _update_keys)
         for key, value in kwargs.items():
             setattr(self, key, value)
             self.__fields.add(key)
