@@ -234,19 +234,25 @@ class ReuseOperation:
             data=item_dict, keys=AyuItem._except_keys
         )
         judge_item = next(iter(insert_data.values()))
+        update_rule = item_dict.get("_update_rule")
+        update_keys = item_dict.get("_update_keys")
         if cls.is_namedtuple_instance(judge_item):
             _table_name = item_dict["_table"].key_value
             _table_notes = item_dict["_table"].notes
             table_info = AlterItemTable(_table_name, _table_notes)
             new_item = {k: v.key_value for k, v in insert_data.items()}
             notes_dic = {k: v.notes for k, v in insert_data.items()}
-            return AlterItem(new_item, notes_dic, table_info, True)
+            return AlterItem(
+                new_item, notes_dic, table_info, True, update_rule, update_keys
+            )
 
         else:
             _table_name = item_dict["_table"]
             table_info = AlterItemTable(_table_name, "")
             notes_dic = {k: "" for k in insert_data}
-            return AlterItem(insert_data, notes_dic, table_info, False)
+            return AlterItem(
+                insert_data, notes_dic, table_info, False, update_rule, update_keys
+            )
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:

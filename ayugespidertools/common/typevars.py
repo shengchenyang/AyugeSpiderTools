@@ -182,6 +182,8 @@ class AlterItem(NamedTuple):
     notes_dic: dict[str, str]
     table: AlterItemTable
     is_namedtuple: bool = False
+    update_rule: dict[str, Any] = {}
+    update_keys: set[str] = set()
 
 
 class MQConf(NamedTuple):

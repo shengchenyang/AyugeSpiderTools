@@ -20,6 +20,7 @@ class AboutSql:
         base: SqlModeStr = "and",
         order_by: str | None = None,
         limit: bool | int = False,
+        vertical: bool = True,
     ) -> tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句
 
@@ -30,19 +31,23 @@ class AboutSql:
             base: 多查询条件
             order_by: 排序的 key 值
             limit: limit
+            vertical: rule 的规则是否是 | 分隔
 
         Returns:
             1). sql: 生成的 sql 语句
             2). 查询字段的参数名称
         """
-        select_key = ", ".join(f"`{k}`" for k in key)
+        select_key = ", ".join(k if k in {1, "1"} else f"`{k}`" for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
         select_key = select_key.replace("""`count(1)`""", "count(1)")
 
         _base = f" {base} "
-        select_where = _base.join(
-            f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
-        )
+        if vertical:
+            select_where = _base.join(
+                f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
+            )
+        else:
+            select_where = _base.join(f"`{k}`=%s" for k in rule)
 
         _where = f"where {select_where}" if select_where else ""
         _order_by = f"order by {order_by}" if order_by else ""
