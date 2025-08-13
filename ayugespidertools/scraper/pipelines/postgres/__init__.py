@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.postgreserrhandle import Synchronize, deal_postgres_err
+from ayugespidertools.common.sqlformat import GenPostgresql
 
 __all__ = ["AyuPostgresPipeline"]
 
@@ -40,8 +41,30 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=_table_name, item=new_item)
+        if update_rule := alter_item.update_rule:
+            select_sql, select_value = GenPostgresql.select_generate(
+                db_table=_table_name,
+                key=["1"],
+                rule=update_rule,
+                limit=1,
+                vertical=False,
+            )
+            self.cursor.execute(select_sql, select_value)
+            if self.cursor.rowcount:
+                if update_keys := alter_item.update_keys:
+                    update_set_data = ReuseOperation.get_items_by_keys(
+                        data=new_item, keys=update_keys
+                    )
+                    update_sql, update_value = GenPostgresql.update_generate(
+                        db_table=_table_name,
+                        data=update_set_data,
+                        rule=update_rule,
+                    )
+                    self.cursor.execute(update_sql, update_value)
+                    self.conn.commit()
+                return
 
+        sql = self._get_sql_by_item(table=_table_name, item=new_item)
         try:
             self.cursor.execute(sql, tuple(new_item.values()))
             self.conn.commit()
