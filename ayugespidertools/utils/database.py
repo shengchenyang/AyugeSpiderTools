@@ -275,12 +275,50 @@ class OraclePortal(metaclass=PortalSingletonMeta):
             host=db_conf.host,
             port=db_conf.port,
             service_name=db_conf.service_name,
-            encoding=db_conf.encoding,
             mode=oracle_authentication_mode,
         )
 
     def connect(self):
         return self.conn
+
+
+class OracleAsyncPortal(metaclass=PortalSingletonMeta):
+    def __init__(
+        self,
+        db_conf: OracleConf,
+        tag: PortalTag = PortalTag.DEFAULT,
+        singleton: bool = False,
+    ):
+        if db_conf.authentication_mode not in {
+            "DEFAULT",
+            "PRELIM",
+            "SYSASM",
+            "SYSBKP",
+            "SYSDBA",
+            "SYSDGD",
+            "SYSKMT",
+            "SYSOPER",
+            "SYSRAC",
+        }:
+            raise ValueError("OracleDB requires the authentication modes parameter.")
+
+        oracle_authentication_mode = getattr(
+            oracledb, f"AUTH_MODE_{db_conf.authentication_mode}", 0
+        )
+        if oracle_thick_lib_dir := db_conf.thick_lib_dir:
+            oracledb.init_oracle_client(oracle_thick_lib_dir)
+
+        self.pool = oracledb.create_pool_async(
+            user=db_conf.user,
+            password=db_conf.password,
+            host=db_conf.host,
+            port=db_conf.port,
+            service_name=db_conf.service_name,
+            mode=oracle_authentication_mode,
+        )
+
+    def connect(self):
+        return self.pool
 
 
 class OSSPortal(metaclass=PortalSingletonMeta):

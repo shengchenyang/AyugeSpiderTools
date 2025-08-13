@@ -8,7 +8,7 @@ from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.sqlformat import AboutSql
+from ayugespidertools.common.sqlformat import GenMysql
 from ayugespidertools.common.typevars import PortalTag
 from ayugespidertools.utils.database import MysqlAsyncPortal
 
@@ -46,7 +46,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                 _table_name = alter_item.table.name
                 new_item = alter_item.new_item
                 if update_rule := alter_item.update_rule:
-                    select_sql, select_value = AboutSql.select_generate(
+                    select_sql, select_value = GenMysql.select_generate(
                         db_table=_table_name,
                         key=["1"],
                         rule=update_rule,
@@ -58,7 +58,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                             update_set_data = ReuseOperation.get_items_by_keys(
                                 data=new_item, keys=update_keys
                             )
-                            update_sql, update_value = AboutSql.update_generate(
+                            update_sql, update_value = GenMysql.update_generate(
                                 db_table=_table_name,
                                 data=update_set_data,
                                 rule=update_rule,

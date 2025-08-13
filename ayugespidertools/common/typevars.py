@@ -133,7 +133,6 @@ class OracleConf(NamedTuple):
     user: str
     password: str
     service_name: str | None = None
-    encoding: str = "utf8"
     thick_lib_dir: bool | str = False
     authentication_mode: OracleAuthenticationModesStr = "DEFAULT"
 

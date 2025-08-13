@@ -36,7 +36,6 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
             "host": self.oracle_conf.host,
             "port": self.oracle_conf.port,
             "service_name": self.oracle_conf.service_name,
-            "encoding": self.oracle_conf.encoding,
             "config_dir": self.oracle_conf.thick_lib_dir or None,
         }
         self.dbpool = adbapi.ConnectionPool(

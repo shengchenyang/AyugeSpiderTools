@@ -8,7 +8,7 @@ import pymysql
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
-from ayugespidertools.common.sqlformat import AboutSql
+from ayugespidertools.common.sqlformat import GenMysql
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
 warnings.filterwarnings(
@@ -54,7 +54,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
         if update_rule := alter_item.update_rule:
-            select_sql, select_value = AboutSql.select_generate(
+            select_sql, select_value = GenMysql.select_generate(
                 db_table=_table_name,
                 key=["1"],
                 rule=update_rule,
@@ -66,7 +66,7 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
                     update_set_data = ReuseOperation.get_items_by_keys(
                         data=new_item, keys=update_keys
                     )
-                    update_sql, update_value = AboutSql.update_generate(
+                    update_sql, update_value = GenMysql.update_generate(
                         db_table=_table_name,
                         data=update_set_data,
                         rule=update_rule,

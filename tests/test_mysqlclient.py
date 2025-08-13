@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ayugespidertools.common.sqlformat import AboutSql
+from ayugespidertools.common.sqlformat import GenMysql
 from ayugespidertools.mysqlclient import MysqlOrm
 from tests import tests_sqlfiledir
 from tests.conftest import PYMYSQL_CONFIG, test_table
@@ -39,7 +39,7 @@ def mysql_first_step(mysql_db_cursor):
 
 
 def test_select_data(mysql_first_step, mysql_db_cursor):
-    select_sql, select_value = AboutSql.select_generate(
+    select_sql, select_value = GenMysql.select_generate(
         db_table=test_table,
         key=["id", "article_title"],
         rule={"nick_name|=": "youcans_"},
@@ -51,7 +51,7 @@ def test_select_data(mysql_first_step, mysql_db_cursor):
 
 
 def test_insert_data(mysql_first_step, mysql_db_cursor):
-    insert_sql, insert_value = AboutSql.insert_generate(
+    insert_sql, insert_value = GenMysql.insert_generate(
         db_table=test_table,
         data={
             "article_detail_url": "https://blog.csdn.net/scm_2008/article/details/129387927",
@@ -64,7 +64,7 @@ def test_insert_data(mysql_first_step, mysql_db_cursor):
     mysql_db_cursor.execute(insert_sql, insert_value)
 
     # 插入后查询这条数据，如果搜索结果中存在一条及以上则正常
-    select_sql, select_value = AboutSql.select_generate(
+    select_sql, select_value = GenMysql.select_generate(
         db_table=test_table,
         key=["id", "article_title"],
         rule={
@@ -80,7 +80,7 @@ def test_insert_data(mysql_first_step, mysql_db_cursor):
 
 def test_update_data(mysql_first_step, mysql_db_cursor):
     _favor_count_updated = "100"
-    update_sql, update_value = AboutSql.update_generate(
+    update_sql, update_value = GenMysql.update_generate(
         db_table=test_table,
         data={"favor_count": _favor_count_updated},
         rule={"id": "1"},
@@ -88,7 +88,7 @@ def test_update_data(mysql_first_step, mysql_db_cursor):
     mysql_db_cursor.execute(update_sql, update_value)
 
     # 更新后查询这条数据，如果确实修改则正常
-    select_sql, select_value = AboutSql.select_generate(
+    select_sql, select_value = GenMysql.select_generate(
         db_table=test_table,
         key=["id", "favor_count"],
         rule={"id|=": "1"},
@@ -107,7 +107,7 @@ def mysqlorm_conn():
 
 class TestMysqlOrm:
     def test_mysqlorm_insert_data(self, mysqlorm_conn, mysql_db_cursor):
-        insert_sql, insert_value = AboutSql.insert_generate(
+        insert_sql, insert_value = GenMysql.insert_generate(
             db_table=test_table,
             data={
                 "article_detail_url": "https://blog.csdn.net/scm_2008/article/details/129387927",
@@ -120,7 +120,7 @@ class TestMysqlOrm:
         mysqlorm_conn.insert_data(sql_pre=insert_sql, sql_after=insert_value)
 
         # 插入后查询这条数据，如果搜索结果中存在一条及以上则正常
-        select_sql, select_value = AboutSql.select_generate(
+        select_sql, select_value = GenMysql.select_generate(
             db_table=test_table,
             key=["id", "article_title"],
             rule={
@@ -134,7 +134,7 @@ class TestMysqlOrm:
         assert len(_select_res) >= 1
 
     def test_mysqlorm_search_data(self, mysqlorm_conn, mysql_db_cursor):
-        select_sql, select_value = AboutSql.select_generate(
+        select_sql, select_value = GenMysql.select_generate(
             db_table=test_table,
             key=["id", "article_title"],
             rule={"nick_name|=": "youcans_"},
@@ -147,7 +147,7 @@ class TestMysqlOrm:
 
     def test_mysqlorm_update_data(self, mysqlorm_conn, mysql_db_cursor):
         _favor_count_updated = "200"
-        update_sql, update_value = AboutSql.update_generate(
+        update_sql, update_value = GenMysql.update_generate(
             db_table=test_table,
             data={"favor_count": _favor_count_updated},
             rule={"id": "1"},
@@ -155,7 +155,7 @@ class TestMysqlOrm:
         mysqlorm_conn.update_data(sql_pre=update_sql, sql_after=update_value)
 
         # 更新后查询这条数据，如果确实修改则正常
-        select_sql, select_value = AboutSql.select_generate(
+        select_sql, select_value = GenMysql.select_generate(
             db_table=test_table,
             key=["id", "favor_count"],
             rule={"id|=": "1"},
