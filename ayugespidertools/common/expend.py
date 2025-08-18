@@ -203,9 +203,9 @@ class PostgreSQLPipeEnhanceMixin:
         Returns:
             1). sql 插入语句
         """
-        keys = f"""{", ".join(item.keys())}"""
-        values = ", ".join(["%s"] * len(item))
-        return f"INSERT INTO {table} ({keys}) values ({values});"
+        keys = ", ".join(item.keys())
+        values = ", ".join(f"${i}" for i in range(1, len(item) + 1))
+        return f"INSERT INTO {table} ({keys}) VALUES ({values}) ON CONFLICT DO NOTHING;"
 
 
 class OraclePipeEnhanceMixin:

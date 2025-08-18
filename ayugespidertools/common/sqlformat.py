@@ -5,6 +5,7 @@ from typing import Any, Literal, Protocol
 __all__ = [
     "GenMysql",
     "GenPostgresql",
+    "GenPostgresqlAsyncpg",
     "GenOracle",
 ]
 
@@ -164,6 +165,56 @@ class GenPostgresql:
         _base = f" {base} "
         update_where = _base.join(f"{k}=%s" for k in rule)
         sql = f"""update {db_table} set {update_set} where {update_where}"""
+        return sql, tuple(data.values()) + tuple(rule.values())
+
+
+class GenPostgresqlAsyncpg:
+    @staticmethod
+    def select_generate(
+        db_table: str,
+        key: list,
+        rule: dict[str, Any],
+        base: SqlModeStr = "and",
+        order_by: str | None = None,
+        limit: bool | int = False,
+        vertical: bool = True,
+    ) -> tuple[str, Any]:
+        select_key = ", ".join(k if k in {1, "1"} else f"{k}" for k in key)
+        select_key = select_key.replace('''"count(*)"''', "count(*)")
+        select_key = select_key.replace('''"count(1)"''', "count(1)")
+
+        _base = f" {base} "
+        if vertical:
+            select_where = _base.join(
+                f"{k.split('|')[0]}{k.split('|')[1]}${i + 1}"
+                for i, k in enumerate(rule)
+            )
+        else:
+            select_where = _base.join(f"{k}=${i + 1}" for i, k in enumerate(rule))
+
+        _where = f"WHERE {select_where}" if select_where else ""
+        _order_by = f"ORDER BY {order_by}" if order_by else ""
+        _limit = f"LIMIT {limit}" if limit else ""
+
+        sql = f"SELECT {select_key} FROM {db_table} {_where} {_order_by} {_limit}"
+        return sql, tuple(rule.values())
+
+    @staticmethod
+    def insert_generate(db_table: str, data: dict) -> tuple[str, Any]:
+        keys = ", ".join(data.keys())
+        placeholders = ", ".join(f"${i + 1}" for i, _ in enumerate(data))
+        sql = f"INSERT INTO {db_table} ({keys}) VALUES ({placeholders})"
+        return sql, data.values()
+
+    @staticmethod
+    def update_generate(
+        db_table: str, data: dict, rule: dict[str, Any], base: SqlModeStr = "and"
+    ) -> tuple[str, tuple]:
+        update_set = ", ".join(f"{k}=${i + 1}" for i, k in enumerate(data))
+        offset = len(data)
+        _base = f" {base} "
+        update_where = _base.join(f"{k}=${i + 1 + offset}" for i, k in enumerate(rule))
+        sql = f"UPDATE {db_table} SET {update_set} WHERE {update_where}"
         return sql, tuple(data.values()) + tuple(rule.values())
 
 

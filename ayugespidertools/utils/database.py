@@ -25,9 +25,10 @@ from ayugespidertools.common.typevars import (
 from ayugespidertools.mongoclient import MongoDbBase
 
 try:
+    import asyncpg
     import oracledb
     import psycopg
-    from psycopg_pool import AsyncConnectionPool
+    from asyncpg.pool import Pool as PGPool
 except ImportError:
     # pip install ayugespidertools[database]
     pass
@@ -38,6 +39,7 @@ __all__ = [
     "MongoDBPortal",
     "MongoDBAsyncPortal",
     "OraclePortal",
+    "OracleAsyncPortal",
     "PostgreSQLPortal",
     "PostgreSQLAsyncPortal",
     "ElasticSearchPortal",
@@ -361,20 +363,15 @@ class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
     ):
-        self.pool = AsyncConnectionPool(
-            f"dbname={db_conf.database} "
-            f"user={db_conf.user} "
-            f"host={db_conf.host} "
-            f"port={db_conf.port} "
-            f"password={db_conf.password}",
-            open=False,
+        self.db_conf = db_conf
+        self._pool: PGPool | None = None
+
+    async def connect(self) -> PGPool:
+        self._pool = await asyncpg.create_pool(
+            f"postgresql://{self.db_conf.user}:{self.db_conf.password}"
+            f"@{self.db_conf.host}:{self.db_conf.port}/{self.db_conf.database}"
         )
+        return self._pool
 
-    async def open(self):
-        await self.pool.open()
-
-    def connect(self) -> AsyncConnectionPool:
-        return self.pool
-
-    def close(self):
-        self.pool.close()
+    async def close(self):
+        await self._pool.close()

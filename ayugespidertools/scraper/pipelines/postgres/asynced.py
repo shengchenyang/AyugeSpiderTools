@@ -6,13 +6,13 @@ from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.sqlformat import GenPostgresql
+from ayugespidertools.common.sqlformat import GenPostgresqlAsyncpg
 from ayugespidertools.common.typevars import PortalTag
 from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import PostgreSQLAsyncPortal
 
 try:
-    from psycopg_pool import AsyncConnectionPool
+    from asyncpg.pool import Pool as PGPool
 except ImportError:
     raise NotConfigured(
         "missing psycopg_pool library, please install it. "
@@ -30,49 +30,49 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
-    pool: AsyncConnectionPool
+    pool: PGPool
 
     def open_spider(self, spider: AyuSpider) -> Deferred:
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
         return deferred_from_coro(self._open_spider(spider))
 
     async def _open_spider(self, spider: AyuSpider) -> None:
-        self.pool = PostgreSQLAsyncPortal(
+        self.pool = await PostgreSQLAsyncPortal(
             db_conf=spider.postgres_conf, tag=PortalTag.LIBRARY
         ).connect()
-        await self.pool.open()
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
-        async with self.pool.connection() as conn:
-            item_dict = ReuseOperation.item_to_dict(item)
+    async def insert_item(self, item_dict: dict) -> None:
+        async with self.pool.acquire() as conn:
             alter_item = ReuseOperation.reshape_item(item_dict)
             _table_name = alter_item.table.name
             new_item = alter_item.new_item
             if update_rule := alter_item.update_rule:
-                select_sql, select_value = GenPostgresql.select_generate(
+                select_sql, select_value = GenPostgresqlAsyncpg.select_generate(
                     db_table=_table_name,
                     key=["1"],
                     rule=update_rule,
                     limit=1,
                     vertical=False,
                 )
-                cur = await conn.execute(select_sql, select_value)
-                if _ := await cur.fetchone():
+                if await conn.fetchrow(select_sql, *select_value):
                     if update_keys := alter_item.update_keys:
                         update_set_data = ReuseOperation.get_items_by_keys(
                             data=new_item, keys=update_keys
                         )
-                        update_sql, update_value = GenPostgresql.update_generate(
+                        update_sql, update_value = GenPostgresqlAsyncpg.update_generate(
                             db_table=_table_name,
                             data=update_set_data,
                             rule=update_rule,
                         )
-                        await conn.execute(update_sql, update_value)
+                        await conn.execute(update_sql, *update_value)
                     return
 
             sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
-            await conn.execute(sql, tuple(new_item.values()))
-        return item
+            await conn.execute(sql, *new_item.values())
+
+    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+        item_dict = ReuseOperation.item_to_dict(item)
+        await self.insert_item(item_dict)
 
     async def _close_spider(self) -> None:
         await self.pool.close()
