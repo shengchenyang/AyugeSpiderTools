@@ -62,7 +62,6 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
 
         sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
         cursor.execute(sql, tuple(new_item.values()))
-        return item
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

@@ -86,7 +86,6 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
                 note_dic=note_dic,
             )
             return self.db_insert(cursor, item)
-        return item
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

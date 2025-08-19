@@ -63,7 +63,7 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=_table_name, item=new_item)
+        sql = self._get_sql_by_item(table=_table_name, item=new_item, is_psycopg=True)
 
         try:
             cursor.execute(sql, tuple(new_item.values()))
@@ -82,7 +82,6 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
                 note_dic=note_dic,
             )
             return self.db_insert(cursor, item)
-        return item
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

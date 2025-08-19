@@ -193,19 +193,27 @@ class PostgreSQLPipeEnhanceMixin:
         return PostgreSQLPortal(db_conf=postgres_conf, tag=PortalTag.LIBRARY).connect()
 
     @staticmethod
-    def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
+    def _get_sql_by_item(
+        table: str, item: dict[str, Any], is_psycopg: bool = False
+    ) -> str:
         """根据处理后的 item 生成 postgresql 插入语句
 
         Args:
             table: 数据库表名
             item: 处理后的 item
+            is_psycopg: 是否是 psycopg 还是 asyncpg
 
         Returns:
             1). sql 插入语句
         """
-        keys = ", ".join(item.keys())
-        values = ", ".join(f"${i}" for i in range(1, len(item) + 1))
-        return f"INSERT INTO {table} ({keys}) VALUES ({values}) ON CONFLICT DO NOTHING;"
+        if is_psycopg:
+            keys = f"""{", ".join(item.keys())}"""
+            values = ", ".join(["%s"] * len(item))
+            return f"INSERT INTO {table} ({keys}) values ({values});"
+        else:
+            keys = ", ".join(item.keys())
+            values = ", ".join(f"${i}" for i in range(1, len(item) + 1))
+            return f"INSERT INTO {table} ({keys}) VALUES ({values}) ON CONFLICT DO NOTHING;"
 
 
 class OraclePipeEnhanceMixin:
