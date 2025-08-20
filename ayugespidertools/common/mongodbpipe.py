@@ -65,7 +65,7 @@ class SyncStorageHandler:
             "_mongo_update_rule"
         )
         if update_rule:
-            query_key = update_rule.keys()
+            update_doc = {}
             mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
                 "_mongo_update_keys"
             )
@@ -73,20 +73,14 @@ class SyncStorageHandler:
                 set_data = ReuseOperation.get_items_by_keys(
                     data=insert_data, keys=mongo_update_keys
                 )
+                update_doc["$set"] = set_data
             else:
-                set_data = ReuseOperation.get_items_except_keys(
-                    data=insert_data, keys=set(query_key).union({"_id"})
-                )
-            set_insert_data = ReuseOperation.get_items_except_keys(
+                set_data = {}
+            update_doc["$setOnInsert"] = ReuseOperation.get_items_except_keys(
                 data=insert_data, keys=set_data
             )
             db[collection].find_one_and_update(
-                filter=update_rule,
-                update={
-                    "$set": set_data,
-                    "$setOnInsert": set_insert_data,
-                },
-                upsert=True,
+                filter=update_rule, update=update_doc, upsert=True
             )
         else:
             db[collection].insert_one(insert_data)
@@ -101,7 +95,7 @@ class AsyncStorageHandler:
             "_mongo_update_rule"
         )
         if update_rule:
-            query_key = update_rule.keys()
+            update_doc = {}
             mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
                 "_mongo_update_keys"
             )
@@ -109,20 +103,14 @@ class AsyncStorageHandler:
                 set_data = ReuseOperation.get_items_by_keys(
                     data=insert_data, keys=mongo_update_keys
                 )
+                update_doc["$set"] = set_data
             else:
-                set_data = ReuseOperation.get_items_except_keys(
-                    data=insert_data, keys=set(query_key).union({"_id"})
-                )
-            set_insert_data = ReuseOperation.get_items_except_keys(
+                set_data = {}
+            update_doc["$setOnInsert"] = ReuseOperation.get_items_except_keys(
                 data=insert_data, keys=set_data
             )
             await db[collection].find_one_and_update(
-                filter=update_rule,
-                update={
-                    "$set": set_data,
-                    "$setOnInsert": set_insert_data,
-                },
-                upsert=True,
+                filter=update_rule, update=update_doc, upsert=True
             )
         else:
             await db[collection].insert_one(insert_data)
