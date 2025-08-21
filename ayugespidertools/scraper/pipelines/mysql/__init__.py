@@ -8,7 +8,6 @@ import pymysql
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
-from ayugespidertools.common.sqlformat import GenMysql
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
 warnings.filterwarnings(
@@ -53,33 +52,17 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        if update_rule := alter_item.update_rule:
-            select_sql, select_value = GenMysql.select_generate(
-                db_table=_table_name,
-                key=["1"],
-                rule=update_rule,
-                limit=1,
-                vertical=False,
+        duplicate = None
+        if update_keys := alter_item.update_keys:
+            duplicate = ReuseOperation.get_items_by_keys(
+                data=new_item, keys=update_keys
             )
-            if _ := self.cursor.execute(select_sql, select_value):
-                if update_keys := alter_item.update_keys:
-                    update_set_data = ReuseOperation.get_items_by_keys(
-                        data=new_item, keys=update_keys
-                    )
-                    update_sql, update_value = GenMysql.update_generate(
-                        db_table=_table_name,
-                        data=update_set_data,
-                        rule=update_rule,
-                    )
-                    self.cursor.execute(update_sql, update_value)
-                    self.conn.commit()
-                return
-
         sql, args = self._get_sql_by_item(
             table=_table_name,
             item=new_item,
             odku_enable=self.mysql_conf.odku_enable,
             insert_prefix=self.mysql_conf.insert_prefix,
+            duplicate=duplicate,
         )
 
         try:

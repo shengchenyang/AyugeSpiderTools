@@ -58,6 +58,7 @@ class MysqlPipeEnhanceMixin:
         item: dict[str, Any],
         odku_enable: bool = True,
         insert_prefix: InsertPrefixStr = "INSERT",
+        duplicate: dict[str, Any] | None = None,
     ) -> tuple[str, tuple]:
         """根据处理后的 item 生成 mysql 插入语句
 
@@ -74,9 +75,13 @@ class MysqlPipeEnhanceMixin:
         keys = f"""`{"`, `".join(item.keys())}`"""
         values = ", ".join(["%s"] * len(item))
         if odku_enable:
-            update = ",".join([f" `{key}` = %s" for key in item])
+            if duplicate:
+                update = ",".join([f" `{key}` = %s" for key in duplicate])
+                args = tuple(item.values()) + tuple(duplicate.values())
+            else:
+                update = ",".join([f" `{key}` = %s" for key in item])
+                args = tuple(item.values()) * 2
             sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
-            args = tuple(item.values()) * 2
         else:
             sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
             args = tuple(item.values())
