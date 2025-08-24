@@ -335,11 +335,11 @@ class GenOracle:
         db_table: str,
         conflict_cols: set[str],
         data: dict[str, Any],
-        update_cols: Iterable[str] = None,
+        update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
         keys = list(data.keys())
         placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
-        insert_cols = ", ".join(keys)
+        insert_cols = ", ".join([f'"{col}"' for col in keys])
         if update_cols:
             update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
             conflict_sql = (
@@ -348,25 +348,29 @@ class GenOracle:
         else:
             conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
 
-        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql}"
+        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql}'
         return sql, tuple(data.values())
 
     @staticmethod
     def merge_generate(
         db_table: str,
-        match_cols: Iterable[str],
+        match_cols: Iterable[str] | None,
         data: dict[str, Any],
-        update_cols: set[str] | None = None,
+        update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
         keys = list(data.keys())
+        insert_cols = ", ".join([f'"{col}"' for col in keys])
+        if not match_cols:
+            placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
+            sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders})'
+            return sql.strip(), tuple(data.values())
+
         select_part = ", ".join(f':{i + 1} "{col}"' for i, col in enumerate(keys))
         using_sql = f"(SELECT {select_part} FROM dual) s"
         on_sql = " AND ".join([f't."{col}" = s."{col}"' for col in match_cols])
         if update_cols is None:
             update_cols = [k for k in keys if k not in match_cols]
         update_set = ", ".join([f't."{col}" = s."{col}"' for col in update_cols])
-
-        insert_cols = ", ".join([f'"{col}"' for col in keys])
         insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
         MERGE INTO "{db_table}" t

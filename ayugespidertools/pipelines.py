@@ -17,6 +17,7 @@ _MODULES = {
     "mysql.twisted": ["AyuTwistedMysqlPipeline"],
     "oracle.fantasy": ["AyuFtyOraclePipeline"],
     "oracle.twisted": ["AyuTwistedOraclePipeline"],
+    "oracle.asynced": ["AyuAsyncOraclePipeline"],
     "oss.ali": ["AyuAsyncOssPipeline"],
     "oss.batch": ["AyuAsyncOssBatchPipeline"],
     "postgres.asynced": ["AyuAsyncPostgresPipeline"],

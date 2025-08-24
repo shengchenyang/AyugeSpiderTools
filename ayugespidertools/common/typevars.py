@@ -185,6 +185,10 @@ class AlterItem(NamedTuple):
     update_keys: set[str] = set()
     conflict_cols: set[str] = set()
 
+    @property
+    def _update_rule(self) -> dict[str, Any]:
+        return self.update_rule or {}
+
 
 class MQConf(NamedTuple):
     host: str

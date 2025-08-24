@@ -35,32 +35,15 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
         if not (new_item := alter_item.new_item):
             return
 
-        _table_name = alter_item.table.name
-        if update_rule := alter_item.update_rule:
-            select_sql, select_value = GenOracle.select_generate(
-                db_table=_table_name,
-                key=["1"],
-                rule=update_rule,
-                limit=1,
-                vertical=False,
-            )
-            self.cursor.execute(select_sql, select_value)
-            if self.cursor.fetchone():
-                if update_keys := alter_item.update_keys:
-                    update_set_data = ReuseOperation.get_items_by_keys(
-                        data=new_item, keys=update_keys
-                    )
-                    update_sql, update_value = GenOracle.update_generate(
-                        db_table=_table_name,
-                        data=update_set_data,
-                        rule=update_rule,
-                    )
-                    self.cursor.execute(update_sql, update_value)
-                    self.conn.commit()
-                return
-
-        sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
-        self.cursor.execute(sql, tuple(new_item.values()))
+        update_keys = alter_item.update_keys
+        update_rules = alter_item._update_rule
+        sql, args = GenOracle.merge_generate(
+            db_table=alter_item.table.name,
+            match_cols=update_rules.keys(),
+            data=new_item,
+            update_cols=update_keys,
+        )
+        self.cursor.execute(sql, args)
         self.conn.commit()
 
     def close_spider(self, spider: AyuSpider) -> None:

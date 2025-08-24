@@ -49,7 +49,6 @@ def test_items_AyuItem():
 
     # 转字典场景
     mdi_dict = mdi.asdict()
-    print("vvvv", mdi_dict)
     assert mdi_dict == {
         "field1": "value1",
         "field2": DataItem(key_value="field2_key", notes="key值"),
