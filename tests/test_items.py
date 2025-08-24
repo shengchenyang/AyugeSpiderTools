@@ -43,17 +43,19 @@ def test_items_AyuItem():
             isinstance(mdi["field2"], DataItem),
             mdi["field2"].key_value == "field2_key",
             mdi["field2"].notes == "key值",
-            mdi.fields() == {"_table", "field1", "field2", "name"},
+            mdi.fields() == {"_table", "field1", "field2", "name", "_conflict_cols"},
         ]
     )
 
     # 转字典场景
     mdi_dict = mdi.asdict()
+    print("vvvv", mdi_dict)
     assert mdi_dict == {
         "field1": "value1",
         "field2": DataItem(key_value="field2_key", notes="key值"),
         "_table": "table",
         "name": "ayuge",
+        "_conflict_cols": {"id"},
     }
 
     # 删除字段场景
@@ -64,7 +66,7 @@ def test_items_AyuItem():
         del mdi["no_this_field"]
     with pytest.raises(AttributeError):
         del mdi.no_this_field
-    assert mdi.fields() == {"_table", "field1", "field2"}
+    assert mdi.fields() == {"_table", "field1", "field2", "_conflict_cols"}
 
     # 转 ScrapyItem 场景
     mdi_item = mdi.asitem()
@@ -86,6 +88,7 @@ def test_items_AyuItem():
         "_table": "table",
         "field1": "value1",
         "field2": DataItem(key_value="field2_key", notes="key值"),
+        "_conflict_cols": {"id"},
     }
 
     # 以下是 item loaders 的使用
@@ -105,6 +108,7 @@ def test_items_AyuItem():
             == {
                 "_table": "table",
                 "book_name": "book_name_data22",
+                "_conflict_cols": {"id"},
             },
         ]
     )
@@ -125,6 +129,7 @@ def test_items_AyuItem():
                 "_table": "table",
                 "_mongo_update_rule": {"title": "title_data"},
                 "field1": "value1",
+                "_conflict_cols": {"id"},
             },
         ]
     )
@@ -158,6 +163,7 @@ def test_items_AyuItem():
                 "_mongo_update_rule": {"title": "title_data"},
                 "_table": "table",
                 "book_name": "book_name_data22",
+                "_conflict_cols": {"id"},
             },
         ]
     )

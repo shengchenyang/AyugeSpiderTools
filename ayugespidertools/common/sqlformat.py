@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any, Literal, Protocol
 
 __all__ = [
@@ -167,6 +168,27 @@ class GenPostgresql:
         sql = f"""update {db_table} set {update_set} where {update_where}"""
         return sql, tuple(data.values()) + tuple(rule.values())
 
+    @staticmethod
+    def upsert_generate(
+        db_table: str,
+        conflict_cols: set[str],
+        data: dict,
+        update_cols: set[str] | None = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        placeholders = ", ".join(["%s"] * len(keys))
+        insert_cols = ", ".join(keys)
+        if update_cols:
+            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
+            conflict_sql = (
+                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
+            )
+        else:
+            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
+
+        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
+        return sql, tuple(data.values())
+
 
 class GenPostgresqlAsyncpg:
     @staticmethod
@@ -182,7 +204,6 @@ class GenPostgresqlAsyncpg:
         select_key = ", ".join(k if k in {1, "1"} else f"{k}" for k in key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
-
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
@@ -217,6 +238,55 @@ class GenPostgresqlAsyncpg:
         sql = f"UPDATE {db_table} SET {update_set} WHERE {update_where}"
         return sql, tuple(data.values()) + tuple(rule.values())
 
+    @staticmethod
+    def upsert_generate(
+        db_table: str,
+        conflict_cols: set[str],
+        data: dict,
+        update_cols: set[str] | None = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
+        insert_cols = ", ".join(keys)
+        if update_cols:
+            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
+            conflict_sql = (
+                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
+            )
+        else:
+            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
+
+        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
+        return sql, tuple(data.values())
+
+    @staticmethod
+    def merge_generate(
+        db_table: str,
+        match_cols: list[str],
+        data: dict,
+        update_cols: list[str] | None = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
+        using_sql = f"(VALUES ({placeholders})) AS s({', '.join(keys)})"
+        on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
+        if update_cols is None:
+            update_cols = [k for k in keys if k not in match_cols]
+        update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
+
+        insert_cols = ", ".join(keys)
+        insert_vals = ", ".join([f"s.{col}" for col in keys])
+        sql = f"""
+        MERGE INTO {db_table} AS t
+        USING {using_sql}
+        ON {on_sql}
+        WHEN MATCHED THEN
+            UPDATE SET {update_set}
+        WHEN NOT MATCHED THEN
+            INSERT ({insert_cols}) VALUES ({insert_vals})
+        """
+        return sql.strip(), tuple(data.values())
+
 
 class GenOracle:
     @staticmethod
@@ -232,7 +302,6 @@ class GenOracle:
         select_key = ", ".join(k if k in {1, "1"} else f"`{k}`" for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
         select_key = select_key.replace("""`count(1)`""", "count(1)")
-
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
@@ -254,10 +323,58 @@ class GenOracle:
         db_table: str, data: dict, rule: dict[str, Any], base: SqlModeStr = "and"
     ) -> tuple[str, tuple]:
         update_set = ", ".join(f'"{k}"=:{i + 1}' for i, k in enumerate(data))
-
         _base = f" {base} "
         update_where = _base.join(
             f'"{k}"=:{i + 1 + len(data)}' for i, k in enumerate(rule)
         )
         sql = f"""update "{db_table}" set {update_set} where {update_where}"""
         return sql, tuple(data.values()) + tuple(rule.values())
+
+    @staticmethod
+    def upsert_generate(
+        db_table: str,
+        conflict_cols: set[str],
+        data: dict[str, Any],
+        update_cols: Iterable[str] = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
+        insert_cols = ", ".join(keys)
+        if update_cols:
+            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
+            conflict_sql = (
+                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
+            )
+        else:
+            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
+
+        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql}"
+        return sql, tuple(data.values())
+
+    @staticmethod
+    def merge_generate(
+        db_table: str,
+        match_cols: Iterable[str],
+        data: dict[str, Any],
+        update_cols: set[str] | None = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        select_part = ", ".join(f':{i + 1} "{col}"' for i, col in enumerate(keys))
+        using_sql = f"(SELECT {select_part} FROM dual) s"
+        on_sql = " AND ".join([f't."{col}" = s."{col}"' for col in match_cols])
+        if update_cols is None:
+            update_cols = [k for k in keys if k not in match_cols]
+        update_set = ", ".join([f't."{col}" = s."{col}"' for col in update_cols])
+
+        insert_cols = ", ".join([f'"{col}"' for col in keys])
+        insert_vals = ", ".join([f's."{col}"' for col in keys])
+        sql = f"""
+        MERGE INTO "{db_table}" t
+        USING {using_sql}
+        ON ({on_sql})
+        WHEN MATCHED THEN
+            UPDATE SET {update_set}
+        WHEN NOT MATCHED THEN
+            INSERT ({insert_cols}) VALUES ({insert_vals})
+        """
+        return sql.strip(), tuple(data.values())

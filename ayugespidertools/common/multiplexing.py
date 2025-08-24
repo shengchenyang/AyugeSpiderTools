@@ -235,6 +235,7 @@ class ReuseOperation:
         judge_item = next(iter(insert_data.values()))
         update_rule = item_dict.get("_update_rule")
         update_keys = item_dict.get("_update_keys")
+        conflict_cols = item_dict.get("_conflict_cols")
         if cls.is_namedtuple_instance(judge_item):
             _table_name = item_dict["_table"].key_value
             _table_notes = item_dict["_table"].notes
@@ -242,7 +243,13 @@ class ReuseOperation:
             new_item = {k: v.key_value for k, v in insert_data.items()}
             notes_dic = {k: v.notes for k, v in insert_data.items()}
             return AlterItem(
-                new_item, notes_dic, table_info, True, update_rule, update_keys
+                new_item=new_item,
+                notes_dic=notes_dic,
+                table=table_info,
+                is_namedtuple=True,
+                update_rule=update_rule,
+                update_keys=update_keys,
+                conflict_cols=conflict_cols,
             )
 
         else:
@@ -250,7 +257,13 @@ class ReuseOperation:
             table_info = AlterItemTable(_table_name, "")
             notes_dic = {k: "" for k in insert_data}
             return AlterItem(
-                insert_data, notes_dic, table_info, False, update_rule, update_keys
+                new_item=insert_data,
+                notes_dic=notes_dic,
+                table=table_info,
+                is_namedtuple=False,
+                update_rule=update_rule,
+                update_keys=update_keys,
+                conflict_cols=conflict_cols,
             )
 
     @staticmethod

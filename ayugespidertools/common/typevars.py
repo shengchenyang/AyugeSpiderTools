@@ -183,6 +183,7 @@ class AlterItem(NamedTuple):
     is_namedtuple: bool = False
     update_rule: dict[str, Any] = {}
     update_keys: set[str] = set()
+    conflict_cols: set[str] = set()
 
 
 class MQConf(NamedTuple):

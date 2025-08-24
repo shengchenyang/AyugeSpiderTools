@@ -121,6 +121,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         "_mongo_update_keys",
         "_update_rule",
         "_update_keys",
+        "_conflict_cols",
     }
 
     def __init__(
@@ -130,6 +131,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         _update_rule: dict[str, Any] | None = None,
         _mongo_update_keys: set | None = None,
         _update_keys: set | None = None,
+        _conflict_cols: set | None = None,
         **kwargs,
     ) -> None:
         """初始化 AyuItem 实例
@@ -140,8 +142,11 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
             _update_rule: 将代替 _mongo_update_rule，适配 mongo mysql postgresql 等场景。
             _mongo_update_keys: MongoDB 更新场景下的需要更新的字段，默认为 None。
             _update_keys: 将代替 _mongo_update_keys，适配 mongo mysql postgresql 等场景。
+            _conflict_cols: 唯一索引冲突列，用于 postgresql 中的参数设置，默认为 {"id"}
         """
         self.__fields = set()
+        if _conflict_cols is None:
+            _conflict_cols = {"id"}
         if _table:
             self.__fields.add("_table")
             setattr(self, "_table", _table)
@@ -157,6 +162,9 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         if _update_keys:
             self.__fields.add("_update_keys")
             setattr(self, "_update_keys", _update_keys)
+        if _conflict_cols:
+            self.__fields.add("_conflict_cols")
+            setattr(self, "_conflict_cols", _conflict_cols)
         for key, value in kwargs.items():
             setattr(self, key, value)
             self.__fields.add(key)

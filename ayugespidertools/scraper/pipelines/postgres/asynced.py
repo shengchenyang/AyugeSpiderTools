@@ -46,29 +46,14 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
             alter_item = ReuseOperation.reshape_item(item_dict)
             _table_name = alter_item.table.name
             new_item = alter_item.new_item
-            if update_rule := alter_item.update_rule:
-                select_sql, select_value = GenPostgresqlAsyncpg.select_generate(
-                    db_table=_table_name,
-                    key=["1"],
-                    rule=update_rule,
-                    limit=1,
-                    vertical=False,
-                )
-                if await conn.fetchrow(select_sql, *select_value):
-                    if update_keys := alter_item.update_keys:
-                        update_set_data = ReuseOperation.get_items_by_keys(
-                            data=new_item, keys=update_keys
-                        )
-                        update_sql, update_value = GenPostgresqlAsyncpg.update_generate(
-                            db_table=_table_name,
-                            data=update_set_data,
-                            rule=update_rule,
-                        )
-                        await conn.execute(update_sql, *update_value)
-                    return
-
-            sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
-            await conn.execute(sql, *new_item.values())
+            update_keys = alter_item.update_keys
+            sql, args = GenPostgresqlAsyncpg.upsert_generate(
+                db_table=_table_name,
+                conflict_cols=alter_item.conflict_cols,
+                data=new_item,
+                update_cols=update_keys,
+            )
+            await conn.execute(sql, *args)
 
     async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
