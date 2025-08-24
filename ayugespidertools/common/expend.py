@@ -78,10 +78,11 @@ class MysqlPipeEnhanceMixin:
             if duplicate:
                 update = ",".join([f" `{key}` = %s" for key in duplicate])
                 args = tuple(item.values()) + tuple(duplicate.values())
+                sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
             else:
-                update = ",".join([f" `{key}` = %s" for key in item])
-                args = tuple(item.values()) * 2
-            sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values}) ON DUPLICATE KEY UPDATE {update}"
+                args = tuple(item.values())
+                sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
+            return sql, args
         else:
             sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
             args = tuple(item.values())

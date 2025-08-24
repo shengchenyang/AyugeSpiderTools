@@ -6,6 +6,7 @@ from twisted.enterprise import adbapi
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.common.sqlformat import GenOracle
 
 __all__ = [
     "AyuTwistedOraclePipeline",
@@ -60,8 +61,15 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         if not (new_item := alter_item.new_item):
             return
 
-        sql = self._get_sql_by_item(table=alter_item.table.name, item=new_item)
-        cursor.execute(sql, tuple(new_item.values()))
+        update_keys = alter_item.update_keys
+        update_rules = alter_item._update_rule
+        sql, args = GenOracle.merge_generate(
+            db_table=alter_item.table.name,
+            match_cols=update_rules.keys(),
+            data=new_item,
+            update_cols=update_keys,
+        )
+        cursor.execute(sql, args)
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")

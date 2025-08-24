@@ -63,11 +63,17 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
+        duplicate = None
+        if update_keys := alter_item.update_keys:
+            duplicate = ReuseOperation.get_items_by_keys(
+                data=new_item, keys=update_keys
+            )
         sql, args = self._get_sql_by_item(
             table=_table_name,
             item=new_item,
             odku_enable=self.mysql_conf.odku_enable,
             insert_prefix=self.mysql_conf.insert_prefix,
+            duplicate=duplicate,
         )
 
         try:

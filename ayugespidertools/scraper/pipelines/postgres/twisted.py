@@ -10,6 +10,7 @@ from ayugespidertools.common.postgreserrhandle import (
     TwistedAsynchronous,
     deal_postgres_err,
 )
+from ayugespidertools.common.sqlformat import GenPostgresql
 
 __all__ = ["AyuTwistedPostgresPipeline"]
 
@@ -63,11 +64,16 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes
         note_dic = alter_item.notes_dic
-        sql = self._get_sql_by_item(table=_table_name, item=new_item, is_psycopg=True)
+        update_keys = alter_item.update_keys
+        sql, args = GenPostgresql.upsert_generate(
+            db_table=_table_name,
+            conflict_cols=alter_item.conflict_cols,
+            data=new_item,
+            update_cols=update_keys,
+        )
 
         try:
-            cursor.execute(sql, tuple(new_item.values()))
-
+            cursor.execute(sql, args)
         except Exception as e:
             self.slog.warning(
                 f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
