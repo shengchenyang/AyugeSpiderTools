@@ -21,6 +21,36 @@ upsert(MongoDB) 更新当前项等规则来设置数据入库方式。
 本库在 MongoDB 场景下的 AyuItem 中的 _mongo_update_rule 配置，或者再结合唯一索引在 asyncio 场景会\
 更优雅且可靠，也是本库最推荐的去重的方式之一。
 
+.. note::
+
+   在 AyugeSpiderTools 3.13.0 版本中内置了更简洁的更新功能，可以通过设置 AyuItem 即可轻松达到之前先 \
+   select 然后再决定 insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。具体的\
+   使用场景和 mongodb，postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
+
+对 mysql 的场景进行介绍：
+
+.. code-block:: python
+
+   from ayugespidertools.items import AyuItem
+
+   octree_item = AyuItem(
+       octree_text=octree_text,
+       octree_href=octree_href,
+       _table=_save_table,
+       # 更新逻辑，如果 octree_text 已存在则更新或忽略，不存在会执行插入(需配合唯一索引使用)。
+       _update_rule={"octree_text": octree_text},
+       # 以 _update_rule 查询条件判断已存在时候，要更新哪些字段。_update_keys 不设置则还是
+       # 走新增(注意：在设置了唯一索引时，推荐设置 _update_keys 参数或 insert_ignore 配置
+       # 为 true，具体使用方式请按照自己喜欢的来。)
+       # 比如此示例，需要在 mysql _table 表设置 octree_text 为唯一索引，插入相同唯一索引
+       # 对应的数据会自动触发更新 _update_keys 中的字段，否则就正常新增数据。若你不设置唯一
+       # 索引，则会永远执行新增插入。
+       # 当然，如果设置了唯一索引且遇到了相同数据，但是并不想走更新逻辑，而是忽略它，那么不设
+       # 置 _update_keys 并结合 insert_ignore 即可。
+       _update_keys={"octree_href"},
+   )
+   yield octree_item
+
 Database
 ========
 
