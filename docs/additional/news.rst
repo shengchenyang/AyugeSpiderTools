@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.12.4 (Preview: TBD)
+AyugeSpiderTools 3.13.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,34 @@ AyugeSpiderTools 3.12.4 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.13.0 (2025-08-25)
+====================================
+
+全新版本中添加了更简洁的入库更新功能，可以通过 AyuItem 的内置参数即可达到根据自定义查询规则来决定对已存在\
+数据进行更新或忽略。具体示例请在 DemoSpider 项目中查看。
+
+请在测试正常后再尝试升级使用。
+
+New features
+------------
+
+- 添加 mongodb, mysql, postgresql, oracle 基于 AyuItem 的内置更新规则。
+
+  (:commit:`fc4516ac565abbc04fc118d8282f97d5bb1036e8`)
+
+  (:commit:`75c03b6640162e0123daffeddadfdd3e2227e888`)
+
+  (:commit:`99b0ff39c0e3e5db5ce32128a399b82d57b5eebf`)
+
+  (:commit:`5111894286508d9016f11feb63ae1def8fde0561`)
+
+  (:commit:`6afd08870e79460d1d1f7bbbf6fd464950d665ad`)
+
+- 添加 oracle asyncio 的示例。
+
+  (:commit:`ecebc552796e7fab1d07e8e5316109d0319afb85`)
+
 
 AyugeSpiderTools 3.12.3 (2025-07-06)
 ====================================
