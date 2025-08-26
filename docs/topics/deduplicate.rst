@@ -12,14 +12,13 @@ Deduplicate
 =====================
 
 一种数据去重的方式是在 ``yield item`` 后 ``pipeline`` 入库时根据库中数据来决定是否新增或更新等，比如\
-给数据库字段添加唯一索引，忽略重复插入的错误(MYSQL: INSERT IGNORE)，ON DUPLICATE KEY UPDATE(MYSQL)，\
-upsert(MongoDB) 更新当前项等规则来设置数据入库方式。
+给数据库字段添加唯一索引，忽略重复插入的错误：
 
-比如本库在 Mysql 场景下的 .conf odku_enable 配置并结合唯一索引可以达到当数据重复时更新当前项，或者选\
-择 insert_ignore 的配置来忽略重复的数据，请按照场景需要自行选择。
-
-本库在 MongoDB 场景下的 AyuItem 中的 _mongo_update_rule 配置，或者再结合唯一索引在 asyncio 场景会\
-更优雅且可靠，也是本库最推荐的去重的方式之一。
+现在可以很方便地通过 AyuItem 中的内置参数结合 mysql，mongodb，postgresql 和 oracledb 的唯一索引即可\
+达到入库时自动判断数据是否已存在，不存在就新增插入，存在时也可自定更新哪些字段或忽略它。而且是通过对应数据库\
+的一条语句实现，减少像之前那样的先 select 再判断 insert， update 或忽略跳过它而造成的 io 延迟。比如：\
+mysql 通过 INSERT INTO ... ON DUPLICATE KEY UPDATE 实现，mongodb 通过 $set 和 $setOnInsert \
+实现，postgresql 是通过 INSERT INTO ... ON CONFLICT 实现，oracledb 是通过 MERGE INTO 实现。
 
 .. note::
 
@@ -27,7 +26,10 @@ upsert(MongoDB) 更新当前项等规则来设置数据入库方式。
    select 然后再决定 insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。具体的\
    使用场景和 mongodb，postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
 
-对 mysql 的场景进行介绍：
+Mysql
+-----
+
+对 mysql 的存储场景进行介绍：
 
 .. code-block:: python
 
@@ -51,12 +53,99 @@ upsert(MongoDB) 更新当前项等规则来设置数据入库方式。
    )
    yield octree_item
 
+MongoDB
+-------
+
+对 mongodb 的存储场景进行介绍：
+
+.. warning::
+
+   - 在 ayugespidertools 3.13.0 之前，mongodb 存储场景是通过 _mongo_update_rule 来确定更新规则，\
+     如果匹配就会更新所有字段。规则有点过于粗暴简陋了。
+   - 目前规则中，更新规则字段改为 _update_rule，如果数据已存在，则会更新 _update_keys 中的字段；如果\
+     已匹配数据但是没有设置 _update_keys 则并不会更新任何字段；虽然新版本依然支持 _mongo_update_rule \
+     和 _mongo_update_keys 字段，但是推荐使用统一内置参数 _update_rule 和 _update_keys，后续会删除\
+     _mongo_x 的字段。
+
+.. code-block:: python
+
+   from ayugespidertools.items import AyuItem
+
+   octree_item = AyuItem(
+       octree_text=octree_text,
+       octree_href=octree_href,
+       # 更新规则，如果匹配 _update_rule 则会尝试更新已存在数据的 _update_keys 中的字段。
+       _update_rule={"octree_text": octree_text},
+       # _update_rule 匹配时自定义更新的字段，支持设置多个，比如 {"octree_href", "new_field"}
+       # 如果没有设置则不会更新任何字段。
+       _update_keys={"octree_href"},
+       _table="demo_two",
+   )
+
+   self.slog.info(f"octree_item: {octree_item}")
+   yield octree_item
+
+PostgreSQL
+----------
+
+对 PostgreSQL 的存储场景进行介绍：
+
+.. note::
+
+   postgresql 的使用和上面 mysql 和 mongodb 的一样，主要是多了一个 _conflict_cols 参数用于指定数\
+   据表中的唯一索引约束字段(在设置了唯一索引时，当然也非常推荐结合唯一索引使用)；为什么不使用 merge into \
+   接口就可以不用多一个自定义 _conflict_cols 字段了，不是更方便简约吗？是因为它只在 postgresql 15 版本\
+   及以上才支持，为了兼容性考虑。
+
+
+.. code-block:: python
+
+   from ayugespidertools.items import AyuItem
+
+   octree_item = AyuItem(
+       octree_text=octree_text,
+       octree_href=octree_href,
+       start_index=index,
+       _table=_save_table,
+       _update_rule={"octree_text": octree_text},
+       _update_keys={"octree_href"},
+       _conflict_cols={"octree_text"},
+   )
+   self.slog.info(f"octree_item: {octree_item}")
+   yield octree_item
+
+Oracle
+------
+
+对 Oracle 的存储场景进行介绍：
+
+.. note::
+
+   oracle 的使用和上面 postgresql 的一致，这里就不再多余介绍了。
+
+
+.. code-block:: python
+
+   from ayugespidertools.items import AyuItem
+
+   octree_item = AyuItem(
+       octree_text=octree_text,
+       octree_href=octree_href,
+       start_index=index,
+       _table=_save_table,
+       _update_rule={"octree_text": octree_text},
+       _update_keys={"octree_href"},
+       _conflict_cols={"octree_text"},
+   )
+   self.slog.info(f"octree_item: {octree_item}")
+   yield octree_item
+
 Database
 ========
 
-一种数据去重的方式是在 ``yield item`` 的 ``spider`` 中根据数据库查询来查看是否需要入库。其实 MongoDB \
-场景下的 AyuItem 中的 _mongo_update_rule 配置和唯一索引方式也是属于这个范畴。只是这里提供一个数据库链\
-接接口，会更加的灵活，适合更复杂、更自定义的查询场景。
+一种数据去重的方式是在 ``yield item`` 的 ``spider`` 中根据数据库查询来查看是否需要入库。这里不是使用\
+内置的更新功能(AyuItem 中自定义 _update_rule 和 _update_keys 的方式)，这里是提供一个数据库链接接口，\
+会更加的灵活，适合更复杂、更自定义的查询场景。
 
 这里提供的接口是 ``ayugespidertools.utils.database``，里面提供了最常见的数据库链接功能。分别介绍他们：
 
