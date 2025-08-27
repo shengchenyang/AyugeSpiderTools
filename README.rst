@@ -139,6 +139,7 @@
    # 数据存入 Oracle 的场景(需要安装 ayugespidertools[database])
    + 25). demo_oracle: 普通同步存储示例
    + 26). demo_oracle_twisted: Twisted 异步存储示例
+   + 36). demo_oracle_async: asyncio 异步存储示例
 
    - 7).demo_seven: 使用 requests 来请求的场景(已删除，更推荐 aiohttp 方式)
    + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景

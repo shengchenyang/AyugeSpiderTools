@@ -22,14 +22,23 @@ mysql 通过 INSERT INTO ... ON DUPLICATE KEY UPDATE 实现，mongodb 通过 $se
 
 .. note::
 
-   在 AyugeSpiderTools 3.13.0 版本中内置了更简洁的更新功能，可以通过设置 AyuItem 即可轻松达到之前先 \
-   select 然后再决定 insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。具体的\
-   使用场景和 mongodb，postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
+   在 AyugeSpiderTools 3.13.0 版本中内置了更简洁的去重及更新功能，可以通过设置 AyuItem 即可轻松达到\
+   之前先 select 然后再决定 insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。\
+   具体的使用场景和 mongodb，postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
 
 Mysql
 -----
 
 对 mysql 的存储场景进行介绍：
+
+.. note::
+
+   - 使用 AyuItem 内置的 mysql 更新规则时，需要在 .conf 配置中设置   为 True 才能激活更\
+     新功能；
+   - 再结合 .conf 中设置 insert_ignore 为 True，且不设置 _update_keys 参数时即可做到忽略更新内容，\
+     达到只新增不更新已存在内容。这个请按需使用。
+   - 当然，你也可以选择保持默认关闭 odku_enable 和关闭 insert_ignore 的配置，不使用 AyuItem 中的\
+     内置更新去重功能，使用自己的去重方式来实现。
 
 .. code-block:: python
 
@@ -61,9 +70,9 @@ MongoDB
 .. warning::
 
    - 在 ayugespidertools 3.13.0 之前，mongodb 存储场景是通过 _mongo_update_rule 来确定更新规则，\
-     如果匹配就会更新所有字段。规则有点过于粗暴简陋了。
-   - 目前规则中，更新规则字段改为 _update_rule，如果数据已存在，则会更新 _update_keys 中的字段；如果\
-     已匹配数据但是没有设置 _update_keys 则并不会更新任何字段；虽然新版本依然支持 _mongo_update_rule \
+     如果匹配就会更新 AyuItem 中所有字段。规则有点过于粗暴简陋了。
+   - 目前规则中，更新规则字段改为统一的 _update_rule，如果数据已存在，则会更新 _update_keys 中的字段；\
+     如果已匹配数据但是没有设置 _update_keys 则并不会更新任何字段；虽然新版本依然支持 _mongo_update_rule \
      和 _mongo_update_keys 字段，但是推荐使用统一内置参数 _update_rule 和 _update_keys，后续会删除\
      _mongo_x 的字段。
 

@@ -149,6 +149,7 @@ following scenarios are currently supported:
    Scenario of storing data in Oracle(need to install ayugespidertools[database]):
    + 25). demo_oracle: synchronous storage example.
    + 26). demo_oracle_twisted: Twisted asynchronous storage example.
+   + 36). demo_oracle_async: Asynchronous storage example.
 
    - 7).demo_seven: Scenarios using requests to request (this feature has been removed, and using aiohttp is recommended instead)
    + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
