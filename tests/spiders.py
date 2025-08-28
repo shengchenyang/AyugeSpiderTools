@@ -84,8 +84,8 @@ class Operations:
 
 class DemoAiohttpSpider(SimpleSpider):
     name = "demo_aiohttp_example"
-    allowed_domains = ["httpbin.org"]
-    start_urls = ["http://httpbin.org/"]
+    allowed_domains = ["postman-echo.com"]
+    start_urls = ["https://postman-echo.com/"]
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
         "DOWNLOADER_MIDDLEWARES": {
@@ -108,7 +108,7 @@ class DemoAiohttpSpider(SimpleSpider):
     }
 
     # 这些参数用于测试临时使用
-    _get_url = "http://httpbin.org/get?get_args=1"
+    _get_url = "https://postman-echo.com/get?get_args=1"
     _ar_headers_ck = "headers_ck_key=ck; headers_ck_key2=ck"
     _ar_ck = {"ck_key": "ck"}
     _post_data = {"post_key1": "post_value1", "post_key2": "post_value2"}
@@ -127,7 +127,7 @@ class DemoAiohttpSpider(SimpleSpider):
 
         # POST normal 示例
         yield AiohttpRequest(
-            url="http://httpbin.org/post",
+            url="https://postman-echo.com/post",
             method="POST",
             callback=self.parse_post_fir,
             headers={"Cookie": self._ar_headers_ck},

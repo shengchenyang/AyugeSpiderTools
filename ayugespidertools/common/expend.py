@@ -67,6 +67,7 @@ class MysqlPipeEnhanceMixin:
             item: 处理后的 item
             odku_enable: 是否开启 ON DUPLICATE KEY UPDATE
             insert_prefix: INSERT 语句前缀设置: INSERT IGNORE or INSERT
+            duplicate: 需要更新的数据
 
         Returns:
             1). sql 插入语句

@@ -27,16 +27,6 @@ class AyuFtyMongoPipeline:
         self.db = mongo_portal.connect()
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
-        """mongoDB 存储的方法，item["_mongo_update_rule"] 用于存储查询条件，如果查询数据存在的话
-        就更新，不存在的话就插入；如果没有 mongo_update_rule 字段则每次都新增。
-
-        Args:
-            item: scrapy item
-            spider: scrapy spider
-
-        Returns:
-            item: scrapy item
-        """
         item_dict = ReuseOperation.item_to_dict(item)
         store_process(item_dict=item_dict, db=self.db, handler=SyncStorageHandler)
         return item

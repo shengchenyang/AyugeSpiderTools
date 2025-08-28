@@ -79,7 +79,7 @@ value 可选择的类型有：
 
 
    def parse(self, response):
-       # 存储到 Mysql 场景时 Item 构建示例：
+       # 存储到 Mysql，mongodb，postgresql，oracle 场景时 Item 构建示例：
        article_mysql_item = AyuItem(
            article_detail_url=article_detail_url,
            article_title=article_title,
@@ -87,18 +87,10 @@ value 可选择的类型有：
            favor_count=favor_count,
            nick_name=nick_name,
            _table=_save_table,
-       )
-
-       # 存储到 MongoDB 场景时 Item 构建示例：
-       article_mongo_item = AyuItem(
-           article_detail_url=article_detail_url,
-           article_title=article_title,
-           comment_count=comment_count,
-           favor_count=favor_count,
-           nick_name=nick_name,
-           _table=_save_table,
-           # 可选参数，此示例表示以 article_detail_url 为去重规则，若存在则更新，不存在则新增
-           _mongo_update_rule={"article_detail_url": article_detail_url},
+           _update_rule={"article_title": article_title},
+           _update_keys={"comment_count", "favor_count"},
+           # postgresql 及 oracle 场景才需要设置的唯一索引约束
+           _conflict_cols={"article_title"},
        )
 
        # 存储到 ElasticSearch 场景时 Item 构建示例：
@@ -128,8 +120,8 @@ value 为对应 key 所存储的值。
 .. warning::
 
    - 不允许 AyuItem 中字段值的类型（str 和 DataItem）混用，这里只是用于示例展示。
-   - 在使用 AyuItem 时，其中各字段值（除了 ``_mongo_update_rule``）的类型都要统一，比如要么都使用 \
-     str 类型，要么都使用 ``DataItem`` 类型。
+   - 在使用 AyuItem 时，其中各字段值（除了 ``_update_rule``，``_update_keys`` \
+     ``_conflict_cols``）的类型都要统一，比如要么都使用 str 类型，要么都使用 ``DataItem`` 类型。
 
 .. code-block:: python
 
@@ -247,14 +239,7 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
            },
        }
 
-       # 可用于入库前查询使用等场景，名称可自定义
-       mysql_conn_pool: Pool
-
        async def start(self) -> AsyncIterator[Any]:
-           # self.mysql_conf 为 .conf 中的 [mysql] 内容
-           # 当然你也可以自定义，请查看:
-           # https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
-           self.mysql_conn_pool = await MysqlAsyncPortal(db_conf=self.mysql_conf).connect()
            yield Request(
                url="https://ayugespidertools.readthedocs.io/en/latest/",
                callback=self.parse_first,
@@ -268,28 +253,23 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
                octree_text = curr_li.xpath("a/text()").get()
                octree_href = curr_li.xpath("a/@href").get()
 
+               # 可使用 ayugespidertools.utils.database 来入库前去重查询；
+               # 或使用 AyuItem 内置的去重更新功能；
+               # 具体使用方法和更多示例，请查看:
+               # https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
                octree_item = AyuItem(
                    octree_text=octree_text,
                    octree_href=octree_href,
                    _table=_save_table,
-                   # 可选参数：这里表示 MongoDB 存储场景以 octree_text 为去重规则，若存在则更新，不存在则新增
-                   _mongo_update_rule={"octree_text": octree_text},
+                   # 这里的更新新增逻辑会在各自的 pipeline 中生效且互不影响，当然你也可以一同设置 postgresql,
+                   # oracle 的 pipeline，它们会互不影响且一同生效。
+                   _update_rule={"octree_text": octree_text},
+                   _update_keys={"octree_href"},
+                   _conflict_cols={"octree_href"},
                )
                # 日志使用 scrapy 的 self.logger 或本库的 self.slog
                self.slog.info(f"octree_item: {octree_item}")
 
-               # 使用 ayugespidertools.utils.database 来入库查询，使用此方法时需要提前建库建表
-               # 具体使用方法和更多示例，请查看:
-               # https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
-               async with self.mysql_conn_pool.acquire() as conn:
-                   async with conn.cursor() as cursor:
-                       exists = await cursor.execute(
-                           f"SELECT `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
-                       )
-                       if not exists:
-                           yield octree_item
-                       else:
-                           self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
 
 由上可知，本库中的 Item 使用方法还是很方便的。
 
@@ -297,8 +277,9 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
 
 - 先导入所需 Item: ``AyuItem``
 - 构建对应场景的 ``Item``
-  - ``Mysql`` 存储场景需要配置 ``_table`` 参数
-  - ``MongoDB`` 存储场景可能会需要 ``_mongo_update_rule`` 来设置去重的更新条件
+  - 若需要使用 AyuItem 内置的去重更新功能，需要自定义 AyuItem 中的内置参数
+  - 若只想使用普通存储场景，自己有另外的去重更新方法，那么就不需要设置 AyuItem 中的内置参数
+
 - 最后 ``yield`` 对应 ``item`` 即可
 
 补充：其中 AyuItem 也可以改成 DataItem 的赋值方式，那么 mysql 场景下在表字段不存在时会添加字段注释，\
@@ -320,7 +301,11 @@ yield item
 
     "自定义字段", "DataItem，Any", "item 所有需要存储的字段，若有多个，请按规则自定义添加即可。"
     "_table", "DataItem, str", "存储至数据表或集合的名称。"
-    "_mongo_update_rule", "dict", "MongoDB item 场景下的查重规则。"
+    "_update_rule", "dict", "去重更新的匹配规则。"
+    "_update_keys", "set", "满足去重更新的匹配规则时，需要更新的字段。"
+    "_conflict_cols", "set", "使用内置去重规则时，postgresql 和 oracle 场景需要设置的唯一索引约束参数。"
+    "_mongo_update_rule", "dict", "旧参数，已用 _update_rule 代替，后续删除。"
+    "_mongo_update_keys", "dict", "无效的兼容参数，请用 _update_keys 代替，后续删除。"
 
 .. note::
 
