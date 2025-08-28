@@ -4,19 +4,15 @@ from typing import TYPE_CHECKING, Any
 
 from ayugespidertools.items import AyuItem
 from ayugespidertools.spiders import AyuSpider
-from ayugespidertools.utils.database import MysqlAsyncPortal
 from scrapy.http import Request
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from aiomysql import Pool
     from scrapy.http.response import Response
 
 
 class $classname(AyuSpider):
-    mysql_conn_pool: Pool
-
     name = "$name"
     allowed_domains = ["$domain"]
     start_urls = ["$url"]
@@ -28,7 +24,6 @@ class $classname(AyuSpider):
     }
 
     async def start(self) -> AsyncIterator[Any]:
-        self.mysql_conn_pool = await MysqlAsyncPortal(db_conf=self.mysql_conf).connect()
         yield Request(
             url="https://ayugespidertools.readthedocs.io/en/latest/",
             callback=self.parse_first,
@@ -42,22 +37,14 @@ class $classname(AyuSpider):
             octree_text = curr_li.xpath("a/text()").get()
             octree_href = curr_li.xpath("a/@href").get()
 
-            octree_item = AyuItem(
+            # AyuItem 内置的更新功能文档: https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
+            yield AyuItem(
                 octree_text=octree_text,
                 octree_href=octree_href,
-                _table=_save_table,
-                # 可选参数：这里表示 MongoDB 存储场景以 octree_text 为去重规则，若存在则更新，不存在则新增
-                _mongo_update_rule={"octree_text": octree_text},
+                _table="demo_eight",
+                # 这里的更新新增逻辑会在各自的 pipeline 中生效且互不影响，当然你也可以一同设置 postgresql,
+                # oracle 的 pipeline，它们会互不影响且一同生效。
+                _update_rule={"octree_text": octree_text},
+                _update_keys={"octree_href"},
+                _conflict_cols={"octree_href"},
             )
-            self.slog.info(f"octree_item: {octree_item}")
-
-            # 数据入库前去重逻辑: 使用此方法时需要提前建库建表
-            async with self.mysql_conn_pool.acquire() as conn:
-                async with conn.cursor() as cursor:
-                    exists = await cursor.execute(
-                        f"SELECT `id` from `{_save_table}` where `octree_text` = {octree_text!r} limit 1"
-                    )
-                    if not exists:
-                        yield octree_item
-                    else:
-                        self.slog.debug(f'标题为 "{octree_text}" 的数据已存在')
