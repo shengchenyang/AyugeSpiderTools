@@ -112,11 +112,13 @@ def test_items_AyuItem():
         ]
     )
 
-    # 以下是包含 _mongo_update_rule 的情况
+    # 以下是包含去重更新的内置参数的情况
     mdi = AyuItem(
-        _table="table",
-        _mongo_update_rule={"title": "title_data"},
+        title="t",
         field1="value1",
+        _table="table",
+        _update_rule={"title": "title_data"},
+        _update_keys={"field1"},
     )
 
     mdi_dict = mdi.asdict()
@@ -126,7 +128,9 @@ def test_items_AyuItem():
             mdi_dict
             == {
                 "_table": "table",
-                "_mongo_update_rule": {"title": "title_data"},
+                "_update_rule": {"title": "title_data"},
+                "_update_keys": {"field1"},
+                "title": "t",
                 "field1": "value1",
                 "_conflict_cols": {"id"},
             },
@@ -144,7 +148,7 @@ def test_items_AyuItem():
     # 以下是 item loaders 的使用
     test_item = AyuItem(
         _table="table",
-        _mongo_update_rule={"title": "title_data"},
+        _update_rule={"title": "title_data"},
         book_name=None,
     )
     mine_item = ItemLoader(item=test_item.asitem(), selector=None)
@@ -159,7 +163,7 @@ def test_items_AyuItem():
             ItemAdapter.is_item(item),
             dict(item)
             == {
-                "_mongo_update_rule": {"title": "title_data"},
+                "_update_rule": {"title": "title_data"},
                 "_table": "table",
                 "book_name": "book_name_data22",
                 "_conflict_cols": {"id"},

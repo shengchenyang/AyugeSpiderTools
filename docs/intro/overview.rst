@@ -96,6 +96,10 @@ AyugeSpiderTools 一目了然
                    octree_text=octree_text,
                    octree_href=octree_href,
                    _table=_save_table,
+                   # 若不使用内置去重更新功能，就不需要设置以下参数
+                   _update_rule={"octree_text": octree_text},
+                   _update_keys={"octree_href"},
+                   _conflict_cols={"octree_href"},
                )
 
                # NOTE: 数据存储方式 2，需要自动添加表字段注释时的写法。但不要风格混用。
@@ -110,7 +114,7 @@ AyugeSpiderTools 一目了然
                """
 
                # NOTE: 数据存储方式 3，当然也可以直接 yield dict
-               # 但 _table，_mongo_update_rule 等参数就没有 IDE 提示功能了
+               # 但 _table，_update_rule，_update_keys 等内置参数就没有 IDE 提示功能了
                """
                yield {
                    "octree_text": octree_text,

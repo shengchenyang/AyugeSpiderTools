@@ -87,9 +87,10 @@ value 可选择的类型有：
            favor_count=favor_count,
            nick_name=nick_name,
            _table=_save_table,
+           # 若不使用内置去重更新功能，就不需要设置以下参数
            _update_rule={"article_title": article_title},
            _update_keys={"comment_count", "favor_count"},
-           # postgresql 及 oracle 场景才需要设置的唯一索引约束
+           # postgresql 及 oracle 去重更新场景才需要设置的唯一索引约束
            _conflict_cols={"article_title"},
        )
 
