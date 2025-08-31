@@ -275,13 +275,6 @@ Oracle 场景下的 asyncio 的数据库链接操作示例:
    from ayugespidertools.utils.database import OracleAsyncPortal
 
 
-   def test_example():
-       conn = OraclePortal(db_conf=oracle_conf).connect()
-       cursor = conn.cursor()
-       cursor.execute("SELECT 42;")
-       conn.close()
-
-
    async def test_example():
        _sql = 'SELECT * from "_article_info_list"'
        pool = OracleAsyncPortal(db_conf=oracle_conf).connect()

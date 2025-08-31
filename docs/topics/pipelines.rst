@@ -109,11 +109,11 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 4. Oracle 存储
 =================
 
-同样地，具有的 pipelines 有 ``AyuFtyOraclePipeline`` 和 ``AyuTwistedOraclePipeline``，但全都\
-没有自动创建库表的功能，因为其相关报错没有其他库那么精准，虽也可实现但没有必要，请手动创建所需的库表及字段。
+同样地，具有的 pipelines 有 ``AyuFtyOraclePipeline``， ``AyuTwistedOraclePipeline`` 和 \
+``AyuAsyncOraclePipeline``， 但全都没有自动创建库表的功能，因为其相关报错没有其他库那么精准，虽也可\
+实现但没有必要，请手动创建所需的库表及字段。
 
-开发时候 ``oracledb`` 还不支持 ``asyncio`` 异步编程，目前 `oracledb v2.0.0`_ 已经支持，我也会在\
-其稳定时添加其支持。
+注意：``AyuAsyncOraclePipeline`` 是在 ayugespidertools 3.13.0 版本才添加的功能。
 
 5. ElasticSearch 存储
 ========================

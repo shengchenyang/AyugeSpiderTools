@@ -108,7 +108,8 @@ AyugeSpiderTools 教程
    - 据上条可知，可以写出很简洁的代码，删除你认为的无关配置和方法并将其配置成你自己的模板就更容易适配更多\
      人的使用场景；
    - 示例中的 AyuFtyMysqlPipeline 和 AyuFtyMongoPipeline 只是为了方便快速复现，其实更推荐使用 \
-     AyuAsyncMysqlPipeline 和 AyuAsyncMongoPipeline 来代替，会更高效。
+     AyuAsyncMysqlPipeline 和 AyuAsyncMongoPipeline 来代替，会更高效；且如果你有去重更新的需求时\
+     推荐使用 AyuItem 自带的去重更新功能。
 
 
 如何运行我们的蜘蛛
