@@ -46,7 +46,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from aiomysql import Pool
+    from aiomysql import Pool as MysqlPool
     from motor.motor_asyncio import AsyncIOMotorDatabase
     from psycopg.connection import Connection as PsycopgConnection
     from pymongo import MongoClient, database
@@ -135,11 +135,11 @@ class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
         singleton: bool = False,
     ):
         self.db_conf = db_conf
-        self._pool: Pool | None = None
-        self._lock = asyncio.Lock()
+        self._pool: MysqlPool | None = None
+        self._init_lock = asyncio.Lock()
         self.singleton = singleton
 
-    async def _create_pool(self):
+    async def _create_pool(self) -> MysqlPool:
         return await aiomysql.create_pool(
             host=self.db_conf.host,
             port=self.db_conf.port,
@@ -151,12 +151,12 @@ class MysqlAsyncPortal(metaclass=PortalSingletonMeta):
             autocommit=True,
         )
 
-    async def connect(self) -> Pool:
+    async def connect(self) -> MysqlPool:
         if not self.singleton:
             return await self._create_pool()
 
         if self._pool is None:
-            async with self._lock:
+            async with self._init_lock:
                 if self._pool is None:
                     self._pool = await self._create_pool()
         return self._pool
@@ -322,6 +322,9 @@ class OracleAsyncPortal(metaclass=PortalSingletonMeta):
     def connect(self):
         return self.pool
 
+    async def close(self):
+        await self.pool.close()
+
 
 class OSSPortal(metaclass=PortalSingletonMeta):
     def __init__(
@@ -365,12 +368,23 @@ class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
     ):
         self.db_conf = db_conf
         self._pool: PGPool | None = None
+        self._init_lock = asyncio.Lock()
+        self.singleton = singleton
 
-    async def connect(self) -> PGPool:
-        self._pool = await asyncpg.create_pool(
+    async def _create_pool(self) -> PGPool:
+        return await asyncpg.create_pool(
             f"postgresql://{self.db_conf.user}:{self.db_conf.password}"
             f"@{self.db_conf.host}:{self.db_conf.port}/{self.db_conf.database}"
         )
+
+    async def connect(self) -> PGPool:
+        if not self.singleton:
+            return await self._create_pool()
+
+        if self._pool is None:
+            async with self._init_lock:
+                if self._pool is None:
+                    self._pool = await self._create_pool()
         return self._pool
 
     async def close(self):

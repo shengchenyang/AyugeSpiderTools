@@ -192,7 +192,7 @@ Mysql 场景下除了使用 insert_ignore 或 odku_enable 的配置外，可以�
 MongoDB
 -------
 
-MongoDB 场景下除了使用 AyuItem _mongo_update_rule 的方式，也可以使用自定义的方式，推荐 asyncio 的方式。
+MongoDB 场景下除了使用 AyuItem 的方式，也可以使用自定义的方式，推荐 asyncio 的方式。
 
 .. code-block:: python
 
@@ -220,6 +220,22 @@ PostgreSQL
 ----------
 
 PostgreSQL 场景下的 asyncio 的数据库链接操作示例：
+
+.. code-block:: python
+
+   from ayugespidertools.utils.database import PostgreSQLAsyncPortal
+
+
+   async def test_example():
+       pool = await PostgreSQLAsyncPortal(db_conf=postgres_conf).connect()
+
+       async with pool.acquire() as conn:
+           await conn.fetchrow("SELECT 42;")
+       await pool.close()
+
+.. warning::
+
+   - 在 ayugespidertool 3.12.x 旧版本中的 PostgreSQL 入库查询使用方式如下，已经删除此方式，使用较复杂。
 
 .. code-block:: python
 
