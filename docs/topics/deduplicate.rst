@@ -268,7 +268,35 @@ PostgreSQL 场景下的 asyncio 的数据库链接操作示例：
 Oracle
 ------
 
-PostgreSQL 场景下的的数据库链接操作示例，这里只提供了普通场景：
+Oracle 场景下的 asyncio 的数据库链接操作示例:
+
+.. code-block:: python
+
+   from ayugespidertools.utils.database import OracleAsyncPortal
+
+
+   def test_example():
+       conn = OraclePortal(db_conf=oracle_conf).connect()
+       cursor = conn.cursor()
+       cursor.execute("SELECT 42;")
+       conn.close()
+
+
+   async def test_example():
+       _sql = 'SELECT * from "_article_info_list"'
+       pool = OracleAsyncPortal(db_conf=oracle_conf).connect()
+       async with pool.acquire() as conn:
+           with conn.cursor() as cursor:
+               await cursor.execute(_sql)
+               exists = await cursor.fetchone()
+       await conn.close()
+
+       # 但是更推荐直接使用 conn 操作即可，更简洁，可自行挑选喜欢的方式
+       async with pool.acquire() as conn:
+           exists = await connection.fetchone(_sql)
+       await conn.close()
+
+当然，也可以使用普通的方式来查询：
 
 .. code-block:: python
 
