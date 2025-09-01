@@ -5,7 +5,11 @@
    :alt: ayugespidertools-logo
    :width: 480px
 
-|license| |python_support| |docs| |releases_downloads| |pypi_downloads| |codecov|
+|version| |license| |python_support| |docs| |downloads| |codecov|
+
+.. |version| image:: https://img.shields.io/pypi/v/ayugespidertools
+   :target: https://pypi.org/pypi/ayugespidertools
+   :alt: PyPI Version
 
 .. |license| image:: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :target: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
@@ -19,11 +23,7 @@
    :target: https://ayugespidertools.readthedocs.io/en/latest/
    :alt: Read the Docs
 
-.. |releases_downloads| image:: https://img.shields.io/github/downloads/shengchenyang/AyugeSpiderTools/total?label=releases%20downloads
-   :target: https://github.com/shengchenyang/AyugeSpiderTools/releases
-   :alt: GitHub all releases
-
-.. |pypi_downloads| image:: https://img.shields.io/pypi/dm/AyugeSpiderTools?label=pypi%20downloads
+.. |downloads| image:: https://img.shields.io/pypi/dm/ayugespidertools
    :target: https://pypistats.org/packages/ayugespidertools
    :alt: PyPI - Downloads
 
