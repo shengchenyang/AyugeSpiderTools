@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.scraper.pipelines.oss.ali import AyuAsyncOssPipeline
 
 __all__ = [
@@ -11,6 +10,7 @@ __all__ = [
 
 if TYPE_CHECKING:
     from ayugespidertools.common.typevars import AlterItem, OssConf
+    from ayugespidertools.extras.oss import AliOssBase
     from ayugespidertools.spiders import AyuSpider
 
 

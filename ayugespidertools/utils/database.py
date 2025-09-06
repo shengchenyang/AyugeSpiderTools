@@ -28,7 +28,7 @@ try:
     import asyncpg
     import oracledb
     import psycopg
-    from asyncpg.pool import Pool as PGPool
+    from asyncpg.pool import Pool as PGPool  # noqa: TC002
 except ImportError:
     # pip install ayugespidertools[database]
     pass

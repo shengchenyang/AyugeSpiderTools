@@ -233,12 +233,12 @@ class CvnpilKit:
         nx = [i + 1 for i in func]
         add = random.randrange(10, 15)
         sadd = space + add
-        x.extend(list(map(lambda x: x * (sadd / 2), nx)))
+        x.extend([i * (sadd / 2) for i in nx])
         # x.extend(np.linspace(sadd, space, 4 if add > 12 else 3))
         x.extend(np.linspace(sadd, space, 3 if add > 12 else 2))
         x = [math.floor(i) for i in x]
         # y
-        for i in range(len(x) - 2):
+        for _ in range(len(x) - 2):
             if y[-1] < 30:
                 y.append(y[-1] + random.choice([0, 0, 1, 1, 2, 2, 1, 2, 0, 0, 3, 3]))
             else:
@@ -246,7 +246,7 @@ class CvnpilKit:
                     y[-1] + random.choice([0, 0, -1, -1, -2, -2, -1, -2, 0, 0, -3, -3])
                 )
         # z
-        for i in range(len(x) - 1):
+        for _ in range(len(x) - 1):
             # z.append((z[-1] // 100 * 100) + 100 + random.choice([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2]))
             z.append(
                 (z[-1] // 100 * 100)

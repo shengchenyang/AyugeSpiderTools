@@ -1,8 +1,13 @@
-import argparse
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from scrapy.commands.version import Command
 
 from ayugespidertools import __version__
+
+if TYPE_CHECKING:
+    import argparse
 
 
 class AyuCommand(Command):

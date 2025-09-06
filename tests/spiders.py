@@ -1,10 +1,14 @@
-import json
+from __future__ import annotations
 
-from scrapy.http.response.text import TextResponse
+import json
+from typing import TYPE_CHECKING
 
 from ayugespidertools import AiohttpRequest
 from ayugespidertools.spiders import AyuSpider
 from tests.conftest import article_list_table
+
+if TYPE_CHECKING:
+    from scrapy.http.response.text import TextResponse
 
 
 class MockServerSpider(AyuSpider):

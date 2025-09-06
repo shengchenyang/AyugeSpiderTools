@@ -330,7 +330,7 @@ class Tools(AppConfManageMixin):
                 break
 
         diff = x_list[-1] - distance
-        for j in range(diff):
+        for _ in range(diff):
             x_list.append(x_list[-1] + random.randint(-2, -1))
             if x_list[-1] <= distance:
                 x_list[-1] = distance

@@ -3,7 +3,6 @@ from __future__ import annotations
 import configparser
 import json
 import random
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 import pymysql
@@ -30,6 +29,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from scrapy.settings import BaseSettings
@@ -255,7 +255,7 @@ class ReuseOperation:
         else:
             _table_name = item_dict["_table"]
             table_info = AlterItemTable(_table_name, "")
-            notes_dic = {k: "" for k in insert_data}
+            notes_dic = dict.fromkeys(insert_data, "")
             return AlterItem(
                 new_item=insert_data,
                 notes_dic=notes_dic,
@@ -396,7 +396,7 @@ class ReuseOperation:
                     )
 
         else:
-            assert False, f"Invalid db_conf type: {type(db_conf)}"
+            raise TypeError(f"Invalid db_conf type: {type(db_conf)}")
         logger.info(
             f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!"
         )

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import copy
 import warnings
-from collections.abc import Awaitable, Callable, Iterable, Mapping
-from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, AnyStr, TypedDict, Union
 
 from scrapy import Request
@@ -16,7 +14,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable, Iterable, Mapping
     from ssl import SSLContext
+    from types import SimpleNamespace
 
     from aiohttp.client import ClientTimeout
     from aiohttp.client_reqrep import ClientResponse, Fingerprint

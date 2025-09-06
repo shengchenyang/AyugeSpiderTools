@@ -149,22 +149,22 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
             _conflict_cols = {"id"}
         if _table:
             self.__fields.add("_table")
-            setattr(self, "_table", _table)
+            self._table = _table
         if _mongo_update_rule:
             self.__fields.add("_mongo_update_rule")
-            setattr(self, "_mongo_update_rule", _mongo_update_rule)
+            self._mongo_update_rule = _mongo_update_rule
         if _mongo_update_keys:
             self.__fields.add("_mongo_update_keys")
-            setattr(self, "_mongo_update_keys", _mongo_update_keys)
+            self._mongo_update_keys = _mongo_update_keys
         if _update_rule:
             self.__fields.add("_update_rule")
-            setattr(self, "_update_rule", _update_rule)
+            self._update_rule = _update_rule
         if _update_keys:
             self.__fields.add("_update_keys")
-            setattr(self, "_update_keys", _update_keys)
+            self._update_keys = _update_keys
         if _conflict_cols:
             self.__fields.add("_conflict_cols")
-            setattr(self, "_conflict_cols", _conflict_cols)
+            self._conflict_cols = _conflict_cols
         for key, value in kwargs.items():
             setattr(self, key, value)
             self.__fields.add(key)

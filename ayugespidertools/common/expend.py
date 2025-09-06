@@ -250,5 +250,5 @@ class OraclePipeEnhanceMixin:
             1). sql 插入语句
         """
         keys = f""":{", :".join(item.keys())}"""
-        table_keys = ", ".join(map(lambda key: f'"{key}"', item.keys()))
+        table_keys = ", ".join(f'"{key}"' for key in item.keys())
         return f'INSERT INTO "{table}" ({table_keys}) values ({keys})'

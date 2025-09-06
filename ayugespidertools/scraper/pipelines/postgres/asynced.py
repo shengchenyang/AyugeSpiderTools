@@ -12,7 +12,7 @@ from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import PostgreSQLAsyncPortal
 
 try:
-    from asyncpg.pool import Pool as PGPool
+    from asyncpg.pool import Pool as PGPool  # noqa: TC002
 except ImportError:
     raise NotConfigured(
         "missing psycopg_pool library, please install it. "

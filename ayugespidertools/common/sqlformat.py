@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 __all__ = [
     "GenMysql",
@@ -9,6 +8,9 @@ __all__ = [
     "GenPostgresqlAsyncpg",
     "GenOracle",
 ]
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 SqlModeStr = Literal["and", "or"]
 

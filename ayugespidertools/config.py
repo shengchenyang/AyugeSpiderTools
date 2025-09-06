@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import configparser
 import importlib
 from importlib import import_module
@@ -31,7 +33,9 @@ def get_cfg() -> configparser.ConfigParser:
     _cfg = get_config(use_closest=True)
     settings_default = _cfg.get("settings", "default")
     module = import_module(settings_default)
-    vit_dir = getattr(module, "VIT_DIR")
+    vit_dir = getattr(module, "VIT_DIR", None)
+    if vit_dir is None:
+        raise NotConfigured("VIT_DIR must be defined")
     cfg = configparser.ConfigParser()
     cfg.read(f"{vit_dir}/.conf", encoding="utf-8")
     return cfg
