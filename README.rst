@@ -38,15 +38,12 @@
 
    一句话介绍：用于扩展 Scrapy 功能来解放双手。
 
-在使用 Scrapy 开发爬虫时，免不了会重复地编写 settings，items，middlewares，pipelines 和一些通用方\
-法，但各项目中的这些内容都大致相同，那为何不把它们统一整理在一起呢？我也想扩展一些功能，比如当 spider 中\
-添加字段后，不用再修改对应的 item 和 pipeline 甚至不用手动修改 Mysql 和 PostgreSQL 的表结构。
+在使用 Scrapy 开发爬虫时，免不了会重复地编写 settings，items，middlewares，pipelines 和入库前的去\
+重更新等一些通用方法，但各项目中的这些内容都大致相同，那为何不把它们统一整理在一起呢？我也想扩展一些功能，\
+比如当 spider 中添加字段后，不用再修改对应的 item 和 pipeline。
 
 项目的主旨是让开发者只需专注于 spider 脚本的编写，减少开发和维护流程。理想状态下，只需关注 spider 中字\
 段的解析规则和 VIT 下的 .conf 配置即可，**脱离无意义的重复操作**。
-
-以 Mysql 存储场景举例：可以自动创建相关数据库，数据表，字段注释，自动添加 spider 中新添加的字段，和自动\
-修复常见（字段编码，Data too long，存储字段不存在等）的存储问题。
 
 安装
 =======

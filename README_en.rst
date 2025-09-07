@@ -38,22 +38,17 @@ Overview
 
    One-sentence introduction: Used to extend Scrapy functionality and free up your hands.
 
-When developing a spider using Scrapy, it is inevitable that one has to repeatedly write\
-settings, items, middlewares, pipeline, and some common methods. However, these contents\
-in different projects are roughly the same. So why not consolidate them together? I also\
-want to extend some functionality, such as automatically modifying the corresponding item\
-and pipeline when adding a field in the spider, without even manually modifying the table\
-structure of MySQL.
+When developing spiders with Scrapy, it is inevitable to repeatedly write settings, items,\
+middlewares, pipelines, and some common methods such as deduplication and updates before \
+storing data. However, these parts are generally similar across different projects, so why \
+not consolidate them into one place? I also want to extend some functionality, for example, \
+when adding a field in a spider, there should be no need to modify the corresponding item \
+and pipeline manually.
 
 The main idea of the project is to allow developers to focus only on writing spider scripts,\
-reducing development and maintenance processes. In an ideal state, one only needs to pay\
-attention to the parsing rules of fields in the spider and the .conf configuration under\
+reducing development and maintenance processes. In an ideal state, one only needs to pay \
+attention to the parsing rules of fields in the spider and the .conf configuration under \
 VIT, and be free from meaningless repetitive operations.
-
-Taking the scenario of storing data in MySQL as an example, the project can automatically\
-create relevant databases, data tables, field annotations, add newly added fields in the\
-spider automatically, and fix common storage problems such as field encoding, Data too long,\
-and non-existent storage fields.
 
 Install
 =======
@@ -85,7 +80,7 @@ Note: For detailed installation instructions, please see `Installation Guide`_.
 Usage
 =====
 
-   Developers only need to generate a sample template according to the command, and then\
+   Developers only need to generate a sample template according to the command, and then \
    configure the relevant settings.
 
 Here's an example of how to use it in a GIF:
@@ -177,7 +172,7 @@ following scenarios are currently supported:
 Awesome Demo
 ============
 
-An example of quickly realizing distributed development: demo_s. Please view the detailed\
+An example of quickly realizing distributed development: demo_s. Please view the detailed \
 introduction in the `DemoSpider`_ project. The running example picture is:
 
 .. image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-async-demo.png
@@ -186,7 +181,7 @@ introduction in the `DemoSpider`_ project. The running example picture is:
 Run Through The Test
 ====================
 
-Prerequisite: You need to create a .conf file in the VIT directory of the tests, and an\
+Prerequisite: You need to create a .conf file in the VIT directory of the tests, and an \
 example file has been provided. Please fill in the required content for testing, then:
 
 - You can directly use tox to run the tests.
@@ -197,8 +192,8 @@ example file has been provided. Please fill in the required content for testing,
 Things You Might Care About
 ===========================
 
-1. If you find that the implementation of certain features in certain scenarios does not\
-   meet your expectations and you want to modify or add custom functionality, such as removing\
+1. If you find that the implementation of certain features in certain scenarios does not \
+   meet your expectations and you want to modify or add custom functionality, such as removing \
    unused modules or modifying the library name, you can modify it yourself and then build it.
 
 2. This library mainly promotes the scrapy extension function. When using this library,\
@@ -230,21 +225,21 @@ Build Your Own Library
    Please refer to the official documentation of `poetry`_ for specific content.
 
 As mentioned in the section `Things You Might Care About`_, you can clone the source code
-and modify any methods (e.g. you may need a different default log configuration value or\
-add other project structure templates for your project scenario), and then package and use\
+and modify any methods (e.g. you may need a different default log configuration value or \
+add other project structure templates for your project scenario), and then package and use \
 it by running poetry build or make build after modification.
 
-For example, if you need to update kafka-python in the dependency library to a new version\
-x.x.x, you can simply install the existing dependencies with poetry install, and then install\
+For example, if you need to update kafka-python in the dependency library to a new version \
+x.x.x, you can simply install the existing dependencies with poetry install, and then install \
 the target version with poetry add kafka-python==x.x.x (try not to use poetry update kafka-python).\
-After ensuring that the test is working properly, you can package the modified library\
+After ensuring that the test is working properly, you can package the modified library \
 with poetry build for use.
 
    Other ways to customize scrapy projects
 
 The project can be customized through cookiecutter, please refer to the `LazyScraper`_ project.
 
-**I hope that this project can provide guidance for you when you encounter scenarios where\
+**I hope that this project can provide guidance for you when you encounter scenarios where \
 you need to extend the functionality of Scrapy.**
 
 Features
@@ -252,9 +247,9 @@ Features
 
 - [✓] Scenarios for extending the functionality of Scrapy:
 
-  - [✓] Scrapy script runtime information statistics and project dependency table collection\
+  - [✓] Scrapy script runtime information statistics and project dependency table collection \
     statistics can be used for logging and alerts.
-  - [✓] Custom templates that generate template files suitable for this library when using\
+  - [✓] Custom templates that generate template files suitable for this library when using \
     ayuge startproject <projname> and ayuge genspider <spidername>.
   - [✓] Get project configuration from remote application management service.
 
@@ -264,12 +259,12 @@ Features
   - [✓] Random User-Agent middleware.
   - [✓] Use the following tools to replace scrapy's Request for sending requests:
 
-    - [✓] requests: Using the synchronous library requests will reduce the efficiency\
+    - [✓] requests: Using the synchronous library requests will reduce the efficiency \
       of scrapy.（This feature has been removed, and using aiohttp is now recommended instead.）
     - [✓] aiohttp: Integrated the coroutine method of replacing scrapy Request with aiohttp.
   - [✓] Adaptation for scenarios where storage is done in Mysql:
 
-    - [✓] Automatically create the required databases, tables, field formats, and field\
+    - [✓] Automatically create the required databases, tables, field formats, and field \
       comments for scenarios where Mysql users need to be created.
   - [✓] Adaptation for scenarios where storage is done in MongoDB.
   - [✓] Adaptation for scenarios where storage is done in PostgreSQL.
@@ -289,23 +284,23 @@ Features
 
     - [✓] Based on mapping of font files such as ttf and woff, or combined with css, etc.
 
-      - [✓] For font files where the mapping relationship can be found directly in\
+      - [✓] For font files where the mapping relationship can be found directly in \
         the xml file, you can export the mapping using the `FontForge`_ tool.
-      - [✓] For font files where the mapping relationship cannot be found, OCR recognition\
-        (with less than 100% accuracy) is generally used. First, each mapping is exported\
+      - [✓] For font files where the mapping relationship cannot be found, OCR recognition \
+        (with less than 100% accuracy) is generally used. First, each mapping is exported \
         as a png using fontforge, and then various methods are used for recognition.
       - [✓] Part of the font anti-crawling function has been migrated to the FontMapster project.
-  - [✓] Processing of HTML data, including removal of tags, invisible characters, and\
+  - [✓] Processing of HTML data, including removal of tags, invisible characters, and \
     conversion of special characters to normal display, etc.
   - [✓] Common methods for processing image CAPTCHA:
 
-    - [✓] Methods for recognizing the distance of the missing part of a slider captcha\
+    - [✓] Methods for recognizing the distance of the missing part of a slider captcha \
       (with multiple implementation options).
     - [✓] Methods for generating a trajectory array based on the distance of a slider.
     - [✓] Identification of the position and click order of click-based CAPTCHAs.
     - [✓] Example methods for restoring images that have been randomly disordered and mixed up.
 
-Notice: I will include the function demo in the `readthedocs`_ documentation to avoid\
+Notice: I will include the function demo in the `readthedocs`_ documentation to avoid \
 overwhelming this section with too much content.
 
 Thanks
