@@ -19,5 +19,5 @@ jobs:
       env:
         RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
       run: |
-        pip install -U poetry tox
+        pip install poetry==2.1.1 tox==4.28.4
         tox
