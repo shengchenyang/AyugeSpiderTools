@@ -18,6 +18,8 @@ jobs:
     - name: Run tests
       env:
         RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
+        TMP: D:\a\AyugeSpiderTools\temp
+        TEMP: D:\a\AyugeSpiderTools\temp
       run: |
         pip install poetry==2.1.1 tox==4.28.4
         tox
