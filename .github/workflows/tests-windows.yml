@@ -15,11 +15,14 @@ jobs:
       with:
         python-version: "3.9"
 
+    - name: Prepare temp dir
+      run: mkdir ${{ github.workspace }}\temp
+
     - name: Run tests
       env:
         RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
-        TMP: D:\a\AyugeSpiderTools\temp
-        TEMP: D:\a\AyugeSpiderTools\temp
+        TMP: ${{ github.workspace }}\temp
+        TEMP: ${{ github.workspace }}\temp
       run: |
         pip install poetry==2.1.1 tox==4.28.4
         tox
