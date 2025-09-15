@@ -79,7 +79,7 @@ class SyncStorageHandler:
             update_doc["$setOnInsert"] = ReuseOperation.get_items_except_keys(
                 data=insert_data, keys=set_data
             )
-            db[collection].find_one_and_update(
+            db[collection].update_one(
                 filter=update_rule, update=update_doc, upsert=True
             )
         else:
@@ -109,7 +109,7 @@ class AsyncStorageHandler:
             update_doc["$setOnInsert"] = ReuseOperation.get_items_except_keys(
                 data=insert_data, keys=set_data
             )
-            await db[collection].find_one_and_update(
+            await db[collection].update_one(
                 filter=update_rule, update=update_doc, upsert=True
             )
         else:
