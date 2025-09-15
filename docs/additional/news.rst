@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.13.1 (Preview: TBD)
+AyugeSpiderTools 3.13.2 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,26 @@ AyugeSpiderTools 3.13.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.13.1 (2025-09-16)
+====================================
+
+Code optimizations
+------------------
+
+- AyuItem 的自带去重更新方法 mongodb 实现由 find_one_update_one 替换为效率更高的 update_one。
+
+  (:commit:`84914a31d3d873ee5331e31e2a36f56eec8637de`)
+
+- genspider 生成爬虫示例文件改为目前版本推荐的方法。
+
+  (:commit:`c289315fd3f88d69a02ce2cec9e043d550debb9c`)
+
+- 固定 ci/cd 依赖库版本，完善 windows test ci 场景，优化测试稳定等。
+
+  (:commit:`d4a05464b236e1867f55cbcdb5423f7f88b82a22`)
+
+  (:commit:`bfd27f1e6b8c91139c4cc06fcc272edf4b2ce35c`)
 
 AyugeSpiderTools 3.13.0 (2025-08-25)
 ====================================
