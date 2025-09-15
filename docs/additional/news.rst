@@ -27,7 +27,7 @@ AyugeSpiderTools 3.13.1 (2025-09-16)
 Code optimizations
 ------------------
 
-- AyuItem 的自带去重更新方法 mongodb 实现由 find_one_update_one 替换为效率更高的 update_one。
+- AyuItem 的自带去重更新方法 mongodb 的实现由 find_one_and_update 替换为效率更高的 update_one。
 
   (:commit:`84914a31d3d873ee5331e31e2a36f56eec8637de`)
 
