@@ -34,15 +34,15 @@ except ImportError:
     pass
 
 __all__ = [
-    "MysqlPortal",
-    "MysqlAsyncPortal",
-    "MongoDBPortal",
-    "MongoDBAsyncPortal",
-    "OraclePortal",
-    "OracleAsyncPortal",
-    "PostgreSQLPortal",
-    "PostgreSQLAsyncPortal",
     "ElasticSearchPortal",
+    "MongoDBAsyncPortal",
+    "MongoDBPortal",
+    "MysqlAsyncPortal",
+    "MysqlPortal",
+    "OracleAsyncPortal",
+    "OraclePortal",
+    "PostgreSQLAsyncPortal",
+    "PostgreSQLPortal",
 ]
 
 if TYPE_CHECKING:
@@ -79,7 +79,7 @@ def unique_key(data: dict | NamedTuple, referer: str, tag: PortalTag) -> str:
     sorted_items = sorted(items)
     joined_str = "&".join(f"{k}={v}" for k, v in sorted_items)
     final_str = f"{tag}_{referer}_{joined_str}"
-    return hashlib.sha1(final_str.encode("utf-8")).hexdigest()
+    return hashlib.sha1(final_str.encode("utf-8")).hexdigest()  # noqa: S324
 
 
 class PortalSingletonMeta(type, Generic[T, DataBaseConf]):

@@ -178,8 +178,7 @@ class DataHandle:
 
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
-            func_res = remove_tags(func_res)
-            return func_res
+            return remove_tags(func_res)
 
         return inner
 
@@ -189,8 +188,7 @@ class DataHandle:
 
         def inner(*args, **kwargs):
             func_res = func(*args, **kwargs)
-            func_res = replace_entities(func_res)
-            return func_res
+            return replace_entities(func_res)
 
         return inner
 
@@ -203,7 +201,6 @@ class DataHandle:
             if type(func_res) in [str, int, float, bool]:
                 # 这里可添加一些通用的数据处理
                 return str(func_res).strip()
-            else:
-                return func_res
+            return func_res
 
         return inner

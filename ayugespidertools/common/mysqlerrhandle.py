@@ -272,7 +272,7 @@ class Synchronize(AbstractClass):
             cursor.execute(sql)
         except Exception as e:
             logger.warning(
-                f"synchronize mysql exec sql err: {str(e)}\n"
+                f"synchronize mysql exec sql err: {e!s}\n"
                 f"possible_err ->: {possible_err}"
             )
 
@@ -292,8 +292,7 @@ class TwistedAsynchronous(AbstractClass):
             cursor.execute(sql)
         except Exception as e:
             logger.warning(
-                f"twisted mysql exec sql err: {str(e)}\n"
-                f"possible_err: {possible_err}"
+                f"twisted mysql exec sql err: {e!s}\npossible_err: {possible_err}"
             )
 
 

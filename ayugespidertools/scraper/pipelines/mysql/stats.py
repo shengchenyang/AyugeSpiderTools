@@ -47,7 +47,7 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         ' where crawl_time = "{crawl_time}"') from information_schema.tables
         where TABLE_SCHEMA='{database}' and TABLE_NAME in
         (SELECT TABLE_NAME FROM information_schema.columns WHERE COLUMN_NAME='crawl_time');
-        """
+        """  # noqa: S608
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
         if sql_list := [row[0] for row in results]:

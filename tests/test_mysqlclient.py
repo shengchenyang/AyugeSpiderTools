@@ -102,7 +102,9 @@ def test_update_data(mysql_first_step, mysql_db_cursor):
 # 以上测试使用的是测试中的 mysql_db_cursor，以下真正使用的是库中的 MysqlOrm 来测试
 @pytest.fixture(scope="class")
 def mysqlorm_conn():
-    yield MysqlOrm(pymsql_connect_conf=PYMYSQL_CONFIG)
+    conn = MysqlOrm(pymsql_connect_conf=PYMYSQL_CONFIG)
+    yield conn
+    conn.close()
 
 
 class TestMysqlOrm:

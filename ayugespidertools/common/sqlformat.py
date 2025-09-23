@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 __all__ = [
     "GenMysql",
+    "GenOracle",
     "GenPostgresql",
     "GenPostgresqlAsyncpg",
-    "GenOracle",
 ]
 
 if TYPE_CHECKING:
@@ -141,7 +141,7 @@ class GenPostgresql:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f'{k.split("|")[0]}{k.split("|")[1]}%s' for k in rule
+                f"{k.split('|')[0]}{k.split('|')[1]}%s" for k in rule
             )
         else:
             select_where = _base.join(f"{k}=%s" for k in rule)

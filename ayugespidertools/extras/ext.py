@@ -11,7 +11,7 @@ except ImportError:
     # pip install ayugespidertools[all]
     pass
 
-__all__ = ["EncryptMixin", "AppConfManageMixin"]
+__all__ = ["AppConfManageMixin", "EncryptMixin"]
 
 
 class EncryptMixin:
@@ -40,11 +40,9 @@ class EncryptMixin:
         Returns:
             1). rsa encrypted result
         """
-        public_key = """-----BEGIN PUBLIC KEY-----
-            {key}
-            -----END PUBLIC KEY-----""".format(
-            key=rsa_public_key
-        )
+        public_key = f"""-----BEGIN PUBLIC KEY-----
+            {rsa_public_key}
+            -----END PUBLIC KEY-----"""
         a = bytes(encode_data, encoding="utf8")
         rsa_key = RSA.importKey(public_key)
         cipher = Cipher_pkcsl_v1_5.new(rsa_key)
@@ -62,7 +60,7 @@ class AppConfManageMixin:
 
     @staticmethod
     def xml_parser(data: str) -> dict:
-        root = ET.fromstring(data)
+        root = ET.fromstring(data)  # noqa: S314
         conf_data: dict = {}
         for child in root:
             conf_data[child.tag] = {}

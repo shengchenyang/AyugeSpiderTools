@@ -26,17 +26,14 @@ class MysqlOrm:
         self.cursor.execute(sql_pre, sql_after)
         if type == "all":
             return self.cursor.fetchall()
-        elif type == "one":
+        if type == "one":
             return self.cursor.fetchone()
+        raise ValueError("search mode error")
 
     def update_data(self, sql_pre: str, sql_after: tuple) -> None:
         self.cursor.execute(sql_pre, sql_after)
         self.conn.commit()
 
     def close(self):
-        self.cursor.close()
-        self.conn.close()
-
-    def __del__(self):
         self.cursor.close()
         self.conn.close()

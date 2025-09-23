@@ -59,7 +59,7 @@ class AyuAsyncESPipeline:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
-            return
+            return item
 
         _index = alert_item.table.name
         if not hasattr(self, "es_type"):

@@ -58,7 +58,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     def db_insert(self, cursor: Any, item: Any) -> Any:
         alter_item = ReuseOperation.reshape_item(item)
         if not (new_item := alter_item.new_item):
-            return
+            return None
 
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes

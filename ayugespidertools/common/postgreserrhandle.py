@@ -8,8 +8,8 @@ from ayugespidertools.config import logger
 
 __all__ = [
     "Synchronize",
-    "deal_postgres_err",
     "TwistedAsynchronous",
+    "deal_postgres_err",
 ]
 
 if TYPE_CHECKING:
@@ -110,7 +110,7 @@ class Synchronize(AbstractClass):
             conn.commit()
         except Exception as e:
             logger.warning(
-                f"synchronize postgres exec sql err: {str(e)}\n"
+                f"synchronize postgres exec sql err: {e!s}\n"
                 f"possible_err: {possible_err}"
             )
             conn.rollback()
@@ -132,8 +132,7 @@ class TwistedAsynchronous(AbstractClass):
             cursor.execute("COMMIT")
         except Exception as e:
             logger.warning(
-                f"twisted postgres exec sql err: {str(e)}\n"
-                f"possible_err ->: {possible_err}"
+                f"twisted postgres exec sql err: {e!s}\npossible_err ->: {possible_err}"
             )
             cursor.execute("ROLLBACK")
 

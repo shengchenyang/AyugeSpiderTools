@@ -36,7 +36,7 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def insert_item(self, alter_item: AlterItem) -> None:
         if not (new_item := alter_item.new_item):
-            return
+            return None
 
         _table_name = alter_item.table.name
         _table_notes = alter_item.table.notes

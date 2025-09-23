@@ -8,8 +8,8 @@ from pymongo import MongoClient
 from ayugespidertools.common.typevars import DatabaseSingletonMeta
 
 __all__ = [
-    "MongoDbBase",
     "MongoDBEngineClass",
+    "MongoDbBase",
 ]
 
 if TYPE_CHECKING:
@@ -114,9 +114,9 @@ class MongoDbBase:
                 metadata=metadata,
             )
             md5 = cls.getFileMd5(db, gridfs_id, "fs")["md5"]
-            image_id = f"/file/find/{str(gridfs_id)}/{md5}"
+            image_id = f"/file/find/{gridfs_id!s}/{md5}"
             return gridfs_id, image_id
 
         # 否则，只需返回文件的 id 等标识即可
         res = gridfs_col.find_one({"filename": file_name})
-        return res._id, f"/file/find/{str(res._id)}/{res.md5}"
+        return res._id, f"/file/find/{res._id!s}/{res.md5}"

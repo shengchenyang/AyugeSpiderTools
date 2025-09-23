@@ -24,7 +24,7 @@ class Encrypt(EncryptMixin):
         Returns:
             1). md5 处理后的参数
         """
-        hl = hashlib.md5()
+        hl = hashlib.md5()  # noqa: S324
         hl.update(encrypt_data.encode(encoding="utf-8"))
         return hl.hexdigest()
 

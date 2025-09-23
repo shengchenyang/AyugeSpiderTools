@@ -11,15 +11,13 @@ from scrapy.item import Item
 from ayugespidertools.exceptions import EmptyKeyError, FieldAlreadyExistsError
 
 __all__ = [
-    "DataItem",
     "AyuItem",
+    "DataItem",
 ]
 
 
 class ScrapyItem(Item):
     """scrapy item 的标准方式"""
-
-    ...
 
 
 class DataItem(NamedTuple):
@@ -47,7 +45,7 @@ class ItemMeta(ABCMeta):
                 value: 需要添加的字段对应的值
             """
             if not key:
-                raise EmptyKeyError()
+                raise EmptyKeyError
             if key in self._AyuItem__fields:
                 raise FieldAlreadyExistsError(key)
             setattr(self, key, value)
@@ -56,8 +54,7 @@ class ItemMeta(ABCMeta):
         def asdict(self) -> dict[str, Any]:
             """将 AyuItem 转换为 dict"""
             self._AyuItem__fields.discard("_AyuItem__fields")
-            _item_dict = {key: getattr(self, key) for key in self._AyuItem__fields}
-            return _item_dict
+            return {key: getattr(self, key) for key in self._AyuItem__fields}
 
         def asitem(self, assignment: bool = True) -> ScrapyItem:
             """将 AyuItem 转换为 ScrapyItem

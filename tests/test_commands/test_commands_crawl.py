@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 import sys
@@ -8,10 +7,13 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryFile, mkdtemp
 from threading import Timer
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from scrapy.utils.python import to_unicode
 from scrapy.utils.test import get_testenv
+
+if TYPE_CHECKING:
+    import os
 
 
 class TestProjectBase:
@@ -90,8 +92,7 @@ class TestCrawlCommand(TestCommandBase):
 
     def get_log(self, code, args=()):
         _, _, stderr = self.crawl(code, args=args)
-        stderr = str(stderr)
-        return stderr
+        return str(stderr)
 
     def test_no_output(self):
         spider_code = """

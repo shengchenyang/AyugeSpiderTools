@@ -56,7 +56,7 @@ class AyuESPipeline:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
-            return
+            return item
 
         if not hasattr(self, "es_type"):
             fields_define = {k: v.notes for k, v in item_dict.items()}

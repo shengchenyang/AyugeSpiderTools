@@ -10,8 +10,8 @@ from ayugespidertools.utils.database import MysqlPortal, OraclePortal, PostgreSQ
 
 __all__ = [
     "MysqlPipeEnhanceMixin",
-    "PostgreSQLPipeEnhanceMixin",
     "OraclePipeEnhanceMixin",
+    "PostgreSQLPipeEnhanceMixin",
 ]
 
 if TYPE_CHECKING:
@@ -84,9 +84,8 @@ class MysqlPipeEnhanceMixin:
                 args = tuple(item.values())
                 sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
             return sql, args
-        else:
-            sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
-            args = tuple(item.values())
+        sql = f"{insert_prefix} INTO `{table}` ({keys}) values ({values})"
+        args = tuple(item.values())
         return sql, args
 
     @staticmethod
@@ -217,10 +216,9 @@ class PostgreSQLPipeEnhanceMixin:
             keys = f"""{", ".join(item.keys())}"""
             values = ", ".join(["%s"] * len(item))
             return f"INSERT INTO {table} ({keys}) values ({values});"
-        else:
-            keys = ", ".join(item.keys())
-            values = ", ".join(f"${i}" for i in range(1, len(item) + 1))
-            return f"INSERT INTO {table} ({keys}) VALUES ({values}) ON CONFLICT DO NOTHING;"
+        keys = ", ".join(item.keys())
+        values = ", ".join(f"${i}" for i in range(1, len(item) + 1))
+        return f"INSERT INTO {table} ({keys}) VALUES ({values}) ON CONFLICT DO NOTHING;"
 
 
 class OraclePipeEnhanceMixin:
@@ -250,5 +248,5 @@ class OraclePipeEnhanceMixin:
             1). sql 插入语句
         """
         keys = f""":{", :".join(item.keys())}"""
-        table_keys = ", ".join(f'"{key}"' for key in item.keys())
+        table_keys = ", ".join(f'"{key}"' for key in item)
         return f'INSERT INTO "{table}" ({table_keys}) values ({keys})'

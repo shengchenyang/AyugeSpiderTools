@@ -101,9 +101,8 @@ class AyuSpider(Spider):
             logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
             if module_spec := importlib.util.find_spec(settings["BOT_NAME"]):
                 submodule_paths = module_spec.submodule_search_locations
-                assert (
-                    submodule_paths and len(submodule_paths) == 1
-                ), "please change your project name"
+                assert submodule_paths, "project path is None or empty"
+                assert len(submodule_paths) == 1, "please change your project name"
                 vit_dir = Path(*submodule_paths) / "VIT"
                 _normal_settings["VIT_DIR"] = vit_dir
             else:

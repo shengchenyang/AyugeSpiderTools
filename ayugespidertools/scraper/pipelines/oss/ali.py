@@ -33,7 +33,7 @@ async def files_download_by_scrapy(spider: AyuSpider, url: str) -> tuple[Respons
     )
     content_type = headers_dict.get("Content-Type")
     file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
-    file_guid = hashlib.sha1(to_bytes(url)).hexdigest()
+    file_guid = hashlib.sha1(to_bytes(url)).hexdigest()  # noqa: S324
     filename = f"{file_guid}.{file_format}"
     return response, filename
 

@@ -16,7 +16,7 @@ except ImportError:
         "install command: pip install ayugespidertools[all]"
     )
 
-__all__ = ["CvnpilKit", "BezierTrajectory"]
+__all__ = ["BezierTrajectory", "CvnpilKit"]
 
 if TYPE_CHECKING:
     from cv2.typing import MatLike
@@ -255,8 +255,7 @@ class CvnpilKit:
             )
 
         tracks_list = list(map(list, zip(x, y, z)))
-        tracks_list = [x for x in tracks_list if x[0] > 0]
-        return tracks_list
+        return [x for x in tracks_list if x[0] > 0]
 
 
 class BezierTrajectory:
@@ -294,14 +293,12 @@ class BezierTrajectory:
         if mode == 0:
             numbers.extend(i * pin for i in range(length))
             if pin >= 0:
-                numbers = numbers[::-1]
+                numbers.reverse()
         elif mode == 1:
-            for i in range(length):
-                numbers.append(1 * ((i * pin) ** 2))
-            numbers = numbers[::-1]
+            numbers = [1 * ((i * pin) ** 2) for i in range(length)]
+            numbers.reverse()
         elif mode == 2:
-            for i in range(length):
-                numbers.append(1 * ((i * pin - x[1]) ** 2))
+            numbers = [1 * ((i * pin - x[1]) ** 2) for i in range(length)]
 
         elif mode == 3:
             track = [

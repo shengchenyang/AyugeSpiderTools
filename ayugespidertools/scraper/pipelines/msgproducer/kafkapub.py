@@ -68,7 +68,6 @@ class KafkaProducerClient:
     def on_send_error(self, data, key):
         """发送失败回调函数，只日志记录"""
         logger.error(f"send error, data: {data}, key: {key}")
-        return
 
     def close_producer(self):
         if self.producer:

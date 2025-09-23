@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any
 
-import aiomysql
 from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
@@ -16,6 +15,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    import aiomysql
     from twisted.internet.defer import Deferred
 
     from ayugespidertools.common.typevars import MysqlConf

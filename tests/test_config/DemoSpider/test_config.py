@@ -5,7 +5,7 @@ import pytest
 from ayugespidertools.config import get_cfg
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def change_test_directory():
     # 保存当前工作目录
     original_dir = os.getcwd()

@@ -29,17 +29,17 @@ except ImportError:
     pass
 
 __all__ = [
-    "get_spider_conf",
-    "ESConfCreator",
-    "MysqlConfCreator",
-    "MongoDBConfCreator",
-    "MQConfCreator",
-    "OracleConfCreator",
-    "PostgreSQLConfCreator",
-    "KafkaConfCreator",
     "DynamicProxyCreator",
+    "ESConfCreator",
     "ExclusiveProxyCreator",
+    "KafkaConfCreator",
+    "MQConfCreator",
+    "MongoDBConfCreator",
+    "MysqlConfCreator",
+    "OracleConfCreator",
     "OssConfCreator",
+    "PostgreSQLConfCreator",
+    "get_spider_conf",
     "get_sqlalchemy_conf",
 ]
 

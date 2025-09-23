@@ -64,8 +64,8 @@ class Tools(AppConfManageMixin):
             if all([remote_type == "consul", token is not None])
             else {}
         )
-        req = urllib.request.Request(url=url, headers=headers)
-        r = urllib.request.urlopen(req)
+        req = urllib.request.Request(url=url, headers=headers)  # noqa: S310
+        r = urllib.request.urlopen(req)  # noqa: S310
         data = r.read().decode(errors="ignore")
 
         url_params = urlparse(url).query
@@ -137,8 +137,7 @@ class Tools(AppConfManageMixin):
             return response.css(query)
         if get_all:
             return response.css(query).getall()
-        else:
-            return response.css(query).get(default="").strip()
+        return response.css(query).get(default="").strip()
 
     @staticmethod
     def extract_with_xpath(
@@ -162,13 +161,12 @@ class Tools(AppConfManageMixin):
             return response.xpath(query)
         if get_all:
             return response.xpath(query).getall()
-        else:
-            return response.xpath(query).get(default="").strip()
+        return response.xpath(query).get(default="").strip()
 
     @staticmethod
     def extract_with_json(
         json_data: dict, query: str | list[str], ignore_err: bool = False
-    ):
+    ) -> Any:
         """scrapy 中提取 json 数据遇到的情况
 
         Args:
@@ -184,7 +182,7 @@ class Tools(AppConfManageMixin):
             [isinstance(query, str), all([isinstance(query, list), len(query) == 1])]
         ):
             if isinstance(query, str):
-                return json_data.get(query, None)
+                return json_data.get(query)
             return json_data.get(query[0], None)
 
         # 循环取值时的处理
@@ -195,7 +193,7 @@ class Tools(AppConfManageMixin):
                     logger.error(f"解析时出错，当前 query 为 {query}")
                 return None
 
-            json_data = json_data.get(curr_q, None)
+            json_data = json_data.get(curr_q)  # type: ignore[assignment]
             if json_data is None:
                 return None
         return json_data
@@ -320,18 +318,18 @@ class Tools(AppConfManageMixin):
         Returns:
             xyt: 轨迹数组
         """
-        t_list = [random.randint(50, 160)]
-        x_list = [random.randint(5, 11)]
+        t_list = [random.randint(50, 160)]  # noqa: S311
+        x_list = [random.randint(5, 11)]  # noqa: S311
         y_list = []
         # 生成 x 坐标轨迹, 生成 t 坐标轨迹
         for j in range(1, distance):
-            x_list.append(x_list[j - 1] + random.randint(2, 4))
+            x_list.append(x_list[j - 1] + random.randint(2, 4))  # noqa: S311
             if x_list[j] > distance:
                 break
 
         diff = x_list[-1] - distance
         for _ in range(diff):
-            x_list.append(x_list[-1] + random.randint(-2, -1))
+            x_list.append(x_list[-1] + random.randint(-2, -1))  # noqa: S311
             if x_list[-1] <= distance:
                 x_list[-1] = distance
                 break
@@ -349,7 +347,7 @@ class Tools(AppConfManageMixin):
                 y_list.append(-3)
             else:
                 y_list.append(-4)
-            t_list.append(t_list[i - 1] + random.randint(20, 80))
+            t_list.append(t_list[i - 1] + random.randint(20, 80))  # noqa: S311
 
         # 生成 t 的坐标
         xyt = list(zip(x_list, y_list, t_list))

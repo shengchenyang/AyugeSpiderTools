@@ -252,19 +252,18 @@ class ReuseOperation:
                 conflict_cols=conflict_cols,
             )
 
-        else:
-            _table_name = item_dict["_table"]
-            table_info = AlterItemTable(_table_name, "")
-            notes_dic = dict.fromkeys(insert_data, "")
-            return AlterItem(
-                new_item=insert_data,
-                notes_dic=notes_dic,
-                table=table_info,
-                is_namedtuple=False,
-                update_rule=update_rule,
-                update_keys=update_keys,
-                conflict_cols=conflict_cols,
-            )
+        _table_name = item_dict["_table"]
+        table_info = AlterItemTable(_table_name, "")
+        notes_dic = dict.fromkeys(insert_data, "")
+        return AlterItem(
+            new_item=insert_data,
+            notes_dic=notes_dic,
+            table=table_info,
+            is_namedtuple=False,
+            update_rule=update_rule,
+            update_keys=update_keys,
+            conflict_cols=conflict_cols,
+        )
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
@@ -291,7 +290,7 @@ class ReuseOperation:
         """
         total = sum(item["weight"] for item in weight_data)
         # 在 0 与权重和之间获取一个随机数
-        ra = random.uniform(0, total)
+        ra = random.uniform(0, total)  # noqa: S311
         curr_sum = 0
         ret = None
         for data in weight_data:

@@ -13,8 +13,8 @@ from ayugespidertools.exceptions import NotConfigured
 
 __all__ = [
     "NormalConfig",
-    "logger",
     "get_cfg",
+    "logger",
     "setup_lazy_import",
 ]
 

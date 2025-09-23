@@ -70,9 +70,9 @@ class AbuDynamicProxyDownloaderMiddleware:
             data=dynamic_proxy_conf,
             keys={"proxy", "username", "password"},
         )
-        assert (
-            is_match
-        ), f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
+        assert is_match, (
+            f"没有配置动态隧道代理，配置示例为：{Param.dynamic_proxy_conf_example}"
+        )
 
         self.proxy_url = dynamic_proxy_conf["proxy"]
         self.username = dynamic_proxy_conf["username"]
