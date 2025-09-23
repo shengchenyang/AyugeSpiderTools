@@ -1,5 +1,5 @@
-.PHONY: build build_dist check clean git help install patch pypi_token pytest major minor \
-release start tag tag_remove test version
+.PHONY: build build_dist check clean format git help install patch pypi_token pytest major \
+minor release start tag tag_remove test version
 
 refresh: clean build install
 
@@ -47,6 +47,7 @@ check:
 	poetry run pre-commit run --all-files
 	poetry run mypy .
 	poetry check
+	poetry run ruff check --fix
 
 clean:
 	-$(CLEAN_PYCACHE)
@@ -65,6 +66,10 @@ clean:
 	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.key)
 	pip uninstall -y $(PROJECT_NAME)
 
+format:
+	- poetry run ruff format
+	- poetry run ruff check --fix
+
 git:
 	git config core.eol lf
 	git config core.autocrlf input
@@ -81,6 +86,7 @@ help:
 	@echo "  check            Code check"
 	@echo "  clean            Clean up test files, mypy cache and dist folders"
 	@echo "  git              Set git proxy and line separator"
+	@echo "  format           Code format"
 	@echo "  help             Show this help message"
 	@echo "  install          Install whl/tar.gz file from the dist folder"
 	@echo "  pypi_token       Set the poetry pypi-token, Run 'make pypi_token token=<token>' to set the poetry pypi_token"
