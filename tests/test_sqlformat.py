@@ -63,9 +63,9 @@ def test_postgresql_merge():
 
     sql, value = GenPostgresqlAsyncpg.upsert_generate(
         db_table="demo_eleven",
-        conflict_cols=["octree_text"],
+        conflict_cols={"octree_text"},
         data={"octree_text": "zs", "octree_href": "new@mail.com"},
-        update_cols=["octree_href"],
+        update_cols={"octree_href"},
     )
     assert (
         sql
