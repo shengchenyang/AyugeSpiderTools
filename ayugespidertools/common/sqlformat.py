@@ -76,10 +76,13 @@ class GenMysql:
         else:
             select_where = _base.join(f"`{k}`=%s" for k in rule)
 
-        _where = f"where {select_where}" if select_where else ""
-        _order_by = f"order by {order_by}" if order_by else ""
-        _limit = f"limit {limit}" if limit else ""
-        sql = f"""select {select_key} from {db_table} {_where} {_order_by} {_limit}"""
+        sql = f"select {select_key} from {db_table}"
+        if select_where:
+            sql += f" where {select_where}"
+        if order_by:
+            sql += f" order by {order_by}"
+        if limit:
+            sql += f" limit {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod

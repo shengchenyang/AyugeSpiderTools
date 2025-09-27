@@ -45,6 +45,8 @@ class TestDatabasePipeEnhanceMixin:
             sql
             == "INSERT INTO demo_one (nick_name, age) VALUES ($1, $2) ON CONFLICT DO NOTHING;"
         )
+        sql = self.ppem._get_sql_by_item(self._table, self._item, is_psycopg=True)
+        assert sql == "INSERT INTO demo_one (nick_name, age) values (%s, %s);"
 
     def test_oracle_get_sql_by_item(self):
         sql = self.opem._get_sql_by_item(self._table, self._item)

@@ -202,7 +202,9 @@ ignore_errors = "True"
 [tool.ruff]
 unsafe-fixes = true
 exclude = [
-    "tests",
+    ".github",
+    ".venv",
+    ".poetry",
 ]
 
 [tool.ruff.lint]
@@ -352,6 +354,7 @@ ignore = [
 "ayugespidertools/common/sqlformat.py" = ["S608"]
 "ayugespidertools/extras/cvnpil.py" = ["S311"]
 "ayugespidertools/scraper/middlewares/headers/ua.py" = ["S311"]
+"tests/**" = ["S", "PLC0415", "PT", "PTH"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"

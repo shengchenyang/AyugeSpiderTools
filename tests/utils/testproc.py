@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class ProcessTest:
     command: str | None = None
     prefix = [sys.executable, "-m", "scrapy.cmdline"]
-    cwd = os.getcwd()  # trial chdirs to temp dir  # noqa: PTH109
+    cwd = os.getcwd()  # trial chdirs to temp dir
 
     def execute(
         self,
