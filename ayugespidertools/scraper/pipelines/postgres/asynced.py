@@ -58,6 +58,7 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         await self.insert_item(item_dict)
+        return item
 
     async def _close_spider(self) -> None:
         await self.pool.close()
