@@ -149,10 +149,13 @@ class GenPostgresql:
         else:
             select_where = _base.join(f"{k}=%s" for k in rule)
 
-        _where = f"where {select_where}" if select_where else ""
-        _order_by = f"order by {order_by}" if order_by else ""
-        _limit = f"limit {limit}" if limit else ""
-        sql = f"""select {select_key} from {db_table} {_where} {_order_by} {_limit}"""
+        sql = f"select {select_key} from {db_table}"
+        if select_where:
+            sql += f" where {select_where}"
+        if order_by:
+            sql += f" order by {order_by}"
+        if limit:
+            sql += f" limit {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod
@@ -218,11 +221,13 @@ class GenPostgresqlAsyncpg:
         else:
             select_where = _base.join(f"{k}=${i + 1}" for i, k in enumerate(rule))
 
-        _where = f"WHERE {select_where}" if select_where else ""
-        _order_by = f"ORDER BY {order_by}" if order_by else ""
-        _limit = f"LIMIT {limit}" if limit else ""
-
-        sql = f"SELECT {select_key} FROM {db_table} {_where} {_order_by} {_limit}"
+        sql = f"SELECT {select_key} FROM {db_table}"
+        if select_where:
+            sql += f" WHERE {select_where}"
+        if order_by:
+            sql += f" ORDER BY {order_by}"
+        if limit:
+            sql += f" LIMIT {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod
@@ -310,17 +315,19 @@ class GenOracle:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"""'"{k.split("|")[0]}"{k.split("|")[1]}:{i + 1}"""
+                f""""{k.split("|")[0]}"{k.split("|")[1]}:{i + 1}"""
                 for i, k in enumerate(rule)
             )
         else:
             select_where = _base.join(f'"{k}"=:{i + 1}' for i, k in enumerate(rule))
 
-        _where = f"where {select_where}" if select_where else ""
-        _order_by = f"order by {order_by}" if order_by else ""
-        _limit = f"limit {limit}" if limit else ""
-        _limit = f"AND ROWNUM = {limit}" if limit else ""
-        sql = f"""select {select_key} from "{db_table}" {_where} {_order_by} {_limit}"""
+        sql = f'select {select_key} from "{db_table}"'
+        if select_where:
+            sql += f" where {select_where}"
+        if order_by:
+            sql += f" order by {order_by}"
+        if limit:
+            sql += f" AND ROWNUM = {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod
