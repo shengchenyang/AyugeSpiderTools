@@ -1,5 +1,3 @@
-# NOTE: 虽然目前 AyuItem 支持 item["field"], item.field 两种方式来操作 field，
-# 但还是推荐使用 item["field"] 的方式，更明了。
 import pytest
 from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
@@ -73,8 +71,17 @@ def test_items_AyuItem():
         [
             isinstance(mdi_item, ScrapyItem),
             ItemAdapter.is_item(mdi_item),
+            mdi_item["_conflict_cols"] == {"id"},
         ]
     )
+
+    mdi_item_sec = mdi.asitem(assignment=True)
+    assert mdi_item_sec == {
+        "_conflict_cols": {"id"},
+        "_table": "table",
+        "field1": "value1",
+        "field2": DataItem(key_value="field2_key", notes="key值"),
+    }
 
     # 另一种赋值方式
     mdi_sec = AyuItem(
@@ -183,3 +190,30 @@ def test_empty_key_error():
 def test_field_already_exists_error():
     with pytest.raises(FieldAlreadyExistsError):
         cur_item.add_field("title", "title")
+
+
+def test_getattr_field_in_fields():
+    with pytest.raises(AttributeError):
+        _ = cur_item.name
+
+
+def test_iter_over_fields():
+    item = AyuItem(_table="users", title="hello")
+    item["age"] = 18
+    item["name"] = "zhangsan"
+
+    # 使用 __iter__ 得到字段列表
+    fields = set(iter(item))
+    assert fields == {
+        "name",
+        "_AyuItem__fields",
+        "title",
+        "_conflict_cols",
+        "age",
+        "_table",
+    }
+
+
+def test_len_fields():
+    item = AyuItem(_table="users", title="hello")
+    assert len(item) == 4

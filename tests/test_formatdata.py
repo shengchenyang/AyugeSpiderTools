@@ -54,5 +54,25 @@ def test_remove_tags():
         return f"{html_content}'<p>无事发生</p>'"
 
     res = true_test_remove_tags("""<a href="https://www.baidu.com">跳转到百度1</a>""")
-    print(res)
     assert res is not None
+
+
+def test_normal_display():
+    @DataHandle.normal_display
+    def true_test_normal_display(html_content):
+        return f"{html_content}"
+
+    res = true_test_normal_display("&lt;p&gt;Hello World&lt;/p&gt;")
+    assert "<p>Hello World</p>" in res
+
+
+def test_simple_deal_for_extract():
+    @DataHandle.simple_deal_for_extract
+    def true_test_simple_deal_for_extract(html_content):
+        return html_content
+
+    res = true_test_simple_deal_for_extract("123 ")
+    assert res == "123"
+    _data = {"demo": "demo_data"}
+    res = true_test_simple_deal_for_extract(html_content=_data)
+    assert res == _data
