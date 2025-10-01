@@ -53,6 +53,8 @@ clean:
 	-$(CLEAN_PYCACHE)
 	-$(CLEAN_PYTESTCACHE)
 	-$(CLEAN_MYPYCACHE)
+	-$(RMDIR) $(call path, .tox)
+	-$(RMDIR) $(call path, .tox_envs)
 	-$(RMDIR) $(call path, dist)
 	-$(RMDIR) $(call path, file.log)
 	-$(RMDIR) $(call path, docs$(PATHSEP)_build)
