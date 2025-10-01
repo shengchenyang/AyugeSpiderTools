@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 
-# sourcery skip: dont-import-test-modules
+from scrapy.settings import Settings
+
+from ayugespidertools.commands.genspider import AyuCommand
 from tests.test_commands.test_commands_crawl import TestProjectBase
 
 
@@ -53,3 +55,11 @@ class TestGenspiderCommand(TestCommandBase):
 
     def test_template_xmlfeed(self):
         self.test_template(tplname="xmlfeed")
+
+    def test_genspider_command_object(self):
+        cmd = AyuCommand()
+        cmd.settings = Settings()
+        templates_dir = cmd.templates_dir
+        assert isinstance(templates_dir, str)
+        assert "ayugespidertools" in templates_dir
+        assert "templates" in templates_dir
