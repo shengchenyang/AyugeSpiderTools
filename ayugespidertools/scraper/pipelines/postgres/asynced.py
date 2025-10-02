@@ -43,15 +43,12 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     async def insert_item(self, item_dict: dict) -> None:
         async with self.pool.acquire() as conn:
-            alter_item = ReuseOperation.reshape_item(item_dict)
-            _table_name = alter_item.table.name
-            new_item = alter_item.new_item
-            update_keys = alter_item.update_keys
+            insert_data, table_name = ReuseOperation.get_insert_data(item_dict)
             sql, args = GenPostgresqlAsyncpg.upsert_generate(
-                db_table=_table_name,
-                conflict_cols=alter_item.conflict_cols,
-                data=new_item,
-                update_cols=update_keys,
+                db_table=table_name,
+                conflict_cols=item_dict.get("_conflict_cols"),
+                data=insert_data,
+                update_cols=item_dict.get("_update_keys"),
             )
             await conn.execute(sql, *args)
 

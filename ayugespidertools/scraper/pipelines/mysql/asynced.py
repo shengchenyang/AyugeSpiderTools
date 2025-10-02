@@ -41,16 +41,15 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     async def insert_item(self, item_dict: dict) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cursor:
-                alter_item = ReuseOperation.reshape_item(item_dict)
-                new_item = alter_item.new_item
+                insert_data, table_name = ReuseOperation.get_insert_data(item_dict)
                 duplicate = None
-                if update_keys := alter_item.update_keys:
+                if update_keys := item_dict.get("_update_keys"):
                     duplicate = ReuseOperation.get_items_by_keys(
-                        data=new_item, keys=update_keys
+                        data=insert_data, keys=update_keys
                     )
                 sql, args = self._get_sql_by_item(
-                    table=alter_item.table.name,
-                    item=new_item,
+                    table=table_name,
+                    item=insert_data,
                     odku_enable=self.mysql_conf.odku_enable,
                     insert_prefix=self.mysql_conf.insert_prefix,
                     duplicate=duplicate,

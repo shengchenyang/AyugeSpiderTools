@@ -38,15 +38,12 @@ class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
     async def insert_item(self, item_dict: dict) -> None:
         async with self.pool.acquire() as conn:
             conn.autocommit = True
-            alter_item = ReuseOperation.reshape_item(item_dict)
-            new_item = alter_item.new_item
-            update_keys = alter_item.update_keys
-            update_rules = alter_item._update_rule
+            insert_data, table_name = ReuseOperation.get_insert_data(item_dict)
             sql, args = GenOracle.merge_generate(
-                db_table=alter_item.table.name,
-                match_cols=update_rules.keys(),
-                data=new_item,
-                update_cols=update_keys,
+                db_table=table_name,
+                match_cols=item_dict.get("_update_rule"),
+                data=insert_data,
+                update_cols=item_dict.get("_update_keys"),
             )
             await conn.execute(sql, args)
 

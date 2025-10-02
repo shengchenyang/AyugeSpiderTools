@@ -220,6 +220,16 @@ class ReuseOperation:
         )
 
     @classmethod
+    def get_insert_data(cls, item_dict: dict) -> tuple[dict, str]:
+        insert_data = cls.get_items_except_keys(item_dict, keys=AyuItem._except_keys)
+        table_name = item_dict["_table"]
+        judge_item = next(iter(insert_data.values()))
+        if cls.is_namedtuple_instance(judge_item):
+            insert_data = {k: v.key_value for k, v in insert_data.items()}
+            table_name = table_name.key_value
+        return insert_data, table_name
+
+    @classmethod
     def reshape_item(cls, item_dict: dict[str, Any]) -> AlterItem:
         """重新整合 item
 

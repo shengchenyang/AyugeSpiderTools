@@ -380,17 +380,17 @@ class GenOracle:
         select_part = ", ".join(f':{i + 1} "{col}"' for i, col in enumerate(keys))
         using_sql = f"(SELECT {select_part} FROM dual) s"
         on_sql = " AND ".join([f't."{col}" = s."{col}"' for col in match_cols])
-        if update_cols is None:
-            update_cols = [k for k in keys if k not in match_cols]
-        update_set = ", ".join([f't."{col}" = s."{col}"' for col in update_cols])
+        if not update_cols:
+            when_matched_sql = ""
+        else:
+            update_set = ", ".join([f't."{col}" = s."{col}"' for col in update_cols])
+            when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
         insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
         MERGE INTO "{db_table}" t
         USING {using_sql}
         ON ({on_sql})
-        WHEN MATCHED THEN
-            UPDATE SET {update_set}
-        WHEN NOT MATCHED THEN
-            INSERT ({insert_cols}) VALUES ({insert_vals})
+        {when_matched_sql}
+        WHEN NOT MATCHED THEN INSERT ({insert_cols}) VALUES ({insert_vals})
         """
         return sql.strip(), tuple(data.values())
