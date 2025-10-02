@@ -66,12 +66,12 @@ class SyncStorageHandler:
         )
         if update_rule:
             update_doc = {}
-            mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
+            update_keys = item_dict.get("_update_keys") or item_dict.get(
                 "_mongo_update_keys"
             )
-            if mongo_update_keys:
+            if update_keys:
                 set_data = ReuseOperation.get_items_by_keys(
-                    data=insert_data, keys=mongo_update_keys
+                    data=insert_data, keys=update_keys
                 )
                 update_doc["$set"] = set_data
             else:
@@ -96,12 +96,12 @@ class AsyncStorageHandler:
         )
         if update_rule:
             update_doc = {}
-            mongo_update_keys = item_dict.get("_update_keys") or item_dict.get(
+            update_keys = item_dict.get("_update_keys") or item_dict.get(
                 "_mongo_update_keys"
             )
-            if mongo_update_keys:
+            if update_keys:
                 set_data = ReuseOperation.get_items_by_keys(
-                    data=insert_data, keys=mongo_update_keys
+                    data=insert_data, keys=update_keys
                 )
                 update_doc["$set"] = set_data
             else:
