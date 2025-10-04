@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from abc import ABCMeta
 from collections.abc import Iterator, MutableMapping
 from dataclasses import dataclass
@@ -8,7 +9,12 @@ from typing import Any, ClassVar, NamedTuple, NoReturn
 import scrapy
 from scrapy.item import Item
 
-from ayugespidertools.exceptions import EmptyKeyError, FieldAlreadyExistsError
+from ayugespidertools.common.typevars import _SENTINEL, sentinel
+from ayugespidertools.exceptions import (
+    AyugeSpiderToolsDeprecationWarning,
+    EmptyKeyError,
+    FieldAlreadyExistsError,
+)
 
 __all__ = [
     "AyuItem",
@@ -124,21 +130,21 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
     def __init__(
         self,
         _table: DataItem | str,
-        _mongo_update_rule: dict[str, Any] | None = None,
+        _mongo_update_rule: dict[str, Any] | _SENTINEL | None = sentinel,
         _update_rule: dict[str, Any] | None = None,
-        _mongo_update_keys: set | None = None,
-        _update_keys: set | None = None,
-        _conflict_cols: set | None = None,
+        _mongo_update_keys: set[str] | _SENTINEL | None = sentinel,
+        _update_keys: set[str] | None = None,
+        _conflict_cols: set[str] | None = None,
         **kwargs,
     ) -> None:
         """初始化 AyuItem 实例
 
         Args:
             _table: 数据库表名。
-            _mongo_update_rule: MongoDB 存储场景下可能需要的查重条件，默认为 None。
-            _update_rule: 将代替 _mongo_update_rule，适配 mongo mysql postgresql 等场景。
-            _mongo_update_keys: MongoDB 更新场景下的需要更新的字段，默认为 None。
-            _update_keys: 将代替 _mongo_update_keys，适配 mongo mysql postgresql 等场景。
+            _mongo_update_rule: 被 _update_rule 参数代替，即将删除此参数。
+            _update_rule: 去重更新规则，用于 mongo mysql postgresql 等入库前的去重更新判断条件。
+            _mongo_update_keys: 被 _update_keys 参数代替，即将删除此参数。
+            _update_keys: 去重更新规则 _update_rule 匹配时，需要更新的字段，若不设置则忽略。
             _conflict_cols: 唯一索引冲突列，用于 postgresql 中的参数设置，默认为 {"id"}
         """
         self.__fields = set()
@@ -147,12 +153,22 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         if _table:
             self.__fields.add("_table")
             self._table = _table
-        if _mongo_update_rule:
+        if _mongo_update_rule is not sentinel:
             self.__fields.add("_mongo_update_rule")
             self._mongo_update_rule = _mongo_update_rule
-        if _mongo_update_keys:
+            warnings.warn(
+                "parameter '_mongo_update_rule' is deprecated, use '_update_rule' argument instead",
+                category=AyugeSpiderToolsDeprecationWarning,
+                stacklevel=2,
+            )
+        if _mongo_update_keys is not sentinel:
             self.__fields.add("_mongo_update_keys")
             self._mongo_update_keys = _mongo_update_keys
+            warnings.warn(
+                "parameter '_mongo_update_keys' is deprecated, use '_update_keys' argument instead",
+                category=AyugeSpiderToolsDeprecationWarning,
+                stacklevel=2,
+            )
         if _update_rule:
             self.__fields.add("_update_rule")
             self._update_rule = _update_rule
