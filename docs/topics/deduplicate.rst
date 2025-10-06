@@ -33,8 +33,8 @@ Mysql
 
 .. note::
 
-   - 使用 AyuItem 内置的 mysql 更新规则时，需要在 .conf 配置中设置   为 True 才能激活更\
-     新功能；
+   - 使用 AyuItem 内置的 mysql 更新规则时，需要在 .conf 配置中设置其 odku_enable 为 True 才能激活\
+     更新功能；
    - 再结合 .conf 中设置 insert_ignore 为 True，且不设置 _update_keys 参数时即可做到忽略更新内容，\
      达到只新增不更新已存在内容。这个请按需使用。
    - 当然，你也可以选择保持默认关闭 odku_enable 和关闭 insert_ignore 的配置，不使用 AyuItem 中的\
