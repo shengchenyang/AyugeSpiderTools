@@ -72,8 +72,6 @@ AyugeSpiderTools 一目了然
            "ITEM_PIPELINES": {
                # 激活此项则数据会存储至 Mysql
                "ayugespidertools.pipelines.AyuFtyMysqlPipeline": 300,
-               # 开启记录项目相关运行统计信息
-               "ayugespidertools.pipelines.AyuStatisticsMysqlPipeline": 301,
            },
        }
 
@@ -85,7 +83,6 @@ AyugeSpiderTools 一目了然
 
        def parse_first(self, response: Response) -> Any:
            _save_table = "_octree_info"
-
            li_list = response.xpath('//div[@aria-label="Navigation menu"]/ul/li')
            for curr_li in li_list:
                octree_text = curr_li.xpath("a/text()").get()
@@ -99,7 +96,6 @@ AyugeSpiderTools 一目了然
                    # 若不使用内置去重更新功能，就不需要设置以下参数
                    _update_rule={"octree_text": octree_text},
                    _update_keys={"octree_href"},
-                   _conflict_cols={"octree_href"},
                )
 
                # NOTE: 数据存储方式 2，需要自动添加表字段注释时的写法。但不要风格混用。

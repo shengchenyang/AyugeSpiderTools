@@ -144,7 +144,6 @@ Oracle
        _table=_save_table,
        _update_rule={"octree_text": octree_text},
        _update_keys={"octree_href"},
-       _conflict_cols={"octree_text"},
    )
    self.slog.info(f"octree_item: {octree_item}")
    yield octree_item

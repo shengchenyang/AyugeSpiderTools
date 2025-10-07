@@ -95,7 +95,7 @@ value 可选择的类型有：
            # 若不使用内置去重更新功能，就不需要设置以下参数
            _update_rule={"article_title": article_title},
            _update_keys={"comment_count", "favor_count"},
-           # postgresql 及 oracle 去重更新场景才需要设置的唯一索引约束
+           # postgresql 去重更新场景才需要设置的唯一索引约束
            _conflict_cols={"article_title"},
        )
 
@@ -271,7 +271,6 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
                    # oracle 的 pipeline，它们会互不影响且一同生效。
                    _update_rule={"octree_text": octree_text},
                    _update_keys={"octree_href"},
-                   _conflict_cols={"octree_href"},
                )
                # 日志使用 scrapy 的 self.logger 或本库的 self.slog
                self.slog.info(f"octree_item: {octree_item}")
