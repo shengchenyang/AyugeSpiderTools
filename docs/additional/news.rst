@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.13.2 (Preview: TBD)
+AyugeSpiderTools 3.13.3 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,35 @@ AyugeSpiderTools 3.13.2 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.13.2 (2025-10-07)
+====================================
+
+Bug fixes
+---------
+
+- 解决 postgresql 的协程 pipeline 缺失返回 item 的问题，可能会造成在多 pipeline 场景时异常的错误。
+
+  (:commit:`83463832f5ca50580badaa13bff8ecf6f06c49fa`)
+
+- 解决 oracledb 自带去重更新场景中，在 AyuItem 的 _update_keys 参数为 None 时，会造成更新所有字段的错误。
+
+  (:commit:`70299c44a2f627727321bb2b38bc8f2aef15ddbd`)
+
+Code optimizations
+------------------
+
+- AyuItem 添加上 _mongo_update_rule 和 _mongo_update_keys 参数的过期警告，会在下一 minor 版本中彻底删除。
+
+  (:commit:`6a2a52464af7de04c1b60a6fd66d9aec57ecd28c`)
+
+- 将格式化工具替换为 ruff，方便新开发环境的配置。
+
+  (:commit:`9477277b6db8caf3e2713cfeb7b3a40392765b83`)
+
+- 优化 sql 构建，去除多余的空格。
+
+  (:commit:`e4507093c57c8751541c8737d17937fdba6a53a4`)
 
 AyugeSpiderTools 3.13.1 (2025-09-16)
 ====================================
