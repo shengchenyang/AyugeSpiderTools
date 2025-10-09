@@ -142,7 +142,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         Args:
             _table: 数据库表名。
             _mongo_update_rule: 被 _update_rule 参数代替，即将删除此参数。
-            _update_rule: 去重更新规则，用于 mongo mysql postgresql 等入库前的去重更新判断条件。
+            _update_rule: 去重更新规则，用于 mongo mysql postgresql oracle 等入库前的去重更新判断条件。
             _mongo_update_keys: 被 _update_keys 参数代替，即将删除此参数。
             _update_keys: 去重更新规则 _update_rule 匹配时，需要更新的字段，若不设置则忽略。
             _conflict_cols: 唯一索引冲突列，用于 postgresql 中的参数设置，默认为 {"id"}

@@ -39,7 +39,9 @@
 功能及 bug 修复等通过此分支测试后才会最终同步到 master 分支。所以，若您有 pull request 需求请推送至 \
 feature。若您不太了解 pull request 流程，我会在以下部分介绍，并给出参考文章。
 
-注意：请完成以上前提准备，以下步骤皆在你的 repo 中操作。
+.. warning::
+
+   注意：请完成以上前提准备，以下步骤皆在你的 repo 中操作。
 
 1. Checkout the feature branch
 
