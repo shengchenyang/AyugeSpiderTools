@@ -14,4 +14,4 @@
 
 注：并非存在以上的问题就不允许提 issue，它只是用于自我快速排查问题。
 
-.. _issue: https://github.com/shengchenyang/AyugeSpiderTools/issues
+.. _issue: https://github.com/shengchenyang/AyugeSpiderTools/issues/new/choose
