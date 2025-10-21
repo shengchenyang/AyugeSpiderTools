@@ -223,7 +223,6 @@ AyuItem 在 spider 中常用的基础使用方法示例，以本库模板中的 
    from ayugespidertools.items import AyuItem
    from ayugespidertools.spiders import AyuSpider
    from scrapy.http import Request
-   from sqlalchemy import text
 
    if TYPE_CHECKING:
        from collections.abc import AsyncIterator

@@ -56,7 +56,6 @@ AyugeSpiderTools 一目了然
    from ayugespidertools.items import DataItem, AyuItem
    from ayugespidertools.spiders import AyuSpider
    from scrapy.http import Request
-   from sqlalchemy import text
 
    if TYPE_CHECKING:
        from collections.abc import AsyncIterator
@@ -133,15 +132,9 @@ AyugeSpiderTools 一目了然
 
 .. note::
 
-   本库中提供了 sqlalchemy 来对 spider 中 mysql，postgresql 和 oracle 的入库前的去重查询，但是未\
-   提供支持异步场景。这里只是用于简单场景的使用，如果你需要更加自定义的复杂场景，那么你需要在 spider 中\
-   直接只使用 ``self.mysql_conf``，``self.postgres_conf``，``self.oracle_conf`` 等，或者结合\
-   `custom_section`_ 的自定义配置创建对应的数据库连接来达到入库前去重的场景，这样你就可以选择自己喜欢\
-   的工具，不再局限于 sqlalchemy。
-
-   本库不会增加 sqlalchemy 的异步支持了，会使得项目臃肿，``self.mysql_conf`` 和 ``custom_section`` \
-   的方式已经可以很简单优雅地实现你想要的去重要求了。或者你可以考虑基于文件的去重、``scrapy-redis`` 库或 \
-   ``rabbitmq`` 的任务分发等方式来解决去重方式。
+   使用本库如果你需要更加自定义入库前的去重查询的场景，那么你需要在 spider 中直接只使用 ``self.mysql_conf``，\
+   ``self.postgres_conf``，``self.oracle_conf`` 等，或者结合 `custom_section`_ 的自定义配置创\
+   建对应的数据库连接来达到入库前去重的场景，这样你就可以选择自己喜欢的工具。
 
    本库在 3.12.0 版本添加了链接到各种数据库的方法 ，以方便用户创建对应数据库场景的链接来自定义去重功能。\
    可以在 ayugespidertools.utils.database 和 `DemoSpider`_ 的 3.12.x 分支中查看详情。

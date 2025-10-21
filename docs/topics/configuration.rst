@@ -56,8 +56,8 @@ Introduction
 [mysql]
 =======
 
-用于 mysql 存储相关场景中使用，比如创建对应的 sqlalchemy 的 engine，engine_conn 来用于去重，创建数\
-据库连接来解决表格缺失，字段缺失等问题。
+用于 mysql 存储相关场景中使用，比如创建对应的数据库连接来用于去重，创建数据库连接来解决表格缺失，字段缺失\
+等问题。
 
 .. csv-table::
    :header: "参数名", "参数备注", "描述"
@@ -114,8 +114,8 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 [postgresql]
 ============
 
-用于 postgresql 存储相关场景中使用，比如创建对应的 sqlalchemy 的 engine，engine_conn 来用于去重，\
-创建数据库连接来解决表格缺失，字段缺失等问题。
+用于 postgresql 存储相关场景中使用，比如创建对应的数据库连接来用于去重，创建数据库连接来解决表格缺失，字\
+段缺失等问题。
 
 .. csv-table::
    :header: "参数名", "参数备注", "描述"
@@ -237,9 +237,8 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 [oracle]
 ========
 
-用于 oracle 存储相关场景中使用，比如创建对应的 sqlalchemy 的 engine，engine_conn 来用于去重，但不会\
-处理数据库表及字段缺失等错误，请提前创建好，因为其部分报错不如 mysql 及 postgresql 那样清晰明了，虽然也\
-能解决，但必要性不高。
+用于 oracle 存储相关场景中使用，比如创建对应的数据库连接来用于去重，但不会处理数据库表及字段缺失等错误，\
+请提前创建好，因为其部分报错不如 mysql 及 postgresql 那样清晰明了，虽然也能解决，但必要性不高。
 
 .. csv-table::
    :header: "参数名", "参数备注", "描述"
