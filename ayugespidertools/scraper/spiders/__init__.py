@@ -21,7 +21,6 @@ from ayugespidertools.common.spiderconf import (
     OssConfCreator,
     PostgreSQLConfCreator,
     get_spider_conf,
-    get_sqlalchemy_conf,
 )
 from ayugespidertools.config import logger
 from ayugespidertools.exceptions import (
@@ -34,11 +33,8 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from elasticsearch import Elasticsearch
     from scrapy.crawler import Crawler
     from scrapy.settings import BaseSettings
-    from sqlalchemy.engine.base import Connection as SqlalchemyConnectT
-    from sqlalchemy.engine.base import Engine as SqlalchemyEngineT
     from typing_extensions import Self
 
     from ayugespidertools.common.typevars import (
@@ -57,15 +53,6 @@ if TYPE_CHECKING:
 
 
 class AyuSpider(Spider):
-    mysql_engine: SqlalchemyEngineT | None
-    mysql_engine_conn: SqlalchemyConnectT | None
-    postgres_engine: SqlalchemyEngineT | None
-    postgres_engine_conn: SqlalchemyConnectT | None
-    oracle_engine: SqlalchemyEngineT | None
-    oracle_engine_conn: SqlalchemyConnectT | None
-    es_engine: Elasticsearch | None
-    es_engine_conn: Elasticsearch | None
-
     mysql_conf: MysqlConf
     mongodb_conf: MongoDBConf
     postgres_conf: PostgreSQLConf
@@ -131,11 +118,6 @@ class AyuSpider(Spider):
             MysqlConfCreator(), crawler.settings, remote_option
         ):
             spider.mysql_conf = mysql_conf
-            spider.mysql_engine, spider.mysql_engine_conn = get_sqlalchemy_conf(
-                creator=MysqlConfCreator(),
-                db_conf=mysql_conf,
-                db_engine_enabled=_db_engine_enabled,
-            )
 
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
@@ -146,30 +128,14 @@ class AyuSpider(Spider):
             PostgreSQLConfCreator(), crawler.settings, remote_option
         ):
             spider.postgres_conf = cast("PostgreSQLConf", postgres_conf)
-            spider.postgres_engine, spider.postgres_engine_conn = get_sqlalchemy_conf(
-                creator=PostgreSQLConfCreator(),
-                db_conf=postgres_conf,
-                db_engine_enabled=_db_engine_enabled,
-            )
 
         if es_conf := get_spider_conf(ESConfCreator(), crawler.settings, remote_option):
             spider.es_conf = cast("ESConf", es_conf)
-            _es_conn = get_sqlalchemy_conf(
-                creator=ESConfCreator(),
-                db_conf=es_conf,
-                db_engine_enabled=_db_engine_enabled,
-            )
-            spider.es_engine = spider.es_engine_conn = cast("Elasticsearch", _es_conn)
 
         if oracle_conf := get_spider_conf(
             OracleConfCreator(), crawler.settings, remote_option
         ):
             spider.oracle_conf = cast("OracleConf", oracle_conf)
-            spider.oracle_engine, spider.oracle_engine_conn = get_sqlalchemy_conf(
-                creator=OracleConfCreator(),
-                db_conf=oracle_conf,
-                db_engine_enabled=_db_engine_enabled,
-            )
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
