@@ -5,7 +5,6 @@ import threading
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar, Union
 
-from sqlalchemy import create_engine
 from yarl import URL
 
 if TYPE_CHECKING:
@@ -66,15 +65,6 @@ class DatabaseSingletonMeta(type):
                     instance = super().__call__(engine_url, *args, **kwargs)
                     cls._instances[engine_url] = instance
         return cls._instances[engine_url]
-
-
-class DatabaseEngineClass(metaclass=DatabaseSingletonMeta):
-    """database engine 单例模式：同一个 engine_url 只能存在一个实例"""
-
-    def __init__(self, engine_url, *args, **kwargs):
-        self.engine = create_engine(
-            engine_url, *args, pool_pre_ping=True, pool_recycle=3600 * 7, **kwargs
-        )
 
 
 class MysqlConf(NamedTuple):
