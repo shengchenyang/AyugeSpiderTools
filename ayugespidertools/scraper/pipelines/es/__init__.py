@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Union
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.exceptions import NotConfigured
+from ayugespidertools.items import AyuItem
 
 try:
     from elasticsearch_dsl import Document, connections
@@ -54,12 +55,15 @@ class AyuESPipeline:
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
+        insert_data = ReuseOperation.get_items_except_keys(
+            item_dict, keys=AyuItem._except_keys
+        )
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
             return item
 
         if not hasattr(self, "es_type"):
-            fields_define = {k: v.notes for k, v in item_dict.items()}
+            fields_define = {k: v.notes for k, v in insert_data.items()}
             index_define = self.es_conf.index_class
             index_define["name"] = alert_item.table.name
             self.es_type = dynamic_es_document("ESType", fields_define, index_define)
