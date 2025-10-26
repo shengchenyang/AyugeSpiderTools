@@ -58,7 +58,7 @@ database = [
 ]
 
 [tool.poetry]
-version = "3.13.2"
+version = "3.13.3"
 readme = ["README.rst"]
 packages = [{ include = "ayugespidertools" }]
 requires-poetry = "2.1.1"

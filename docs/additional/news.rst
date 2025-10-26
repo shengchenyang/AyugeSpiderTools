@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.13.3 (Preview: TBD)
+AyugeSpiderTools 3.13.4 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,28 @@ AyugeSpiderTools 3.13.3 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.13.3 (2025-10-26)
+====================================
+
+Deprecation removals
+--------------------
+
+- 移除早已不再支持的 sqlalchemy 部分，想保持使用也可方便地自行构建，更推荐 AyuItem 自带更新去重和 ayugespidertools.utils.database 的方式。
+
+  (:commit:`778c12a2ceef482561ecd1e505e24218afa40178`)
+
+Bug fixes
+---------
+
+- 解决使用新 AyuItem 时造成 mq，kafka，es 的不兼容报错问题。
+
+  (:commit:`0515815e0422bc2b4e0653164cfb783ed56a75a5`)
+
+  (:commit:`333289397128debf0a2ccfd01e6046e1792f5475`)
+
+  (:commit:`06071118306cbcc50a6a20fc303449b6e1fd089d`)
+
 
 AyugeSpiderTools 3.13.2 (2025-10-07)
 ====================================
