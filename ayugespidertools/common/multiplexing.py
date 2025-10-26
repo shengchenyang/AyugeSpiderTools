@@ -247,8 +247,12 @@ class ReuseOperation:
         update_keys = item_dict.get("_update_keys")
         conflict_cols = item_dict.get("_conflict_cols")
         if cls.is_namedtuple_instance(judge_item):
-            _table_name = item_dict["_table"].key_value
-            _table_notes = item_dict["_table"].notes
+            if _table := item_dict.get("_table"):
+                _table_name = _table.key_value
+                _table_notes = _table.notes
+            else:
+                _table_name = _table_notes = ""
+
             table_info = AlterItemTable(_table_name, _table_notes)
             new_item = {k: v.key_value for k, v in insert_data.items()}
             notes_dic = {k: v.notes for k, v in insert_data.items()}
@@ -262,8 +266,8 @@ class ReuseOperation:
                 conflict_cols=conflict_cols,
             )
 
-        _table_name = item_dict.get("_table")
-        table_info = AlterItemTable(_table_name, "")
+        _table_name = item_dict.get("_table", "")
+        table_info = AlterItemTable(_table_name)
         notes_dic = dict.fromkeys(insert_data, "")
         return AlterItem(
             new_item=insert_data,
