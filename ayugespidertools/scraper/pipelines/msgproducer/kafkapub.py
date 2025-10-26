@@ -86,9 +86,13 @@ class AyuKafkaPipeline:
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
+        alert_item = ReuseOperation.reshape_item(item_dict)
+        if not (new_item := alert_item.new_item):
+            return item
+
         self.kp.sendmsg(
             topic=spider.kafka_conf.topic,
-            value=item_dict,
+            value=new_item,
             key=spider.kafka_conf.key,
         )
         return item

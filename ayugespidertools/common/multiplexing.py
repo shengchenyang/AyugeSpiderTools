@@ -262,7 +262,7 @@ class ReuseOperation:
                 conflict_cols=conflict_cols,
             )
 
-        _table_name = item_dict["_table"]
+        _table_name = item_dict.get("_table")
         table_info = AlterItemTable(_table_name, "")
         notes_dic = dict.fromkeys(insert_data, "")
         return AlterItem(
