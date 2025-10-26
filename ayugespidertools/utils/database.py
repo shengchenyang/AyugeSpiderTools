@@ -29,6 +29,7 @@ try:
     import oracledb
     import psycopg
     from asyncpg.pool import Pool as PGPool  # noqa: TC002
+    from elasticsearch_dsl import connections
 except ImportError:
     # pip install ayugespidertools[database]
     pass
@@ -173,9 +174,24 @@ class ElasticSearchPortal(metaclass=PortalSingletonMeta):
         db_conf: ESConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-    ): ...
+    ):
+        _hosts_lst = db_conf.hosts.split(",")
+        if any([db_conf.user is not None, db_conf.password is not None]):
+            http_auth = (db_conf.user, db_conf.password)
+        else:
+            http_auth = None
+        self.conn = connections.create_connection(
+            hosts=_hosts_lst,
+            http_auth=http_auth,
+            verify_certs=db_conf.verify_certs,
+            ca_certs=db_conf.ca_certs,
+            client_cert=db_conf.client_cert,
+            client_key=db_conf.client_key,
+            ssl_assert_fingerprint=db_conf.ssl_assert_fingerprint,
+        )
 
-    def connect(self): ...
+    def connect(self):
+        return self.conn
 
 
 class MongoDBPortal(metaclass=PortalSingletonMeta):
