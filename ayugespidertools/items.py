@@ -129,7 +129,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
 
     def __init__(
         self,
-        _table: DataItem | str,
+        _table: DataItem | str | None = None,
         _mongo_update_rule: dict[str, Any] | _SENTINEL | None = sentinel,
         _update_rule: dict[str, Any] | None = None,
         _mongo_update_keys: set[str] | _SENTINEL | None = sentinel,

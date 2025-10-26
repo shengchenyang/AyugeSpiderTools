@@ -57,7 +57,11 @@ class AyuMQPipeline:
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
-        publish_data = json.dumps(item_dict).encode()
+        alert_item = ReuseOperation.reshape_item(item_dict)
+        if not (new_item := alert_item.new_item):
+            return item
+
+        publish_data = json.dumps(new_item).encode()
         self.channel.basic_publish(
             exchange=spider.rabbitmq_conf.exchange,
             routing_key=spider.rabbitmq_conf.routing_key,
