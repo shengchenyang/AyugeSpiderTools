@@ -187,6 +187,10 @@ class ReuseOperation:
                 ),
                 "topic": kafka_section.get("topic", None),
                 "key": kafka_section.get("key", None),
+                "security_protocol": kafka_section.get("security_protocol", None),
+                "sasl_mechanism": kafka_section.get("sasl_mechanism", None),
+                "user": kafka_section.get("user", None),
+                "password": kafka_section.get("password", None),
             }
         if "oss:ali" in cfg:
             oss_section = cfg["oss:ali"]

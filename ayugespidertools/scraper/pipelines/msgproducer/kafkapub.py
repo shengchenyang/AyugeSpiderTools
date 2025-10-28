@@ -12,16 +12,28 @@ from ayugespidertools.config import logger
 __all__ = ["AyuKafkaPipeline"]
 
 if TYPE_CHECKING:
+    from ayugespidertools.common.typevars import KafkaConf
     from ayugespidertools.spiders import AyuSpider
 
 
 class KafkaProducerClient:
-    def __init__(self, bootstrap_servers: list) -> None:
-        self.producer = KafkaProducer(
-            bootstrap_servers=bootstrap_servers,
-            key_serializer=lambda k: json.dumps(k).encode(),
-            value_serializer=lambda v: json.dumps(v).encode(),
-        )
+    def __init__(self, kafka_conf: KafkaConf) -> None:
+        # 如果有多个 kafka 服务地址，用逗号分隔，会在此处拆分为列表
+        _bts = kafka_conf.bootstrap_servers
+        bts_lst = _bts.split(",")
+        producer_kwargs = {
+            "bootstrap_servers": bts_lst,
+            "key_serializer": lambda k: json.dumps(k).encode(),
+            "value_serializer": lambda v: json.dumps(v).encode(),
+        }
+        if kafka_conf.security_protocol:
+            producer_kwargs |= {
+                "security_protocol": kafka_conf.security_protocol,
+                "sasl_mechanism": kafka_conf.sasl_mechanism,
+                "sasl_plain_username": kafka_conf.user,
+                "sasl_plain_password": kafka_conf.password,
+            }
+        self.producer = KafkaProducer(**producer_kwargs)
 
     def sendmsg(
         self,
@@ -79,10 +91,7 @@ class AyuKafkaPipeline:
 
     def open_spider(self, spider: AyuSpider) -> None:
         assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
-        # 如果有多个 kafka 服务地址，用逗号分隔，会在此处拆分为列表
-        _bts = spider.kafka_conf.bootstrap_servers
-        bts_lst = _bts.split(",")
-        self.kp = KafkaProducerClient(bootstrap_servers=bts_lst)
+        self.kp = KafkaProducerClient(kafka_conf=spider.kafka_conf)
 
     def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)

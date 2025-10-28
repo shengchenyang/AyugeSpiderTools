@@ -45,6 +45,10 @@ authMechanismStr = Literal[
 ]
 MysqlEngineStr = Literal["InnoDB", "MyISAM", "MEMORY", "NDB", "ARCHIVE"]
 DataItemModeStr = Literal["normal", "namedtuple", "dict"]
+SecurityProtocolStr = Literal["PLAINTEXT", "SSL", "SASL_PLAINTEXT", "SASL_SSL"]
+SaslMechanismStr = Literal[
+    "PLAIN", "GSSAPI", "OAUTHBEARER", "SCRAM-SHA-256", "SCRAM-SHA-512"
+]
 
 
 class PortalTag(str, Enum):
@@ -216,6 +220,10 @@ class KafkaConf(NamedTuple):
     bootstrap_servers: str
     topic: str
     key: str
+    security_protocol: SecurityProtocolStr
+    sasl_mechanism: SaslMechanismStr
+    user: str | None = None
+    password: str | None = None
 
 
 class OssConf(NamedTuple):
