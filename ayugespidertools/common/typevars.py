@@ -220,8 +220,8 @@ class KafkaConf(NamedTuple):
     bootstrap_servers: str
     topic: str
     key: str
-    security_protocol: SecurityProtocolStr
-    sasl_mechanism: SaslMechanismStr
+    security_protocol: SecurityProtocolStr | None = None
+    sasl_mechanism: SaslMechanismStr | None = None
     user: str | None = None
     password: str | None = None
 
