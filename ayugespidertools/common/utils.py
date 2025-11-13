@@ -45,9 +45,7 @@ class Tools(AppConfManageMixin):
     @staticmethod
     @lru_cache(maxsize=16)
     def get_remote_kvs(
-        url: str,
-        remote_type: RemoteTypeStr = "consul",
-        token: str | None = None,
+        url: str, remote_type: RemoteTypeStr = "consul", token: str | None = None
     ) -> str:
         """获取远程配置中的 key_values 信息
 

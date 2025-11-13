@@ -58,11 +58,7 @@ class AbstractClass(ABC):
             logger.error(f"创建表 {table_name} 失败，err：{e}")
 
     def _get_column_type(
-        self,
-        cursor: Cursor,
-        database: str,
-        table: str,
-        column: str,
+        self, cursor: Cursor, database: str, table: str, column: str
     ) -> str | None:
         """获取数据字段存储类型
 

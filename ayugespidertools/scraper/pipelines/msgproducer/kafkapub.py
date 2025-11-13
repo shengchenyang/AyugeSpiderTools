@@ -35,12 +35,7 @@ class KafkaProducerClient:
             }
         self.producer = KafkaProducer(**producer_kwargs)
 
-    def sendmsg(
-        self,
-        topic: str,
-        value: dict,
-        key: str | None = None,
-    ) -> None:
+    def sendmsg(self, topic: str, value: dict, key: str | None = None) -> None:
         """发送数据
 
         Args:

@@ -543,12 +543,7 @@ class ReuseOperation:
         # 先判断是否为数组类型的元素
         judge_array = isinstance(
             array,
-            (
-                frozenset,
-                list,
-                set,
-                tuple,
-            ),
+            (frozenset, list, set, tuple),
         )
         return (
             int(judge_array) and len(array) and 1 + max(map(cls.get_array_depth, array))

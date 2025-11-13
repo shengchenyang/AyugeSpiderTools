@@ -55,11 +55,7 @@ class AliOssBase:
         self.bucket = oss2.Bucket(self.auth, f"{self.endpoint}/", bucket)
         self.headers = {"Connection": "close"}
 
-    def put_oss(
-        self,
-        put_bytes: bytes,
-        file: str,
-    ) -> None:
+    def put_oss(self, put_bytes: bytes, file: str) -> None:
         """上传单个文件的 bytes 内容
 
         Args:

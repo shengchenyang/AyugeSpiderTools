@@ -42,10 +42,7 @@ class AiohttpDownloaderMiddleware:
     slog: slogT
 
     def _retry(
-        self,
-        request: AyuRequest,
-        reason: str | int,
-        spider: AyuSpider,
+        self, request: AyuRequest, reason: str | int, spider: AyuSpider
     ) -> AyuRequest | None:
         """重试请求
 
@@ -140,8 +137,7 @@ class AiohttpDownloaderMiddleware:
         return s
 
     async def _request_by_aiohttp(
-        self,
-        aio_request_args: ItemAdapter | dict,
+        self, aio_request_args: ItemAdapter | dict
     ) -> tuple[int, str]:
         """使用 aiohttp 来请求
 
