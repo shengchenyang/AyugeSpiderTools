@@ -15,4 +15,4 @@ __all__ = [
     "logger",
 ]
 
-__version__ = "3.13.3"
+__version__ = "3.13.4"

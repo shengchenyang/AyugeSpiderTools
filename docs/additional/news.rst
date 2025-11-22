@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.13.4 (Preview: TBD)
+AyugeSpiderTools 3.13.5 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,27 @@ AyugeSpiderTools 3.13.4 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.13.4 (2025-11-22)
+====================================
+
+New features
+------------
+
+- kafka 场景添加认证的可选配置。
+
+  (:commit:`2883b32bb0cdd0cd55b3bcd52143da20de8a4246`)
+
+Code optimizations
+------------------
+
+- 将 AyuItem DataItem 场景中的 _table 改为可选参数，以更符合直觉的在 kafka，mq 等场景中使用。但还是推荐在非场景功能需要时，使用简洁模式赋值。
+
+  (:commit:`8a33756994572fd1cef377b2d761fd686915639f`)
+
+- scrapy 依赖更新为最新的 2.13.4。
+
+  (:commit:`b0cf7f6e8785615ef2d55afa67b8f3d49f31c9d8`)
 
 AyugeSpiderTools 3.13.3 (2025-10-26)
 ====================================
