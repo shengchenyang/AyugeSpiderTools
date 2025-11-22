@@ -265,6 +265,10 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "bootstrap_servers", "若有多个，用逗号分隔。比如 x.x.x.x:9092,x.x.x.x:9093", ""
    "topic", "_", "_"
    "key", "_", "_"
+   "security_protocol", "默认值 SASL_PLAINTEXT", "若不需要可删除"
+   "sasl_mechanism", "默认值 PLAIN", "若不需要可删除"
+   "user", "用户", "若不需要可删除"
+   "password", "密码", "若不需要可删除"
 
 [kdl_dynamic_proxy]
 ===================
