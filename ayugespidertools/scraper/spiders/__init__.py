@@ -4,7 +4,7 @@ import importlib.util
 import time
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from scrapy.spiders import Spider
 
@@ -122,43 +122,43 @@ class AyuSpider(Spider):
         if mongodb_conf := get_spider_conf(
             MongoDBConfCreator(), crawler.settings, remote_option
         ):
-            spider.mongodb_conf = cast("MongoDBConf", mongodb_conf)
+            spider.mongodb_conf = mongodb_conf
 
         if postgres_conf := get_spider_conf(
             PostgreSQLConfCreator(), crawler.settings, remote_option
         ):
-            spider.postgres_conf = cast("PostgreSQLConf", postgres_conf)
+            spider.postgres_conf = postgres_conf
 
         if es_conf := get_spider_conf(ESConfCreator(), crawler.settings, remote_option):
-            spider.es_conf = cast("ESConf", es_conf)
+            spider.es_conf = es_conf
 
         if oracle_conf := get_spider_conf(
             OracleConfCreator(), crawler.settings, remote_option
         ):
-            spider.oracle_conf = cast("OracleConf", oracle_conf)
+            spider.oracle_conf = oracle_conf
 
         if rabbitmq_conf := get_spider_conf(
             MQConfCreator(), crawler.settings, remote_option
         ):
-            spider.rabbitmq_conf = cast("MQConf", rabbitmq_conf)
+            spider.rabbitmq_conf = rabbitmq_conf
 
         if kafka_conf := get_spider_conf(
             KafkaConfCreator(), crawler.settings, remote_option
         ):
-            spider.kafka_conf = cast("KafkaConf", kafka_conf)
+            spider.kafka_conf = kafka_conf
 
         if dynamicproxy_conf := get_spider_conf(
             DynamicProxyCreator(), crawler.settings, remote_option
         ):
-            spider.dynamicproxy_conf = cast("DynamicProxyConf", dynamicproxy_conf)
+            spider.dynamicproxy_conf = dynamicproxy_conf
 
         if exclusiveproxy_conf := get_spider_conf(
             ExclusiveProxyCreator(), crawler.settings, remote_option
         ):
-            spider.exclusiveproxy_conf = cast("ExclusiveProxyConf", exclusiveproxy_conf)
+            spider.exclusiveproxy_conf = exclusiveproxy_conf
 
         if oss_conf := get_spider_conf(
             OssConfCreator(), crawler.settings, remote_option
         ):
-            spider.oss_conf = cast("OssConf", oss_conf)
+            spider.oss_conf = oss_conf
         return spider

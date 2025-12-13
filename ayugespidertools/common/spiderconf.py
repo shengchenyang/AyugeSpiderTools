@@ -43,6 +43,9 @@ SpiderConf = TypeVar(
     OssConf,
     DynamicProxyConf,
     ExclusiveProxyConf,
+    PostgreSQLConf,
+    ESConf,
+    OracleConf,
 )
 
 
@@ -57,15 +60,15 @@ class Product(ABC, Generic[SpiderConf]):
         )
 
 
-class Creator(ABC):
+class Creator(ABC, Generic[SpiderConf]):
     @abstractmethod
-    def create_product(self) -> Product:
+    def create_product(self) -> Product[SpiderConf]:
         raise NotImplementedError(
             "Subclasses must implement the 'create_product' method"
         )
 
 
-class MysqlConfProduct(Product):
+class MysqlConfProduct(Product[MysqlConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> MysqlConf | None:
@@ -79,7 +82,7 @@ class MysqlConfProduct(Product):
         return MysqlConf(**local_conf) if local_conf else None
 
 
-class MongoDBConfProduct(Product):
+class MongoDBConfProduct(Product[MongoDBConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> MongoDBConf | None:
@@ -97,7 +100,7 @@ class MongoDBConfProduct(Product):
         return MongoDBConf(**local_conf) if local_conf else None
 
 
-class PostgreSQLConfProduct(Product):
+class PostgreSQLConfProduct(Product[PostgreSQLConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> PostgreSQLConf | None:
@@ -111,7 +114,7 @@ class PostgreSQLConfProduct(Product):
         return PostgreSQLConf(**local_conf) if local_conf else None
 
 
-class ESConfProduct(Product):
+class ESConfProduct(Product[ESConf]):
     def get_conn_conf(self, settings: Settings, remote_option: dict) -> ESConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(
@@ -123,7 +126,7 @@ class ESConfProduct(Product):
         return ESConf(**local_conf) if local_conf else None
 
 
-class OracleConfProduct(Product):
+class OracleConfProduct(Product[OracleConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> OracleConf | None:
@@ -135,7 +138,7 @@ class OracleConfProduct(Product):
         return OracleConf(**local_conf) if local_conf else None
 
 
-class MQConfProduct(Product):
+class MQConfProduct(Product[MQConf]):
     def get_conn_conf(self, settings: Settings, remote_option: dict) -> MQConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="rabbitmq", **remote_option)
@@ -145,7 +148,7 @@ class MQConfProduct(Product):
         return MQConf(**local_conf) if local_conf else None
 
 
-class KafkaConfProduct(Product):
+class KafkaConfProduct(Product[KafkaConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> KafkaConf | None:
@@ -157,7 +160,7 @@ class KafkaConfProduct(Product):
         return KafkaConf(**local_conf) if local_conf else None
 
 
-class DynamicProxyProduct(Product):
+class DynamicProxyProduct(Product[DynamicProxyConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> DynamicProxyConf | None:
@@ -171,7 +174,7 @@ class DynamicProxyProduct(Product):
         return DynamicProxyConf(**local_conf) if local_conf else None
 
 
-class ExclusiveProxyProduct(Product):
+class ExclusiveProxyProduct(Product[ExclusiveProxyConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> ExclusiveProxyConf | None:
@@ -185,7 +188,7 @@ class ExclusiveProxyProduct(Product):
         return ExclusiveProxyConf(**local_conf) if local_conf else None
 
 
-class OssConfProduct(Product):
+class OssConfProduct(Product[OssConf]):
     def get_conn_conf(self, settings: Settings, remote_option: dict) -> OssConf | None:
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="oss:ali", **remote_option)
@@ -195,58 +198,58 @@ class OssConfProduct(Product):
         return OssConf(**local_conf) if local_conf else None
 
 
-class MysqlConfCreator(Creator):
-    def create_product(self) -> Product:
+class MysqlConfCreator(Creator[MysqlConf]):
+    def create_product(self) -> Product[MysqlConf]:
         return MysqlConfProduct()
 
 
-class MongoDBConfCreator(Creator):
-    def create_product(self) -> Product:
+class MongoDBConfCreator(Creator[MongoDBConf]):
+    def create_product(self) -> Product[MongoDBConf]:
         return MongoDBConfProduct()
 
 
-class PostgreSQLConfCreator(Creator):
-    def create_product(self) -> Product:
+class PostgreSQLConfCreator(Creator[PostgreSQLConf]):
+    def create_product(self) -> Product[PostgreSQLConf]:
         return PostgreSQLConfProduct()
 
 
-class ESConfCreator(Creator):
-    def create_product(self) -> Product:
+class ESConfCreator(Creator[ESConf]):
+    def create_product(self) -> Product[ESConf]:
         return ESConfProduct()
 
 
-class OracleConfCreator(Creator):
-    def create_product(self) -> Product:
+class OracleConfCreator(Creator[OracleConf]):
+    def create_product(self) -> Product[OracleConf]:
         return OracleConfProduct()
 
 
-class MQConfCreator(Creator):
-    def create_product(self) -> Product:
+class MQConfCreator(Creator[MQConf]):
+    def create_product(self) -> Product[MQConf]:
         return MQConfProduct()
 
 
-class KafkaConfCreator(Creator):
-    def create_product(self) -> Product:
+class KafkaConfCreator(Creator[KafkaConf]):
+    def create_product(self) -> Product[KafkaConf]:
         return KafkaConfProduct()
 
 
-class DynamicProxyCreator(Creator):
-    def create_product(self) -> Product:
+class DynamicProxyCreator(Creator[DynamicProxyConf]):
+    def create_product(self) -> Product[DynamicProxyConf]:
         return DynamicProxyProduct()
 
 
-class ExclusiveProxyCreator(Creator):
-    def create_product(self) -> Product:
+class ExclusiveProxyCreator(Creator[ExclusiveProxyConf]):
+    def create_product(self) -> Product[ExclusiveProxyConf]:
         return ExclusiveProxyProduct()
 
 
-class OssConfCreator(Creator):
-    def create_product(self) -> Product:
+class OssConfCreator(Creator[OssConf]):
+    def create_product(self) -> Product[OssConf]:
         return OssConfProduct()
 
 
 def get_spider_conf(
-    creator: Creator, settings: Settings, remote_option: dict
+    creator: Creator[SpiderConf], settings: Settings, remote_option: dict
 ) -> SpiderConf | None:
     product = creator.create_product()
     return product.get_conn_conf(settings, remote_option)
