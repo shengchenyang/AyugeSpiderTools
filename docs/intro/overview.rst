@@ -144,7 +144,7 @@ AyugeSpiderTools 一目了然
 
 .. warning::
 
-   后续会删除 sqlalchemy 部分，防止依赖冗余。推荐方法请查看 :ref:`去重更新方法 <topics-deduplicate>`。
+   目前删除 sqlalchemy 部分，防止依赖冗余，你也可以方便地自行构建。推荐的方法请查看 :ref:`去重更新方法 <topics-deduplicate>`。
 
 还有什么？
 ===========
