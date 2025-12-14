@@ -199,7 +199,7 @@ class MQConf(NamedTuple):
     exchange: str | None = None
     routing_key: str | None = None
     content_type: str = "text/plain"
-    delivery_mode: int = 1
+    delivery_mode: Literal[1, 2] = 1
     mandatory: bool = True
 
 
