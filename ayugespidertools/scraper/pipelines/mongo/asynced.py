@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ayugespidertools.common.mongodbpipe import AsyncStorageHandler, store_async_process
+from ayugespidertools.common.mongodbpipe import AsyncStorageHandler, store_process_async
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import PortalTag
 from ayugespidertools.utils.database import MongoDBAsyncPortal
@@ -29,7 +29,7 @@ class AyuAsyncMongoPipeline:
 
     async def process_item(self, item: Any, spider: AyuSpider) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
-        await store_async_process(
+        await store_process_async(
             item_dict=item_dict, db=self.db, handler=AsyncStorageHandler
         )
         return item

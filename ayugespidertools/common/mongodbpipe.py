@@ -7,8 +7,8 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 __all__ = [
     "AsyncStorageHandler",
     "SyncStorageHandler",
-    "store_async_process",
     "store_process",
+    "store_process_async",
 ]
 
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ def store_process(item_dict: dict, db: Database, handler: SyncStorage):
     handler.store(db, item_dict, collection, insert_data)
 
 
-async def store_async_process(
+async def store_process_async(
     item_dict: dict, db: AgnosticDatabase, handler: AsyncStorage
 ):
     insert_data, collection = ReuseOperation.get_insert_data(item_dict)
