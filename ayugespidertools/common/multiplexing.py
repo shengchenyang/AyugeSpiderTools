@@ -156,7 +156,7 @@ class ReuseOperation:
                 "proxy": kdl_exclusive_section.get("proxy", None),
                 "username": kdl_exclusive_section.get("username", None),
                 "password": kdl_exclusive_section.get("password", None),
-                "index": kdl_exclusive_section.getint("index", 1),
+                "proxy_index": kdl_exclusive_section.getint("index", 1),
             }
         if "mq" in cfg:
             mq_section = cfg["mq"]

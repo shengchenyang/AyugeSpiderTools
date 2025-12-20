@@ -115,10 +115,10 @@ class ESConf(NamedTuple):
     password: str | None = None
     init: bool = False
     verify_certs: bool = False
-    ca_certs: str = None
-    client_cert: str = None
-    client_key: str = None
-    ssl_assert_fingerprint: str = None
+    ca_certs: str | None = None
+    client_cert: str | None = None
+    client_key: str | None = None
+    ssl_assert_fingerprint: str | None = None
 
 
 class OracleConf(NamedTuple):
@@ -213,7 +213,7 @@ class ExclusiveProxyConf(NamedTuple):
     proxy: str
     username: str
     password: str
-    index: int
+    proxy_index: int
 
 
 class KafkaConf(NamedTuple):
