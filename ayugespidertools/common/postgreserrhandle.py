@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, NamedTuple, TypeVar
 
 from ayugespidertools.config import logger
 
@@ -20,14 +20,18 @@ if TYPE_CHECKING:
     TwistedTransactionT = TypeVar("TwistedTransactionT", bound=Transaction)
 
 
+class PostgresContext(NamedTuple):
+    cursor: Cursor | Transaction
+    conn: Connection | None = None
+
+
 class AbstractClass(ABC):
     """用于处理 postgresql 异常的模板方法类"""
 
     def template_method(
         self,
         err_msg: str,
-        conn: Connection,
-        cursor: Cursor | TwistedTransactionT,
+        context: PostgresContext,
         table: str,
         table_notes: str,
         note_dic: dict[str, str],
@@ -36,8 +40,7 @@ class AbstractClass(ABC):
 
         Args:
             err_msg: pipeline 存储时报错内容
-            conn: postgresql conn
-            cursor: postgresql connect cursor or twisted.enterprise.adbapi.Transaction
+            context: postgresql conn context
             table: 数据表
             table_notes: 数据表注释
             note_dic: 当前表字段注释
@@ -46,7 +49,7 @@ class AbstractClass(ABC):
             sql, possible_err = self.deal_1054_error(
                 err_msg=err_msg, table=table, note_dic=note_dic
             )
-            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
+            self._exec_sql(context=context, sql=sql, possible_err=possible_err)
 
         elif f'relation "{table}" does not exist' in err_msg:
             sql = f"""
@@ -54,7 +57,7 @@ class AbstractClass(ABC):
             COMMENT ON TABLE {table} IS {table_notes!r};
             COMMENT ON COLUMN {table}.id IS 'id';
             """
-            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err="创建表失败")
+            self._exec_sql(context=context, sql=sql, possible_err="创建表失败")
 
         elif "value too long for type" in err_msg:
             raise Exception(f"postgres 有字段超出长度限制：{err_msg}")
@@ -88,7 +91,9 @@ class AbstractClass(ABC):
         return sql, f"添加字段 {colum} 已存在"
 
     @abstractmethod
-    def _exec_sql(self, *args, **kwargs) -> None:
+    def _exec_sql(
+        self, context: PostgresContext, sql: str, possible_err: str | None = None
+    ) -> None:
         """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
         raise NotImplementedError("Subclasses must implement the '_exec_sql' method")
 
@@ -97,44 +102,34 @@ class Synchronize(AbstractClass):
     """pipeline 同步执行 sql 的场景"""
 
     def _exec_sql(
-        self,
-        conn: Connection,
-        cursor: Cursor,
-        sql: str,
-        possible_err: str | None = None,
-        *args,
-        **kwargs,
+        self, context: PostgresContext, sql: str, possible_err: str | None = None
     ) -> None:
+        assert context.conn is not None
         try:
-            cursor.execute(sql)
-            conn.commit()
+            context.cursor.execute(sql)  # type: ignore[arg-type]
+            context.conn.commit()
         except Exception as e:
             logger.warning(
                 f"synchronize postgres exec sql err: {e!s}\n"
                 f"possible_err: {possible_err}"
             )
-            conn.rollback()
+            context.conn.rollback()
 
 
 class TwistedAsynchronous(AbstractClass):
     """pipeline twisted 异步执行 sql 的场景"""
 
     def _exec_sql(
-        self,
-        cursor: TwistedTransactionT,
-        sql: str,
-        possible_err: str | None = None,
-        *args,
-        **kwargs,
+        self, context: PostgresContext, sql: str, possible_err: str | None = None
     ) -> None:
         try:
-            cursor.execute(sql)
-            cursor.execute("COMMIT")
+            context.cursor.execute(sql)  # type: ignore[arg-type]
+            context.cursor.execute("COMMIT")
         except Exception as e:
             logger.warning(
                 f"twisted postgres exec sql err: {e!s}\npossible_err ->: {possible_err}"
             )
-            cursor.execute("ROLLBACK")
+            context.cursor.execute("ROLLBACK")
 
 
 def deal_postgres_err(
@@ -146,10 +141,10 @@ def deal_postgres_err(
     note_dic: dict[str, str],
     conn: Connection | None = None,
 ) -> None:
+    context = PostgresContext(cursor=cursor, conn=conn)
     abstract_class.template_method(
         err_msg,
-        conn,
-        cursor,
+        context,
         table,
         table_notes,
         note_dic,
