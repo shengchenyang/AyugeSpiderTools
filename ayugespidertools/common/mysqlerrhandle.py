@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, NamedTuple, TypeVar
 
 from ayugespidertools.config import logger
 
@@ -23,12 +23,17 @@ if TYPE_CHECKING:
     PymysqlDictCursorT = TypeVar("PymysqlDictCursorT", bound=DictCursor)
 
 
+class MysqlContext(NamedTuple):
+    cursor: Cursor | Transaction
+    conn: Connection | None = None
+
+
 class AbstractClass(ABC):
     """用于处理 mysql 异常的模板方法类"""
 
     def _create_table(
         self,
-        cursor: Cursor,
+        context: MysqlContext,
         table_name: str,
         engine: str,
         charset: str,
@@ -38,7 +43,7 @@ class AbstractClass(ABC):
         """创建数据库表
 
         Args:
-            cursor: mysql connect cursor
+            context: mysql connect context
             table_name: 创建表的名称
             engine: 创建表的 engine
             charset: charset
@@ -52,18 +57,18 @@ class AbstractClass(ABC):
         )
 
         try:
-            cursor.execute(sql)
+            context.cursor.execute(sql)
             logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
         except Exception as e:
             logger.error(f"创建表 {table_name} 失败，err：{e}")
 
     def _get_column_type(
-        self, cursor: Cursor, database: str, table: str, column: str
+        self, context: MysqlContext, database: str, table: str, column: str
     ) -> str | None:
         """获取数据字段存储类型
 
         Args:
-            cursor: mysql connect cursor
+            context: mysql connect context
             database: 数据库名
             table: 数据表名
             column: 字段名称
@@ -77,8 +82,8 @@ class AbstractClass(ABC):
         )
         column_type = None
         try:
-            cursor.execute(sql)
-            lines = cursor.fetchall()
+            context.cursor.execute(sql)
+            lines = context.cursor.fetchall()
             if isinstance(lines, list):
                 # 此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
                 column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
@@ -93,8 +98,7 @@ class AbstractClass(ABC):
     def template_method(
         self,
         err_msg: str,
-        conn: Connection,
-        cursor: Cursor | TwistedTransactionT,
+        context: MysqlContext,
         mysql_conf: MysqlConf,
         table: str,
         table_notes: str,
@@ -104,8 +108,7 @@ class AbstractClass(ABC):
 
         Args:
             err_msg: pipeline 存储时报错内容
-            conn: mysql conn
-            cursor: mysql connect cursor
+            context: mysql conn context
             mysql_conf: spider mysql_conf
             table: 数据表
             table_notes: 数据表注释
@@ -115,11 +118,11 @@ class AbstractClass(ABC):
             sql, possible_err = self.deal_1054_error(
                 err_msg=err_msg, table=table, note_dic=note_dic
             )
-            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
+            self._exec_sql(context=context, sql=sql, possible_err=possible_err)
 
         elif "1146" in err_msg:
             self._create_table(
-                cursor=cursor,
+                context=context,
                 table_name=table,
                 engine=mysql_conf.engine,
                 charset=mysql_conf.charset,
@@ -130,22 +133,22 @@ class AbstractClass(ABC):
         elif "1406" in err_msg:
             sql, possible_err = self.deal_1406_error(
                 err_msg=err_msg,
-                cursor=cursor,
+                context=context,
                 database=mysql_conf.database,
                 table=table,
                 note_dic=note_dic,
             )
-            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
+            self._exec_sql(context=context, sql=sql, possible_err=possible_err)
 
         elif "1265" in err_msg:
             sql, possible_err = self.deal_1265_error(
                 err_msg=err_msg,
-                cursor=cursor,
+                context=context,
                 database=mysql_conf.database,
                 table=table,
                 note_dic=note_dic,
             )
-            self._exec_sql(conn=conn, cursor=cursor, sql=sql, possible_err=possible_err)
+            self._exec_sql(context=context, sql=sql, possible_err=possible_err)
 
         else:
             raise Exception(f"MYSQL OTHER ERROR: {err_msg}")
@@ -175,7 +178,7 @@ class AbstractClass(ABC):
     def deal_1406_error(
         self,
         err_msg: str,
-        cursor: Cursor,
+        context: MysqlContext,
         database: str,
         table: str,
         note_dic: dict[str, str],
@@ -184,7 +187,7 @@ class AbstractClass(ABC):
 
         Args:
             err_msg: 报错内容
-            cursor: mysql connect cursor
+            context: mysql connect context
             database: 数据库名
             table: 数据表名
             note_dic: 当前表字段的注释
@@ -199,7 +202,7 @@ class AbstractClass(ABC):
             colum = text[0]
             notes = note_dic[colum]
             column_type = self._get_column_type(
-                cursor=cursor, database=database, table=table, column=colum
+                context=context, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = (
@@ -212,7 +215,7 @@ class AbstractClass(ABC):
     def deal_1265_error(
         self,
         err_msg: str,
-        cursor: Cursor,
+        context: MysqlContext,
         database: str,
         table: str,
         note_dic: dict[str, str],
@@ -221,7 +224,7 @@ class AbstractClass(ABC):
 
         Args:
             err_msg: 报错内容
-            cursor: mysql connect cursor
+            context: mysql connect context
             database: 数据库名
             table: 数据表名
             note_dic: 当前表字段的注释
@@ -236,7 +239,7 @@ class AbstractClass(ABC):
             colum = text[0]
             notes = note_dic[colum]
             column_type = self._get_column_type(
-                cursor=cursor, database=database, table=table, column=colum
+                context=context, database=database, table=table, column=colum
             )
             change_colum_type = "LONGTEXT" if column_type == "text" else "TEXT"
             sql = (
@@ -247,7 +250,9 @@ class AbstractClass(ABC):
         raise Exception(f"未解决 Data truncated 问题，err: {err_msg}")
 
     @abstractmethod
-    def _exec_sql(self, *args, **kwargs) -> None:
+    def _exec_sql(
+        self, context: MysqlContext, sql: str, possible_err: str | None = None
+    ) -> None:
         """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
         raise NotImplementedError("Subclasses must implement the '_exec_sql' method")
 
@@ -256,16 +261,10 @@ class Synchronize(AbstractClass):
     """pipeline 同步执行 sql 的场景"""
 
     def _exec_sql(
-        self,
-        conn: Connection,
-        cursor: Cursor,
-        sql: str,
-        possible_err: str | None = None,
-        *args,
-        **kwargs,
+        self, context: MysqlContext, sql: str, possible_err: str | None = None
     ) -> None:
         try:
-            cursor.execute(sql)
+            context.cursor.execute(sql)
         except Exception as e:
             logger.warning(
                 f"synchronize mysql exec sql err: {e!s}\n"
@@ -277,15 +276,10 @@ class TwistedAsynchronous(AbstractClass):
     """pipeline twisted 异步执行 sql 的场景"""
 
     def _exec_sql(
-        self,
-        cursor: TwistedTransactionT,
-        sql: str,
-        possible_err: str | None = None,
-        *args,
-        **kwargs,
+        self, context: MysqlContext, sql: str, possible_err: str | None = None
     ) -> None:
         try:
-            cursor.execute(sql)
+            context.cursor.execute(sql)
         except Exception as e:
             logger.warning(
                 f"twisted mysql exec sql err: {e!s}\npossible_err: {possible_err}"
@@ -302,10 +296,10 @@ def deal_mysql_err(
     note_dic: dict[str, str],
     conn: Connection | None = None,
 ) -> None:
+    context = MysqlContext(cursor=cursor, conn=conn)
     abstract_class.template_method(
         err_msg,
-        conn,
-        cursor,
+        context,
         mysql_conf,
         table,
         table_notes,
