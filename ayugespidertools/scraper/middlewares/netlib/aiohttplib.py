@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ayugespidertools.common.typevars import slogT
-    from ayugespidertools.scraper.http import AiohttpRequest
+    from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest
     from ayugespidertools.spiders import AyuSpider
 
     AyuRequest = Union[AiohttpRequest, Request]

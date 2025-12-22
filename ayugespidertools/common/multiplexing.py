@@ -92,9 +92,9 @@ class ReuseOperation:
             data=item_dict, keys=AyuItem._except_keys
         )
         judge_item = next(iter(insert_data.values()))
-        update_rule = item_dict.get("_update_rule")
-        update_keys = item_dict.get("_update_keys")
-        conflict_cols = item_dict.get("_conflict_cols")
+        update_rule = item_dict.get("_update_rule", {})
+        update_keys = item_dict.get("_update_keys", set())
+        conflict_cols = item_dict.get("_conflict_cols", set())
         if cls.is_namedtuple_instance(judge_item):
             if _table := item_dict.get("_table"):
                 _table_name = _table.key_value
@@ -254,7 +254,7 @@ class ReuseOperation:
                 with conn.cursor() as cur:
                     conn.autocommit = True
                     cur.execute(
-                        f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset};"
+                        f"CREATE DATABASE {db_conf.database} WITH ENCODING {db_conf.charset};"  # type: ignore[arg-type]
                     )
 
         else:

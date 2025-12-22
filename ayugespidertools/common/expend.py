@@ -100,13 +100,14 @@ class MysqlPipeEnhanceMixin:
             log_info: 日志信息
         """
         mysql_conf = spider.mysql_conf
-        text = {}
+        text: dict[str, Any] = {}
         stats = spider.crawler.stats.get_stats()
         error_reason = ""
         _curr_utc_time = datetime.datetime.now(datetime.timezone.utc)
         for k, v in stats.items():
+            key = k.replace("/", "_")
             if isinstance(v, datetime.datetime):
-                text[k.replace("/", "_")] = (v + datetime.timedelta(hours=8)).strftime(
+                text[key] = (v + datetime.timedelta(hours=8)).strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
             else:
@@ -137,7 +138,7 @@ class MysqlPipeEnhanceMixin:
                     else:
                         # "ResponseNeverReceived" or "ResponseFailed"
                         error_reason += f"{error_name}:网站无响应 "
-                text[k.replace("/", "_")] = v
+                text[key] = v
 
         log_info = {
             "database": mysql_conf.database,

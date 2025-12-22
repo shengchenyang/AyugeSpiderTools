@@ -42,7 +42,7 @@ class GenMysql:
     @staticmethod
     def select_generate(
         db_table: str,
-        key: list,
+        key: list[str],
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
@@ -64,7 +64,7 @@ class GenMysql:
             1). sql: 生成的 sql 语句
             2). 查询字段的参数名称
         """
-        select_key = ", ".join(k if k in {1, "1"} else f"`{k}`" for k in key)
+        select_key = ", ".join(k if k == "1" else f"`{k}`" for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
         select_key = select_key.replace("""`count(1)`""", "count(1)")
 
@@ -130,14 +130,14 @@ class GenPostgresql:
     @staticmethod
     def select_generate(
         db_table: str,
-        key: list,
+        key: list[str],
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(k if k in {1, "1"} else f"{k}" for k in key)
+        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
 
@@ -202,14 +202,14 @@ class GenPostgresqlAsyncpg:
     @staticmethod
     def select_generate(
         db_table: str,
-        key: list,
+        key: list[str],
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, Any]:
-        select_key = ", ".join(k if k in {1, "1"} else f"{k}" for k in key)
+        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
         _base = f" {base} "
@@ -302,14 +302,14 @@ class GenOracle:
     @staticmethod
     def select_generate(
         db_table: str,
-        key: list,
+        key: list[str],
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(k if k in {1, "1"} else f"`{k}`" for k in key)
+        select_key = ", ".join(k if k == "1" else f"`{k}`" for k in key)
         select_key = select_key.replace("""`count(*)`""", "count(*)")
         select_key = select_key.replace("""`count(1)`""", "count(1)")
         _base = f" {base} "
