@@ -404,4 +404,5 @@ class PostgreSQLAsyncPortal(metaclass=PortalSingletonMeta):
         return self._pool
 
     async def close(self):
-        await self._pool.close()
+        if self._pool:
+            await self._pool.close()

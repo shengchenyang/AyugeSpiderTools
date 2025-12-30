@@ -82,7 +82,9 @@ class MongoDbBase:
         return {"_id": _id, "md5": md5}
 
     @classmethod
-    def upload(cls, db, file_name, _id, content_type, collection, file_data):
+    def upload(
+        cls, db, file_name, _id, content_type, collection, file_data
+    ) -> tuple[int | None, str | None]:
         """上传文件
 
         Args:
@@ -118,5 +120,6 @@ class MongoDbBase:
             return gridfs_id, image_id
 
         # 否则，只需返回文件的 id 等标识即可
-        res = gridfs_col.find_one({"filename": file_name})
-        return res._id, f"/file/find/{res._id!s}/{res.md5}"
+        if res := gridfs_col.find_one({"filename": file_name}):
+            return res._id, f"/file/find/{res._id!s}/{res.md5}"
+        return None, None
