@@ -72,5 +72,5 @@ class ExclusiveProxyDownloaderMiddleware:
         self.proxy_url = spider.exclusiveproxy_conf.proxy
         self.username = spider.exclusiveproxy_conf.username
         self.password = spider.exclusiveproxy_conf.password
-        self.proxy_index = spider.exclusiveproxy_conf.index
+        self.proxy_index = spider.exclusiveproxy_conf.proxy_index
         self.proxy = self.get_proxy_ip(proxy_url=self.proxy_url, index=self.proxy_index)

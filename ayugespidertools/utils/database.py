@@ -88,7 +88,7 @@ class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
     _lock = threading.Lock()
 
     def __call__(
-        cls: type[T],
+        cls,
         db_conf: DataBaseConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,

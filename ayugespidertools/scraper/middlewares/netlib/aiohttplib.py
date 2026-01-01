@@ -160,7 +160,7 @@ class AiohttpDownloaderMiddleware:
     async def process_request(
         self, request: AyuRequest, spider: AyuSpider
     ) -> AyuRequest | Response | None:
-        aiohttp_options = request.meta.get("aiohttp")
+        aiohttp_options = request.meta.get("aiohttp", {})
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
         # 设置 aiohttp 请求参数
