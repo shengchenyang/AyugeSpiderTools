@@ -66,10 +66,7 @@ def _get_commands_from_entry_points(
     inproject: bool, group: str = "ayugespidertools.commands"
 ) -> dict[str, ScrapyCommand]:
     cmds: dict[str, ScrapyCommand] = {}
-    if sys.version_info >= (3, 10):
-        eps = entry_points(group=group)
-    else:
-        eps = entry_points().get(group, ())
+    eps = entry_points(group=group)
     for entry_point in eps:
         obj = entry_point.load()
         if inspect.isclass(obj):

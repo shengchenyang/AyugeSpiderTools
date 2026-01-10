@@ -254,7 +254,7 @@ class CvnpilKit:
                 + random.choice([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3])
             )
 
-        tracks_list = list(map(list, zip(x, y, z)))
+        tracks_list = list(map(list, zip(x, y, z, strict=False)))
         return [x for x in tracks_list if x[0] > 0]
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import aiohttp
 from scrapy import signals
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest
     from ayugespidertools.spiders import AyuSpider
 
-    AyuRequest = Union[AiohttpRequest, Request]
+    AyuRequest = AiohttpRequest | Request
 
 
 class AiohttpDownloaderMiddleware:

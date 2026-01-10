@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.exceptions import NotConfigured
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider
 
-    DocumentType = Union[type[Document], type]
+    DocumentType = type[Document] | type
 
 
 def dynamic_es_document(class_name, fields, index_settings=None):

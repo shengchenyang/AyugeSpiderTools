@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import threading
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
 
 from yarl import URL
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from loguru import Logger
     from scrapy.utils.log import SpiderLoggerAdapter
 
-    slogT = Union[Logger, SpiderLoggerAdapter]
+    slogT = Logger | SpiderLoggerAdapter
 
 NoneType = type(None)
 I_Str = TypeVar("I_Str", int, str)
@@ -23,7 +23,7 @@ I_Str_N = TypeVar("I_Str_N", int, str, None)
 Str_Lstr = TypeVar("Str_Lstr", str, list[str])
 _SENTINEL = Enum("_SENTINEL", "sentinel")
 sentinel = _SENTINEL.sentinel
-StrOrURL = Union[str, URL]
+StrOrURL = str | URL
 
 InsertPrefixStr = Literal["INSERT IGNORE", "INSERT"]
 OracleAuthenticationModesStr = Literal[

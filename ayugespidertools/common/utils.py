@@ -348,7 +348,7 @@ class Tools(AppConfManageMixin):
             t_list.append(t_list[i - 1] + random.randint(20, 80))  # noqa: S311
 
         # 生成 t 的坐标
-        xyt = list(zip(x_list, y_list, t_list))
+        xyt = list(zip(x_list, y_list, t_list, strict=False))
         for j in range(length):
             xyt[j] = list(xyt[j])
         return xyt

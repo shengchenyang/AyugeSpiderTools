@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from ayugespidertools.common.params import Param
 
 if TYPE_CHECKING:
     import configparser
+    from collections.abc import Callable
 
 
 class ConfigHandler(ABC):
