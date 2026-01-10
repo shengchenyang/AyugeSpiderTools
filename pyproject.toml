@@ -3,7 +3,7 @@ name = "AyugeSpiderTools"
 dynamic = ["version", "readme"]
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手。"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "ayuge", email = "ayugesheng@gmail.com" },
 ]
@@ -64,7 +64,7 @@ packages = [{ include = "ayugespidertools" }]
 requires-poetry = "2.1.1"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 mmh3 = { version = "^3.0.0", optional = true }
 pycryptodome = { version = "^3.15.0", optional = true }
 python-hcl2 = { version = "^4.3.0", optional = true }
@@ -172,7 +172,7 @@ line-length = 88
 profile = "black"
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 ignore_missing_imports = true
 disable_error_code = ["attr-defined", "arg-type", "union-attr"]
 
