@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pymysql
 from dbutils.pooled_db import PooledDB
@@ -27,19 +27,18 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
     slog: slogT
     cursor: Cursor
     pool_db_conf: dict
-
-    def __init__(self, pool_db_conf: dict) -> None:
-        self.pool_db_conf = pool_db_conf
+    crawler: Crawler
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Self:
-        pool_db_conf = crawler.settings.get("POOL_DB_CONFIG", None)
-        return cls(
-            pool_db_conf=pool_db_conf,
-        )
+        s = cls()
+        s.crawler = crawler
+        return s
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
+        self.pool_db_conf = self.crawler.settings.get("POOL_DB_CONFIG", None)
         self.slog = spider.slog
         if not self.pool_db_conf:
             spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")

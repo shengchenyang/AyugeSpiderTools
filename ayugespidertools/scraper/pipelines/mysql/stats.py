@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 
@@ -12,6 +12,8 @@ __all__ = [
 if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MysqlConf, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -23,8 +25,16 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     slog: slogT
     cursor: Cursor
     crawl_time: datetime.date
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         self.crawl_time = datetime.date.today()
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
@@ -147,19 +157,21 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             self.conn.rollback()
             self.slog.warning(f"日志记录存储错误: {e}")
 
-    def close_spider(self, spider: AyuSpider) -> None:
-        log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
+    def close_spider(self) -> None:
+        log_info = self._get_log_by_spider(
+            spider=self.crawler.spider, crawl_time=self.crawl_time
+        )
 
         # 运行脚本统计信息
         self.insert_script_statistics(log_info)
         self.table_collection_statistics(
-            spider_name=spider.name,
-            database=spider.mysql_conf.database,
+            spider_name=self.crawler.spider.name,
+            database=self.crawler.spider.mysql_conf.database,
             crawl_time=self.crawl_time,
         )
 
         if self.conn:
             self.conn.close()
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         return item

@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any
-
-from scrapy.utils.defer import deferred_from_coro
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -16,7 +14,8 @@ __all__ = [
 
 if TYPE_CHECKING:
     import aiomysql
-    from twisted.internet.defer import Deferred
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MysqlConf
     from ayugespidertools.spiders import AyuSpider
@@ -26,14 +25,19 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
     mysql_conf: MysqlConf
     pool: aiomysql.Pool
     running_tasks: set
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> Deferred:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    async def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.running_tasks = set()
         self.mysql_conf = spider.mysql_conf
-        return deferred_from_coro(self._open_spider(spider))
-
-    async def _open_spider(self, spider: AyuSpider) -> None:
         self.pool = await MysqlAsyncPortal(
             db_conf=self.mysql_conf, tag=PortalTag.LIBRARY
         ).connect()
@@ -57,7 +61,7 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
                 )
                 await cursor.execute(sql, args)
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    async def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         task = asyncio.create_task(self.insert_item(item_dict))
         self.running_tasks.add(task)
@@ -65,9 +69,6 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
         task.add_done_callback(lambda t: self.running_tasks.discard(t))
         return item
 
-    async def _close_spider(self) -> None:
-        await self.pool.wait_closed()
-
-    def close_spider(self, spider: AyuSpider) -> Deferred:
+    async def close_spider(self) -> None:
         self.pool.close()
-        return deferred_from_coro(self._close_spider())
+        await self.pool.wait_closed()

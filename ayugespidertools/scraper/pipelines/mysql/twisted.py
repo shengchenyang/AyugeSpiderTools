@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from pymysql import cursors
 from twisted.enterprise import adbapi
@@ -14,7 +14,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
     from twisted.python.failure import Failure
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MysqlConf, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -24,8 +26,16 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     mysql_conf: MysqlConf
     slog: slogT
     dbpool: adbapi.ConnectionPool
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
@@ -49,7 +59,7 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
     def db_create_err(self, failure: Failure) -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)
@@ -95,3 +105,6 @@ class AyuTwistedMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")
+
+    def close_spider(self) -> None:
+        self.dbpool.close()

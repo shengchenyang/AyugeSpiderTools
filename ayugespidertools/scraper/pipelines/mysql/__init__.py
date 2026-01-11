@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pymysql
 
@@ -21,6 +21,8 @@ __all__ = [
 if TYPE_CHECKING:
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, MysqlConf, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -31,15 +33,23 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
     conn: Connection
     slog: slogT
     cursor: Cursor
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.conn = self._connect(self.mysql_conf)
         self.cursor = self.conn.cursor()
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         self.insert_item(alter_item)
@@ -85,5 +95,5 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
             )
             return self.insert_item(alter_item)
 
-    def close_spider(self, spider: AyuSpider) -> None:
+    def close_spider(self) -> None:
         self.conn.close()
