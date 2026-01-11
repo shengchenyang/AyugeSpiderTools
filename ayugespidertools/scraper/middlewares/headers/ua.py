@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 class RandomRequestUaMiddleware:
     """随机请求头中间件"""
 
+    crawler: Crawler
+
     def __init__(self):
         self.explorer_types = None
         self.explorer_weights = None
@@ -40,6 +42,7 @@ class RandomRequestUaMiddleware:
     def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        s.crawler = crawler
         return s
 
     def spider_opened(self, spider: AyuSpider) -> None:
@@ -56,5 +59,5 @@ class RandomRequestUaMiddleware:
             f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}"
         )
 
-    def process_request(self, request: Request, spider: AyuSpider) -> None:
+    def process_request(self, request: Request) -> None:
         request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())
