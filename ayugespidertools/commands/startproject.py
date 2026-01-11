@@ -16,7 +16,7 @@ class AyuCommand(Command):
 
     @property
     def templates_dir(self) -> str:
-        # 修改 startproject 模板文件路径为 ayugespidertools 的自定义路径
+        assert self.settings is not None
         return str(
             Path(
                 Path(ayugespidertools.__path__[0], "templates"),
