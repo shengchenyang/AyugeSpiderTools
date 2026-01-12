@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
@@ -11,6 +11,8 @@ from ayugespidertools.scraper.pipelines.oss.ali import files_download_by_scrapy
 __all__ = ["FilesDownloadPipeline"]
 
 if TYPE_CHECKING:
+    import os
+
     from scrapy.crawler import Crawler
     from typing_extensions import Self
 
@@ -19,18 +21,23 @@ if TYPE_CHECKING:
 
 
 class FilesDownloadPipeline:
-    def __init__(self, file_path=None):
-        self.file_path = file_path
+    file_path: str | os.PathLike
+    crawler: Crawler
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Self:
-        _file_path = crawler.settings.get("FILES_STORE", None)
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        _file_path = self.crawler.settings.get("FILES_STORE", None)
         assert _file_path is not None, "未配置 FILES_STORE 存储路径参数！"
 
         if not Path.exists(_file_path):
             logger.warning(f"FILES_STORE: {_file_path} 路径不存在，自动创建所需路径！")
             Path(_file_path).mkdir(parents=True)
-        return cls(file_path=_file_path)
+        self.file_path = _file_path
 
     async def _download_and_add_field(
         self, alter_item: AlterItem, item: Any, spider: AyuSpider
@@ -54,8 +61,9 @@ class FilesDownloadPipeline:
                         key_value=filename, notes=f"{key} 文件存储路径"
                     )
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    async def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
+        spider = cast("AyuSpider", self.crawler.spider)
         await self._download_and_add_field(alter_item, item, spider)
         return item

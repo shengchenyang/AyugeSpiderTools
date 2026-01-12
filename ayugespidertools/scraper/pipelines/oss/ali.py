@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
-from scrapy.utils.defer import maybe_deferred_to_future
 from scrapy.utils.python import to_bytes
 
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
 
 async def files_download_by_scrapy(spider: AyuSpider, url: str) -> tuple[Response, str]:
     request = scrapy.Request(url, callback=NO_CALLBACK)
-    response = await maybe_deferred_to_future(spider.crawler.engine.download(request))
+    response = await spider.crawler.engine.download_async(request)
     headers_dict = Tools.get_dict_form_scrapy_req_headers(
         scrapy_headers=response.headers
     )
