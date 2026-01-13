@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.exceptions import NotConfigured
@@ -17,6 +17,9 @@ except ImportError:
 __all__ = ["AyuESPipeline", "dynamic_es_document"]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
+
     from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider
 
@@ -34,8 +37,16 @@ def dynamic_es_document(class_name, fields, index_settings=None):
 class AyuESPipeline:
     es_conf: ESConf
     es_type: DocumentType
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
         self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
@@ -53,7 +64,7 @@ class AyuESPipeline:
             ssl_assert_fingerprint=self.es_conf.ssl_assert_fingerprint,
         )
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         insert_data = ReuseOperation.get_items_except_keys(
             item_dict, keys=AyuItem._except_keys
