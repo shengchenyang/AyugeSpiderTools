@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
@@ -12,6 +12,9 @@ from ayugespidertools.config import logger
 __all__ = ["AyuKafkaPipeline"]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
+
     from ayugespidertools.common.typevars import KafkaConf
     from ayugespidertools.spiders import AyuSpider
 
@@ -83,17 +86,26 @@ class KafkaProducerClient:
 
 class AyuKafkaPipeline:
     kp: KafkaProducerClient
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
         self.kp = KafkaProducerClient(kafka_conf=spider.kafka_conf)
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
             return item
 
+        spider = cast("AyuSpider", self.crawler.spider)
         self.kp.sendmsg(
             topic=spider.kafka_conf.topic,
             value=new_item,
@@ -101,5 +113,5 @@ class AyuKafkaPipeline:
         )
         return item
 
-    def close_spider(self, spider: AyuSpider) -> None:
+    def close_spider(self) -> None:
         self.kp.close_producer()
