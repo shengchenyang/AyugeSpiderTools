@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import aio_pika
-from scrapy.utils.defer import deferred_from_coro
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.exceptions import UnsupportedError
@@ -16,7 +15,8 @@ __all__ = [
 if TYPE_CHECKING:
     from aio_pika import RobustConnection
     from aio_pika.abc import AbstractChannel, AbstractExchange, AbstractRobustConnection
-    from twisted.internet.defer import Deferred
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MQConf
     from ayugespidertools.spiders import AyuSpider
@@ -27,14 +27,22 @@ class AyuAsyncMQPipeline:
     connection: RobustConnection | AbstractRobustConnection
     channel: AbstractChannel
     exchange: AbstractExchange | None
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> Deferred:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    async def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
         self.mq_conf = spider.rabbitmq_conf
         self.exchange = None
-        return deferred_from_coro(self._open_spider(spider))
+        await self._open_spider()
 
-    async def _open_spider(self, spider: AyuSpider) -> None:
+    async def _open_spider(self) -> None:
         if "," in self.mq_conf.host:
             raise UnsupportedError(
                 "The host parameter in AyuAsyncMQPipeline cannot contain commas. "
@@ -73,7 +81,7 @@ class AyuAsyncMQPipeline:
                 routing_key=self.mq_conf.routing_key,
             )
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    async def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alert_item = ReuseOperation.reshape_item(item_dict)
         if not (new_item := alert_item.new_item):
@@ -83,8 +91,5 @@ class AyuAsyncMQPipeline:
         await self.insert_item(publish_data)
         return item
 
-    async def _close_spider(self) -> None:
+    async def close_spider(self) -> None:
         await self.connection.close()
-
-    def close_spider(self, spider: AyuSpider) -> Deferred:
-        return deferred_from_coro(self._close_spider())
