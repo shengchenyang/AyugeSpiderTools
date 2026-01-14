@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -11,6 +11,8 @@ __all__ = ["AyuOraclePipeline"]
 if TYPE_CHECKING:
     from oracledb.connection import Connection
     from oracledb.cursor import Cursor
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem
     from ayugespidertools.spiders import AyuSpider
@@ -19,13 +21,21 @@ if TYPE_CHECKING:
 class AyuOraclePipeline(OraclePipeEnhanceMixin):
     conn: Connection
     cursor: Cursor
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
         self.conn = self._connect(spider.oracle_conf)
         self.cursor = self.conn.cursor()
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         self.insert_item(alter_item)
@@ -46,5 +56,5 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
         self.cursor.execute(sql, args)
         self.conn.commit()
 
-    def close_spider(self, spider: AyuSpider) -> None:
+    def close_spider(self) -> None:
         self.conn.close()

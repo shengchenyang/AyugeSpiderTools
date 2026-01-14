@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-from scrapy.utils.defer import deferred_from_coro
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -13,24 +11,28 @@ from ayugespidertools.utils.database import OracleAsyncPortal
 __all__ = ["AyuAsyncOraclePipeline"]
 
 if TYPE_CHECKING:
-    from oracledb.connection import Connection
-    from oracledb.cursor import Cursor
-    from twisted.internet.defer import Deferred
+    import oracledb
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.spiders import AyuSpider
 
 
 class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
-    conn: Connection
-    cursor: Cursor
     running_tasks: set
+    crawler: Crawler
+    pool: oracledb.AsyncConnectionPool
 
-    def open_spider(self, spider: AyuSpider) -> Deferred:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    async def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
         self.running_tasks = set()
-        return deferred_from_coro(self._open_spider(spider))
-
-    async def _open_spider(self, spider: AyuSpider) -> None:
         self.pool = OracleAsyncPortal(
             db_conf=spider.oracle_conf, tag=PortalTag.LIBRARY
         ).connect()
@@ -47,13 +49,10 @@ class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
             )
             await conn.execute(sql, args)
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    async def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         await self.insert_item(item_dict)
         return item
 
-    async def _close_spider(self) -> None:
+    async def close_spider(self) -> None:
         await self.pool.close()
-
-    def close_spider(self, spider: AyuSpider) -> Deferred:
-        return deferred_from_coro(self._close_spider())

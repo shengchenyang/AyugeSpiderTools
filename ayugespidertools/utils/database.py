@@ -267,7 +267,7 @@ class OraclePortal(metaclass=PortalSingletonMeta):
         db_conf: OracleConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-    ):
+    ) -> None:
         if db_conf.authentication_mode not in {
             "DEFAULT",
             "PRELIM",
@@ -296,7 +296,7 @@ class OraclePortal(metaclass=PortalSingletonMeta):
             mode=oracle_authentication_mode,
         )
 
-    def connect(self):
+    def connect(self) -> oracledb.Connection:
         return self.conn
 
 
@@ -306,7 +306,7 @@ class OracleAsyncPortal(metaclass=PortalSingletonMeta):
         db_conf: OracleConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-    ):
+    ) -> None:
         if db_conf.authentication_mode not in {
             "DEFAULT",
             "PRELIM",
@@ -335,10 +335,10 @@ class OracleAsyncPortal(metaclass=PortalSingletonMeta):
             mode=oracle_authentication_mode,
         )
 
-    def connect(self):
+    def connect(self) -> oracledb.AsyncConnectionPool:
         return self.pool
 
-    async def close(self):
+    async def close(self) -> None:
         await self.pool.close()
 
 
