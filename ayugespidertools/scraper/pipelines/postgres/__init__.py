@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from ayugespidertools.common.expend import PostgreSQLPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -12,6 +12,8 @@ __all__ = ["AyuPostgresPipeline"]
 if TYPE_CHECKING:
     from psycopg.connection import Connection
     from psycopg.cursor import Cursor
+    from scrapy.crawler import Crawler
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -21,14 +23,22 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     conn: Connection
     slog: slogT
     cursor: Cursor
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
         self.slog = spider.slog
         self.conn = self._connect(spider.postgres_conf)
         self.cursor = self.conn.cursor()
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         self.insert_item(alter_item)
@@ -68,6 +78,6 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
             )
             return self.insert_item(alter_item)
 
-    def close_spider(self, spider: AyuSpider) -> None:
+    def close_spider(self) -> None:
         self.cursor.close()
         self.conn.close()

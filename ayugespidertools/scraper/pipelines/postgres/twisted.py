@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from twisted.enterprise import adbapi
 
@@ -15,7 +15,9 @@ from ayugespidertools.common.sqlformat import GenPostgresql
 __all__ = ["AyuTwistedPostgresPipeline"]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
     from twisted.python.failure import Failure
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import PostgreSQLConf, slogT
     from ayugespidertools.spiders import AyuSpider
@@ -25,8 +27,16 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     postgres_conf: PostgreSQLConf
     dbpool: adbapi.ConnectionPool
     slog: slogT
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
@@ -50,7 +60,7 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     def db_create_err(self, failure: Failure) -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)
