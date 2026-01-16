@@ -158,15 +158,14 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
             self.slog.warning(f"日志记录存储错误: {e}")
 
     def close_spider(self) -> None:
-        log_info = self._get_log_by_spider(
-            spider=self.crawler.spider, crawl_time=self.crawl_time
-        )
+        spider = cast("AyuSpider", self.crawler.spider)
+        log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
 
         # 运行脚本统计信息
         self.insert_script_statistics(log_info)
         self.table_collection_statistics(
-            spider_name=self.crawler.spider.name,
-            database=self.crawler.spider.mysql_conf.database,
+            spider_name=spider.name,
+            database=spider.mysql_conf.database,
             crawl_time=self.crawl_time,
         )
 
