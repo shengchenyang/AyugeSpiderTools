@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import scrapy
 from scrapy.http.request import NO_CALLBACK
@@ -18,7 +18,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from scrapy.crawler import Crawler
     from scrapy.http.response import Response
+    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, OssConf
     from ayugespidertools.spiders import AyuSpider
@@ -41,8 +43,16 @@ class AyuAsyncOssPipeline:
     oss_bucket: AliOssBase
     oss_conf: OssConf
     full_link_enable: bool
+    crawler: Crawler
 
-    def open_spider(self, spider: AyuSpider) -> None:
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        s.crawler = crawler
+        return s
+
+    def open_spider(self) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "oss_conf"), "未配置 oss 参数！"
         self.oss_conf = spider.oss_conf
         oss_conf_dict = self.oss_conf._asdict()
@@ -83,7 +93,8 @@ class AyuAsyncOssPipeline:
                 filename = await self._upload_process(url, spider)
                 self._add_oss_field(_is_namedtuple, item, key, filename)
 
-    async def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    async def process_item(self, item: Any) -> Any:
+        spider = cast("AyuSpider", self.crawler.spider)
         item_dict = ReuseOperation.item_to_dict(item)
         alter_item = ReuseOperation.reshape_item(item_dict)
         await self._upload_file(alter_item, item, spider)
