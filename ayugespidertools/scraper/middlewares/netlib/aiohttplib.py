@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import aiohttp
 from scrapy import signals
@@ -40,6 +40,7 @@ class AiohttpDownloaderMiddleware:
     aiohttp_cfg: AiohttpConf
     aiohttp_args: dict
     slog: slogT
+    crawler: Crawler
 
     def _retry(
         self, request: AyuRequest, reason: str | int, spider: AyuSpider
@@ -134,6 +135,7 @@ class AiohttpDownloaderMiddleware:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         crawler.signals.connect(s.spider_closed, signal=signals.spider_closed)
+        s.crawler = crawler
         return s
 
     async def _request_by_aiohttp(
@@ -158,8 +160,9 @@ class AiohttpDownloaderMiddleware:
             return 504, ""
 
     async def process_request(
-        self, request: AyuRequest, spider: AyuSpider
+        self, request: AyuRequest
     ) -> AyuRequest | Response | None:
+        spider = cast("AyuSpider", self.crawler.spider)
         aiohttp_options = request.meta.get("aiohttp", {})
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
 
