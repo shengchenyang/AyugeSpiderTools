@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import base64
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from scrapy import signals
 
@@ -11,7 +11,6 @@ from ayugespidertools.common.params import Param
 if TYPE_CHECKING:
     from scrapy import Request
     from scrapy.crawler import Crawler
-    from scrapy.settings import Settings
     from typing_extensions import Self
 
     from ayugespidertools.spiders import AyuSpider
@@ -20,18 +19,20 @@ if TYPE_CHECKING:
 class DynamicProxyDownloaderMiddleware:
     """动态隧道代理中间件"""
 
-    def __init__(self):
-        self.proxy_url = None
-        self.username = None
-        self.password = None
+    proxy_url: str
+    username: str
+    password: str
+    crawler: Crawler
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        s.crawler = crawler
         return s
 
-    def process_request(self, request: Request, spider: AyuSpider) -> None:
+    def process_request(self, request: Request) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         if request.url.startswith("https://"):
             request.meta["proxy"] = (
                 f"https://{self.username}:{self.password}@{self.proxy_url}/"
@@ -63,8 +64,23 @@ class DynamicProxyDownloaderMiddleware:
 class AbuDynamicProxyDownloaderMiddleware:
     """阿布云动态代理 - 隧道验证方式（其实和快代理的写法一致）"""
 
-    def __init__(self, settings: Settings) -> None:
-        dynamic_proxy_conf = settings.get("DYNAMIC_PROXY_CONFIG", None)
+    proxy_url: str
+    username: str
+    password: str
+    crawler: Crawler
+
+    @classmethod
+    def from_crawler(cls, crawler: Crawler) -> Self:
+        s = cls()
+        crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        s.crawler = crawler
+        return s
+
+    def spider_opened(self, spider: AyuSpider) -> None:
+        spider.slog.info(
+            f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
+        )
+        dynamic_proxy_conf = self.crawler.settings.get("DYNAMIC_PROXY_CONFIG", None)
         # 查看动态隧道代理配置是否符合要求
         is_match = ReuseOperation.is_dict_meet_min_limit(
             data=dynamic_proxy_conf,
@@ -78,18 +94,8 @@ class AbuDynamicProxyDownloaderMiddleware:
         self.username = dynamic_proxy_conf["username"]
         self.password = dynamic_proxy_conf["password"]
 
-    @classmethod
-    def from_crawler(cls, crawler: Crawler) -> Self:
-        s = cls(crawler.settings)
-        crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
-        return s
-
-    def spider_opened(self, spider: AyuSpider) -> None:
-        spider.slog.info(
-            f"阿布云动态隧道代理中间件: AbuDynamicProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
-        )
-
-    def process_request(self, request: Request, spider: AyuSpider) -> None:
+    def process_request(self, request: Request) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         if request.url.startswith("https://"):
             request.meta["proxy"] = f"https://{self.proxy_url}"
         elif request.url.startswith("http://"):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 import json
 import urllib.request
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from scrapy import signals
 
@@ -22,18 +22,18 @@ if TYPE_CHECKING:
 class ExclusiveProxyDownloaderMiddleware:
     """独享代理中间件"""
 
-    def __init__(self):
-        self.proxy_url = None
-        self.username = None
-        self.password = None
-        self.proxy_index = None
-        # 从 proxy_list 中取出索引为 proxy_index 的值
-        self.proxy = None
+    proxy_url: str
+    username: str
+    password: str
+    proxy_index: int
+    proxy: str
+    crawler: Crawler
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Self:
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
+        s.crawler = crawler
         return s
 
     def get_proxy_ip(self, proxy_url: str, index: int) -> str:
@@ -50,7 +50,8 @@ class ExclusiveProxyDownloaderMiddleware:
         except Exception:
             raise Exception("获取独享代理时失败，请查看独享配置及网络是否正常。")
 
-    def process_request(self, request: Request, spider: AyuSpider) -> None:
+    def process_request(self, request: Request) -> None:
+        spider = cast("AyuSpider", self.crawler.spider)
         if request.url.startswith("https://"):
             request.meta["proxy"] = f"https://{self.proxy}"
         elif request.url.startswith("http://"):
