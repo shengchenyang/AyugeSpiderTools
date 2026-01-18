@@ -114,8 +114,6 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
 
     _except_keys: ClassVar[set[str]] = {
         "_table",
-        "_mongo_update_rule",
-        "_mongo_update_keys",
         "_update_rule",
         "_update_keys",
         "_conflict_cols",

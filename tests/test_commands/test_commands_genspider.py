@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import pytest
 from scrapy.settings import Settings
 
 from ayugespidertools.commands.genspider import AyuCommand
@@ -24,7 +25,17 @@ class TestGenspiderCommand(TestCommandBase):
         assert self.call("genspider", "test_name", "test.com") == 0
         assert Path(self.proj_mod_path, "spiders", "test_name.py").exists()
 
-    def test_template(self, tplname="crawl"):
+    @pytest.mark.parametrize(
+        "tplname",
+        [
+            "basic",
+            "crawl",
+            "async",
+            "xmlfeed",
+            "csvfeed",
+        ],
+    )
+    def test_template(self, tplname: str) -> None:
         args = [f"--template={tplname}"] if tplname else []
         spname = "test_spider"
         spmodule = f"{self.project_name}.spiders.{spname}"
@@ -43,18 +54,6 @@ class TestGenspiderCommand(TestCommandBase):
             Path(self.proj_mod_path, "spiders", "test_spider.py").stat().st_mtime
         )
         assert modify_time_after == modify_time_before
-
-    def test_template_basic(self):
-        self.test_template(tplname="basic")
-
-    def test_template_async(self):
-        self.test_template(tplname="async")
-
-    def test_template_csvfeed(self):
-        self.test_template(tplname="csvfeed")
-
-    def test_template_xmlfeed(self):
-        self.test_template(tplname="xmlfeed")
 
     def test_genspider_command_object(self):
         cmd = AyuCommand()

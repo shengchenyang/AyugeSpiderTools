@@ -6,14 +6,11 @@ import sys
 from pathlib import Path
 from shutil import rmtree
 from tempfile import TemporaryFile, mkdtemp
-from threading import Timer
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+import pytest
 from scrapy.utils.python import to_unicode
 from scrapy.utils.test import get_testenv
-
-if TYPE_CHECKING:
-    import os
 
 
 class TestProjectBase:
@@ -49,25 +46,20 @@ class TestProjectBase:
             **popen_kwargs,
         )
 
-        def kill_proc():
+        try:
+            stdout, stderr = p.communicate(timeout=15)
+        except subprocess.TimeoutExpired:
             p.kill()
             p.communicate()
-            raise AssertionError("Command took too much time to complete")
-
-        timer = Timer(15, kill_proc)
-        try:
-            timer.start()
-            stdout, stderr = p.communicate()
-            stderr = str(stderr)
-        finally:
-            timer.cancel()
+            pytest.fail("Command took too much time to complete")
 
         return p, to_unicode(stdout), to_unicode(stderr)
 
-    def find_in_file(self, filename: str | os.PathLike, regex) -> re.Match | None:
+    @staticmethod
+    def find_in_file(filename: Path, regex: str) -> re.Match | None:
         """Find first pattern occurrence in file"""
         pattern = re.compile(regex)
-        with Path(filename).open("r", encoding="utf-8") as f:
+        with filename.open("r", encoding="utf-8") as f:
             for line in f:
                 match = pattern.search(line)
                 if match is not None:
