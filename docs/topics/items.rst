@@ -308,8 +308,8 @@ yield item
     "_update_rule", "dict", "去重更新的匹配规则。"
     "_update_keys", "set", "满足去重更新的匹配规则时，需要更新的字段。"
     "_conflict_cols", "set", "使用内置去重规则时，postgresql 和 oracle 场景需要设置的唯一索引约束参数。"
-    "_mongo_update_rule", "dict", "旧参数，已用 _update_rule 代替，后续删除。"
-    "_mongo_update_keys", "dict", "无效的兼容参数，请用 _update_keys 代替，后续删除。"
+    "_mongo_update_rule", "dict", "旧参数，已用 _update_rule 代替，并在3.14删除。"
+    "_mongo_update_keys", "dict", "无效的兼容参数，已用 _update_keys 代替，并在3.14删除。"
 
 .. note::
 
