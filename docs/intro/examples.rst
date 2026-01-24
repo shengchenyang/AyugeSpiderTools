@@ -135,16 +135,8 @@
            "topic":"***",
            "key":"***"
        },
-       "kdl_dynamic_proxy":{
-           "proxy":"o668.kdltps.com:15818",
-           "username":"***",
-           "password":"***"
-       },
-       "kdl_exclusive_proxy":{
-           "proxy":"http://kps.kdlapi.com/api/getkps?orderid=***&num=100&format=json",
-           "username":"***",
-           "password":"***",
-           "index":1
+       "proxy":{
+           "proxy":"http://user:password@host:port"
        }
    }
 

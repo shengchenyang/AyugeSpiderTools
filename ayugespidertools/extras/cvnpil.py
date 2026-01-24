@@ -37,7 +37,9 @@ class CvnpilKit:
         return len(np.array(array).shape)
 
     @staticmethod
-    def read_image_data(img: bytes | str, flags: int = cv2.IMREAD_COLOR) -> np.ndarray:
+    def read_image_data(
+        img: bytes | str, flags: int = cv2.IMREAD_COLOR
+    ) -> np.ndarray | None:
         """
         用 opencv 读取图片数据
         Args:

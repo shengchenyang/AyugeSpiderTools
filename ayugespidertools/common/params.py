@@ -18,20 +18,6 @@ class Param:
     IS_WINDOWS = platform.system().lower() == "windows"
     IS_LINUX = platform.system().lower() == "linux"
 
-    # 动态隧道代理配置示例
-    dynamic_proxy_conf_example = {
-        "proxy": "动态隧道代理地址：***.***.com:*****",
-        "username": "隧道代理用户名",
-        "password": "对应用户的密码",
-    }
-    # 独享代理配置示例
-    exclusive_proxy_conf_example = {
-        "proxy": "独享代理地址：'http://***.com/api/***&num=100&format=json'",
-        "username": "独享代理用户名",
-        "password": "对应用户的密码",
-        "index": "需要返回的独享代理的索引",
-    }
-
     # aiohttp 配置示例
     aiohttp_conf_example = {
         "timeout": 5,

@@ -203,17 +203,8 @@ class MQConf(NamedTuple):
     mandatory: bool = True
 
 
-class DynamicProxyConf(NamedTuple):
+class ProxyConf(NamedTuple):
     proxy: str
-    username: str
-    password: str
-
-
-class ExclusiveProxyConf(NamedTuple):
-    proxy: str
-    username: str
-    password: str
-    proxy_index: int
 
 
 class KafkaConf(NamedTuple):

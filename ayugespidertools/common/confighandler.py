@@ -196,29 +196,12 @@ class NacosHandler(ConfigHandler):
         }
 
 
-@ConfigRegistry.register(section="kdl_dynamic_proxy", target="DYNAMIC_PROXY_CONFIG")
-class KdlDynamicProxyHandler(ConfigHandler):
+@ConfigRegistry.register(section="proxy", target="PROXY_CONFIG")
+class ProxyHandler(ConfigHandler):
     @classmethod
     def parse(cls, cfg: configparser.ConfigParser) -> dict[str, Any]:
-        kdl_dynamic_section = cfg[cls.section]
-        return {
-            "proxy": kdl_dynamic_section.get("proxy", None),
-            "username": kdl_dynamic_section.get("username", None),
-            "password": kdl_dynamic_section.get("password", None),
-        }
-
-
-@ConfigRegistry.register(section="kdl_exclusive_proxy", target="EXCLUSIVE_PROXY_CONFIG")
-class KdlExclusiveProxyHandler(ConfigHandler):
-    @classmethod
-    def parse(cls, cfg: configparser.ConfigParser) -> dict[str, Any]:
-        kdl_exclusive_section = cfg[cls.section]
-        return {
-            "proxy": kdl_exclusive_section.get("proxy", None),
-            "username": kdl_exclusive_section.get("username", None),
-            "password": kdl_exclusive_section.get("password", None),
-            "proxy_index": kdl_exclusive_section.getint("index", 1),
-        }
+        proxy_section = cfg[cls.section]
+        return {"proxy": proxy_section.get("proxy", None)}
 
 
 @ConfigRegistry.register(section="mq", target="MQ_CONFIG")

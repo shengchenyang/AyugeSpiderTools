@@ -34,8 +34,7 @@ RemoteConfNameStr = Literal[
     "oss:ali",
     "rabbitmq",
     "kafka",
-    "dynamicproxy",
-    "exclusiveproxy",
+    "proxy",
 ]
 
 

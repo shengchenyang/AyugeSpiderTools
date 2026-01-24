@@ -4,9 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from ayugespidertools.common.typevars import (
-    DynamicProxyConf,
     ESConf,
-    ExclusiveProxyConf,
     KafkaConf,
     MongoDBConf,
     MQConf,
@@ -14,13 +12,12 @@ from ayugespidertools.common.typevars import (
     OracleConf,
     OssConf,
     PostgreSQLConf,
+    ProxyConf,
 )
 from ayugespidertools.common.utils import Tools
 
 __all__ = [
-    "DynamicProxyCreator",
     "ESConfCreator",
-    "ExclusiveProxyCreator",
     "KafkaConfCreator",
     "MQConfCreator",
     "MongoDBConfCreator",
@@ -28,6 +25,7 @@ __all__ = [
     "OracleConfCreator",
     "OssConfCreator",
     "PostgreSQLConfCreator",
+    "ProxyCreator",
     "get_spider_conf",
 ]
 
@@ -41,8 +39,7 @@ SpiderConf = TypeVar(
     MQConf,
     KafkaConf,
     OssConf,
-    DynamicProxyConf,
-    ExclusiveProxyConf,
+    ProxyConf,
     PostgreSQLConf,
     ESConf,
     OracleConf,
@@ -160,32 +157,16 @@ class KafkaConfProduct(Product[KafkaConf]):
         return KafkaConf(**local_conf) if local_conf else None
 
 
-class DynamicProxyProduct(Product[DynamicProxyConf]):
+class ProxyProduct(Product[ProxyConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
-    ) -> DynamicProxyConf | None:
+    ) -> ProxyConf | None:
         if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = Tools.fetch_remote_conf(
-                conf_name="dynamicproxy", **remote_option
-            )
-            return DynamicProxyConf(**remote_conf) if remote_conf else None
+            remote_conf = Tools.fetch_remote_conf(conf_name="proxy", **remote_option)
+            return ProxyConf(**remote_conf) if remote_conf else None
 
-        local_conf = settings.get("DYNAMIC_PROXY_CONFIG")
-        return DynamicProxyConf(**local_conf) if local_conf else None
-
-
-class ExclusiveProxyProduct(Product[ExclusiveProxyConf]):
-    def get_conn_conf(
-        self, settings: Settings, remote_option: dict
-    ) -> ExclusiveProxyConf | None:
-        if settings.get("APP_CONF_MANAGE", False):
-            remote_conf = Tools.fetch_remote_conf(
-                conf_name="exclusiveproxy", **remote_option
-            )
-            return ExclusiveProxyConf(**remote_conf) if remote_conf else None
-
-        local_conf = settings.get("EXCLUSIVE_PROXY_CONFIG")
-        return ExclusiveProxyConf(**local_conf) if local_conf else None
+        local_conf = settings.get("PROXY_CONFIG")
+        return ProxyConf(**local_conf) if local_conf else None
 
 
 class OssConfProduct(Product[OssConf]):
@@ -233,14 +214,9 @@ class KafkaConfCreator(Creator[KafkaConf]):
         return KafkaConfProduct()
 
 
-class DynamicProxyCreator(Creator[DynamicProxyConf]):
-    def create_product(self) -> Product[DynamicProxyConf]:
-        return DynamicProxyProduct()
-
-
-class ExclusiveProxyCreator(Creator[ExclusiveProxyConf]):
-    def create_product(self) -> Product[ExclusiveProxyConf]:
-        return ExclusiveProxyProduct()
+class ProxyCreator(Creator[ProxyConf]):
+    def create_product(self) -> Product[ProxyConf]:
+        return ProxyProduct()
 
 
 class OssConfCreator(Creator[OssConf]):

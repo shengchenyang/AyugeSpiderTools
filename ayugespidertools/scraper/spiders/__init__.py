@@ -10,9 +10,7 @@ from scrapy.spiders import Spider
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.spiderconf import (
-    DynamicProxyCreator,
     ESConfCreator,
-    ExclusiveProxyCreator,
     KafkaConfCreator,
     MongoDBConfCreator,
     MQConfCreator,
@@ -20,6 +18,7 @@ from ayugespidertools.common.spiderconf import (
     OracleConfCreator,
     OssConfCreator,
     PostgreSQLConfCreator,
+    ProxyCreator,
     get_spider_conf,
 )
 from ayugespidertools.config import logger
@@ -38,9 +37,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ayugespidertools.common.typevars import (
-        DynamicProxyConf,
         ESConf,
-        ExclusiveProxyConf,
         KafkaConf,
         MongoDBConf,
         MQConf,
@@ -48,6 +45,7 @@ if TYPE_CHECKING:
         OracleConf,
         OssConf,
         PostgreSQLConf,
+        ProxyConf,
         slogT,
     )
 
@@ -60,8 +58,7 @@ class AyuSpider(Spider):
     oracle_conf: OracleConf
     rabbitmq_conf: MQConf
     kafka_conf: KafkaConf
-    dynamicproxy_conf: DynamicProxyConf
-    exclusiveproxy_conf: ExclusiveProxyConf
+    proxy_conf: ProxyConf
     oss_conf: OssConf
 
     SPIDER_TIME: str = time.strftime("%Y-%m-%d", time.localtime())
@@ -147,15 +144,10 @@ class AyuSpider(Spider):
         ):
             spider.kafka_conf = kafka_conf
 
-        if dynamicproxy_conf := get_spider_conf(
-            DynamicProxyCreator(), crawler.settings, remote_option
+        if proxy_conf := get_spider_conf(
+            ProxyCreator(), crawler.settings, remote_option
         ):
-            spider.dynamicproxy_conf = dynamicproxy_conf
-
-        if exclusiveproxy_conf := get_spider_conf(
-            ExclusiveProxyCreator(), crawler.settings, remote_option
-        ):
-            spider.exclusiveproxy_conf = exclusiveproxy_conf
+            spider.proxy_conf = proxy_conf
 
         if oss_conf := get_spider_conf(
             OssConfCreator(), crawler.settings, remote_option
