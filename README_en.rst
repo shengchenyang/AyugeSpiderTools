@@ -15,7 +15,7 @@
    :target: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :alt: license
 
-.. |python_support| image:: https://img.shields.io/badge/python-3.9%2B-blue
+.. |python_support| image:: https://img.shields.io/badge/python-3.10%2B-blue
    :target: https://pypi.org/pypi/AyugeSpiderTools
    :alt: python support
 
@@ -151,8 +151,9 @@ following scenarios are currently supported:
    + 9).demo_aiohttp_example: Scenarios using aiohttp to request.
    + 10).demo_aiohttp_test: Example of using scrapy aiohttp in a specific project.
 
-   + 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".
-   + 12).demo_proxy_two: Example of using dedicated proxies with "kuaidaili.com".
+   - 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".(removed)
+   - 12).demo_proxy_two: Example of using dedicated proxies with "kuaidaili.com".(removed)
+   + 37).demo_proxy: Universal proxy middleware.
    + 14).demo_crawl: Example of supporting scrapy CrawlSpider.
 
    # Example of supporting Item "Loaders feature" in this library

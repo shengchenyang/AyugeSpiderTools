@@ -15,7 +15,7 @@
    :target: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :alt: license
 
-.. |python_support| image:: https://img.shields.io/badge/python-3.9%2B-blue
+.. |python_support| image:: https://img.shields.io/badge/python-3.10%2B-blue
    :target: https://pypi.org/pypi/AyugeSpiderTools
    :alt: python support
 
@@ -143,8 +143,9 @@
    + 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
    + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
-   + 11).demo_proxy_one: 快代理动态隧道代理示例
-   + 12).demo_proxy_two: 测试快代理独享代理
+   - 11).demo_proxy_one: 快代理动态隧道代理示例(已删除)
+   - 12).demo_proxy_two: 测试快代理独享代理(已删除)
+   + 37).demo_proxy: 通用代理中间件
    + 14).demo_crawl: 支持 scrapy CrawlSpider 的示例
 
    # 本库中给出支持 Item Loaders 特性的示例

@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.13.5 (Preview: TBD)
+AyugeSpiderTools 3.14.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,46 @@ AyugeSpiderTools 3.13.5 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.14.0 (2026-01-25)
+====================================
+
+Deprecations
+------------
+
+- 移除对 python3.9 的支持。
+
+  (:commit:`651b0d85ee5fc33a4616ef76c2d9b206b782d601`)
+
+- 删除自带的固定代理商的中间件，改为更通用的代理中间件。如果不满足此示例，你可以通过本库支持的自定义配置\
+  解析功能来自行实现定制代理功能，你也可以使用本库支持的使用 aiohttp 请求的方式在 yield AiohttpRequest 时\
+  设置代理参数，请自行选择喜欢的方式。示例请查看 DemoSpider 项目中的 demo_proxy。
+
+  (:commit:`d433f48307c002777cddf7365a416546d7d268b0`)
+
+- 删除 AyuItem 中早已不再推荐的 _mongo_update_rule 和 _mongo_update_keys 的参数，新版本一定要切\
+  换为通用的 _update_rule 和 _update_keys 参数。
+
+  (:commit:`0628fa1307fbccdc347aee6124e5272f30ddcf09`)
+
+New features
+------------
+
+- 更新 scrapy 依赖，并更新为最新推荐的写法。
+
+  (:commit:`722e434b3d5dc6cf3d90b9c24b64f4f99255c502`)
+
+Code optimizations
+------------------
+
+- 优化配置解析。
+
+  (:commit:`040947e848012a84c6ba21868ee7c7484d61b09b`)
+
+- 更新依赖版本。
+
+  (:commit:`64c504f1ba076e568192607c0c99c751a7865ab5`)
+
 
 AyugeSpiderTools 3.13.4 (2025-11-22)
 ====================================
