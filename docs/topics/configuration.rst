@@ -275,27 +275,31 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 
 快代理动态代理配置参数。
 
-.. csv-table::
-   :header: "参数名", "参数备注", "描述"
-   :widths: 10, 15, 30
+.. warning::
 
-   "proxy", "_", "快代理动态代理 api。"
-   "username", "_", "_"
-   "password", "_", "_"
+   已经删除此代理提供商的示例了，改为更通用的代理中间件示例了。
 
 [kdl_exclusive_proxy]
 =====================
 
 快代理独享代理配置参数。
 
+.. warning::
+
+   同样地，已经删除此代理提供商的示例了，改为更通用的代理中间件示例了。
+
+[proxy]
+===================
+
+通用的代理配置参数，可以更方便地设置静态代理，动态代理等参数，更通用。当然你可以通过本库支持的自定义配置\
+解析功能来自行实现定制代理功能，你也可以使用本库支持的使用 aiohttp 请求的方式在 yield AiohttpRequest \
+时设置代理参数，请自行选择喜欢的方式。示例请查看 DemoSpider 项目中的 demo_proxy。
+
 .. csv-table::
    :header: "参数名", "参数备注", "描述"
    :widths: 10, 15, 30
 
-   "proxy", "_", "快代理独享代理 api。"
-   "username", "_", "_"
-   "password", "_", "_"
-   "index", "可选，默认 1", "表示取其索引值对应的代理。"
+   "proxy", "_", "代理提供商给的代理地址，格式为http://user:password@host:port。"
 
 [oss:ali]
 =========

@@ -79,7 +79,7 @@ git:
 	git config --global https.proxy http://127.0.0.1:7897
 
 help:
-	@echo "Usage: make [target]"
+	@echo "Usage: make [target] [option]"
 	@echo ""
 	@echo "Targets:"
 	@echo "  build            Poetry build"

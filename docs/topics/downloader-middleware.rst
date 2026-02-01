@@ -43,10 +43,10 @@ downloader-middleware
 2. 代理
 ==========
 
-2.1. 动态隧道代理
+2.1. 中间件代理方式
 ---------------------
 
-本库以快代理为例，其各个代理种类的使用方法大致相同
+本库给出简单通用的中间件代理示例。
 
 2.1.1. 使用方法
 ^^^^^^^^^^^^^^^^^^^
@@ -58,50 +58,36 @@ downloader-middleware
    custom_settings = {
        "DOWNLOADER_MIDDLEWARES": {
            # 动态隧道代理激活
-           "ayugespidertools.middlewares.DynamicProxyDownloaderMiddleware": 125,
+           "ayugespidertools.middlewares.ProxyDownloaderMiddleware": 125,
        },
    }
 
-需要修改此项目中的 VIT 文件夹下的 .conf 对应的配置信息。
+需要修改此项目中的 VIT 文件夹下的 .conf 中 [proxy] 的配置信息。
 
 .. code:: ini
 
-   [KDL_DYNAMIC_PROXY]
-   PROXY=o668.kdltps.com:15818
-   USERNAME=***
-   PASSWORD=***
+   [proxy]
+   proxy=http://user:password@host:port
 
 然后即可正常运行。
 
-2.2. 独享代理
------------------
+2.2. 自定义代理中间件
+---------------------
 
 2.2.1. 使用方法
 ^^^^^^^^^^^^^^^^^^^
 
-激活 DOWNLOADER_MIDDLEWARES 中的独享代理配置。
+如果不太喜欢库中通用代理中间件示例，你可以根据 `custom_section`_ 的自定义配置创建对应的自定义代理中间件。\
+这里不再举例。
 
-.. code-block:: python
+2.3. aiohttp 的代理方式
+------------------------
 
-   custom_settings = {
-       "DOWNLOADER_MIDDLEWARES": {
-           # 独享代理激活
-           "ayugespidertools.middlewares.ExclusiveProxyDownloaderMiddleware": 125,
-       },
-   }
+2.3.1. 使用方法
+^^^^^^^^^^^^^^^^^^^
 
-
-需要修改此项目中的 VIT 文件夹下的 .conf 对应的配置信息。
-
-.. code:: ini
-
-   [kdl_exclusive_proxy]
-   proxy=http://kps.kdlapi.com/api/getkps?orderid=***&num=100&format=json
-   username=***
-   password=***
-   index=1
-
-注：index 为在有多个独享代理时取的代理对应的索引值。
+除了自带的通用代理中间件、自定义配置解析的代理中间件，你也可以通过使用 aiohttp 发送请求时设置代理参数。\
+具体示例请查看 :ref:`downloader-middleware <topics-downloader-middleware-aiohttp>` 的部分文档。
 
 .. _topics-downloader-middleware-aiohttp:
 
@@ -210,3 +196,5 @@ AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的
 
 由于改成通过 yield AiohttpRequest 的统一接口发送请求，且此方法参数与 aiohttp 的请求参数一致，极大地\
 减少用户使用成本和避免维护地狱。
+
+.. _custom_section: https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
