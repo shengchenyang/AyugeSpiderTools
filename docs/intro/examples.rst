@@ -63,14 +63,16 @@
    # 数据存入 Oracle 的场景(需要安装 ayugespidertools[database])
    + 25). demo_oracle: 普通同步存储示例
    + 26). demo_oracle_twisted: Twisted 异步存储示例
+   + 36). demo_oracle_async: asyncio 异步存储示例
 
    - 7).demo_seven: 使用 requests 来请求的场景(已删除，更推荐 aiohttp 方式)
    + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
    + 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
    + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
 
-   + 11).demo_proxy_one: 快代理动态隧道代理示例
-   + 12).demo_proxy_two: 测试快代理独享代理
+   - 11).demo_proxy_one: 快代理动态隧道代理示例(已删除)
+   - 12).demo_proxy_two: 测试快代理独享代理(已删除)
+   + 37).demo_proxy: 通用代理中间件
    + 14).demo_crawl: 支持 scrapy CrawlSpider 的示例
 
    # 本库中给出支持 Item Loaders 特性的示例
