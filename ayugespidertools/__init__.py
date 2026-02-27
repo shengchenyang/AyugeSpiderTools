@@ -4,11 +4,13 @@ from ayugespidertools.items import AyuItem
 from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest
 from ayugespidertools.scraper.spiders import AyuSpider
 from ayugespidertools.scraper.spiders.crawl import AyuCrawlSpider
+from ayugespidertools.spiders import AyuRabbitMQSpider
 
 __all__ = [
     "AiohttpRequest",
     "AyuCrawlSpider",
     "AyuItem",
+    "AyuRabbitMQSpider",
     "AyuSpider",
     "PortalTag",
     "__version__",

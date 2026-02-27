@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class ConfigHandler(ABC):
     section: ClassVar[str]
     target: ClassVar[str]
+    is_spider: ClassVar[bool] = False
 
     @classmethod
     @abstractmethod
@@ -28,7 +29,11 @@ class ConfigRegistry:
 
     @classmethod
     def register(
-        cls, section: str, target: str, priority: list[str] | None = None
+        cls,
+        section: str,
+        target: str,
+        priority: list[str] | None = None,
+        is_spider: bool = False,
     ) -> Callable[[type[ConfigHandler]], type[ConfigHandler]]:
         def decorator(handler_cls: type[ConfigHandler]) -> type[ConfigHandler]:
             if section in cls._handlers:
@@ -36,6 +41,7 @@ class ConfigRegistry:
 
             handler_cls.section = section
             handler_cls.target = target
+            handler_cls.is_spider = is_spider
             cls._handlers[section] = handler_cls
             if priority:
                 cls._priority[target] = priority
@@ -55,6 +61,10 @@ class ConfigRegistry:
 
     @classmethod
     def parse_all(cls, cfg: configparser.ConfigParser, inner_settings: dict) -> dict:
+        for handler in cls._handlers.values():
+            if handler.is_spider:
+                inner_settings[handler.target] = handler.parse(cfg)
+
         for target, handler in cls._iter_priority_handlers(cfg):
             inner_settings[target] = handler.parse(cfg)
 
@@ -64,6 +74,24 @@ class ConfigRegistry:
             if section in cfg:
                 inner_settings[handler.target] = handler.parse(cfg)
         return inner_settings
+
+
+@ConfigRegistry.register(section="spider:", target="AYUSPIDERS_CONFIG", is_spider=True)
+class SpiderHandler(ConfigHandler):
+    @classmethod
+    def parse(cls, cfg: configparser.ConfigParser) -> dict[str, Any]:
+        spiders = {}
+        for section in cfg.sections():
+            if not section.startswith("spider:"):
+                continue
+
+            spider_name = section.removeprefix("spider:").strip()
+            sec = cfg[section]
+            spiders[spider_name] = {
+                "name": sec.get("name", spider_name),
+                "task_mq": sec.get("task_mq"),
+            }
+        return spiders
 
 
 @ConfigRegistry.register(section="mysql", target="MYSQL_CONFIG")
