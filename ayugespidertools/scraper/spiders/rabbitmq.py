@@ -3,34 +3,21 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any, cast
 
-import aio_pika
 from typing_extensions import Self
 
 from ayugespidertools.common.typevars import MQConf
-from ayugespidertools.config import get_cfg, logger
-from ayugespidertools.exceptions import NotConfigured, UnsupportedError
+from ayugespidertools.config import get_cfg
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.spiders import AyuSpider
+from ayugespidertools.utils.database import RabbitMQAsyncPortal
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
+    import aio_pika
+
+
 __all__ = ["AyuRabbitMQSpider"]
-
-
-async def mq_conn(mq_conf: MQConf):
-    if "," in mq_conf.host:
-        raise UnsupportedError(
-            "The host parameter in AyuRabbitMQSpider cannot contain commas. "
-            "Modify the host parameter in the [mq] section of the .conf file."
-        )
-
-    return await aio_pika.connect_robust(
-        host=mq_conf.host,
-        port=mq_conf.port,
-        login=mq_conf.username,
-        password=mq_conf.password,
-        virtualhost=mq_conf.virtualhost,
-    )
 
 
 class AyuRabbitMQSpider(AyuSpider):
@@ -41,7 +28,6 @@ class AyuRabbitMQSpider(AyuSpider):
         spider = cast("Self", super().from_crawler(crawler, *args, **kwargs))
         spiders_conf: dict = crawler.settings.get("AYUSPIDERS_CONFIG", {})
         spider_conf = spiders_conf.get(spider.name)
-        logger.warning(f"spider_conf: {spider.name}, {spiders_conf}")
         if not spider_conf:
             raise NotConfigured(f"No spider config found for spider '{spider.name}'")
 
@@ -68,7 +54,7 @@ class AyuRabbitMQSpider(AyuSpider):
     async def start(self):
         self.slog.info("Starting RabbitMQ consumer (async start)")
         spider = cast("AyuRabbitMQSpider", self.crawler.spider)
-        connection = await mq_conn(mq_conf=spider.task_mq_conf)
+        connection = await RabbitMQAsyncPortal(db_conf=spider.task_mq_conf).connect()
         async with connection:
             queue_name = self.rabbitmq_conf.queue
             channel: aio_pika.abc.AbstractChannel = await connection.channel()

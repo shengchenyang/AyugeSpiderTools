@@ -22,9 +22,11 @@ from ayugespidertools.common.typevars import (
     PortalTag,
     PostgreSQLConf,
 )
+from ayugespidertools.exceptions import UnsupportedError
 from ayugespidertools.mongoclient import MongoDbBase
 
 try:
+    import aio_pika
     import asyncpg
     import oracledb
     import psycopg
@@ -44,9 +46,11 @@ __all__ = [
     "OraclePortal",
     "PostgreSQLAsyncPortal",
     "PostgreSQLPortal",
+    "RabbitMQAsyncPortal",
 ]
 
 if TYPE_CHECKING:
+    from aio_pika.abc import AbstractRobustConnection
     from aiomysql import Pool as MysqlPool
     from motor.motor_asyncio import AsyncIOMotorDatabase
     from psycopg.connection import Connection as PsycopgConnection
@@ -88,7 +92,7 @@ class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
     _lock = threading.Lock()
 
     def __call__(
-        cls,
+        cls: type[T],
         db_conf: DataBaseConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
@@ -248,6 +252,30 @@ class RabbitMQPortal(metaclass=PortalSingletonMeta):
     ): ...
 
     def connect(self): ...
+
+
+class RabbitMQAsyncPortal(metaclass=PortalSingletonMeta):
+    def __init__(
+        self,
+        db_conf: MQConf,
+        tag: PortalTag = PortalTag.DEFAULT,
+        singleton: bool = False,
+    ):
+        self.db_conf = db_conf
+        if "," in self.db_conf.host:
+            raise UnsupportedError(
+                "The host parameter in AyuAsyncMQPipeline cannot contain commas. "
+                "Modify the host parameter in the [mq] section of the .conf file."
+            )
+
+    async def connect(self) -> AbstractRobustConnection:
+        return await aio_pika.connect_robust(
+            host=self.db_conf.host,
+            port=self.db_conf.port,
+            login=self.db_conf.username,
+            password=self.db_conf.password,
+            virtualhost=self.db_conf.virtualhost,
+        )
 
 
 class KafkaPortal(metaclass=PortalSingletonMeta):
