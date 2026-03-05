@@ -7,6 +7,7 @@ import urllib.parse
 from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar
 
 import aiomysql
+import pika
 import pymysql
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -47,6 +48,7 @@ __all__ = [
     "PostgreSQLAsyncPortal",
     "PostgreSQLPortal",
     "RabbitMQAsyncPortal",
+    "RabbitMQPortal",
 ]
 
 if TYPE_CHECKING:
@@ -249,9 +251,27 @@ class RabbitMQPortal(metaclass=PortalSingletonMeta):
         db_conf: MQConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-    ): ...
+    ):
+        self.db_conf = db_conf
 
-    def connect(self): ...
+    def connect(self):
+        cluster_hosts = [h.strip() for h in self.db_conf.host.split(",")]
+        parameters = [
+            pika.ConnectionParameters(
+                host=host,
+                port=self.db_conf.port,
+                virtual_host=self.db_conf.virtualhost,
+                credentials=pika.PlainCredentials(
+                    username=self.db_conf.username, password=self.db_conf.password
+                ),
+                heartbeat=self.db_conf.heartbeat,
+                socket_timeout=self.db_conf.socket_timeout,
+                connection_attempts=3,
+                retry_delay=1,
+            )
+            for host in cluster_hosts
+        ]
+        return pika.BlockingConnection(parameters=parameters)
 
 
 class RabbitMQAsyncPortal(metaclass=PortalSingletonMeta):
