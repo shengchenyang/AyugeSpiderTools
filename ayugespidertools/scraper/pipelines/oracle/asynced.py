@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
-    running_tasks: set
     crawler: Crawler
     pool: oracledb.AsyncConnectionPool
 
@@ -32,7 +31,6 @@ class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
     async def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
-        self.running_tasks = set()
         self.pool = OracleAsyncPortal(
             db_conf=spider.oracle_conf, tag=PortalTag.LIBRARY
         ).connect()
