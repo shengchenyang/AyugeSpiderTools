@@ -237,7 +237,6 @@ class MQHandler(ConfigHandler):
     @classmethod
     def parse(cls, cfg: configparser.ConfigParser) -> dict[str, Any]:
         mq_section = cfg[cls.section]
-        _queue = mq_section.get("queue", None)
         return {
             "host": mq_section.get("host", "localhost"),
             "port": mq_section.getint("port", 5672),
@@ -246,12 +245,12 @@ class MQHandler(ConfigHandler):
             "virtualhost": mq_section.get("virtualhost", "/"),
             "heartbeat": mq_section.getint("heartbeat", 0),
             "socket_timeout": mq_section.getint("socket_timeout", 1),
-            "queue": _queue,
+            "queue": mq_section.get("queue", None),
             "durable": mq_section.getboolean("durable", True),
             "exclusive": mq_section.getboolean("exclusive", False),
             "auto_delete": mq_section.getboolean("auto_delete", False),
             "exchange": mq_section.get("exchange", ""),
-            "routing_key": mq_section.get("routing_key", _queue),
+            "routing_key": mq_section.get("routing_key", None),
             "content_type": mq_section.getint("content_type", "text/plain"),
             "delivery_mode": mq_section.getint("delivery_mode", 1),
             "mandatory": mq_section.getboolean("mandatory", True),

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 import pika
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.utils.database import RabbitMQPortal
 
 __all__ = [
     "AyuMQPipeline",
@@ -24,6 +25,7 @@ class AyuMQPipeline:
     channel: BlockingChannel
     conn: BlockingConnection
     crawler: Crawler
+    _declared_queues: set[str]
 
     @classmethod
     def from_crawler(cls, crawler: Crawler) -> Self:
@@ -35,34 +37,27 @@ class AyuMQPipeline:
         spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
         _mq_conf: MQConf = spider.rabbitmq_conf
-        cluster_hosts = [h.strip() for h in _mq_conf.host.split(",")]
-        parameters = [
-            pika.ConnectionParameters(
-                host=host,
-                port=_mq_conf.port,
-                virtual_host=_mq_conf.virtualhost,
-                credentials=pika.PlainCredentials(
-                    username=_mq_conf.username, password=_mq_conf.password
-                ),
-                heartbeat=_mq_conf.heartbeat,
-                socket_timeout=_mq_conf.socket_timeout,
-                connection_attempts=3,
-                retry_delay=1,
-            )
-            for host in cluster_hosts
-        ]
-
-        self.conn = pika.BlockingConnection(parameters=parameters)
+        self.conn = RabbitMQPortal(db_conf=_mq_conf).connect()
         self.channel = self.conn.channel()
+        self.channel.confirm_delivery()
+        self._declared_queues = set()
+
+    def _ensure_queue(self, queue_name: str) -> None:
+        if queue_name in self._declared_queues:
+            return
+
+        spider = cast("AyuSpider", self.crawler.spider)
+        _mq_conf: MQConf = spider.rabbitmq_conf
         self.channel.queue_declare(
-            queue=_mq_conf.queue,
+            queue=queue_name,
             durable=_mq_conf.durable,
             exclusive=_mq_conf.exclusive,
             auto_delete=_mq_conf.auto_delete,
         )
-        self.channel.confirm_delivery()
+        self._declared_queues.add(queue_name)
 
     def close_spider(self) -> None:
+        self._declared_queues.clear()
         self.conn.close()
 
     def process_item(self, item: Any) -> Any:
@@ -72,10 +67,14 @@ class AyuMQPipeline:
             return item
 
         spider = cast("AyuSpider", self.crawler.spider)
+        table_name = alert_item.table.name
+        queue_name = table_name or spider.rabbitmq_conf.queue
+        routing_key = spider.rabbitmq_conf.get_routing_key(item_routing_key=table_name)
+        self._ensure_queue(queue_name)
         publish_data = json.dumps(new_item).encode()
         self.channel.basic_publish(
             exchange=spider.rabbitmq_conf.exchange,
-            routing_key=spider.rabbitmq_conf.routing_key,
+            routing_key=routing_key,
             body=publish_data,
             properties=pika.BasicProperties(
                 content_type=spider.rabbitmq_conf.content_type,

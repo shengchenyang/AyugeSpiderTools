@@ -202,6 +202,9 @@ class MQConf(NamedTuple):
     delivery_mode: Literal[1, 2] = 1
     mandatory: bool = True
 
+    def get_routing_key(self, item_routing_key: str | None = None) -> str | None:
+        return self.routing_key or item_routing_key or self.queue
+
 
 class ProxyConf(NamedTuple):
     proxy: str
