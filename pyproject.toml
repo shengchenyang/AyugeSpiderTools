@@ -352,7 +352,7 @@ ignore = [
 "ayugespidertools/common/mysqlerrhandle.py" = ["S608"]
 "ayugespidertools/common/sqlformat.py" = ["S608"]
 "ayugespidertools/extras/cvnpil.py" = ["S311"]
-"ayugespidertools/scraper/middlewares/headers/ua.py" = ["S311"]
+"ayugespidertools/scraper/downloadermiddlewares/headers/ua.py" = ["S311"]
 "tests/**" = ["S", "PLC0415", "PT", "PTH"]
 
 [tool.ruff.lint.pydocstyle]

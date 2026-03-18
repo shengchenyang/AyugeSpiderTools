@@ -9,6 +9,6 @@ _MODULES = {
 
 setup_lazy_import(
     modules_map=_MODULES,
-    base_package="ayugespidertools.scraper.middlewares",
+    base_package="ayugespidertools.scraper.downloadermiddlewares",
     globals_dict=globals(),
 )
