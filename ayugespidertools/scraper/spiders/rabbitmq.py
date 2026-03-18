@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from typing_extensions import Self
 
+from ayugespidertools.common.confighandler import parse_mq_section
 from ayugespidertools.common.typevars import MQConf
 from ayugespidertools.config import get_cfg
 from ayugespidertools.exceptions import NotConfigured
@@ -41,13 +42,7 @@ class AyuRabbitMQSpider(AyuSpider):
                 f"'{mq_queue}' not configured for spider '{spider.name}'"
             )
         task_mq_option = _my_cfg[mq_queue]
-        spider.task_mq_conf = MQConf(
-            host=task_mq_option.get("host"),
-            port=task_mq_option.getint("port"),
-            username=task_mq_option.get("username"),
-            password=task_mq_option.get("password"),
-            virtualhost=task_mq_option.get("virtualhost"),
-        )
+        spider.task_mq_conf = MQConf(**parse_mq_section(task_mq_option))
         spider.crawler = crawler
         return spider
 

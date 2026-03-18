@@ -11,6 +11,27 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
+def parse_mq_section(section: configparser.SectionProxy) -> dict:
+    return {
+        "host": section.get("host", "localhost"),
+        "port": section.getint("port", 5672),
+        "username": section.get("username", "guest"),
+        "password": section.get("password", "guest"),
+        "virtualhost": section.get("virtualhost", "/"),
+        "heartbeat": section.getint("heartbeat", 0),
+        "socket_timeout": section.getint("socket_timeout", 1),
+        "queue": section.get("queue", None),
+        "durable": section.getboolean("durable", True),
+        "exclusive": section.getboolean("exclusive", False),
+        "auto_delete": section.getboolean("auto_delete", False),
+        "exchange": section.get("exchange", ""),
+        "routing_key": section.get("routing_key", None),
+        "content_type": section.getint("content_type", "text/plain"),
+        "delivery_mode": section.getint("delivery_mode", 1),
+        "mandatory": section.getboolean("mandatory", True),
+    }
+
+
 class ConfigHandler(ABC):
     section: ClassVar[str]
     target: ClassVar[str]
@@ -237,24 +258,7 @@ class MQHandler(ConfigHandler):
     @classmethod
     def parse(cls, cfg: configparser.ConfigParser) -> dict[str, Any]:
         mq_section = cfg[cls.section]
-        return {
-            "host": mq_section.get("host", "localhost"),
-            "port": mq_section.getint("port", 5672),
-            "username": mq_section.get("username", "guest"),
-            "password": mq_section.get("password", "guest"),
-            "virtualhost": mq_section.get("virtualhost", "/"),
-            "heartbeat": mq_section.getint("heartbeat", 0),
-            "socket_timeout": mq_section.getint("socket_timeout", 1),
-            "queue": mq_section.get("queue", None),
-            "durable": mq_section.getboolean("durable", True),
-            "exclusive": mq_section.getboolean("exclusive", False),
-            "auto_delete": mq_section.getboolean("auto_delete", False),
-            "exchange": mq_section.get("exchange", ""),
-            "routing_key": mq_section.get("routing_key", None),
-            "content_type": mq_section.getint("content_type", "text/plain"),
-            "delivery_mode": mq_section.getint("delivery_mode", 1),
-            "mandatory": mq_section.getboolean("mandatory", True),
-        }
+        return parse_mq_section(section=mq_section)
 
 
 @ConfigRegistry.register(section="kafka", target="KAFKA_CONFIG")
