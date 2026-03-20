@@ -3068,14 +3068,14 @@ files = [
 
 [[package]]
 name = "scrapy"
-version = "2.14.1"
+version = "2.14.2"
 description = "A high-level Web Crawling and Web Scraping framework"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "scrapy-2.14.1-py3-none-any.whl", hash = "sha256:e3a3c7969b7e692864f7de05e10ecb2d1bc813ed571361dc71142e5368ff92dc"},
-    {file = "scrapy-2.14.1.tar.gz", hash = "sha256:b2a4e61802e0a5518bc8293058adedbb6b0d51c08c125d1322b1af7c7cbca4c1"},
+    {file = "scrapy-2.14.2-py3-none-any.whl", hash = "sha256:dc6ddf6e1601fc6c50191d2e4d4a65497e37c4b848f542f21c9278a55f86af42"},
+    {file = "scrapy-2.14.2.tar.gz", hash = "sha256:23bf5d37503ad16973bd09604b9c36249bd4bbc282c48ddedbf58105d4639337"},
 ]
 
 [package.dependencies]
@@ -3799,4 +3799,4 @@ database = ["aio-pika", "asyncpg", "elasticsearch-dsl", "oracledb", "psycopg", "
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "402da12a174b32e0b1739d7434219d4674a6b4457e4c04280a2c8b6c0ec55eb2"
+content-hash = "0de98bba07924be1545310f92b80f4c06e619e7ab706d9b86830df1b922fc02f"
