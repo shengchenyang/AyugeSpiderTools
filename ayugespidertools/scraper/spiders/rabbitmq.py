@@ -66,7 +66,7 @@ class AyuRabbitMQSpider(AyuSpider):
                         async for req in self.start_requests_from_mq(task_info):
                             yield req
 
-    async def start_requests_from_mq(self, msg: dict) -> AsyncIterator[Any]:
+    async def start_requests_from_mq(self, task_info: dict) -> AsyncIterator[Any]:
         yield
         raise NotImplementedError(
             f"{self.__class__.__name__}.start_requests_from_mq callback is not defined. ",

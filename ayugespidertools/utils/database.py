@@ -254,7 +254,7 @@ class RabbitMQPortal(metaclass=PortalSingletonMeta):
     ):
         self.db_conf = db_conf
 
-    def connect(self):
+    def connect(self) -> pika.BlockingConnection:
         cluster_hosts = [h.strip() for h in self.db_conf.host.split(",")]
         parameters = [
             pika.ConnectionParameters(
