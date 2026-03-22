@@ -93,12 +93,17 @@ Getting help
 
    topics/logging
    topics/deduplicate
+   topics/rabbitspider
 
 :doc:`topics/logging`
     在 ``ayugespidertools`` 上学习如何使用日志。
 
 :doc:`topics/deduplicate`
     在 ``ayugespidertools`` 上的去重方式介绍。
+
+:doc:`topics/rabbitspider`
+    使用 AyuRabbitMQSpider 来实现基于 rabbitmq 的(任务分发)分布式部署，基于此和不同的 pipeline 或 \
+    ayugespidertools.utils.database 可以根据 mq 任务来实现不同数据的存储。
 
 扩展 scrapy
 ==================================

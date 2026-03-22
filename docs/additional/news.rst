@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.14.1 (Preview: TBD)
+AyugeSpiderTools 3.14.3 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,37 @@ AyugeSpiderTools 3.14.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.14.2 (2026-03-22)
+====================================
+
+Cleanups & Refactoring
+----------------------
+
+- 将 middleware 改为 downloadermiddlewares 和 spidermiddlewares，用户使用方法无影响。
+
+  (:commit:`178039884e78ef63bf5f4efe5c856f441654f593`)
+
+New features
+------------
+
+- 添加 rabbitmq spider 用于使用 mq 来分发任务，可更方便地实现分布式部署，也可实现以 mq 实现的任务消费和分发的效果。
+
+  (:commit:`0e81b0078d57ae39392e0a75bb26a025af191572`)
+
+- 添加 rabbitmq 的快速连接方式。
+
+  (:commit:`1eb582c6865d43d87d440dc5ee1f1d3da11545cf`)
+
+  (:commit:`b669a176c1a15c7afd75aba8d6c76c4aa914673e`)
+
+- 添加 rabbitmq 存储场景时，可在 yield item 时自定义 queue。
+
+  (:commit:`4f92e0cb267f6e6ade6fe61821530e530d9e98d9`)
+
+- 更新 scrapy 依赖。
+
+  (:commit:`18f0b8ccb0d976882574643dd9a7c6e45bd139ab`)
 
 AyugeSpiderTools 3.14.0 (2026-01-25)
 ====================================
