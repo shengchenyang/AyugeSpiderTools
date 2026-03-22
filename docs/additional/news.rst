@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.14.3 (Preview: TBD)
+AyugeSpiderTools 3.14.2 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -21,7 +21,7 @@ AyugeSpiderTools 3.14.3 (Preview: TBD)
 
 ... ...
 
-AyugeSpiderTools 3.14.2 (2026-03-22)
+AyugeSpiderTools 3.14.1 (2026-03-22)
 ====================================
 
 Cleanups & Refactoring
