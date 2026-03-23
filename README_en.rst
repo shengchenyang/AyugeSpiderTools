@@ -169,6 +169,7 @@ following scenarios are currently supported:
    + 32).demo_oss_sec: Self-implemented oss upload example.
    + 33).demo_oss_super: MongoDB storage scenario oss upload field supports list type.
    + 34).demo_conf: Supports obtaining custom configuration from .conf.
+   + 38).demo_mq_task: Supports obtaining acquisition tasks from MQ.
 
 Awesome Demo
 ============
@@ -178,6 +179,9 @@ introduction in the `DemoSpider`_ project. The running example picture is:
 
 .. image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/examples/ayugespidertools-async-demo.png
    :alt: async-demo
+
+It is now more recommended to use the method in the demo_mq_task example to implement \
+distributed deployment.
 
 Run Through The Test
 ====================
