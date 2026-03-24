@@ -27,18 +27,19 @@ AyugeSpiderTools 3.14.1 (2026-03-22)
 Cleanups & Refactoring
 ----------------------
 
-- 将 middleware 改为 downloadermiddlewares 和 spidermiddlewares，用户使用方法无影响。
+- 将 middlewares 改为 downloadermiddlewares 和 spidermiddlewares，用户使用方法无影响。
 
   (:commit:`178039884e78ef63bf5f4efe5c856f441654f593`)
 
 New features
 ------------
 
-- 添加 rabbitmq spider 用于使用 mq 来分发任务，可更方便地实现分布式部署，也可实现以 mq 实现的任务消费和分发的效果。
+- 添加 rabbitmq spider 用于使用 mq 来分发任务，可更方便地实现分布式部署，也可实现基于 mq 的任务消费和分发的效果。具体的示例请查看 DemoSpider \
+  项目中的 demo_mq_task。
 
   (:commit:`0e81b0078d57ae39392e0a75bb26a025af191572`)
 
-- 添加 rabbitmq 的快速连接方式。
+- 添加 rabbitmq 的快速连接方式 RabbitMQPortal 和 RabbitMQAsyncPortal。
 
   (:commit:`1eb582c6865d43d87d440dc5ee1f1d3da11545cf`)
 
