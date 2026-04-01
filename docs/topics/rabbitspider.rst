@@ -53,4 +53,4 @@ RabbitSpider
 你可以通过 DemoSpider 中的 demo_mq 或 demo_mq_async 或自己的脚本来发送采集任务，当任务队列中有数据时\
 会自动触发 spider 的采集任务。
 
-.. _custom_section: https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
+.. _custom_section: https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#spider-spider-name
