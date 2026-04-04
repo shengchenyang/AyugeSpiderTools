@@ -165,6 +165,7 @@ genspider
      basic
      crawl
      csvfeed
+     task
      xmlfeed
 
    $ ayuge genspider example example.com
