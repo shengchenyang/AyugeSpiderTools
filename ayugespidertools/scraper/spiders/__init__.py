@@ -101,8 +101,7 @@ class AyuSpider(Spider):
     @classmethod
     def from_crawler(cls, crawler: Crawler, *args: Any, **kwargs: Any) -> Self:
         spider = super().from_crawler(crawler, *args, **kwargs)
-        _db_engine_enabled = crawler.settings.get("DATABASE_ENGINE_ENABLED", False)
-        if _db_engine_enabled:
+        if crawler.settings.get("DATABASE_ENGINE_ENABLED") is not None:
             warnings.warn(
                 "parameter 'DATABASE_ENGINE_ENABLED' is deprecated, use 'ayugespidertools.utils.database' instead",
                 category=AyugeSpiderToolsDeprecationWarning,
