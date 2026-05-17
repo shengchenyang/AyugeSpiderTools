@@ -4,7 +4,7 @@ import importlib.util
 import time
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from scrapy.spiders import Spider
 
@@ -100,7 +100,7 @@ class AyuSpider(Spider):
 
     @classmethod
     def from_crawler(cls, crawler: Crawler, *args: Any, **kwargs: Any) -> Self:
-        spider = super().from_crawler(crawler, *args, **kwargs)
+        spider = cast("Self", super().from_crawler(crawler, *args, **kwargs))
         if crawler.settings.get("DATABASE_ENGINE_ENABLED") is not None:
             warnings.warn(
                 "parameter 'DATABASE_ENGINE_ENABLED' is deprecated, use 'ayugespidertools.utils.database' instead",
