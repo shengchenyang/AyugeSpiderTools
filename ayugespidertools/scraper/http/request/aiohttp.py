@@ -149,3 +149,20 @@ class AiohttpRequest(Request):
             flags=flags,
             cb_kwargs=cb_kwargs,
         )
+
+    def copy(self) -> AiohttpRequest:
+        aiohttp_args = copy.deepcopy(self.meta.get("aiohttp", {}).get("args", {}))
+        meta = copy.deepcopy(self.meta)
+        meta.pop("aiohttp", None)
+
+        return self.__class__(
+            callback=self.callback,
+            meta=meta,
+            encoding=self.encoding,
+            priority=self.priority,
+            dont_filter=self.dont_filter,
+            errback=self.errback,
+            flags=self.flags,
+            cb_kwargs=self.cb_kwargs,
+            **aiohttp_args,
+        )

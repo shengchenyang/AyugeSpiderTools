@@ -32,6 +32,9 @@ if TYPE_CHECKING:
     AyuRequest = AiohttpRequest | Request
 
 
+AIOHTTP_REQUEST_ERROR_STATUS = 599
+
+
 class AiohttpDownloaderMiddleware:
     """Downloader middleware handling the requests with aiohttp"""
 
@@ -43,7 +46,7 @@ class AiohttpDownloaderMiddleware:
     crawler: Crawler
 
     def _retry(
-        self, request: AyuRequest, reason: str | int, spider: AyuSpider
+        self, request: AyuRequest, reason: str | int | Exception, spider: AyuSpider
     ) -> AyuRequest | None:
         """重试请求
 
@@ -68,7 +71,7 @@ class AiohttpDownloaderMiddleware:
         self,
         request: AyuRequest,
         retries: int,
-        reason: str | int,
+        reason: str | int | Exception,
         stats: StatsCollector,
     ):
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
@@ -147,17 +150,17 @@ class AiohttpDownloaderMiddleware:
             aio_request_args: aiohttp 请求参数
 
         Returns:
-            1). status_code: 状态码
-            2). r_text: 响应内容
+            1). response_status: 响应状态码
+            2). response_text: 响应内容
         """
-        try:
-            async with self.session.request(**aio_request_args) as r:
-                status_code = r.status
-                r_text = await r.text(errors="ignore")
-                return status_code, r_text
-        except Exception as e:
-            self.slog.error(f"aiohttp 出现请求错误，Error: {e}")
-            return 504, ""
+        async with self.session.request(**aio_request_args) as response:
+            response_status = response.status
+            response_text = await response.text(errors="ignore")
+            return response_status, response_text
+
+    @staticmethod
+    def _response_status_from_error(error: Exception) -> int:
+        return getattr(error, "status", None) or AIOHTTP_REQUEST_ERROR_STATUS
 
     async def process_request(
         self, request: AyuRequest
@@ -165,27 +168,41 @@ class AiohttpDownloaderMiddleware:
         spider = cast("AyuSpider", self.crawler.spider)
         aiohttp_options = request.meta.get("aiohttp", {})
         self.aiohttp_args = aiohttp_options.setdefault("args", {})
-
-        # 设置 aiohttp 请求参数
         aiohttp_req_args = ReuseOperation.filter_none_value(data=self.aiohttp_args)
-        status_code, html_content = await self._request_by_aiohttp(
-            aio_request_args=aiohttp_req_args
-        )
 
-        # 请求间隔设置
+        try:
+            response_status, response_text = await self._request_by_aiohttp(
+                aio_request_args=aiohttp_req_args
+            )
+        except Exception as e:
+            self.slog.error(f"url: {request.url} aiohttp 请求失败，Error: {e}")
+            response_status = self._response_status_from_error(e)
+            response_text = ""
+
+            if _sleep := self.aiohttp_cfg.sleep:
+                await asyncio.sleep(_sleep)
+
+            retry_req = self._retry(request=request, reason=e, spider=spider)
+            if retry_req is not None:
+                return retry_req
+
+            return HtmlResponse(
+                url=request.url,
+                status=response_status,
+                headers=request.headers,
+                body=response_text,
+                encoding="utf-8",
+                request=request,
+            )
+
         if _sleep := self.aiohttp_cfg.sleep:
             await asyncio.sleep(_sleep)
 
-        # 重试请求
-        if all([status_code == 504, not html_content]):
-            spider.slog.error(f"url: {request.url} 返回内容为空，请求超时！")
-            self._retry(request=request, reason=504, spider=spider)
-
         return HtmlResponse(
             url=request.url,
-            status=status_code,
+            status=response_status,
             headers=request.headers,
-            body=html_content,
+            body=response_text,
             encoding="utf-8",
             request=request,
         )
