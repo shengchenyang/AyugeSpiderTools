@@ -56,6 +56,11 @@ def setup_lazy_import(
     globals_dict["__all__"] = _all
 
     def __getattr__(name):
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(
+                f"module {globals_dict['__name__']!r} has no attribute {name!r}"
+            )
+
         if name not in class_map:
             if name in _all:
                 raise NotConfigured(
