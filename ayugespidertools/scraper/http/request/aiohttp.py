@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import warnings
-from typing import TYPE_CHECKING, Any, AnyStr, TypedDict
+from typing import TYPE_CHECKING, Any, AnyStr
 
 from scrapy import Request
 
@@ -25,22 +25,10 @@ if TYPE_CHECKING:
     from aiohttp.typedefs import LooseHeaders
     from scrapy.http import Response
     from twisted.python.failure import Failure
-    from typing_extensions import NotRequired
 
-    from ayugespidertools.common.typevars import StrOrURL
+    from ayugespidertools.common.typevars import CookiesT, StrOrURL
 
     CallbackT = Callable[Concatenate[Response, ...], Any]
-
-
-class VerboseCookie(TypedDict):
-    name: str | bytes
-    value: str | bytes | bool | float | int
-    domain: NotRequired[str | bytes]
-    path: NotRequired[str | bytes]
-    secure: NotRequired[bool]
-
-
-CookiesT = dict[str, str] | list[VerboseCookie]
 
 
 class AiohttpRequest(Request):

@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import threading
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, TypeVar
 
+from typing_extensions import NotRequired
 from yarl import URL
 
 if TYPE_CHECKING:
@@ -49,6 +50,17 @@ SecurityProtocolStr = Literal["PLAINTEXT", "SSL", "SASL_PLAINTEXT", "SASL_SSL"]
 SaslMechanismStr = Literal[
     "PLAIN", "GSSAPI", "OAUTHBEARER", "SCRAM-SHA-256", "SCRAM-SHA-512"
 ]
+
+
+class VerboseCookie(TypedDict):
+    name: str | bytes
+    value: str | bytes | bool | float | int
+    domain: NotRequired[str | bytes]
+    path: NotRequired[str | bytes]
+    secure: NotRequired[bool]
+
+
+CookiesT = dict[str, str] | list[VerboseCookie]
 
 
 class PortalTag(str, Enum):
