@@ -25,4 +25,4 @@ jobs:
         TEMP: ${{ github.workspace }}\temp
       run: |
         pip install poetry==2.1.1 tox==4.28.4
-        tox
+        tox -r
