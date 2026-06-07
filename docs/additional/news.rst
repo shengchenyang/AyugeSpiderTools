@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.14.2 (Preview: TBD)
+AyugeSpiderTools 3.15.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,40 @@ AyugeSpiderTools 3.14.2 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.15.0 (2026-06-07)
+====================================
+
+New features
+------------
+
+- 添加通过 curl_cffi 的请求方式。
+
+  (:commit:`479ccc2f2bc66a2b515373a15bd893c01da4f322`)
+
+- 兼容 middlewares 和 pipelines 的模块导入方式，不只支持字符串的方式。
+
+  (:commit:`710acbe631e95b5a6b97e812bae1d001ca5ae883`)
+
+- 更新 scrapy 依赖。
+
+  (:commit:`c74f402671ba2bfdd179c5e35b49192be2e890b5`)
+
+Bug fixes
+---------
+
+- 解决 aiohttp 错误并重试请求时自定义参数失效问题。
+
+  (:commit:`691d4cc373acc2acf8dcd509c5b77bfbde21b737`)
+
+Code optimizations
+------------------
+
+- 优化 .conf 中 rabbitmq 分发任务的配置示例模版。
+
+  (:commit:`1606fd72eb294d65add884ee46d2cec3766dbfb8`)
+
+  (:commit:`b981ef020211589a339d98588baff45f2b9bd16d`)
 
 AyugeSpiderTools 3.14.1 (2026-03-22)
 ====================================
