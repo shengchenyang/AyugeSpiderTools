@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 from scrapy import signals
 from scrapy.http import Headers, HtmlResponse
+from scrapy.responsetypes import responsetypes
 from scrapy.utils.python import global_object_name
 
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -213,9 +214,10 @@ class CurlCffiDownloaderMiddleware:
 
     @staticmethod
     def _response_headers_from_curl_cffi(response: curl_requests.Response) -> Headers:
-        headers = Headers(response.headers)
-        for header in CURL_CFFI_DECODED_RESPONSE_HEADERS:
-            headers.pop(header, None)
+        headers = Headers(response.headers.multi_items())
+        if b"Content-Encoding" in headers:
+            for header in CURL_CFFI_DECODED_RESPONSE_HEADERS:
+                headers.pop(header, None)
         return headers
 
     async def process_request(
@@ -256,12 +258,20 @@ class CurlCffiDownloaderMiddleware:
         if _sleep := self.curl_cffi_cfg.sleep:
             await asyncio.sleep(_sleep)
 
-        return HtmlResponse(
-            url=response.url or request.url,
+        response_url = response.url or request.url
+        response_body = response.content
+        response_headers = self._response_headers_from_curl_cffi(response)
+        response_class = responsetypes.from_args(
+            headers=response_headers,
+            url=response_url,
+            body=response_body,
+        )
+
+        return response_class(
+            url=response_url,
             status=response.status_code,
-            headers=self._response_headers_from_curl_cffi(response),
-            body=response.content,
-            encoding=response.encoding,
+            headers=response_headers,
+            body=response_body,
             request=request,
         )
 

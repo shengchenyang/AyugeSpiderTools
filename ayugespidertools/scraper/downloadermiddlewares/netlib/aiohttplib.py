@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING, cast
 
 import aiohttp
 from scrapy import signals
-from scrapy.http import HtmlResponse
+from scrapy.http import Headers, HtmlResponse
+from scrapy.responsetypes import responsetypes
 from scrapy.utils.python import global_object_name
 
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
 
 
 AIOHTTP_REQUEST_ERROR_STATUS = 599
+AIOHTTP_DECODED_RESPONSE_HEADERS = (b"Content-Encoding", b"Content-Length")
 
 
 class AiohttpDownloaderMiddleware:
@@ -141,9 +143,19 @@ class AiohttpDownloaderMiddleware:
         s.crawler = crawler
         return s
 
+    @staticmethod
+    def _response_headers_from_aiohttp(
+        response: aiohttp.ClientResponse, auto_decompress: bool
+    ) -> Headers:
+        headers = Headers(response.raw_headers)
+        if auto_decompress and b"Content-Encoding" in headers:
+            for header in AIOHTTP_DECODED_RESPONSE_HEADERS:
+                headers.pop(header, None)
+        return headers
+
     async def _request_by_aiohttp(
         self, aio_request_args: ItemAdapter | dict
-    ) -> tuple[int, str]:
+    ) -> tuple[int, str, Headers, bytes]:
         """使用 aiohttp 来请求
 
         Args:
@@ -151,12 +163,19 @@ class AiohttpDownloaderMiddleware:
 
         Returns:
             1). response_status: 响应状态码
-            2). response_text: 响应内容
+            2). response_url: 响应 URL
+            3). response_headers: 响应头
+            4). response_body: 响应内容
         """
         async with self.session.request(**aio_request_args) as response:
             response_status = response.status
-            response_text = await response.text(errors="ignore")
-            return response_status, response_text
+            response_url = str(response.url)
+            response_headers = self._response_headers_from_aiohttp(
+                response=response,
+                auto_decompress=aio_request_args.get("auto_decompress") is not False,
+            )
+            response_body = await response.read()
+            return response_status, response_url, response_headers, response_body
 
     @staticmethod
     def _response_status_from_error(error: Exception) -> int:
@@ -171,13 +190,15 @@ class AiohttpDownloaderMiddleware:
         aiohttp_req_args = ReuseOperation.filter_none_value(data=self.aiohttp_args)
 
         try:
-            response_status, response_text = await self._request_by_aiohttp(
-                aio_request_args=aiohttp_req_args
-            )
+            (
+                response_status,
+                response_url,
+                response_headers,
+                response_body,
+            ) = await self._request_by_aiohttp(aio_request_args=aiohttp_req_args)
         except Exception as e:
             self.slog.error(f"url: {request.url} aiohttp 请求失败，Error: {e}")
             response_status = self._response_status_from_error(e)
-            response_text = ""
 
             if _sleep := self.aiohttp_cfg.sleep:
                 await asyncio.sleep(_sleep)
@@ -190,7 +211,7 @@ class AiohttpDownloaderMiddleware:
                 url=request.url,
                 status=response_status,
                 headers=request.headers,
-                body=response_text,
+                body=b"",
                 encoding="utf-8",
                 request=request,
             )
@@ -198,12 +219,17 @@ class AiohttpDownloaderMiddleware:
         if _sleep := self.aiohttp_cfg.sleep:
             await asyncio.sleep(_sleep)
 
-        return HtmlResponse(
-            url=request.url,
+        response_class = responsetypes.from_args(
+            headers=response_headers,
+            url=response_url,
+            body=response_body,
+        )
+
+        return response_class(
+            url=response_url,
             status=response_status,
-            headers=request.headers,
-            body=response_text,
-            encoding="utf-8",
+            headers=response_headers,
+            body=response_body,
             request=request,
         )
 
