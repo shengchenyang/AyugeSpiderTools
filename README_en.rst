@@ -190,7 +190,7 @@ Prerequisite: You need to create a .conf file in the VIT directory of the tests,
 example file has been provided. Please fill in the required content for testing, then:
 
 - You can directly use tox to run the tests.
-- As this library is developed with `poetry`_, you can simply run poetry install in a new
+- As this library is developed with `uv`_, you can simply run make start in a new \
   environment, and then manually run the target test or the pytest command for testing.
 - Alternatively, you can use the make tool, run make start, and then make test.
 
@@ -211,7 +211,7 @@ Things You Might Care About
 3. You have complex storage requirements for (media) resource fields in your item! Or do \
    you need support for other types of object cloud storage? How can I implement this easily?
 
-   1. If you are familiar with this project and the Poetry packaging and building process, \
+   1. If you are familiar with this project and the uv packaging and building process, \
       it is recommended to add the required functionality following the project's example \
       style, then build and install it yourself. This approach ensures ease of use for \
       future requirements.
@@ -223,26 +223,6 @@ Things You Might Care About
 4. Code test coverage is a bit low, should you consider increasing it?
 
    Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
-
-Build Your Own Library
-======================
-
-   Please refer to the official documentation of `poetry`_ for specific content.
-
-As mentioned in the section `Things You Might Care About`_, you can clone the source code
-and modify any methods (e.g. you may need a different default log configuration value or \
-add other project structure templates for your project scenario), and then package and use \
-it by running poetry build or make build after modification.
-
-For example, if you need to update kafka-python in the dependency library to a new version \
-x.x.x, you can simply install the existing dependencies with poetry install, and then install \
-the target version with poetry add kafka-python==x.x.x (try not to use poetry update kafka-python).\
-After ensuring that the test is working properly, you can package the modified library \
-with poetry build for use.
-
-   Other ways to customize scrapy projects
-
-The project can be customized through cookiecutter, please refer to the `LazyScraper`_ project.
 
 **I hope that this project can provide guidance for you when you encounter scenarios where \
 you need to extend the functionality of Scrapy.**
@@ -326,7 +306,6 @@ If this project is helpful to you, you can choose to reward the author.
 .. _Installation Guide: https://ayugespidertools.readthedocs.io/en/latest/intro/install.html
 .. _DemoSpider: https://github.com/shengchenyang/DemoSpider
 .. _readthedocs: https://ayugespidertools.readthedocs.io/en/latest/
-.. _poetry: https://python-poetry.org/docs/
-.. _LazyScraper: https://github.com/shengchenyang/LazyScraper
+.. _uv: https://docs.astral.sh/uv/
 .. _fontforge: https://github.com/fontforge/fontforge/releases
 .. _scrapy: https://github.com/scrapy/scrapy

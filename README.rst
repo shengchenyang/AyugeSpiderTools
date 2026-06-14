@@ -180,8 +180,7 @@
 前提：需要在 tests 的 VIT 目录下创建 .conf 文件，已给出示例文件，请填写测试所需内容，然后：
 
 - 可以直接使用 tox 来运行测试。
-- 本库以 `poetry`_ 开发，那么直接新环境下运行 poetry install 后，手动运行目标测试或 pytest 命令来测\
-  试等皆可。
+- 本库用 `uv`_ 开发，那么配置好 uv 后运行 make start 后，手动运行目标测试或 pytest 命令来测试等皆可。
 - 也可以使用 make 工具，make start 然后 make test 即可。
 
 你可能在意的事
@@ -198,8 +197,8 @@
 3. item 中 (媒体)资源字段的存储需求较复杂？比如上传到 oss 功能需要更细分的需求，或者有其它更多类型的对\
    象云存储的需要，我该怎么方便地实现？
 
-   1. 如果你比较了解本项目和 poetry 打包构建的流程，那么推荐你按照项目示例风格将需要功能添加后自行打包并\
-      安装，比较方便后续使用；
+   1. 如果你比较了解本项目和打包构建的流程，那么推荐你按照项目示例风格将需要功能添加后自行打包并安装，比\
+      较方便后续使用；
    2. 因为本身就是 scrapy 项目，所以更推荐使用普通存储场景结合自己编写的 scrapy pipeline 来对 item \
       中的资源上传字段进行个性化处理，达到即保留了此库的通用和便捷，也实现了灵活性。
 
@@ -207,22 +206,6 @@
 
    不考虑，场景所依赖服务太多，且云服务等其它因素导致个人维护成本过高，但不必担心，我会和本地服务的自动化\
    测试结合使用。
-
-构建你的专属库
-===============
-
-   具体内容请以 `poetry`_ 官方文档为准。
-
-据 `你可能在意的事`_ 可知，你可以 clone 源码后，修改任意方法（比如你的项目场景下可能需要其它的日志配置默\
-认值，或添加其它的项目结构模板等），修改完成后 poetry build 或 make build 即可打包使用。
-
-比如你可能需要更新依赖库中 kafka-python 为新版本 x.x.x，那只需 poetry install 安装现有依赖后，再\
-poetry add kafka-python==x.x.x 安装目标版本（尽量不要使用 poetry update kafka-python），确定测\
-试正常了即可 poetry build 打包使用。
-
-   其它自定义 scrapy 项目的方式
-
-也可以通过 cookiecutter 对项目个性化定制，可参考 `LazyScraper`_ 项目。
 
 **希望此项目能在你遇到扩展 scrapy 功能的场景时对你有所指引。**
 
@@ -298,7 +281,6 @@ poetry add kafka-python==x.x.x 安装目标版本（尽量不要使用 poetry up
 .. _安装指南: https://ayugespidertools.readthedocs.io/en/latest/intro/install.html
 .. _DemoSpider: https://github.com/shengchenyang/DemoSpider
 .. _readthedocs: https://ayugespidertools.readthedocs.io/en/latest/
-.. _poetry: https://python-poetry.org/docs/
-.. _LazyScraper: https://github.com/shengchenyang/LazyScraper
+.. _uv: https://docs.astral.sh/uv/
 .. _fontforge: https://github.com/fontforge/fontforge/releases
 .. _scrapy: https://github.com/scrapy/scrapy

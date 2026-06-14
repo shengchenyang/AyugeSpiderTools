@@ -4,7 +4,7 @@
 How-To-Build-Your-Own-Library
 =============================
 
-本库由 poetry 包管理工具构建，任何修改本库后自定义打包等需求请以 `poetry`_ 官方文档为准。
+本库由在 3.15.0 版本之后由 poetry 改为 uv 管理和构建，任何修改本库后自定义打包等需求请以 `uv`_ 官方文档为准。
 
 前言
 ======
@@ -23,29 +23,23 @@ How-To-Build-Your-Own-Library
 构建方法
 ==========
 
-你可以 clone 源码后，修改任意方法，修改完成后 poetry build 或 make build 即可打包并内部使用。
+你可以 clone 源码后，修改任意方法，修改完成后 make build 即可打包并内部使用。
 
-以更新 kafka-python 版本为例：
+具体的构建流程如下：
 
 - Prepare: clone 项目并准备开发环境
 
-  将项目克隆到本地，创建 python 虚拟环境并安装 poetry，然后在项目根目录下运行 poetry instal\
-  安装依赖即可。
+  将项目克隆到本地，配置好 uv 工具，然后在项目根目录运行 make start 即可初始化项目开发环境。
 
 - Make your changes: 自定义更改的内容
 
   修改你所关注的部分，比如你的项目场景下可能需要其它的日志配置默认值，或添加其它的项目结构模板，\
   更改库名等。
 
-  若需要更新本项目的 kafka-python 依赖库版本为 x.x.x，那只需 poetry add kafka-python==x.x.x\
-  安装目标版本即可。
-
 - Run tests & Rebuild: 测试功能并重打包
 
-  修改完毕并测试可用后，即可通过 poetry build 或 make 工具的 make build 打包即可使用。
-
-以上步骤可以简化为，先 clone 源码，然后做出改变（若构建 preview 包时则不需要变动），最后在虚拟环境中执行\
-pip install poetry && poetry build 即可打包。
+  修改完毕并测试可用后，即可通过 make build 打包即可使用。当然使用其他方式也都是可以的，比如：\
+   python -m build 或 uv build。
 
 补充
 =======
@@ -53,4 +47,4 @@ pip install poetry && poetry build 即可打包。
 若你自定义的方法对大多数人都合适的话，可以尝试将此功能添加到本项目，但是在此之前请先提交相关的 ISSUES 确\
 认可行后再开发和提交对应 PULL REQUESTS，以免浪费了你做出的贡献。
 
-.. _poetry: https://python-poetry.org/
+.. _uv: https://docs.astral.sh/uv/
