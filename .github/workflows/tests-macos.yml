@@ -10,19 +10,19 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-python@v6
-      with:
-        python-version: "3.10"
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
 
-    - name: Run tests
-      env:
-        RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
-      run: |
-        pip install poetry==2.1.1 tox==4.28.4
-        tox -e py
+      - name: Run tests
+        env:
+          RUNTEST_CFG: ${{ secrets.RUNTEST_CFG }}
+        run: |
+          pip install tox==4.28.4
+          tox -e py
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

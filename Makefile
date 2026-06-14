@@ -1,5 +1,5 @@
-.PHONY: build build_dist check clean format git help install patch pypi_token pytest major \
-minor release start tag tag_remove test version
+.PHONY: build build_dist check clean format git help install patch pytest major minor \
+release start tag tag_remove test version
 
 refresh: clean build install
 
@@ -37,17 +37,16 @@ else
 endif
 
 build:
-	poetry build
+	uv build --no-create-gitignore
 
 build_dist:
 	make clean
 	python setup.py sdist bdist_wheel
 
 check:
-	poetry run pre-commit run --all-files
-	poetry run mypy .
-	poetry check
-	poetry run ruff check --fix
+	uv run pre-commit run --all-files
+	uv run mypy .
+	uv run ruff check --fix
 
 clean:
 	-$(CLEAN_PYCACHE)
@@ -68,8 +67,8 @@ clean:
 	pip uninstall -y $(PROJECT_NAME)
 
 format:
-	- poetry run ruff format
-	- poetry run ruff check --fix
+	- uv run ruff format
+	- uv run ruff check --fix
 
 git:
 	git config core.eol lf
@@ -82,7 +81,7 @@ help:
 	@echo "Usage: make [target] [option]"
 	@echo ""
 	@echo "Targets:"
-	@echo "  build            Poetry build"
+	@echo "  build            Uv build"
 	@echo "  build_dist       Setuptools build"
 	@echo "  check            Code check"
 	@echo "  clean            Clean up test files, mypy cache and dist folders"
@@ -90,11 +89,8 @@ help:
 	@echo "  format           Code format"
 	@echo "  help             Show this help message"
 	@echo "  install          Install whl/tar.gz file from the dist folder"
-	@echo "  pypi_token       Set the poetry pypi-token, Run 'make pypi_token token=<token>' to set the poetry pypi_token"
 	@echo "  pytest           Code test"
-	@echo "  release          Publish package to PyPI:"
-	@echo "                     1. Run 'make release token=<token>'"
-	@echo "                     2. Run 'make release' if poetry pypi_token is already set"
+	@echo "  release          Publish package to PyPI"
 	@echo "  start            Pre-development setup steps"
 	@echo "  tag              Push a Git tag to trigger the publish action"
 	@echo "  tag_remove       Delete current (Git and Local) tag if the publish Action fails"
@@ -106,59 +102,43 @@ help:
 install:
 	$(PIPINSTALL)
 
-pypi_token:
-	@echo "==> Setting up the poetry pypi-token..."
-	@poetry config pypi-token.pypi $(token)
-	@echo ":) Poetry pypi_token set successfully!"
-
 pytest:
-	poetry install -E "all"
-	poetry run pytest -W ignore::DeprecationWarning
+	uv sync --all-extras --all-groups
+	uv run pytest -W ignore::DeprecationWarning
 
 release:
-	@if [ -n "$(token)" ]; then \
-		make pypi_token token=$(token); \
-	else \
-		echo "Please ensure the pypi-token is configured!"; \
-	fi
-	@echo "==> Publishing package to PyPI..."
-	poetry publish
+	uv publish
 	@echo ":) Publish successfully"
 
 start:
-	pyenv local 3.10.11
-	pip install poetry==2.1.1
-	poetry config virtualenvs.in-project true
-	poetry self add poetry-bumpversion
-	poetry env use python
-	poetry install -E "all"
-	poetry run pre-commit install
+	uv sync --python 3.10.11 --all-extras --all-groups
+	uv run pre-commit install
 
 tag:
-	@PKG_VER=$(shell poetry version --short); \
+	@PKG_VER=$(shell uv version --short); \
 	TAG_NAME="$(PROJECT_NAME)-$${PKG_VER}"; \
 	echo "==> Creating tag $$TAG_NAME"; \
 	git tag $$TAG_NAME; \
 	git push origin $$TAG_NAME
 
 tag_remove:
-	@PKG_VER=$(shell poetry version --short); \
+	@PKG_VER=$(shell uv version --short); \
 	TAG_NAME="$(PROJECT_NAME)-$${PKG_VER}"; \
 	echo "==> Deleting tag $$TAG_NAME"; \
 	git tag -d $$TAG_NAME; \
 	git push origin :refs/tags/$$TAG_NAME
 
 test:
-	poetry install -E "all"
-	poetry run coverage run -m pytest
-	poetry run coverage combine
-	poetry run coverage report
+	uv sync --all-extras --all-groups
+	uv run coverage run -m pytest
+	uv run coverage combine
+	uv run coverage report
 
 version:
 	@if [ "$(filter patch minor major,$(MAKECMDGOALS))" = "" ]; then \
-		poetry version; \
+		uv version; \
 	else \
-		poetry version $(filter patch minor major,$(MAKECMDGOALS)); \
+		uv run bump-my-version bump $(filter patch minor major,$(MAKECMDGOALS)); \
 	fi
 
 patch:

@@ -25,7 +25,7 @@ class TestVersionCommand(TestProjectBase):
     def _version() -> str:
         toml_file = Path(NormalConfig.ROOT_DIR, "pyproject.toml")
         conf = toml.load(toml_file)
-        return conf["tool"]["poetry"]["version"]
+        return conf["project"]["version"]
 
     def test_output(self):
         _, out, _ = self.proc("version")
