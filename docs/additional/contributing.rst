@@ -4,12 +4,12 @@
 贡献
 ======
 
-在编写和提交 pull request 前，建议先创建一个对应 issues 并在其中讨论相关详细信息。
+在编写和提交 pull request 前，建议先创建一个对应 issues 并在其中讨论相关详细信息(非必须)。
 
 前提准备
 ==========
 
-本指南假设您已拥有 github 账户，以及 pyenv 和 git 的安装配置。
+本指南假设您已拥有 github 账户，并完成了 uv 和 git 的安装配置。
 
 1. `Fork <https://github.com/shengchenyang/AyugeSpiderTools/fork>`_ AyugeSpiderTools
 
@@ -30,7 +30,7 @@
 
 .. code:: bash
 
-   pytest tests/test_items.py
+   uv run pytest -s tests/test_items.py
 
 开发工作流
 ============
