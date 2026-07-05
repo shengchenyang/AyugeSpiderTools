@@ -150,6 +150,7 @@ following scenarios are currently supported:
    + 8).demo_eight: Scenario of storing data in both MySQL and MongoDB at the same time.
    + 9).demo_aiohttp_example: Scenarios using aiohttp to request.
    + 10).demo_aiohttp_test: Example of using scrapy aiohttp in a specific project.
+   + 39).demo_curl_cffi: Scenarios using curl_cffi to request.
 
    - 11).demo_proxy_one: Example of using dynamic tunnel proxy with "kuaidaili.com".(removed)
    - 12).demo_proxy_two: Example of using dedicated proxies with "kuaidaili.com".(removed)
