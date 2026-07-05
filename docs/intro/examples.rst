@@ -69,6 +69,7 @@
    + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
    + 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
    + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
+   + 39).demo_curl_cffi: 使用 curl_cffi 请求的示例
 
    - 11).demo_proxy_one: 快代理动态隧道代理示例(已删除)
    - 12).demo_proxy_two: 测试快代理独享代理(已删除)
@@ -88,6 +89,7 @@
    + 32).demo_oss_sec: 自行实现的 oss 上传示例
    + 33).demo_oss_super: MongoDB 存储场景 oss 上传字段支持列表类型
    + 34).demo_conf: 支持从 .conf 中获取自定义配置
+   + 38).demo_mq_task: 支持从 mq 中获取采集任务
 
 基本查看以上 spider 即可了解使用方法，但有些示例还是不够详细，对以上内容进行补充。
 

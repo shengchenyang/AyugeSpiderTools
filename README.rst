@@ -142,6 +142,7 @@
    + 8).demo_eight: 同时存入 Mysql 和 MongoDB 的场景
    + 9).demo_aiohttp_example: 使用 aiohttp 来请求的场景
    + 10).demo_aiohttp_test: scrapy aiohttp 在具体项目中的使用方法示例
+   + 39).demo_curl_cffi: 使用 curl_cffi 请求的示例
 
    - 11).demo_proxy_one: 快代理动态隧道代理示例(已删除)
    - 12).demo_proxy_two: 测试快代理独享代理(已删除)
