@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import threading
 import urllib.parse
-from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, NamedTuple, TypeVar
 
 import aiomysql
 import pika
 import pymysql
+from kafka import KafkaProducer
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -39,6 +41,7 @@ except ImportError:
 
 __all__ = [
     "ElasticSearchPortal",
+    "KafkaPortal",
     "MongoDBAsyncPortal",
     "MongoDBPortal",
     "MysqlAsyncPortal",
@@ -304,9 +307,32 @@ class KafkaPortal(metaclass=PortalSingletonMeta):
         db_conf: KafkaConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-    ): ...
+    ):
+        bootstrap_servers = [
+            host.strip()
+            for host in db_conf.bootstrap_servers.split(",")
+            if host.strip()
+        ]
+        producer_kwargs: dict[str, Any] = {
+            "bootstrap_servers": bootstrap_servers,
+            "key_serializer": lambda k: json.dumps(k).encode(),
+            "value_serializer": lambda v: json.dumps(v).encode(),
+        }
+        if db_conf.security_protocol:
+            producer_kwargs |= {
+                "security_protocol": db_conf.security_protocol,
+                "sasl_mechanism": db_conf.sasl_mechanism,
+                "sasl_plain_username": db_conf.user,
+                "sasl_plain_password": db_conf.password,
+            }
 
-    def connect(self): ...
+        self.producer = KafkaProducer(**producer_kwargs)
+
+    def connect(self) -> KafkaProducer:
+        return self.producer
+
+    def close(self) -> None:
+        self.producer.close()
 
 
 class OraclePortal(metaclass=PortalSingletonMeta):
