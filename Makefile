@@ -10,7 +10,7 @@ ifeq ($(OS),Windows_NT)
     RM = cmd.exe /C del /F /Q
     RMDIR = cmd.exe /C rd /S /Q
     PATHSEP = \\
-    PIPINSTALL = cmd.exe /C "FOR %%i in (dist\*.whl) DO python -m pip install --no-index --no-deps %%i"
+    PIPINSTALL = cmd.exe /C "FOR %%i in (dist\*.whl) DO uv pip install --no-index --no-deps %%i"
     CLEAN_PYCACHE = for /d /r . %%d in (__pycache__) do @(if exist "%%d" (rd /s /q "%%d"))
     CLEAN_PYTESTCACHE = for /d /r . %%d in (.pytest_cache) do @(if exist "%%d" (rd /s /q "%%d"))
     CLEAN_MYPYCACHE = for /d /r . %%d in (.mypy_cache) do @(if exist "%%d" (rd /s /q "%%d"))
@@ -20,7 +20,7 @@ else
         RM = rm -f
         RMDIR = rm -rf
         PATHSEP = /
-        PIPINSTALL = pip install dist/*.tar.gz
+        PIPINSTALL = uv pip install dist/*.tar.gz
         CLEAN_PYCACHE = find . -type d -name '__pycache__' -print0 | xargs -0 rm -rf
         CLEAN_PYTESTCACHE = find . -type d -name '.pytest_cache' -print0 | xargs -0 rm -rf
         CLEAN_MYPYCACHE = find . -type d -name '.mypy_cache' -print0 | xargs -0 rm -rf
@@ -29,7 +29,7 @@ else
         RM = rm -f
         RMDIR = rm -rf
         PATHSEP = /
-        PIPINSTALL = pip install dist/*.tar.gz
+        PIPINSTALL = uv pip install dist/*.tar.gz
         CLEAN_PYCACHE = find . -type d -name '__pycache__' -print0 | xargs -0 rm -rf
         CLEAN_PYTESTCACHE = find . -type d -name '.pytest_cache' -print0 | xargs -0 rm -rf
         CLEAN_MYPYCACHE = find . -type d -name '.mypy_cache' -print0 | xargs -0 rm -rf
@@ -64,7 +64,7 @@ clean:
 	-$(RM) $(call path, tests$(PATHSEP)docs$(PATHSEP)txt$(PATHSEP)run.log)
 	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.crt)
 	-$(RM) $(call path, tests$(PATHSEP)keys$(PATHSEP)localhost.key)
-	pip uninstall -y $(PROJECT_NAME)
+	uv pip uninstall $(PROJECT_NAME)
 
 format:
 	- uv run ruff format
