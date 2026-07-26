@@ -64,9 +64,11 @@ class ReuseOperation:
         Returns:
             1). dict 类型的 item
         """
-        return (
-            item.asdict() if isinstance(item, AyuItem) else ItemAdapter(item).asdict()
-        )
+        if isinstance(item, dict):
+            return item
+        if isinstance(item, AyuItem):
+            return item.asdict()
+        return ItemAdapter(item).asdict()
 
     @classmethod
     def get_insert_data(cls, item_dict: dict) -> tuple[dict, str]:
