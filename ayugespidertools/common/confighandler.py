@@ -213,6 +213,7 @@ class OracleHandler(ConfigHandler):
             "password": oracle_section.get("password", None),
             "service_name": oracle_section.get("service_name", None),
             "thick_lib_dir": oracle_section.get("thick_lib_dir", False),
+            "disable_oob": oracle_section.get("disable_oob", False),
             "authentication_mode": oracle_section.get("authentication_mode", "DEFAULT"),
         }
 
