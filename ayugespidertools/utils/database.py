@@ -367,6 +367,7 @@ class OraclePortal(metaclass=PortalSingletonMeta):
             host=db_conf.host,
             port=db_conf.port,
             service_name=db_conf.service_name,
+            disable_oob=db_conf.disable_oob,
             mode=oracle_authentication_mode,
         )
 
@@ -406,6 +407,7 @@ class OracleAsyncPortal(metaclass=PortalSingletonMeta):
             host=db_conf.host,
             port=db_conf.port,
             service_name=db_conf.service_name,
+            disable_oob=db_conf.disable_oob,
             mode=oracle_authentication_mode,
         )
 

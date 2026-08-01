@@ -140,6 +140,7 @@ class OracleConf(NamedTuple):
     password: str
     service_name: str | None = None
     thick_lib_dir: bool | str = False
+    disable_oob: bool = False
     authentication_mode: OracleAuthenticationModesStr = "DEFAULT"
 
 
