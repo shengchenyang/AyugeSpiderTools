@@ -20,13 +20,13 @@ def test_items_AyuItem():
         mdi.add_field("_table", "table1")
 
     # 取值不存在 field 场景
-    with pytest.raises(AttributeError):
+    with pytest.raises(KeyError):
         _ = mdi["field12"]
 
     assert all(
         [
-            mdi["_table"] == mdi._table == "turbo",
-            mdi["field1"] == mdi.field1 == "value1",
+            mdi["_table"] == "turbo",
+            mdi["field1"] == "value1",
         ],
     )
 
@@ -57,10 +57,11 @@ def test_items_AyuItem():
 
     # 删除字段场景
     del mdi["name"]
-    with pytest.raises(AttributeError):
-        _ = mdi["name"]
     with pytest.raises(KeyError):
-        del mdi["no_this_field"]
+        _ = mdi["name"]
+    # 删除字段规则修改: 删除不存在的字段时不再报错
+    del mdi["no_this_field"]
+
     with pytest.raises(AttributeError):
         del mdi.no_this_field
     assert mdi.fields() == {"_table", "field1", "field2", "_conflict_cols"}
@@ -206,7 +207,6 @@ def test_iter_over_fields():
     fields = set(iter(item))
     assert fields == {
         "name",
-        "_AyuItem__fields",
         "title",
         "_conflict_cols",
         "age",
@@ -214,6 +214,42 @@ def test_iter_over_fields():
     }
 
 
+def test_get_fields():
+    user_data = AyuItem(_table="users", title="hello")
+    with pytest.raises(AttributeError):
+        _ = user_data.title
+
+
 def test_len_fields():
     item = AyuItem(_table="users", title="hello")
-    assert len(item) == 4
+    assert len(item) == 3
+
+
+def test_copy_and_deepcopy():
+    item = AyuItem(
+        _table="users",
+        title="hello",
+        _update_rule={"title": "hello"},
+        _update_keys={"title"},
+    )
+
+    copied = item.copy()
+    deep_copied = item.deepcopy()
+
+    assert all(
+        [
+            isinstance(copied, AyuItem),
+            copied is not item,
+            copied.asdict() == item.asdict(),
+            copied["_update_rule"] is item["_update_rule"],
+            copied["_update_keys"] is item["_update_keys"],
+            isinstance(deep_copied, AyuItem),
+            deep_copied is not item,
+            deep_copied.asdict() == item.asdict(),
+            deep_copied["_update_rule"] is not item["_update_rule"],
+            deep_copied["_update_keys"] is not item["_update_keys"],
+        ]
+    )
+
+    del item["_conflict_cols"]
+    assert "_conflict_cols" not in item.copy()
