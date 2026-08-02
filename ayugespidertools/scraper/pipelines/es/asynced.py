@@ -20,7 +20,7 @@ except ImportError:
 __all__ = ["AyuAsyncESPipeline"]
 
 if TYPE_CHECKING:
-    from elasticsearch_dsl import Document
+    from elasticsearch.dsl import Document
     from scrapy.crawler import Crawler
     from typing_extensions import Self
 

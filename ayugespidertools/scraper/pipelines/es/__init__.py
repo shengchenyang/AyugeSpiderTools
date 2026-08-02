@@ -7,10 +7,10 @@ from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.items import AyuItem
 
 try:
-    from elasticsearch_dsl import Document, connections
+    from elasticsearch.dsl import Document, connections
 except ImportError:
     raise NotConfigured(
-        "missing elasticsearch_dsl library, please install it. "
+        "missing elasticsearch library, please install it. "
         "install command: pip install ayugespidertools[database]"
     )
 

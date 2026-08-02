@@ -34,7 +34,7 @@ try:
     import oracledb
     import psycopg
     from asyncpg.pool import Pool as PGPool  # noqa: TC002
-    from elasticsearch_dsl import connections
+    from elasticsearch.dsl import connections
 except ImportError:
     # pip install ayugespidertools[database]
     pass
