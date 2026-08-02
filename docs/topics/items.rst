@@ -45,7 +45,7 @@ value 可选择的类型有：
    )
 
    # es 场景
-   from elasticsearch_dsl import Keyword
+   from elasticsearch.dsl import Keyword
 
    demo_item = AyuItem(
        article_title=DataItem(_title, Keyword()),
@@ -103,7 +103,7 @@ value 可选择的类型有：
        # 同样地，为保持风格统一，es 存储场景中会把 es Document 中 fields 的声明
        # 放在 AyuItem 中 DataItem 的 notes 参数中。
        # 这个参数在其他(需要字段注释，比如 Mysql，postgresql)场景中表示为字段注释。
-       from elasticsearch_dsl import Keyword, Search, Text
+       from elasticsearch.dsl import Keyword, Search, Text
 
        book_info_item = AyuItem(
            book_name=DataItem(
