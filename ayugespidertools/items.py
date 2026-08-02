@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-from abc import ABCMeta
-from collections.abc import Iterator, MutableMapping
-from dataclasses import dataclass
-from typing import Any, ClassVar, NamedTuple, NoReturn
+from collections.abc import MutableMapping
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any, ClassVar, NamedTuple, NoReturn
 
 import scrapy
 from scrapy.item import Item
 
 from ayugespidertools.exceptions import EmptyKeyError, FieldAlreadyExistsError
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator, KeysView
+
+    from typing_extensions import Self
+
 __all__ = [
     "AyuItem",
     "DataItem",
 ]
+
+_MISSING = object()
 
 
 class ScrapyItem(Item):
@@ -32,55 +38,7 @@ class DataItem(NamedTuple):
     notes: Any = ""
 
 
-class ItemMeta(ABCMeta):
-    def __new__(
-        cls, class_name: str, bases: tuple[type, ...], attrs: dict[str, Any]
-    ) -> ItemMeta:
-        def add_field(self, key: str, value: Any) -> None:
-            """动态添加字段方法
-
-            Args:
-                self: self
-                key: 需要添加的字段名
-                value: 需要添加的字段对应的值
-            """
-            if not key:
-                raise EmptyKeyError
-            if key in self._AyuItem__fields:
-                raise FieldAlreadyExistsError(key)
-            setattr(self, key, value)
-            self._AyuItem__fields.add(key)
-
-        def asdict(self) -> dict[str, Any]:
-            """将 AyuItem 转换为 dict"""
-            self._AyuItem__fields.discard("_AyuItem__fields")
-            return {key: getattr(self, key) for key in self._AyuItem__fields}
-
-        def asitem(self, assignment: bool = True) -> ScrapyItem:
-            """将 AyuItem 转换为 ScrapyItem
-
-            Args:
-                self: self
-                assignment: 是否将 AyuItem 中的值赋值给 ScrapyItem，默认为 True
-
-            Returns:
-                1). 转换 ScrapyItem 后的实例
-            """
-            item_temp = ScrapyItem()
-            for k, v in self.asdict().items():
-                item_temp.fields[k] = scrapy.Field()
-                if assignment:
-                    item_temp[k] = v
-            return item_temp
-
-        attrs["add_field"] = add_field
-        attrs["asdict"] = asdict
-        attrs["asitem"] = asitem
-        return super().__new__(cls, class_name, bases, attrs)
-
-
-@dataclass
-class AyuItem(MutableMapping, metaclass=ItemMeta):
+class AyuItem(MutableMapping[str, Any]):
     """Used to create AyuItem, add fields dynamically,
     and provides methods to convert to dict and ScrapyItem.
 
@@ -99,7 +57,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         >>> [ item["_table"], item["title"], item["num"] ]
         ['tab', 'tit', 10]
         >>> # 转换为 dict
-        >>> item.asdict() == {'title': 'tit', '_table': 'tab', 'num': 10}
+        >>> item.asdict() == {'_table': 'tab', '_conflict_cols': {'id'}, 'title': 'tit', 'num': 10}
         True
         >>> # 转换为 scrapy item
         >>> item.asitem().__class__.__name__ == "ScrapyItem"
@@ -109,15 +67,22 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         10
         >>> del item["title"]
         >>> item
-        {'_table': 'tab'}
+        {'_table': 'tab', '_conflict_cols': {'id'}}
+        >>> item.fields()
+        dict_keys(['_table', '_conflict_cols'])
     """
 
-    _except_keys: ClassVar[set[str]] = {
-        "_table",
-        "_update_rule",
-        "_update_keys",
-        "_conflict_cols",
-    }
+    __slots__ = ("_data",)
+
+    _except_keys: ClassVar[frozenset[str]] = frozenset(
+        {
+            "_table",
+            "_update_rule",
+            "_update_keys",
+            "_conflict_cols",
+        }
+    )
+    _data: dict[str, Any]
 
     def __init__(
         self,
@@ -125,7 +90,7 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
         _update_rule: dict[str, Any] | None = None,
         _update_keys: set[str] | None = None,
         _conflict_cols: set[str] | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """初始化 AyuItem 实例
 
@@ -135,73 +100,80 @@ class AyuItem(MutableMapping, metaclass=ItemMeta):
             _update_keys: 去重更新规则 _update_rule 匹配时，需要更新的字段，若不设置则忽略。
             _conflict_cols: 唯一索引冲突列，用于 postgresql 中的参数设置，默认为 {"id"}
         """
-        self.__fields = set()
+        object.__setattr__(self, "_data", kwargs)
         if _conflict_cols is None:
             _conflict_cols = {"id"}
-        if _table:
-            self.__fields.add("_table")
-            self._table = _table
+        if _table is not None:
+            self._data["_table"] = _table
         if _update_rule:
-            self.__fields.add("_update_rule")
-            self._update_rule = _update_rule
+            self._data["_update_rule"] = _update_rule
         if _update_keys:
-            self.__fields.add("_update_keys")
-            self._update_keys = _update_keys
+            self._data["_update_keys"] = _update_keys
         if _conflict_cols:
-            self.__fields.add("_conflict_cols")
-            self._conflict_cols = _conflict_cols
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-            self.__fields.add(key)
+            self._data["_conflict_cols"] = _conflict_cols
+
+    def __contains__(self, key: object) -> bool:
+        return key in self._data
 
     def __getitem__(self, key: str) -> Any:
-        return getattr(self, key)
+        value = self._data.get(key, _MISSING)
+        if value is _MISSING:
+            raise KeyError(f"Field {key!r} does not exist.")
+        return value
 
     def __setitem__(self, key: str, value: Any) -> None:
-        if key not in self.__fields:
-            setattr(self, key, value)
-            self.__fields.add(key)
-        else:
-            setattr(self, key, value)
+        self._data[key] = value
 
     def __delitem__(self, key: str) -> None:
-        if key not in self.__fields:
-            raise KeyError(f"{key} not found")
-        delattr(self, key)
-        self.__fields.discard(key)
-
-    def __getattr__(self, name: str) -> NoReturn:
-        if name in self.__fields:
-            raise AttributeError(f"Use item[{name!r}] to get field value")
-        raise AttributeError(name)
-
-    def __setattr__(self, name: str, value: Any) -> None:
-        super().__setattr__(name, value)
-        self.__fields.add(name)
-
-    def __delattr__(self, name: str) -> None:
-        super().__delattr__(name)
-        self.__fields.discard(name)
+        self._data.pop(key, None)
 
     def __iter__(self) -> Iterator[str]:
-        return iter(self.__fields)
+        return iter(self._data)
 
     def __len__(self) -> int:
-        return len(self.__fields)
+        return len(self._data)
 
-    def __str__(self) -> str:
-        # 与下方 __repr__ 一样，不返回 AyuItem(field=data) 的格式
-        return f"{self.asdict()}"
+    def __getattr__(self, name: str) -> NoReturn:
+        raise AttributeError(f"Use item[{name!r}] to get field value")
+
+    def __setattr__(self, name: str, value: Any) -> NoReturn:
+        raise AttributeError(f"use item[{name!r}] = value to set field value")
+
+    def __delattr__(self, name: str) -> NoReturn:
+        raise AttributeError(
+            f"use del item[{name!r}] or item.pop({name!r}) to delete field value"
+        )
+
+    def add_field(self, key: str, value: Any) -> None:
+        if not key:
+            raise EmptyKeyError
+        if key in self._data:
+            raise FieldAlreadyExistsError(key)
+        self._data[key] = value
+
+    def fields(self) -> KeysView[str]:
+        return self._data.keys()
+
+    def asdict(self) -> dict[str, Any]:
+        return dict(self._data)
+
+    def asitem(self, assignment: bool = True) -> ScrapyItem:
+        item = ScrapyItem()
+        for key, value in self._data.items():
+            item.fields[key] = scrapy.Field()
+            if assignment:
+                item[key] = value
+        return item
+
+    def copy(self) -> Self:
+        new_item = self.__class__.__new__(self.__class__)
+        object.__setattr__(new_item, "_data", dict(self._data))
+        return new_item
+
+    def deepcopy(self) -> Self:
+        new_item = self.__class__.__new__(self.__class__)
+        object.__setattr__(new_item, "_data", deepcopy(self._data))
+        return new_item
 
     def __repr__(self) -> str:
-        return f"{self.asdict()}"
-
-    def fields(self) -> set:
-        self.__fields.discard("_AyuItem__fields")
-        return self.__fields
-
-    def add_field(self, key: str, value: Any) -> None: ...
-
-    def asdict(self) -> dict[str, Any]: ...
-
-    def asitem(self, assignment: bool = True) -> ScrapyItem: ...
+        return repr(self._data)
