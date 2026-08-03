@@ -67,7 +67,7 @@ class AyuSpider(Spider):
     def slog(self) -> slogT:
         """本库的日志管理模块，使用 loguru 来管理日志
         Note:
-            本配置可与 Scrapy 的 spider.log 同时管理，根据场景可以自行配置。
+            本配置可与 Scrapy 的 Spider.logger 同时管理，根据场景可以自行配置。
         """
         loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
         assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
