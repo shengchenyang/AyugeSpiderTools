@@ -253,3 +253,52 @@ def test_copy_and_deepcopy():
 
     del item["_conflict_cols"]
     assert "_conflict_cols" not in item.copy()
+
+
+def test_ayuge_and_scrapy_item():
+    from scrapy import Field, Item
+
+    class BookItem(Item):
+        name = Field()
+        profile = Field()
+
+    # 测试 item 的默认浅拷贝
+    profile = {"score": 89}
+    book_item = BookItem(name="name_value", profile=profile)
+    assert book_item["profile"] is profile
+    profile["score"] = 96
+    assert book_item["profile"]["score"] == 96
+
+    # 测试 item 的浅拷贝
+    copied = book_item.copy()
+    assert copied is not book_item
+    assert copied["profile"] is book_item["profile"]
+    copied["profile"]["score"] = 20
+    assert book_item["profile"]["score"] == 20
+
+    # 测试 item 的深拷贝
+    deep_copied = book_item.deepcopy()
+    assert deep_copied["profile"] is not book_item["profile"]
+    deep_copied["profile"]["score"] = 30
+    assert book_item["profile"]["score"] == 20
+
+    # 测试 AyuItem 的默认浅拷贝
+    ayu_profile = {"score": 89}
+    ayu_book_item = AyuItem(name="name_value", profile=ayu_profile)
+
+    assert ayu_book_item["profile"] is ayu_profile
+    ayu_profile["score"] = 96
+    assert ayu_book_item["profile"]["score"] == 96
+
+    # 测试 AyuItem 的浅拷贝
+    ayu_copied = ayu_book_item.copy()
+    assert ayu_copied is not ayu_book_item
+    assert ayu_copied["profile"] is ayu_book_item["profile"]
+    ayu_copied["profile"]["score"] = 20
+    assert ayu_book_item["profile"]["score"] == 20
+
+    # 测试 AyuItem 的深拷贝
+    ayu_deep_copied = ayu_book_item.deepcopy()
+    assert ayu_deep_copied["profile"] is not ayu_book_item["profile"]
+    ayu_deep_copied["profile"]["score"] = 30
+    assert ayu_book_item["profile"]["score"] == 20
