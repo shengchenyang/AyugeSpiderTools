@@ -97,21 +97,21 @@ class PortalSingletonMeta(type, Generic[T, DataBaseConf]):
     _lock = threading.Lock()
 
     def __call__(
-        cls: type[T],
+        cls,
         db_conf: DataBaseConf,
         tag: PortalTag = PortalTag.DEFAULT,
         singleton: bool = False,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ) -> T:
         if not singleton:
-            return super().__call__(db_conf, tag, singleton, *args, **kwargs)  # type: ignore[misc]
+            return super().__call__(db_conf, tag, singleton, *args, **kwargs)
 
         unique_id = unique_key(data=db_conf, referer=cls.__name__, tag=tag)
         if unique_id not in cls._instances:
             with cls._lock:
                 if unique_id not in cls._instances:
-                    instance = super().__call__(db_conf, tag, *args, **kwargs)  # type: ignore[misc]
+                    instance = super().__call__(db_conf, tag, *args, **kwargs)
                     cls._instances[unique_id] = instance
         return cls._instances[unique_id]
 

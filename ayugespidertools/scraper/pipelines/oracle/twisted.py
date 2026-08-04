@@ -50,7 +50,7 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
     def db_create_err(self, failure: Failure) -> None:
         self.slog.error(f"创建数据表失败: {failure}")
 
-    def process_item(self, item: Any, spider: AyuSpider) -> Any:
+    def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
         query = self.dbpool.runInteraction(self.db_insert, item_dict)
         query.addErrback(self.handle_error, item)
