@@ -1,6 +1,6 @@
 [project]
 name = "AyugeSpiderTools"
-version = "3.15.0"
+version = "3.16.0"
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手。"
 license = { text = "MIT" }
 requires-python = ">=3.10"
@@ -105,7 +105,7 @@ dev = [
 ]
 
 [tool.bumpversion]
-current_version = "3.15.0"
+current_version = "3.16.0"
 commit = true
 tag = false
 tag_name = "ayugespidertools-{new_version}"
