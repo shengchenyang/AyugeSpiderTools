@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.15.1 (Preview: TBD)
+AyugeSpiderTools 3.16.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,41 @@ AyugeSpiderTools 3.15.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.16.0 (2026-08-09)
+====================================
+
+New features
+------------
+
+- database 添加 kafka 的统一连接接口。
+
+  (:commit:`21aada5dbfb818c58395a7958eb43c60a639efc0`)
+
+- 添加 oracle 的连接配置 disable_oob 参数，默认 false 与原功能保持一致。
+
+  (:commit:`e6c761164e737b19d3191350c861fcb429cb6d68`)
+
+- 更新 scrapy 依赖为 2.17.0。
+
+  (:commit:`8d47c27ba6c673c8195542e50068acfeef27958e`)
+
+  (:commit:`15ea0a2a534333f4ed90c23fa449bfd87e325ba2`)
+
+Improvements
+------------------
+
+- 项目管理由 poetry + pyenv 改为 uv。
+
+  (:commit:`cf59fd6fdee9b70c66f7e130482e32ec254d3aa7`)
+
+- 更新 AyuItem 实现方式，使更易理解和维护；添加 copy 和 deepcopy 方便用户使用。
+
+  (:commit:`61689ede5f9428f5765c24bf61aca89054e8802d`)
+
+- es 存储场景依赖的库由已不维护的 elasticsearch-dsl 改为 elasticsearch。
+
+  (:commit:`5198a404dc540cc25ade8abe6a9a9418fc0f7c20`)
 
 AyugeSpiderTools 3.15.0 (2026-06-07)
 ====================================
