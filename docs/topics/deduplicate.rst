@@ -72,9 +72,8 @@ MongoDB
    - 在 ayugespidertools 3.13.0 之前，mongodb 存储场景是通过 _mongo_update_rule 来确定更新规则，\
      如果匹配就会更新 AyuItem 中所有字段。规则有点过于粗暴简陋了。
    - 目前规则中，更新规则字段改为统一的 _update_rule，如果数据已存在，则会更新 _update_keys 中的字段；\
-     如果已匹配数据但是没有设置 _update_keys 则并不会更新任何字段；虽然新版本依然支持 _mongo_update_rule \
-     和 _mongo_update_keys 字段，但是推荐使用统一内置参数 _update_rule 和 _update_keys，3.14.0已删除\
-     _mongo_x 的字段。
+     如果已匹配数据但是没有设置 _update_keys 则并不会更新任何字段；3.14.0 版本之后删除 _mongo_update_rule \
+     和 _mongo_update_keys 旧字段参数，保持字段统一。
 
 .. code-block:: python
 

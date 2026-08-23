@@ -136,11 +136,19 @@ AyugeSpiderTools 一目了然
    ``self.postgres_conf``，``self.oracle_conf`` 等，或者结合 `custom_section`_ 的自定义配置创\
    建对应的数据库连接来达到入库前去重的场景，这样你就可以选择自己喜欢的工具。
 
-   本库在 3.12.0 版本添加了链接到各种数据库的方法 ，以方便用户创建对应数据库场景的链接来自定义去重功能。\
-   可以在 ayugespidertools.utils.database 和 `DemoSpider`_ 的 3.12.x 分支中查看详情。
+.. versionadded:: 3.12.0
 
-   本库在 3.13.0 版本添加了基于 AyuItem 的内置去重更新功能，会更高效且方便，最推荐的去重更新方式。具体\
-   使用方法请在 `DemoSpider`_ 的 3.13.x 分支中查看。
+.. note::
+
+   本库添加了链接到各种数据库的方法 ，以方便用户创建对应数据库场景的链接来自定义去重功能。可以在 \
+   ayugespidertools.utils.database 和 `DemoSpider`_ 的 3.12.x 分支中查看详情。
+
+.. versionadded:: 3.13.0
+
+.. note::
+
+   本库添加了基于 AyuItem 的内置去重更新功能，会更高效且方便，最推荐的去重更新方式。具体使用方法请在 \
+   `DemoSpider`_ 的 3.13.x 分支中查看。
 
 .. warning::
 

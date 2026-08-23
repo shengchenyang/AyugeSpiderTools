@@ -35,11 +35,17 @@ extensions = [
     "hoverxref.extension",
     "notfound.extension",
     "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
 ]
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_use_param = True
+napoleon_use_rtype = False
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -62,8 +68,6 @@ html_theme = "sphinx_rtd_theme"
 html_static_path: list = []
 
 source_suffix = [".rst", ".md"]
-
-autodoc_mock_imports = ["ayugespidertools"]
 
 suppress_warnings = ["myst.xref_missing"]
 
