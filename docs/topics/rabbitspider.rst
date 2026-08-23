@@ -4,6 +4,8 @@
 RabbitSpider
 ============
 
+.. versionadded:: 3.14.1
+
 本库添加了一个 AyuRabbitMQSpider 来提供依赖 rabbitmq 实现的任务分发功能，可以通过 mq 的任务队列来发\
 送任务，可以方便地达到分布式部署，不涉及主从爬虫的概念，直接部署启动你所需要的爬虫数即可。非常适合以 mq 为\
 任务队列和推送运行结果，结合不同的 pipeline 或者根据不同的 ayugespidertools.utils.database 中的数\

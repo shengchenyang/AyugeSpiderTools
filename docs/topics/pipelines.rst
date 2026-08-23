@@ -113,7 +113,9 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 ``AyuAsyncOraclePipeline``， 但全都没有自动创建库表的功能，因为其相关报错没有其他库那么精准，虽也可\
 实现但没有必要，请手动创建所需的库表及字段。
 
-注意：``AyuAsyncOraclePipeline`` 是在 ayugespidertools 3.13.0 版本才添加的功能。
+.. versionadded:: 3.13.0
+
+更推荐使用 ``AyuAsyncOraclePipeline`` 的 asyncio 的方式。
 
 5. ElasticSearch 存储
 ========================

@@ -254,9 +254,12 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "disable_oob", "可选，默认 false", "oracledb 的 thick_mode 所需参数，按需配置。"
    "authentication_mode", "可选，默认 DEFAULT", "oracledb 的 authentication_mode 所需参数，按需配置。"
 
+.. versionadded:: 3.16.0
+
 .. note::
 
-   disable_oob 将在 3.16.0 添加。
+   disable_oob 是一个默认 false 的布尔值，用于控制是否禁用 Oracle 的 Out-of-Band Break(OOB) 功能。该参数仅在 python-oracledb 的 \
+   Thin 模式下生效。
 
 [kafka]
 =======
