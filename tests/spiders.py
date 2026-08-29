@@ -56,36 +56,6 @@ class RecordLogToMysqlSpider(SimpleSpider):
         self.logger.info(f"Got response {response.status}")
 
 
-class Operations:
-    """项目依赖方法"""
-
-    @staticmethod
-    def parse_response_data(response_data: str, mark: str):
-        """解析测试请求中的内容，并打印基本信息
-
-        Args:
-            response_data: 请求响应内容
-            mark: 请求标识
-
-        Returns:
-            args: request args
-            headers: request headers
-            origin: request origin
-            url: request url
-        """
-        print(f"mark: {mark}, content: {response_data}")
-        json_data = json.loads(response_data)
-        args = json_data["args"]
-        headers = json_data["headers"]
-        origin = json_data["origin"]
-        url = json_data["url"]
-        print(f"{mark} response, args: {args}")
-        print(f"{mark} response, headers: {headers}")
-        print(f"{mark} response, origin: {origin}")
-        print(f"{mark} response, url: {url}")
-        return args, headers, origin, url
-
-
 class DemoAiohttpSpider(SimpleSpider):
     name = "demo_aiohttp_example"
     allowed_domains = ["postman-echo.com"]
@@ -113,6 +83,7 @@ class DemoAiohttpSpider(SimpleSpider):
 
     # 这些参数用于测试临时使用
     _get_url = "https://postman-echo.com/get?get_args=1"
+    _post_url = "https://postman-echo.com/post"
     _ar_headers_ck = "headers_ck_key=ck; headers_ck_key2=ck"
     _ar_ck = {"ck_key": "ck"}
     _post_data = {"post_key1": "post_value1", "post_key2": "post_value2"}
@@ -131,7 +102,7 @@ class DemoAiohttpSpider(SimpleSpider):
 
         # POST normal 示例
         yield AiohttpRequest(
-            url="https://postman-echo.com/post",
+            url=self._post_url,
             method="POST",
             callback=self.parse_post_fir,
             headers={"Cookie": self._ar_headers_ck},
@@ -144,9 +115,13 @@ class DemoAiohttpSpider(SimpleSpider):
     def parse_get_fir(self, response: TextResponse, request_name: int):
         meta_data = response.meta.get("meta_data")
         self.logger.info(f"get meta_data: {meta_data}")
-        Operations.parse_response_data(response_data=response.text, mark="GET FIRST")
+        json_data = json.loads(response.text)
+        url = json_data.get("url")
+        assert url == self._get_url
 
     def parse_post_fir(self, response: TextResponse, request_name: int):
         meta_data = response.meta.get("meta_data")
         self.logger.info(f"post first meta_data: {meta_data}")
-        Operations.parse_response_data(response_data=response.text, mark="POST FIRST")
+        json_data = json.loads(response.text)
+        url = json_data.get("url")
+        assert url == self._post_url
