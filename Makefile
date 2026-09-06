@@ -1,4 +1,4 @@
-.PHONY: build build_dist check clean format git help install patch pytest major minor \
+.PHONY: build build_dist check clean format git help install patch pr pytest major minor \
 release start tag tag_remove test version
 
 refresh: clean build install
@@ -89,6 +89,7 @@ help:
 	@echo "  format           Code format"
 	@echo "  help             Show this help message"
 	@echo "  install          Install whl/tar.gz file from the dist folder"
+	@echo "  pr id=<id>       Fetch GitHub pull request <id> as origin/pr/<id>"
 	@echo "  pytest           Code test"
 	@echo "  release          Publish package to PyPI"
 	@echo "  start            Pre-development setup steps"
@@ -101,6 +102,16 @@ help:
 
 install:
 	$(PIPINSTALL)
+
+pr:
+	@if [ -z "$(id)" ]; then \
+		echo "Usage: make pr id=<pull-request-id>"; \
+		echo "Example: make pr id=12"; \
+		echo "Fetches the PR as origin/pr/<pull-request-id> without switching branches."; \
+	else \
+		git fetch origin \
+			'+refs/pull/$(id)/head:refs/remotes/origin/pr/$(id)'; \
+	fi
 
 pytest:
 	uv sync --all-extras --all-groups
