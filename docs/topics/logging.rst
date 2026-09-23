@@ -96,7 +96,7 @@ ayugespidertools 会在 ``startproject`` 后默认在 settings 中添加一个�
            # 此条日志在默认下会持久化存储至 error.log 中
            self.slog.error(f"error: Parse function called on {response.url}")
 
-注：不影响 `scrapy` 自带的日志记录，可自行选择或同时使用。
+注：不影响 scrapy 自带的日志记录，可自行选择或同时使用。
 
 .. _logging: https://docs.python.org/3/library/logging.html#module-logging
 .. _日志设置: https://docs.scrapy.org/en/latest/topics/logging.html#topics-logging-settings
