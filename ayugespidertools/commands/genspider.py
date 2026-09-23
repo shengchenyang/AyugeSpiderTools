@@ -11,7 +11,8 @@ class AyuCommand(Command):
         assert self.settings is not None
         return str(
             Path(
-                Path(ayugespidertools.__path__[0], "templates"),
+                self.settings["TEMPLATES_DIR"]
+                or Path(ayugespidertools.__path__[0], "templates"),
                 "spiders",
             )
         )
