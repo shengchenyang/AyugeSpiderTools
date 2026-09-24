@@ -139,6 +139,7 @@ desktop.ini
 # AyugeSpiderTools
 .git/
 .idea/
+.vscode/
 /ayugespidertools/logs/
 /tests/VIT/.conf
 /tests/docs/keys/localhost.crt
