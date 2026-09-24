@@ -170,6 +170,8 @@ class AyuItem(MutableMapping[str, Any]):
         object.__setattr__(new_item, "_data", dict(self._data))
         return new_item
 
+    __copy__ = copy
+
     def deepcopy(self) -> Self:
         new_item = self.__class__.__new__(self.__class__)
         object.__setattr__(new_item, "_data", deepcopy(self._data))
