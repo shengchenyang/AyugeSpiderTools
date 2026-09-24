@@ -1,3 +1,5 @@
+from copy import copy
+
 import pytest
 from itemadapter import ItemAdapter
 from itemloaders.processors import TakeFirst
@@ -296,6 +298,11 @@ def test_ayuge_and_scrapy_item():
     assert ayu_copied["profile"] is ayu_book_item["profile"]
     ayu_copied["profile"]["score"] = 20
     assert ayu_book_item["profile"]["score"] == 20
+
+    # 测试 copy.copy()
+    ayu_std_copied = copy(ayu_book_item)
+    assert ayu_std_copied is not ayu_book_item
+    assert ayu_std_copied["profile"] is ayu_book_item["profile"]
 
     # 测试 AyuItem 的深拷贝
     ayu_deep_copied = ayu_book_item.deepcopy()
