@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-import warnings
 from typing import Any
 
 from ayugespidertools.exceptions import NotConfigured
 
 try:
-    import oss2
+    import alibabacloud_oss_v2 as oss
 except ImportError:
     raise NotConfigured(
-        "missing oss2 library, please install it. "
+        "missing alibabacloud-oss-v2 library, please install it. "
         "install command: pip install ayugespidertools[all]"
     )
-
-warnings.filterwarnings("ignore", module="oss2")
 
 __all__ = [
     "AliOssBase",
@@ -21,10 +18,10 @@ __all__ = [
 
 
 class AliOssBase:
-    """阿里云 Oss 对象存储 python sdk 示例
-    其 GitHub 官方文档地址：
-        https://github.com/aliyun/aliyun-oss-python-sdk
-    阿里云官方 oss sdk 文档地址：
+    """alibabacloud Oss python sdk demo
+    GitHub docs：
+        https://github.com/aliyun/alibabacloud-oss-python-sdk-v2
+    alibabacloud Oss sdk docs：
         https://www.alibabacloud.com/help/zh/oss/developer-reference
     """
 
@@ -33,48 +30,73 @@ class AliOssBase:
         access_key: str,
         access_secret: str,
         endpoint: str,
+        region: str,
         bucket: str,
         doc: str | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """初始化 auth，bucket 等信息
+        """create OSS client
 
         Args:
-            access_key: 阿里云账号 AccessKey
-            access_secret: 阿里云账号 AccessKey 对应的秘钥
-            endpoint: 填写 Bucket 所在地域对应的 Endpoint；
-                以华东1（杭州）为例，Endpoint 填写为 https://oss-cn-hangzhou.aliyuncs.com
-            bucket: 填写 Bucket 名称，此 oss 项目所属 bucket
-            doc: 需要操作的 oss 文件夹目录，比如 file/img，可选参数
+            access_key: your access key id
+            access_secret: your access key secret
+            endpoint: The endpoint corresponding to the location of the bucket
+            region: The region corresponding to the location of the endpoint, see the link:
+                https://www.alibabacloud.com/help/zh/oss/user-guide/regions-and-endpoints
+            bucket: bucket name
+            doc: The OSS folder directory to be operated on，such as: file/img
         """
-        self.endpoint = endpoint
+        self.endpoint = endpoint.rstrip("/")
         self.doc = doc
-        self.auth = oss2.Auth(access_key, access_secret)
         self.bk = bucket
-        self.bucket = oss2.Bucket(self.auth, f"{self.endpoint}/", bucket)
-        self.headers = {"Connection": "close"}
+        credentials_provider = oss.credentials.StaticCredentialsProvider(
+            access_key, access_secret
+        )
+        config = oss.config.load_default()
+        config.credentials_provider = credentials_provider
+        config.endpoint = (
+            self.endpoint
+            if self.endpoint.startswith(("http://", "https://"))
+            else f"https://{self.endpoint}"
+        )
+        if not region:
+            config.region = (
+                self.endpoint.removeprefix("https://")
+                .removeprefix("http://")
+                .removeprefix("oss-")
+                .removesuffix(".aliyuncs.com")
+            )
+        else:
+            config.region = region
+        self.client = oss.Client(config)
 
     def put_oss(self, put_bytes: bytes, file: str) -> None:
-        """上传单个文件的 bytes 内容
+        """Upload a single file
 
         Args:
-            put_bytes: 需要上传的文件 bytes 内容或链接
-            file: 需要上传的文件的名称
+            put_bytes: The file to be uploaded (bytes content)
+            file: upload file name
         """
-        assert isinstance(put_bytes, bytes), "put_bytes 需要是 bytes 格式"
+        assert isinstance(put_bytes, bytes), "put_bytes needs to be in bytes format"
 
         oss_file_path = f"{self.doc}/{file}" if self.doc else file
-        self.bucket.put_object(oss_file_path, put_bytes)
+        self.client.put_object(
+            oss.PutObjectRequest(
+                bucket=self.bk,
+                key=oss_file_path,
+                body=put_bytes,
+            )
+        )
 
     def get_full_link(self, file: str) -> str:
-        """获取文件的完整链接
+        """Get the full link to the file
 
         Args:
-            file: 当前文件
+            file: current file
 
         Returns:
-            1). 当前文件的完整链接
+            1). full link to the current file
         """
         ep = self.endpoint.replace("https://", "", 1).replace("http://", "", 1)
         oss_file_path = f"{self.doc}/{file}" if self.doc else file

@@ -322,6 +322,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "access_secret", "_", "阿里云账号对应的 access_key_secret"
    "endpoint", "_", "填写 Bucket 所在地域对应的 Endpoint"
    "bucket", "_", "Bucket"
+   "region", "_", "填写 endpoint 对应的 region"
    "doc", "_", "需要操作的文件夹目录，比如 file/img，为可选参数。"
    "upload_fields_suffix", "规则字段，默认为 _file_url", "上传到 oss 的字段规则，包含
    upload_fields_suffix 后缀的字段会上传到 oss。"
@@ -334,6 +335,11 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    遵守规则时的 oss 上传逻辑时使用，详细介绍请在 :ref:`item 的规则 <topics-items-yield-item>` 部\
    分中查看，更复杂的需求也可根据示例自行实现。具体请看 demo_oss，demo_oss_sec 和 demo_oss_super 的\
    场景示例。请自行选择可接受的风格。
+
+.. versionadded:: VERSION
+
+   region 是 endpoint 对应的值，具体请在 https://www.alibabacloud.com/help/zh/oss/user-guide/regions-and-endpoints \
+   中查看。默认为空，然后代码会添加自动获取来保持与旧版本的功能保持一致，但尽量手动配置此参数。
 
 [spider:<spider_name>]
 =======================
