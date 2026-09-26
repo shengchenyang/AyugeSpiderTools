@@ -336,7 +336,7 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    分中查看，更复杂的需求也可根据示例自行实现。具体请看 demo_oss，demo_oss_sec 和 demo_oss_super 的\
    场景示例。请自行选择可接受的风格。
 
-.. versionadded:: VERSION
+.. versionadded:: 3.17.0
 
    region 是 endpoint 对应的值，具体请在 https://www.alibabacloud.com/help/zh/oss/user-guide/regions-and-endpoints \
    中查看。默认为空，然后代码会添加自动获取来保持与旧版本的功能保持一致，但尽量手动配置此参数。

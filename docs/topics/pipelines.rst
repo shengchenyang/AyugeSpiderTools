@@ -210,7 +210,11 @@ spider 等其它项目配置中的所需详细设置示例如下：
 8. oss 上传
 ==============
 
-此场景给出的是以 ``alibabacloud-oss-v2`` 实现的 ``oss`` 上传示例
+在旧版本中，是通过 ``oss2`` 来实现的 alibabacloud oss 的上传功能。
+
+.. versionchanged:: 3.17.0
+
+此场景给出的是以 ``alibabacloud-oss-v2`` 实现的 oss 上传示例
 
 对应的 pipelines 名称为 ``AyuAsyncOssPipeline``，其中 .conf 中的所需配置如下：
 
