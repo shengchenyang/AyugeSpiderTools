@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.16.1 (Preview: TBD)
+AyugeSpiderTools 3.17.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,32 @@ AyugeSpiderTools 3.16.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.17.0 (2026-09-26)
+====================================
+
+New features
+------------
+
+- genspider 命令添加支持可自定义 spider 模板的功能。
+
+  (:commit:`094930846059ec35648f45b12d54dd8951cff7da`)
+
+- 更新 scrapy 依赖为 2.19.0。
+
+  (:commit:`678a92d91b511aab71c27ed11442dad75f75d493`)
+
+- ali oss 存储场景的支持库由 oss2 更新为 alibabacloud_oss_v2，并在 .conf 中添加 region 的配置参数，\
+  默认为空，但会自动获取 region 保持与旧版本一致，但最好自行添加此配置，并在测试正常后再尝试更新到正式项目。
+
+  (:commit:`ed447d435d9803bfb1342ffac70e0c67d52f626d`)
+
+Improvements
+------------------
+
+- AyuItem 添加 copy.copy() 的浅拷贝的调用支持。
+
+  (:commit:`2d375d420acc62dad047b6ff582fe9e699183464`)
 
 AyugeSpiderTools 3.16.0 (2026-08-09)
 ====================================
