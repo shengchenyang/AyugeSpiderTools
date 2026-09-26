@@ -239,6 +239,7 @@ class OssConf(NamedTuple):
     endpoint: str
     bucket: str
     doc: str | None = None
+    region: str | None = None
     upload_fields_suffix: str = "_file_url"
     oss_fields_prefix: str = "_"
     full_link_enable: bool = False

@@ -289,6 +289,7 @@ class OssHandler(ConfigHandler):
             "access_key": oss_section.get("access_key", None),
             "access_secret": oss_section.get("access_secret", None),
             "endpoint": oss_section.get("endpoint", None),
+            "region": oss_section.get("region", None),
             "bucket": oss_section.get("bucket", None),
             "doc": oss_section.get("doc", None),
             "upload_fields_suffix": oss_section.get(

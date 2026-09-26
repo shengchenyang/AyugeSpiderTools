@@ -9,6 +9,7 @@ from scrapy.utils.python import to_bytes
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.utils import Tools
+from ayugespidertools.config import logger
 from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.items import DataItem
 
@@ -55,6 +56,8 @@ class AyuAsyncOssPipeline:
         spider = cast("AyuSpider", self.crawler.spider)
         assert hasattr(spider, "oss_conf"), "未配置 oss 参数！"
         self.oss_conf = spider.oss_conf
+        if not self.oss_conf.region:
+            logger.warning("not configure oss region")
         oss_conf_dict = self.oss_conf._asdict()
         self.oss_bucket = AliOssBase(**oss_conf_dict)
         self.full_link_enable = self.oss_conf.full_link_enable

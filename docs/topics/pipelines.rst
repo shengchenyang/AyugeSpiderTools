@@ -210,7 +210,7 @@ spider 等其它项目配置中的所需详细设置示例如下：
 8. oss 上传
 ==============
 
-此场景给出的是以 ``oss2`` 实现的 ``oss`` 上传示例
+此场景给出的是以 ``alibabacloud-oss-v2`` 实现的 ``oss`` 上传示例
 
 对应的 pipelines 名称为 ``AyuAsyncOssPipeline``，其中 .conf 中的所需配置如下：
 
@@ -222,6 +222,7 @@ spider 等其它项目配置中的所需详细设置示例如下：
    access_key=
    access_secret=
    endpoint=
+   region=
    bucket=
    doc=
    upload_fields_suffix=_file_url
