@@ -120,6 +120,13 @@ filename = "ayugespidertools/__init__.py"
 search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
 
+[[tool.bumpversion.files]]
+filename = "uv.lock"
+search = '''name = "ayugespidertools"
+version = "{current_version}"'''
+replace = '''name = "ayugespidertools"
+version = "{new_version}"'''
+
 [tool.pytest.ini_options]
 xfail_strict = true
 python_files = ["test_*.py", "__init__.py"]
