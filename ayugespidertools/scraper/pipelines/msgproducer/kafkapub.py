@@ -11,8 +11,9 @@ from ayugespidertools.utils.database import KafkaPortal
 __all__ = ["AyuKafkaPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import KafkaConf
     from ayugespidertools.spiders import AyuSpider

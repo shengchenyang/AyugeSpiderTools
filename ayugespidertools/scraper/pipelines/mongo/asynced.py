@@ -10,9 +10,10 @@ from ayugespidertools.utils.database import MongoDBAsyncPortal
 __all__ = ["AyuAsyncMongoPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from motor.core import AgnosticClient, AgnosticDatabase
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.spiders import AyuSpider
 

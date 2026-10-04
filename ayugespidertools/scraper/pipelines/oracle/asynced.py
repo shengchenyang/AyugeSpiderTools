@@ -11,9 +11,10 @@ from ayugespidertools.utils.database import OracleAsyncPortal
 __all__ = ["AyuAsyncOraclePipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     import oracledb
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.spiders import AyuSpider
 

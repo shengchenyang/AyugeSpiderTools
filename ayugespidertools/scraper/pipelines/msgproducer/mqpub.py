@@ -13,9 +13,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MQConf
     from ayugespidertools.spiders import AyuSpider

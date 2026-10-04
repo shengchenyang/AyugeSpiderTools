@@ -20,9 +20,10 @@ except ImportError:
 __all__ = ["AyuAsyncESPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from elasticsearch.dsl import Document
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider

@@ -19,10 +19,11 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from pymysql.connections import Connection
     from pymysql.cursors import Cursor
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, MysqlConf, slogT
     from ayugespidertools.spiders import AyuSpider

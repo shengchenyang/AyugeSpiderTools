@@ -15,7 +15,7 @@
    :target: https://img.shields.io/github/license/shengchenyang/AyugeSpiderTools
    :alt: license
 
-.. |python_support| image:: https://img.shields.io/badge/python-3.10%2B-blue
+.. |python_support| image:: https://img.shields.io/badge/python-3.11%2B-blue
    :target: https://pypi.org/pypi/AyugeSpiderTools
    :alt: python support
 

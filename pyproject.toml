@@ -3,7 +3,7 @@ name = "AyugeSpiderTools"
 version = "3.17.0"
 description = "scrapy 扩展库：用于扩展 Scrapy 功能来解放双手。"
 license = { text = "MIT" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.rst"
 authors = [
     { name = "ayuge", email = "ayugesheng@gmail.com" },
@@ -190,7 +190,7 @@ line-length = 88
 profile = "black"
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 ignore_missing_imports = true
 disable_error_code = ["attr-defined", "arg-type", "union-attr"]
 
@@ -335,7 +335,7 @@ ignore = [
     "PLR2004",
     # `for` loop variable overwritten by assignment target
     "PLW2901",
-    # String contains ambiguous {}.
+    # String contains amus {}.
     "RUF001",
     # Docstring contains ambiguous {}.
     "RUF002",

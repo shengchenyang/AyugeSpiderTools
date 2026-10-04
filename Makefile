@@ -122,7 +122,7 @@ release:
 	@echo ":) Publish successfully"
 
 start:
-	uv sync --python 3.10.11 --all-extras --all-groups
+	uv sync --python 3.11.17 --all-extras --all-groups
 	uv run pre-commit install
 
 tag:

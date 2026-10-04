@@ -19,12 +19,13 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from itemadapter import ItemAdapter
     from scrapy import Request
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.statscollectors import StatsCollector
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import slogT
     from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest

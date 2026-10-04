@@ -13,9 +13,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     import aiomysql
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MysqlConf
     from ayugespidertools.spiders import AyuSpider

@@ -103,7 +103,7 @@ class MysqlPipeEnhanceMixin:
         text: dict[str, Any] = {}
         stats = spider.crawler.stats.get_stats()
         error_reason = ""
-        _curr_utc_time = datetime.datetime.now(datetime.timezone.utc)
+        _curr_utc_time = datetime.datetime.now(datetime.UTC)
         for k, v in stats.items():
             key = k.replace("/", "_")
             if isinstance(v, datetime.datetime):

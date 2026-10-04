@@ -3,9 +3,16 @@ from __future__ import annotations
 
 import threading
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypedDict, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Literal,
+    NamedTuple,
+    NotRequired,
+    TypedDict,
+    TypeVar,
+)
 
-from typing_extensions import NotRequired
 from yarl import URL
 
 if TYPE_CHECKING:

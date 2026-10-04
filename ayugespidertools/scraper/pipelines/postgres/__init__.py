@@ -10,10 +10,11 @@ from ayugespidertools.common.sqlformat import GenPostgresql
 __all__ = ["AyuPostgresPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from psycopg.connection import Connection
     from psycopg.cursor import Cursor
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, slogT
     from ayugespidertools.spiders import AyuSpider

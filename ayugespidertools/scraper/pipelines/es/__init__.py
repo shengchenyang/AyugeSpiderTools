@@ -17,8 +17,9 @@ except ImportError:
 __all__ = ["AyuESPipeline", "dynamic_es_document"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import ESConf
     from ayugespidertools.spiders import AyuSpider

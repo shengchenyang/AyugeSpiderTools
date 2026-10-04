@@ -12,9 +12,9 @@ __all__ = ["FilesDownloadPipeline"]
 
 if TYPE_CHECKING:
     import os
+    from typing import Self
 
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem
     from ayugespidertools.spiders import AyuSpider
