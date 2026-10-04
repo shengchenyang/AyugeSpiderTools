@@ -32,9 +32,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from scrapy.crawler import Crawler
     from scrapy.settings import BaseSettings
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import (
         ESConf,

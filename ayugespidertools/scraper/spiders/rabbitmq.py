@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, cast
-
-from typing_extensions import Self
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from ayugespidertools.common.confighandler import parse_mq_section
 from ayugespidertools.common.typevars import MQConf

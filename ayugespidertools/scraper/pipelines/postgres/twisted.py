@@ -15,9 +15,10 @@ from ayugespidertools.common.sqlformat import GenPostgresql
 __all__ = ["AyuTwistedPostgresPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from scrapy.crawler import Crawler
     from twisted.python.failure import Failure
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import PostgreSQLConf, slogT
     from ayugespidertools.spiders import AyuSpider

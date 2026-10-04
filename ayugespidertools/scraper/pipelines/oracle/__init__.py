@@ -9,10 +9,11 @@ from ayugespidertools.common.sqlformat import GenOracle
 __all__ = ["AyuOraclePipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from oracledb.connection import Connection
     from oracledb.cursor import Cursor
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem
     from ayugespidertools.spiders import AyuSpider

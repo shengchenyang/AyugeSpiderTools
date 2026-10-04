@@ -13,10 +13,11 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from aio_pika import RobustConnection
     from aio_pika.abc import AbstractChannel, AbstractExchange, AbstractRobustConnection
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import MQConf
     from ayugespidertools.spiders import AyuSpider

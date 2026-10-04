@@ -10,10 +10,11 @@ from ayugespidertools.utils.database import MongoDBPortal
 __all__ = ["AyuFtyMongoPipeline"]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     import pymongo
     from pymongo import database
     from scrapy.crawler import Crawler
-    from typing_extensions import Self
 
     from ayugespidertools.spiders import AyuSpider
 

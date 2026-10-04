@@ -19,9 +19,10 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from scrapy.crawler import Crawler
     from scrapy.http.response import Response
-    from typing_extensions import Self
 
     from ayugespidertools.common.typevars import AlterItem, OssConf
     from ayugespidertools.spiders import AyuSpider
