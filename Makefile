@@ -44,6 +44,7 @@ build_dist:
 	python setup.py sdist bdist_wheel
 
 check:
+	uv lock --check
 	uv run pre-commit run --all-files
 	uv run mypy .
 	uv run ruff check --fix
