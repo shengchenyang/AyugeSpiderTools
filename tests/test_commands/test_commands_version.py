@@ -1,8 +1,7 @@
 import argparse
+import tomllib
 from io import StringIO
 from pathlib import Path
-
-import toml
 
 from ayugespidertools.commands.version import AyuCommand
 from ayugespidertools.config import NormalConfig
@@ -24,7 +23,8 @@ class TestVersionCommand(TestProjectBase):
     @staticmethod
     def _version() -> str:
         toml_file = Path(NormalConfig.ROOT_DIR, "pyproject.toml")
-        conf = toml.load(toml_file)
+        with toml_file.open("rb") as f:
+            conf = tomllib.load(f)
         return conf["project"]["version"]
 
     def test_output(self):

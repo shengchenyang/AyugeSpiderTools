@@ -80,7 +80,6 @@ test = [
     "coverage==7.4.1",
     "tox==4.28.4",
     "testfixtures>=7.1.0,<8.0.0",
-    "toml==0.10.2",
 ]
 lint = [
     "mypy==1.10.1",

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -344,7 +344,6 @@ dev = [
     { name = "sphinx-notfound-page" },
     { name = "sphinx-rtd-theme" },
     { name = "testfixtures" },
-    { name = "toml" },
     { name = "tox" },
 ]
 docs = [
@@ -366,7 +365,6 @@ test = [
     { name = "coverage" },
     { name = "pytest" },
     { name = "testfixtures" },
-    { name = "toml" },
     { name = "tox" },
 ]
 
@@ -419,7 +417,6 @@ dev = [
     { name = "sphinx-notfound-page", specifier = "==1.0.4" },
     { name = "sphinx-rtd-theme", specifier = "==3.0.2" },
     { name = "testfixtures", specifier = ">=7.1.0,<8.0.0" },
-    { name = "toml", specifier = "==0.10.2" },
     { name = "tox", specifier = "==4.28.4" },
 ]
 docs = [
@@ -439,7 +436,6 @@ test = [
     { name = "coverage", specifier = "==7.4.1" },
     { name = "pytest", specifier = "==7.4.4" },
     { name = "testfixtures", specifier = ">=7.1.0,<8.0.0" },
-    { name = "toml", specifier = "==0.10.2" },
     { name = "tox", specifier = "==4.28.4" },
 ]
 
@@ -3179,15 +3175,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/65/7b/644fbbb49564a6cb124a8582013315a41148dba2f72209bba14a84242bf0/tldextract-5.3.1.tar.gz", hash = "sha256:a72756ca170b2510315076383ea2993478f7da6f897eef1f4a5400735d5057fb", size = 126105, upload-time = "2025-12-28T23:58:05.532Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6d/42/0e49d6d0aac449ca71952ec5bae764af009754fcb2e76a5cc097543747b3/tldextract-5.3.1-py3-none-any.whl", hash = "sha256:6bfe36d518de569c572062b788e16a659ccaceffc486d243af0484e8ecf432d9", size = 105886, upload-time = "2025-12-28T23:58:04.071Z" },
-]
-
-[[package]]
-name = "toml"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload-time = "2020-11-01T01:40:22.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload-time = "2020-11-01T01:40:20.672Z" },
 ]
 
 [[package]]
