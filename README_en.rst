@@ -33,25 +33,42 @@
 
 `简体中文`_ | **English**
 
+Documentation: https://ayugespidertools.readthedocs.io
+
+Demo Project: https://github.com/shengchenyang/DemoSpider
+
 Overview
 ========
 
-   One-sentence introduction: Used to extend Scrapy functionality and free up your hands.
+   Designed to simplify Scrapy development and maintenance.
 
-When developing spiders with Scrapy, it is inevitable to repeatedly write settings, items,\
-middlewares, pipelines, and some common methods such as deduplication and updates before \
-storing data. However, these parts are generally similar across different projects, so why \
-not consolidate them into one place? I also want to extend some functionality, for example, \
-when adding a field in a spider, there should be no need to modify the corresponding item \
-and pipeline manually.
+Includes built-in common middlewares and pipelines. **AyuItem** supports dynamic field \
+assignment, eliminating the need to update `pipelines`, `scrapy.Item`, and other components \
+whenever fields are added or modified. Provides customizable data update and deduplication \
+rules. Offers centralized configuration management with support for both local and remote \
+configuration sources. **RabbitSpider** enables distributed task dispatching via message \
+queues (RabbitMQ). And many more features to streamline your Scrapy workflow.
 
-The main idea of the project is to allow developers to focus only on writing spider scripts,\
-reducing development and maintenance processes. In an ideal state, one only needs to pay \
-attention to the parsing rules of fields in the spider and the .conf configuration under \
-VIT, and be free from meaningless repetitive operations.
+Highlights
+==========
 
-Install
-=======
+- **Project Scaffolding and Templates**: Quickly create Scrapy projects and spiders using \
+  `startproject` and `genspider`. Includes multiple built-in spider templates and supports \
+  custom templates.
+- **Dynamic Items and Database Deduplication**: `AyuItem` supports dynamic field assignment \
+  without predefined fields. Custom deduplication and update rules are supported for MySQL, \
+  MongoDB, PostgreSQL, and Oracle.
+- **Multi-Database Support**: Built-in storage pipelines for MySQL, MongoDB, PostgreSQL, \
+  Oracle, and Elasticsearch.
+- **Message Publishing and Task Distribution**: Supports message publishing via Kafka and \
+  RabbitMQ, as well as distributed deployments powered by RabbitMQ.
+- **Request Middleware**: Supports `aiohttp` and `curl_cffi` request handlers, along with \
+  randomized User-Agent rotation, generic proxy support, and automatic retries.
+- **Configuration Management**: Manage project settings through `.conf` files or retrieve \
+  remote configuration from Consul or Nacos.
+
+Installation
+============
 
    quick start:
 
@@ -225,9 +242,6 @@ Things You Might Care About
 
    Regardless, don’t worry, I will use it in conjunction with automated testing of local services.
 
-**I hope that this project can provide guidance for you when you encounter scenarios where \
-you need to extend the functionality of Scrapy.**
-
 Features
 ========
 
@@ -248,6 +262,7 @@ Features
     - [✓] requests: Using the synchronous library requests will reduce the efficiency \
       of scrapy.（This feature has been removed, and using aiohttp is now recommended instead.）
     - [✓] aiohttp: Integrated the coroutine method of replacing scrapy Request with aiohttp.
+    - [✓] curl_cffi: Integrated the coroutine method of replacing scrapy Request with curl_cffi.
   - [✓] Adaptation for scenarios where storage is done in Mysql:
 
     - [✓] Automatically create the required databases, tables, field formats, and field \

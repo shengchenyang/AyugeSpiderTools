@@ -4,13 +4,33 @@
 AyugeSpiderTools 一目了然
 ===========================
 
-`AyugeSpiderTools`_ 是 Scrapy 的功能扩展模块，对其 spider，item，middleware，pipeline 等模块中\
-的常用功能进行模板化生成和配置。比如生成常见的 spider，运行 sh 和 settings 配置等脚本和固定项目文件结\
-构；也对其不同模块进行功能扩展，比如给 spider 挂上 Mysql engine 的单例句柄可用于 yield 入库前的去重\
-方式之一；给 pipeline 添加自动生成 Mysql 存储场景下所依赖的数据库、数据表、数据字段及注释，也可以解决常\
-见的（字段编码，Data too long，存储字段不存在等的）错误场景；去除 item 的 scrapy.Field 定义，可直接\
-在 spider 中动态赋值 item，且当 spider 中 item 变动后不用关心去对照修改 pipeline 字段部分。还有更多\
-功能，请在 Github 上查看。
+`AyugeSpiderTools`_ 是 Scrapy 的功能扩展模块，旨在简化 Scrapy 的开发和维护。对其 spider，item，\
+middleware，pipeline 等模块中的常用功能进行模板化配置。亮点功能如下：
+
+- 对 spider 进行功能扩展：
+
+  - 给 spider 挂上多种数据库的链接句柄用于 yield 入库前的去重方式之一。
+  - 添加 loguru 配置的记录，可与 scrapy log 一同使用。
+  - 支持基于 RabbitMQ 的分布式部署。
+
+- 内置通用 middlewares、pipelines：
+
+  - 内置 MySQL、MongoDB、PostgreSQL、Oracle 和 Elasticsearch 存储管道。
+  - 基于 mq 的 RabbitSpider 分布式部署。
+  - 支持 aiohttp、curl_cffi 请求方式，以及随机 UA、通用代理。
+
+- AyuItem 动态赋值及支持方便地自定义更新去重规则：
+
+  - 可直接在 spider 中定义 AyuItem 字段，无需预先声明字段即可赋值；且当 AyuItem 字段变动后不用关心去对\
+    照修改 pipeline 部分。
+  - 可方便地自定义去重与更新规则，适配 MySQL、MongoDB、PostgreSQL 和 Oracle。
+
+- 配置管理
+
+  - 私密配置统一在 VIT/.conf 中管理，支持配置文件路径自定义，支持自定义 section 的配置读取功能；也支持 \
+    Consul、Nacos 远程配置的读取。
+
+还有更多功能，请在 Github 上查看。
 
 .. note::
 
