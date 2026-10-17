@@ -33,17 +33,30 @@
 
 **简体中文** | English_
 
+**Documentation**: https://ayugespidertools.readthedocs.io
+
+**Demo Project**: https://github.com/shengchenyang/DemoSpider
+
 概述
 =======
 
-   一句话介绍：用于扩展 Scrapy 功能来解放双手。
+   旨在提升 Scrapy 开发和维护体验。
 
-在使用 Scrapy 开发爬虫时，免不了会重复地编写 settings，items，middlewares，pipelines 和入库前的去\
-重更新等一些通用方法，但各项目中的这些内容都大致相同，那为何不把它们统一整理在一起呢？我也想扩展一些功能，\
-比如当 spider 中添加字段后，不用再修改对应的 item 和 pipeline。
+内置通用 middlewares、pipelines；AyuItem 可直接赋值字段，在添加和修改字段后不用同步处理 pipelines 和 \
+scrapy.Item 等地方，可方便地自定义数据更新/去重规则；有统一的配置管理功能，支持本地和远程配置读取；基于 mq \
+实现的 RabbitSpider 分布式任务分发。还有更多方便的功能 ...
 
-项目的主旨是让开发者只需专注于 spider 脚本的编写，减少开发和维护流程。理想状态下，只需关注 spider 中字\
-段的解析规则和 VIT 下的 .conf 配置即可，**脱离无意义的重复操作**。
+功能亮点
+==========
+
+- **项目脚手架与模板**： 通过 ``startproject`` 和 ``genspider`` 快速创建 Scrapy 项目，内置多种 \
+  Spider 模板，并支持自定义模板。
+- **动态 Item 与入库去重**： AyuItem 无需预先声明字段即可动态赋值；MySQL、MongoDB、PostgreSQL 和 \
+  Oracle 可方便地自定义去重与更新规则。
+- **多数据库支持**： 内置 MySQL、MongoDB、PostgreSQL、Oracle 和 Elasticsearch 存储管道。
+- **支持消息推送与任务分发**： 支持 Kafka、RabbitMQ 消息推送，支持基于 RabbitMQ 的 RabbitSpider 分布式部署。
+- **请求中间件**： 支持 aiohttp、curl_cffi 请求方式，以及随机 UA、通用代理。
+- **配置管理**： 支持通过 ``.conf`` 管理项目配置，也可从 Consul 或 Nacos 获取远程配置。
 
 安装
 =======
@@ -98,7 +111,7 @@
    # 这里是为了演示方便，正常情况是直接在 VIT 中的 .conf 文件填上你需要的配置即可
    cp /root/mytemp/.conf DemoSpider/VIT/.conf
 
-   # 生成爬虫脚本
+   # 生成脚本
    ayuge genspider <spider_name> <example.com>
 
    # 运行脚本
@@ -208,8 +221,6 @@
    不考虑，场景所依赖服务太多，且云服务等其它因素导致个人维护成本过高，但不必担心，我会和本地服务的自动化\
    测试结合使用。
 
-**希望此项目能在你遇到扩展 scrapy 功能的场景时对你有所指引。**
-
 功能
 =======
 
@@ -223,12 +234,13 @@
     - [✓] 从 consul 获取项目配置
     - [✓] 从 nacos 获取项目配置（注意：优先级小于 consul）
   - [✓] 代理中间件（独享代理、动态隧道代理）
-  - [✓] 随机请求头 UA 中间件，根据 fake_useragent 中的权重来随机
+  - [✓] 随机请求头 UA 中间件
   - [✓] 使用以下工具来替换 scrapy 的 Request 来发送请求
 
     - [✓] requests: 这个不推荐使用，requests 同步库会降低 scrapy 运行效率\
       （已移除此功能，更推荐 aiohttp 的方式）
     - [✓] aiohttp: 集成将 scrapy Request 替换为 aiohttp 的协程方式
+    - [✓] curl_cffi: 集成将 scrapy Request 替换为 curl_cffi 的协程方式
   - [✓] Mysql 存储的场景下适配
 
     - [✓] 自动创建 Mysql 用户场景下需要的数据库和数据表及字段格式，还有字段注释
