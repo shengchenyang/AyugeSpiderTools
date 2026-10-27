@@ -10,6 +10,7 @@ from scrapy.utils.python import to_bytes
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.utils import Tools
 from ayugespidertools.config import logger
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.extras.oss import AliOssBase
 from ayugespidertools.items import DataItem
 
@@ -55,7 +56,10 @@ class AyuAsyncOssPipeline:
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "oss_conf"), "未配置 oss 参数！"
+        if not hasattr(spider, "oss_conf"):
+            raise NotConfigured(
+                "[oss:ali] section is not configured in either .conf or remote config."
+            )
         self.oss_conf = spider.oss_conf
         if not self.oss_conf.region:
             logger.warning("not configure oss region")

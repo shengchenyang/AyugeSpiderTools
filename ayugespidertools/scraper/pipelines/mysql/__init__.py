@@ -8,6 +8,7 @@ import pymysql
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
+from ayugespidertools.exceptions import NotConfigured
 
 # 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
 warnings.filterwarnings(
@@ -44,7 +45,10 @@ class AyuMysqlPipeline(MysqlPipeEnhanceMixin):
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
+        if not hasattr(spider, "mysql_conf"):
+            raise NotConfigured(
+                "[mysql] section is not configured in either .conf or remote config."
+            )
         self.slog = spider.slog
         self.mysql_conf = spider.mysql_conf
         self.conn = self._connect(self.mysql_conf)

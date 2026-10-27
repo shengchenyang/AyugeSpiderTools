@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, cast
 from ayugespidertools.common.mongodbpipe import AsyncStorageHandler, store_process_async
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import PortalTag
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import MongoDBAsyncPortal
 
 __all__ = ["AyuAsyncMongoPipeline"]
@@ -31,7 +32,10 @@ class AyuAsyncMongoPipeline:
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "mongodb_conf"), "未配置 MongoDB 连接信息！"
+        if not hasattr(spider, "mongodb_conf"):
+            raise NotConfigured(
+                "Neither [mongodb:uri] nor [mongodb] is configured in either .conf or remote config."
+            )
         mongo_portal = MongoDBAsyncPortal(
             db_conf=spider.mongodb_conf, tag=PortalTag.LIBRARY
         )

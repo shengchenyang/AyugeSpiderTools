@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, cast
 
 from scrapy import signals
 
+from ayugespidertools.exceptions import NotConfigured
+
 if TYPE_CHECKING:
     from typing import Self
 
@@ -28,7 +30,10 @@ class ProxyDownloaderMiddleware:
 
     def process_request(self, request: Request) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "proxy_conf"), "未配置 proxy 信息！"
+        if not hasattr(spider, "proxy_conf"):
+            raise NotConfigured(
+                "[proxy] section is not configured in either .conf or remote config."
+            )
         request.meta["proxy"] = self.proxy
 
     def spider_opened(self, spider: AyuSpider) -> None:

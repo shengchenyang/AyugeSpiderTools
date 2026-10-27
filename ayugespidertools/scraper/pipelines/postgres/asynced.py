@@ -41,7 +41,10 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     async def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息！"
+        if not hasattr(spider, "postgres_conf"):
+            raise NotConfigured(
+                "[postgresql] section is not configured in either .conf or remote config."
+            )
         self.pool = await PostgreSQLAsyncPortal(
             db_conf=spider.postgres_conf, tag=PortalTag.LIBRARY
         ).connect()

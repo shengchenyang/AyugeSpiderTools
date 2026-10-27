@@ -11,6 +11,7 @@ from ayugespidertools.common.postgreserrhandle import (
     deal_postgres_err,
 )
 from ayugespidertools.common.sqlformat import GenPostgresql
+from ayugespidertools.exceptions import NotConfigured
 
 __all__ = ["AyuTwistedPostgresPipeline"]
 
@@ -38,7 +39,10 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "postgres_conf"), "未配置 PostgreSQL 连接信息"
+        if not hasattr(spider, "postgres_conf"):
+            raise NotConfigured(
+                "[postgresql] section is not configured in either .conf or remote config."
+            )
         self.slog = spider.slog
         self.postgres_conf = spider.postgres_conf
         self._connect(self.postgres_conf).close()

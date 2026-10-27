@@ -6,6 +6,7 @@ from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.sqlformat import GenOracle
 from ayugespidertools.common.typevars import PortalTag
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import OracleAsyncPortal
 
 __all__ = ["AyuAsyncOraclePipeline"]
@@ -31,7 +32,10 @@ class AyuAsyncOraclePipeline(OraclePipeEnhanceMixin):
 
     async def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
+        if not hasattr(spider, "oracle_conf"):
+            raise NotConfigured(
+                "[oracle] section is not configured in either .conf or remote config."
+            )
         self.pool = OracleAsyncPortal(
             db_conf=spider.oracle_conf, tag=PortalTag.LIBRARY
         ).connect()

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 from ayugespidertools.common.expend import MysqlPipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import PortalTag
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import MysqlAsyncPortal
 
 __all__ = [
@@ -36,7 +37,10 @@ class AyuAsyncMysqlPipeline(MysqlPipeEnhanceMixin):
 
     async def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
+        if not hasattr(spider, "mysql_conf"):
+            raise NotConfigured(
+                "[mysql] section is not configured in either .conf or remote config."
+            )
         self.running_tasks = set()
         self.mysql_conf = spider.mysql_conf
         self.pool = await MysqlAsyncPortal(
