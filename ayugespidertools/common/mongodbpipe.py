@@ -47,7 +47,7 @@ class SyncStorageHandler:
     def store(
         db: Database, item_dict: dict, collection: str, insert_data: dict
     ) -> None:
-        if update_rule := item_dict.get("_update_rule"):
+        if update_rule := item_dict.get("_update_rule", {}):
             update_doc = {}
             if update_keys := item_dict.get("_update_keys"):
                 set_data = ReuseOperation.get_items_by_keys(
@@ -71,7 +71,7 @@ class AsyncStorageHandler:
     async def store(
         db: AgnosticDatabase, item_dict: dict, collection: str, insert_data: dict
     ) -> None:
-        if update_rule := item_dict.get("_update_rule"):
+        if update_rule := item_dict.get("_update_rule", {}):
             update_doc = {}
             if update_keys := item_dict.get("_update_keys"):
                 set_data = ReuseOperation.get_items_by_keys(

@@ -184,7 +184,7 @@ class ReuseOperation:
         return all(key in data for key in keys)
 
     @classmethod
-    def get_items_by_keys(cls, data: dict, keys: Iterable[str]) -> dict:
+    def get_items_by_keys(cls, data: dict, keys: Iterable[str] | None) -> dict:
         """获取 data 中的含有 keys 的 key 的字段
 
         Args:
@@ -199,7 +199,7 @@ class ReuseOperation:
         return {k: v for k, v in data.items() if k in keys}
 
     @staticmethod
-    def get_items_except_keys(data: dict[str, Any], keys: Iterable[str]) -> dict:
+    def get_items_except_keys(data: dict[str, Any], keys: Iterable[str] | None) -> dict:
         """获取 data 中的不含有 keys 的 key 的字段
 
         Args:
