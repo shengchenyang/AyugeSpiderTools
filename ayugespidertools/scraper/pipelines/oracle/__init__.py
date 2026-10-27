@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, cast
 from ayugespidertools.common.expend import OraclePipeEnhanceMixin
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.sqlformat import GenOracle
+from ayugespidertools.exceptions import NotConfigured
 
 __all__ = ["AyuOraclePipeline"]
 
@@ -32,7 +33,10 @@ class AyuOraclePipeline(OraclePipeEnhanceMixin):
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "oracle_conf"), "未配置 Oracle 连接信息！"
+        if not hasattr(spider, "oracle_conf"):
+            raise NotConfigured(
+                "[oracle] section is not configured in either .conf or remote config."
+            )
         self.conn = self._connect(spider.oracle_conf)
         self.cursor = self.conn.cursor()
 

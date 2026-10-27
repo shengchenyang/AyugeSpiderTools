@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 import aio_pika
 
 from ayugespidertools.common.multiplexing import ReuseOperation
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import RabbitMQAsyncPortal
 
 __all__ = [
@@ -39,7 +40,10 @@ class AyuAsyncMQPipeline:
 
     async def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "rabbitmq_conf"), "未配置 RabbitMQ 连接信息！"
+        if not hasattr(spider, "rabbitmq_conf"):
+            raise NotConfigured(
+                "[mq] section is not configured in either .conf or remote config."
+            )
         self.mq_conf = spider.rabbitmq_conf
         self._declared_queues: set[str] = set()
         self.exchange = None

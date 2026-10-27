@@ -6,6 +6,7 @@ from kafka.errors import KafkaError
 
 from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.config import logger
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.utils.database import KafkaPortal
 
 __all__ = ["AyuKafkaPipeline"]
@@ -81,7 +82,10 @@ class AyuKafkaPipeline:
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "kafka_conf"), "未配置 kafka 连接信息！"
+        if not hasattr(spider, "kafka_conf"):
+            raise NotConfigured(
+                "[kafka] is not configured in either .conf or remote config."
+            )
         self.kp = KafkaProducerClient(kafka_conf=spider.kafka_conf)
 
     def process_item(self, item: Any) -> Any:

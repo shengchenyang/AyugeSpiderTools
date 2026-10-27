@@ -48,7 +48,10 @@ class AyuESPipeline:
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "es_conf"), "未配置 elasticsearch 连接信息！"
+        if not hasattr(spider, "es_conf"):
+            raise NotConfigured(
+                "[elasticsearch] section is not configured in either .conf or remote config."
+            )
         self.es_conf = spider.es_conf
         _hosts_lst = self.es_conf.hosts.split(",")
         if any([self.es_conf.user is not None, self.es_conf.password is not None]):

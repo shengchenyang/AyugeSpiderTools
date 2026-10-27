@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, cast
 import pymysql
 from dbutils.pooled_db import PooledDB
 
+from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.scraper.pipelines.mysql import AyuMysqlPipeline
 
 __all__ = [
@@ -38,7 +39,10 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
 
     def open_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
-        assert hasattr(spider, "mysql_conf"), "未配置 Mysql 连接信息！"
+        if not hasattr(spider, "mysql_conf"):
+            raise NotConfigured(
+                "[mysql] section is not configured in either .conf or remote config."
+            )
         self.pool_db_conf = self.crawler.settings.get("POOL_DB_CONFIG", None)
         self.slog = spider.slog
         if not self.pool_db_conf:
