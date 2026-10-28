@@ -18,6 +18,7 @@ except ImportError:
     )
 
 __all__ = [
+    "AyuAsyncPostgresLegacyPipeline",
     "AyuAsyncPostgresPipeline",
 ]
 
@@ -52,9 +53,9 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     async def insert_item(self, item_dict: dict) -> None:
         async with self.pool.acquire() as conn:
             alter_item = ReuseOperation.reshape_item(item_dict)
-            sql, args = GenPostgresqlAsyncpg.upsert_generate(
+            sql, args = GenPostgresqlAsyncpg.merge_generate(
                 db_table=alter_item.table.name,
-                conflict_cols=alter_item.conflict_cols,
+                match_cols=alter_item.update_rule,
                 data=alter_item.new_item,
                 update_cols=alter_item.update_keys,
             )
@@ -67,3 +68,16 @@ class AyuAsyncPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     async def close_spider(self) -> None:
         await self.pool.close()
+
+
+class AyuAsyncPostgresLegacyPipeline(AyuAsyncPostgresPipeline):
+    async def insert_item(self, item_dict: dict) -> None:
+        async with self.pool.acquire() as conn:
+            alter_item = ReuseOperation.reshape_item(item_dict)
+            sql, args = GenPostgresqlAsyncpg.upsert_generate(
+                db_table=alter_item.table.name,
+                conflict_cols=alter_item.conflict_cols,
+                data=alter_item.new_item,
+                update_cols=alter_item.update_keys,
+            )
+            await conn.execute(sql, *args)

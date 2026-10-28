@@ -197,6 +197,39 @@ class GenPostgresql:
         sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
         return sql, tuple(data.values())
 
+    @staticmethod
+    def merge_generate(
+        db_table: str,
+        match_cols: Iterable[str] | None,
+        data: dict,
+        update_cols: Iterable[str] | None = None,
+    ) -> tuple[str, tuple]:
+        keys = list(data.keys())
+        placeholders = ", ".join(["%s"] * len(keys))
+        if not match_cols:
+            insert_cols = ", ".join(keys)
+            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
+            return sql, tuple(data.values())
+
+        using_sql = f"(VALUES ({placeholders})) AS s({', '.join(keys)})"
+        on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
+        if not update_cols:
+            when_matched_sql = ""
+        else:
+            update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
+            when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
+
+        insert_cols = ", ".join(keys)
+        insert_vals = ", ".join([f"s.{col}" for col in keys])
+        sql = f"""
+        MERGE INTO {db_table} AS t
+        USING {using_sql}
+        ON {on_sql}
+        {when_matched_sql}
+        WHEN NOT MATCHED THEN INSERT ({insert_cols}) VALUES ({insert_vals})
+        """
+        return sql.strip(), tuple(data.values())
+
 
 class GenPostgresqlAsyncpg:
     @staticmethod
@@ -272,12 +305,17 @@ class GenPostgresqlAsyncpg:
     @staticmethod
     def merge_generate(
         db_table: str,
-        match_cols: list[str],
+        match_cols: Iterable[str] | None,
         data: dict,
-        update_cols: list[str] | None = None,
+        update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
         keys = list(data.keys())
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
+        if not match_cols:
+            insert_cols = ", ".join(keys)
+            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
+            return sql, tuple(data.values())
+
         using_sql = f"(VALUES ({placeholders})) AS s({', '.join(keys)})"
         on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
         if not update_cols:
