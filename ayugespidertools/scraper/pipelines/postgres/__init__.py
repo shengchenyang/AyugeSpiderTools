@@ -8,7 +8,10 @@ from ayugespidertools.common.postgreserrhandle import Synchronize, deal_postgres
 from ayugespidertools.common.sqlformat import GenPostgresql
 from ayugespidertools.exceptions import NotConfigured
 
-__all__ = ["AyuPostgresPipeline"]
+__all__ = [
+    "AyuPostgresLegacyPipeline",
+    "AyuPostgresPipeline",
+]
 
 if TYPE_CHECKING:
     from typing import Self
@@ -49,29 +52,32 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         self.insert_item(alter_item)
         return item
 
+    def get_sql_and_args(self, alter_item: AlterItem) -> tuple[str, tuple]:
+        sql, args = GenPostgresql.merge_generate(
+            db_table=alter_item.table.name,
+            match_cols=alter_item.update_rule,
+            data=alter_item.new_item,
+            update_cols=alter_item.update_keys,
+        )
+        return sql, args
+
     def insert_item(self, alter_item: AlterItem) -> None:
         if not (new_item := alter_item.new_item):
             return None
 
-        _table_name = alter_item.table.name
-        _table_notes = alter_item.table.notes
-        note_dic = alter_item.notes_dic
-        update_keys = alter_item.update_keys
-        sql, args = GenPostgresql.upsert_generate(
-            db_table=_table_name,
-            conflict_cols=alter_item.conflict_cols,
-            data=new_item,
-            update_cols=update_keys,
-        )
+        sql, args = self.get_sql_and_args(alter_item=alter_item)
         try:
             self.cursor.execute(sql, args)
             self.conn.commit()
 
         except Exception as e:
+            _table_name = alter_item.table.name
             self.slog.warning(
                 f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             self.conn.rollback()
+            _table_notes = alter_item.table.notes
+            note_dic = alter_item.notes_dic
             deal_postgres_err(
                 Synchronize(),
                 err_msg=str(e),
@@ -86,3 +92,14 @@ class AyuPostgresPipeline(PostgreSQLPipeEnhanceMixin):
     def close_spider(self) -> None:
         self.cursor.close()
         self.conn.close()
+
+
+class AyuPostgresLegacyPipeline(AyuPostgresPipeline):
+    def get_sql_and_args(self, alter_item: AlterItem) -> tuple[str, tuple]:
+        sql, args = GenPostgresql.upsert_generate(
+            db_table=alter_item.table.name,
+            conflict_cols=alter_item.conflict_cols,
+            data=alter_item.new_item,
+            update_cols=alter_item.update_keys,
+        )
+        return sql, args

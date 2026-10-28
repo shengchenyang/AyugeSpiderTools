@@ -1,6 +1,8 @@
 import re
 import textwrap
 
+import pytest
+
 from ayugespidertools.common.sqlformat import (
     GenMysql,
     GenOracle,
@@ -131,6 +133,87 @@ def test_postgres_asyncpg_upsert_generate():
         == "INSERT INTO demo_eleven (name, age) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age;"
     )
     assert value == ("zhangsan", 18)
+
+
+def test_postgresql_psycopg_merge_generate():
+    sql, args = GenPostgresql.merge_generate(
+        db_table="articles",
+        match_cols={"title": "标题", "platform": "web"},
+        data={"title": "标题", "platform": "web", "url": "https://example.com/'"},
+        update_cols={"url"},
+    )
+    assert format_str(sql) == (
+        "MERGE INTO articles AS t "
+        "USING (VALUES (%s, %s, %s)) AS s(title, platform, url) "
+        "ON t.title = s.title AND t.platform = s.platform "
+        "WHEN MATCHED THEN UPDATE SET url = s.url "
+        "WHEN NOT MATCHED THEN INSERT (title, platform, url) "
+        "VALUES (s.title, s.platform, s.url)"
+    )
+    assert args == ("标题", "web", "https://example.com/'")
+    assert args[2] not in sql
+
+
+@pytest.mark.parametrize("update_cols", [None, set()])
+def test_postgresql_psycopg_merge_skips_matched_rows(update_cols):
+    sql, args = GenPostgresql.merge_generate(
+        db_table="articles",
+        match_cols={"title"},
+        data={"title": "标题", "url": "link"},
+        update_cols=update_cols,
+    )
+    assert format_str(sql) == (
+        "MERGE INTO articles AS t "
+        "USING (VALUES (%s, %s)) AS s(title, url) ON t.title = s.title "
+        "WHEN NOT MATCHED THEN INSERT (title, url) VALUES (s.title, s.url)"
+    )
+    assert args == ("标题", "link")
+
+
+@pytest.mark.parametrize("match_cols", [None, {}, []])
+def test_postgresql_psycopg_merge_without_rule_inserts(match_cols):
+    sql, args = GenPostgresql.merge_generate(
+        db_table="articles",
+        match_cols=match_cols,
+        data={"title": "标题", "url": "link"},
+        update_cols={"url"},
+    )
+    assert sql == (
+        "INSERT INTO articles (title, url) VALUES (%s, %s) ON CONFLICT DO NOTHING;"
+    )
+    assert args == ("标题", "link")
+
+
+@pytest.mark.parametrize("match_cols", [None, {}, [], set(), ()])
+@pytest.mark.parametrize("update_cols", [None, {"url"}])
+def test_postgresql_asyncpg_merge_without_rule_inserts(match_cols, update_cols):
+    sql, args = GenPostgresqlAsyncpg.merge_generate(
+        db_table="articles",
+        match_cols=match_cols,
+        data={"title": "标题", "url": "https://example.com/'"},
+        update_cols=update_cols,
+    )
+    assert sql == (
+        "INSERT INTO articles (title, url) VALUES ($1, $2) ON CONFLICT DO NOTHING;"
+    )
+    assert args == ("标题", "https://example.com/'")
+    assert args[1] not in sql
+
+
+@pytest.mark.parametrize("update_cols", [None, set()])
+def test_postgresql_asyncpg_merge_skips_matched_rows(update_cols):
+    sql, args = GenPostgresqlAsyncpg.merge_generate(
+        db_table="articles",
+        match_cols={"title"},
+        data={"title": "标题", "url": "link"},
+        update_cols=update_cols,
+    )
+    assert format_str(sql) == (
+        "MERGE INTO articles AS t "
+        "USING (VALUES ($1, $2)) AS s(title, url) ON t.title = s.title "
+        "WHEN NOT MATCHED THEN INSERT (title, url) VALUES (s.title, s.url)"
+    )
+    assert args == ("标题", "link")
 
 
 def test_postgresql_merge_generate():

@@ -20,9 +20,18 @@ _MODULES = {
     "oracle.asynced": ["AyuAsyncOraclePipeline"],
     "oss.ali": ["AyuAsyncOssPipeline"],
     "oss.batch": ["AyuAsyncOssBatchPipeline"],
-    "postgres.asynced": ["AyuAsyncPostgresPipeline"],
-    "postgres.fantasy": ["AyuFtyPostgresPipeline"],
-    "postgres.twisted": ["AyuTwistedPostgresPipeline"],
+    "postgres.asynced": [
+        "AyuAsyncPostgresPipeline",
+        "AyuAsyncPostgresLegacyPipeline",
+    ],
+    "postgres.fantasy": [
+        "AyuFtyPostgresPipeline",
+        "AyuFtyPostgresLegacyPipeline",
+    ],
+    "postgres.twisted": [
+        "AyuTwistedPostgresPipeline",
+        "AyuTwistedPostgresLegacyPipeline",
+    ],
 }
 
 

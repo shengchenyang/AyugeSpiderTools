@@ -13,7 +13,10 @@ from ayugespidertools.common.postgreserrhandle import (
 from ayugespidertools.common.sqlformat import GenPostgresql
 from ayugespidertools.exceptions import NotConfigured
 
-__all__ = ["AyuTwistedPostgresPipeline"]
+__all__ = [
+    "AyuTwistedPostgresLegacyPipeline",
+    "AyuTwistedPostgresPipeline",
+]
 
 if TYPE_CHECKING:
     from typing import Self
@@ -21,7 +24,7 @@ if TYPE_CHECKING:
     from scrapy.crawler import Crawler
     from twisted.python.failure import Failure
 
-    from ayugespidertools.common.typevars import PostgreSQLConf, slogT
+    from ayugespidertools.common.typevars import AlterItem, PostgreSQLConf, slogT
     from ayugespidertools.spiders import AyuSpider
 
 
@@ -71,29 +74,31 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
         query.addErrback(self.handle_error, item)
         return item
 
+    def get_sql_and_args(self, alter_item: AlterItem) -> tuple[str, tuple]:
+        sql, args = GenPostgresql.merge_generate(
+            db_table=alter_item.table.name,
+            match_cols=alter_item.update_rule,
+            data=alter_item.new_item,
+            update_cols=alter_item.update_keys,
+        )
+        return sql, args
+
     def db_insert(self, cursor: Any, item: Any) -> Any:
         alter_item = ReuseOperation.reshape_item(item)
         if not (new_item := alter_item.new_item):
             return None
 
-        _table_name = alter_item.table.name
-        _table_notes = alter_item.table.notes
-        note_dic = alter_item.notes_dic
-        update_keys = alter_item.update_keys
-        sql, args = GenPostgresql.upsert_generate(
-            db_table=_table_name,
-            conflict_cols=alter_item.conflict_cols,
-            data=new_item,
-            update_cols=update_keys,
-        )
-
+        sql, args = self.get_sql_and_args(alter_item=alter_item)
         try:
             cursor.execute(sql, args)
         except Exception as e:
+            _table_name = alter_item.table.name
             self.slog.warning(
                 f"Pipe Warn: {e} & Table: {_table_name} & Item: {new_item}"
             )
             cursor.execute("ROLLBACK")
+            _table_notes = alter_item.table.notes
+            note_dic = alter_item.notes_dic
             deal_postgres_err(
                 TwistedAsynchronous(),
                 err_msg=str(e),
@@ -106,3 +111,14 @@ class AyuTwistedPostgresPipeline(PostgreSQLPipeEnhanceMixin):
 
     def handle_error(self, failure: Failure, item: Any) -> None:
         self.slog.error(f"插入数据失败:{failure}, item: {item}")
+
+
+class AyuTwistedPostgresLegacyPipeline(AyuTwistedPostgresPipeline):
+    def get_sql_and_args(self, alter_item: AlterItem) -> tuple[str, tuple]:
+        sql, args = GenPostgresql.upsert_generate(
+            db_table=alter_item.table.name,
+            conflict_cols=alter_item.conflict_cols,
+            data=alter_item.new_item,
+            update_cols=alter_item.update_keys,
+        )
+        return sql, args
