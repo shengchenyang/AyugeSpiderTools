@@ -71,7 +71,8 @@ class GenMysql:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
+                f"`{column}`{operator}%s"
+                for column, operator in (k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"`{k}`=%s" for k in rule)
@@ -137,14 +138,15 @@ class GenPostgresql:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
+        select_key = ", ".join(key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
 
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{k.split('|')[0]}{k.split('|')[1]}%s" for k in rule
+                f"{column}{operator}%s"
+                for column, operator in (k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"{k}=%s" for k in rule)
@@ -160,7 +162,7 @@ class GenPostgresql:
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, tuple]:
-        keys = ", ".join(f"{k}" for k in data)
+        keys = ", ".join(data)
         values = ", ".join(["%s"] * len(data))
         sql = f"""insert into {db_table} ({keys}) values ({values})"""
         return sql, tuple(data.values())
@@ -183,7 +185,7 @@ class GenPostgresql:
         data: dict,
         update_cols: set[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
         placeholders = ", ".join(["%s"] * len(keys))
         insert_cols = ", ".join(keys)
         if update_cols:
@@ -204,14 +206,14 @@ class GenPostgresql:
         data: dict,
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
+        insert_cols = ", ".join(keys)
         placeholders = ", ".join(["%s"] * len(keys))
         if not match_cols:
-            insert_cols = ", ".join(keys)
             sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
             return sql, tuple(data.values())
 
-        using_sql = f"(VALUES ({placeholders})) AS s({', '.join(keys)})"
+        using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
         on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
         if not update_cols:
             when_matched_sql = ""
@@ -219,7 +221,6 @@ class GenPostgresql:
             update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
             when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
 
-        insert_cols = ", ".join(keys)
         insert_vals = ", ".join([f"s.{col}" for col in keys])
         sql = f"""
         MERGE INTO {db_table} AS t
@@ -242,14 +243,14 @@ class GenPostgresqlAsyncpg:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, Any]:
-        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
+        select_key = ", ".join(key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{k.split('|')[0]}{k.split('|')[1]}${i + 1}"
-                for i, k in enumerate(rule)
+                f"{column}{operator}${i + 1}"
+                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"{k}=${i + 1}" for i, k in enumerate(rule))
@@ -265,7 +266,7 @@ class GenPostgresqlAsyncpg:
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, Any]:
-        keys = ", ".join(data.keys())
+        keys = ", ".join(data)
         placeholders = ", ".join(f"${i + 1}" for i, _ in enumerate(data))
         sql = f"INSERT INTO {db_table} ({keys}) VALUES ({placeholders})"
         return sql, data.values()
@@ -288,7 +289,7 @@ class GenPostgresqlAsyncpg:
         data: dict,
         update_cols: set[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
         insert_cols = ", ".join(keys)
         if update_cols:
@@ -309,14 +310,14 @@ class GenPostgresqlAsyncpg:
         data: dict,
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
+        insert_cols = ", ".join(keys)
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
         if not match_cols:
-            insert_cols = ", ".join(keys)
             sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
             return sql, tuple(data.values())
 
-        using_sql = f"(VALUES ({placeholders})) AS s({', '.join(keys)})"
+        using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
         on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
         if not update_cols:
             when_matched_sql = ""
@@ -324,7 +325,6 @@ class GenPostgresqlAsyncpg:
             update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
             when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
 
-        insert_cols = ", ".join(keys)
         insert_vals = ", ".join([f"s.{col}" for col in keys])
         sql = f"""
         MERGE INTO {db_table} AS t
@@ -353,8 +353,8 @@ class GenOracle:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f""""{k.split("|")[0]}"{k.split("|")[1]}:{i + 1}"""
-                for i, k in enumerate(rule)
+                f'"{column}"{operator}:{i + 1}'
+                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f'"{k}"=:{i + 1}' for i, k in enumerate(rule))
@@ -387,7 +387,7 @@ class GenOracle:
         data: dict[str, Any],
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
         placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
         insert_cols = ", ".join([f'"{col}"' for col in keys])
         if update_cols:
@@ -408,7 +408,7 @@ class GenOracle:
         data: dict[str, Any],
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
-        keys = list(data.keys())
+        keys = data.keys()
         insert_cols = ", ".join([f'"{col}"' for col in keys])
         if not match_cols:
             placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
