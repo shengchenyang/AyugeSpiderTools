@@ -19,7 +19,7 @@ def format_str(data: str) -> str:
 @pytest.mark.parametrize(
     ("generator", "expected_sql"),
     [
-        (GenMysql, "select `name`, `age`, `title` from articles"),
+        (GenMysql, "select `name`, `age`, `title` from `articles`"),
         (GenPostgresql, "select name, age, title from articles"),
         (GenPostgresqlAsyncpg, "SELECT name, age, title FROM articles"),
         (GenOracle, 'select "name", "age", "title" from "articles"'),
@@ -40,7 +40,6 @@ def test_select_without_rule_or_limit(generator, expected_sql, vertical):
 @pytest.mark.parametrize(
     ("generator", "sql_template"),
     [
-        (GenMysql, "select {} from articles"),
         (GenPostgresql, "select {} from articles"),
         (GenPostgresqlAsyncpg, "SELECT {} FROM articles"),
     ],
@@ -59,10 +58,6 @@ def test_select_single_expression(generator, sql_template, expression):
 @pytest.mark.parametrize(
     ("generator", "expected_sql"),
     [
-        (
-            GenMysql,
-            "select `id` from articles where `age`=%s or `title`=%s order by id DESC",
-        ),
         (
             GenPostgresql,
             "select id from articles where age=%s or title=%s order by id DESC",
@@ -116,7 +111,7 @@ def test_mysql_select_generate():
     sql, value = GenMysql.select_generate(
         db_table="student", key=["id"], rule={"age|=": 18, "sex|!=": "male"}, limit=1
     )
-    assert sql == "select `id` from student where `age`=%s and `sex`!=%s limit 1"
+    assert sql == "select `id` from `student` where `age`=%s and `sex`!=%s limit 1"
     assert value == (18, "male")
 
     sql, value = GenMysql.select_generate(
@@ -126,8 +121,30 @@ def test_mysql_select_generate():
         limit=1,
         vertical=False,
     )
-    assert sql == "select `id` from student where `age=`=%s and `sex`=%s limit 1"
+    assert sql == "select `id` from `student` where `age=`=%s and `sex`=%s limit 1"
     assert value == (18, "male")
+
+
+@pytest.mark.parametrize("column", ["id", "VideoId", "order", "视频ID"])
+@pytest.mark.parametrize("limit", [False, 10])
+def test_mysql_select_order_by_column(column, limit):
+    sql, args = GenMysql.select_generate(
+        db_table="articles",
+        key=[column],
+        rule={"age": 18, "title": "标题"},
+        base="or",
+        order_by=column,
+        limit=limit,
+        vertical=False,
+    )
+    expected_sql = (
+        f"select `{column}` from `articles` where `age`=%s or `title`=%s "
+        f"order by `{column}`"
+    )
+    if limit:
+        expected_sql += " limit 10"
+    assert sql == expected_sql
+    assert args == (18, "标题")
 
 
 def test_mysql_insert_generate():

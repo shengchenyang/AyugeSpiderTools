@@ -58,7 +58,7 @@ class GenMysql:
             key: 需要查询的关键字段
             rule: 查询需要的规则
             base: 多查询条件
-            order_by: 排序的 key 值
+            order_by: 排序列名，不含 ASC/DESC，默认升序
             limit: limit
             vertical: rule 的规则是否是 | 分隔
 
@@ -66,9 +66,7 @@ class GenMysql:
             1). sql: 生成的 sql 语句
             2). 查询字段的参数名称
         """
-        select_key = ", ".join(k if k == "1" else f"`{k}`" for k in key)
-        select_key = select_key.replace("""`count(*)`""", "count(*)")
-        select_key = select_key.replace("""`count(1)`""", "count(1)")
+        select_key = ", ".join(f"`{k}`" for k in key)
 
         _base = f" {base} "
         if vertical:
@@ -79,11 +77,11 @@ class GenMysql:
         else:
             select_where = _base.join(f"`{k}`=%s" for k in rule)
 
-        sql = f"select {select_key} from {db_table}"
+        sql = f"select {select_key} from `{db_table}`"
         if select_where:
             sql += f" where {select_where}"
         if order_by:
-            sql += f" order by {order_by}"
+            sql += f" order by `{order_by}`"
         if limit:
             sql += f" limit {limit}"
         return sql, tuple(rule.values())
