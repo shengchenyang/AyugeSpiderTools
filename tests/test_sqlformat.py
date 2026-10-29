@@ -18,21 +18,41 @@ def format_str(data: str) -> str:
 @pytest.mark.parametrize(
     ("generator", "expected_sql"),
     [
-        (GenMysql, "select 1, count(*), count(1) from articles"),
-        (GenPostgresql, "select 1, count(*), count(1) from articles"),
-        (GenPostgresqlAsyncpg, "SELECT 1, count(*), count(1) FROM articles"),
-        (GenOracle, 'select 1, count(*), count(1) from "articles"'),
+        (GenMysql, "select `name`, `age`, `title` from articles"),
+        (GenPostgresql, "select name, age, title from articles"),
+        (GenPostgresqlAsyncpg, "SELECT name, age, title FROM articles"),
+        (GenOracle, 'select `name`, `age`, `title` from "articles"'),
     ],
 )
 @pytest.mark.parametrize("vertical", [True, False])
 def test_select_without_rule_or_limit(generator, expected_sql, vertical):
     sql, args = generator.select_generate(
         db_table="articles",
-        key=["1", "count(*)", "count(1)"],
+        key=["name", "age", "title"],
         rule={},
         vertical=vertical,
     )
     assert sql == expected_sql
+    assert args == ()
+
+
+@pytest.mark.parametrize(
+    ("generator", "sql_template"),
+    [
+        (GenMysql, "select {} from articles"),
+        (GenPostgresql, "select {} from articles"),
+        (GenPostgresqlAsyncpg, "SELECT {} FROM articles"),
+        (GenOracle, 'select {} from "articles"'),
+    ],
+)
+@pytest.mark.parametrize("expression", ["1", "count(*)", "count(1)"])
+def test_select_single_expression(generator, sql_template, expression):
+    sql, args = generator.select_generate(
+        db_table="articles",
+        key=[expression],
+        rule={},
+    )
+    assert sql == sql_template.format(expression)
     assert args == ()
 
 

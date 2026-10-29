@@ -71,7 +71,8 @@ class GenMysql:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"`{k.split('|')[0]}`{k.split('|')[1]}%s" for k in rule
+                f"`{column}`{operator}%s"
+                for column, operator in (k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"`{k}`=%s" for k in rule)
@@ -137,14 +138,15 @@ class GenPostgresql:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
+        select_key = ", ".join(key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
 
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{k.split('|')[0]}{k.split('|')[1]}%s" for k in rule
+                f"{column}{operator}%s"
+                for column, operator in (k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"{k}=%s" for k in rule)
@@ -160,7 +162,7 @@ class GenPostgresql:
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, tuple]:
-        keys = ", ".join(f"{k}" for k in data)
+        keys = ", ".join(data)
         values = ", ".join(["%s"] * len(data))
         sql = f"""insert into {db_table} ({keys}) values ({values})"""
         return sql, tuple(data.values())
@@ -242,14 +244,14 @@ class GenPostgresqlAsyncpg:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, Any]:
-        select_key = ", ".join(k if k == "1" else f"{k}" for k in key)
+        select_key = ", ".join(key)
         select_key = select_key.replace('''"count(*)"''', "count(*)")
         select_key = select_key.replace('''"count(1)"''', "count(1)")
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{k.split('|')[0]}{k.split('|')[1]}${i + 1}"
-                for i, k in enumerate(rule)
+                f"{column}{operator}${i + 1}"
+                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f"{k}=${i + 1}" for i, k in enumerate(rule))
@@ -265,7 +267,7 @@ class GenPostgresqlAsyncpg:
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, Any]:
-        keys = ", ".join(data.keys())
+        keys = ", ".join(data)
         placeholders = ", ".join(f"${i + 1}" for i, _ in enumerate(data))
         sql = f"INSERT INTO {db_table} ({keys}) VALUES ({placeholders})"
         return sql, data.values()
@@ -353,8 +355,8 @@ class GenOracle:
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f""""{k.split("|")[0]}"{k.split("|")[1]}:{i + 1}"""
-                for i, k in enumerate(rule)
+                f'"{column}"{operator}:{i + 1}'
+                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
             )
         else:
             select_where = _base.join(f'"{k}"=:{i + 1}' for i, k in enumerate(rule))
