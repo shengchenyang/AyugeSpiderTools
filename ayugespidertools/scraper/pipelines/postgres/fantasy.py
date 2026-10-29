@@ -4,8 +4,8 @@ from ayugespidertools.scraper.pipelines.postgres import (
 )
 
 __all__ = [
+    "AyuFtyPostgresLegacyPipeline",
     "AyuFtyPostgresPipeline",
-    "AyuPostgresLegacyPipeline",
 ]
 
 
