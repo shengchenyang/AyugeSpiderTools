@@ -15,6 +15,91 @@ def format_str(data: str) -> str:
     return re.sub(r"\s+", " ", textwrap.dedent(data)).strip()
 
 
+@pytest.mark.parametrize(
+    ("generator", "expected_sql"),
+    [
+        (GenMysql, "select 1, count(*), count(1) from articles"),
+        (GenPostgresql, "select 1, count(*), count(1) from articles"),
+        (GenPostgresqlAsyncpg, "SELECT 1, count(*), count(1) FROM articles"),
+        (GenOracle, 'select 1, count(*), count(1) from "articles"'),
+    ],
+)
+@pytest.mark.parametrize("vertical", [True, False])
+def test_select_without_rule_or_limit(generator, expected_sql, vertical):
+    sql, args = generator.select_generate(
+        db_table="articles",
+        key=["1", "count(*)", "count(1)"],
+        rule={},
+        vertical=vertical,
+    )
+    assert sql == expected_sql
+    assert args == ()
+
+
+@pytest.mark.parametrize(
+    ("generator", "expected_sql"),
+    [
+        (
+            GenMysql,
+            "select `id` from articles where `age`=%s or `title`=%s order by id DESC",
+        ),
+        (
+            GenPostgresql,
+            "select id from articles where age=%s or title=%s order by id DESC",
+        ),
+        (
+            GenPostgresqlAsyncpg,
+            "SELECT id FROM articles WHERE age=$1 or title=$2 ORDER BY id DESC",
+        ),
+        (
+            GenOracle,
+            'select `id` from "articles" where "age"=:1 or "title"=:2 order by id DESC',
+        ),
+    ],
+)
+def test_select_with_order_by(generator, expected_sql):
+    sql, args = generator.select_generate(
+        db_table="articles",
+        key=["id"],
+        rule={"age": 18, "title": "标题"},
+        base="or",
+        order_by="id DESC",
+        vertical=False,
+    )
+    assert sql == expected_sql
+    assert args == (18, "标题")
+
+
+@pytest.mark.parametrize(
+    ("generator", "expected_sql"),
+    [
+        (
+            GenPostgresql,
+            "INSERT INTO articles (title, url) VALUES (%s, %s) ON CONFLICT (title) DO NOTHING;",
+        ),
+        (
+            GenPostgresqlAsyncpg,
+            "INSERT INTO articles (title, url) VALUES ($1, $2) ON CONFLICT (title) DO NOTHING;",
+        ),
+        (
+            GenOracle,
+            'INSERT INTO "articles" ("title", "url") VALUES (:1, :2) ON CONFLICT (title) DO NOTHING',
+        ),
+    ],
+)
+@pytest.mark.parametrize("update_cols", [None, set()])
+def test_upsert_without_update_columns(generator, expected_sql, update_cols):
+    sql, args = generator.upsert_generate(
+        db_table="articles",
+        conflict_cols={"title"},
+        data={"title": "标题", "url": "https://example.com/'"},
+        update_cols=update_cols,
+    )
+    assert sql == expected_sql
+    assert args == ("标题", "https://example.com/'")
+    assert args[1] not in sql
+
+
 def test_mysql_select_generate():
     sql, value = GenMysql.select_generate(
         db_table="student", key=["id"], rule={"age|=": 18, "sex|!=": "male"}, limit=1
@@ -267,6 +352,39 @@ def test_oracle_upsert_generate():
         == 'INSERT INTO "demo_eleven" ("name", "age") VALUES (:1, :2) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age'
     )
     assert value == ("zhangsan", 18)
+
+
+@pytest.mark.parametrize("match_cols", [None, {}, [], set(), ()])
+@pytest.mark.parametrize("update_cols", [None, {"url"}])
+def test_oracle_merge_without_rule_inserts(match_cols, update_cols):
+    sql, args = GenOracle.merge_generate(
+        db_table="articles",
+        match_cols=match_cols,
+        data={"title": "标题", "url": "https://example.com/'"},
+        update_cols=update_cols,
+    )
+    assert sql == 'INSERT INTO "articles" ("title", "url") VALUES (:1, :2)'
+    assert args == ("标题", "https://example.com/'")
+    assert args[1] not in sql
+
+
+@pytest.mark.parametrize("update_cols", [None, set()])
+def test_oracle_merge_skips_matched_rows(update_cols):
+    sql, args = GenOracle.merge_generate(
+        db_table="articles",
+        match_cols=["title", "platform"],
+        data={"title": "标题", "platform": "web", "url": "https://example.com/'"},
+        update_cols=update_cols,
+    )
+    assert format_str(sql) == (
+        'MERGE INTO "articles" t '
+        'USING (SELECT :1 "title", :2 "platform", :3 "url" FROM dual) s '
+        'ON (t."title" = s."title" AND t."platform" = s."platform") '
+        'WHEN NOT MATCHED THEN INSERT ("title", "platform", "url") '
+        'VALUES (s."title", s."platform", s."url")'
+    )
+    assert args == ("标题", "web", "https://example.com/'")
+    assert args[2] not in sql
 
 
 def test_oracle_merge_generate():
