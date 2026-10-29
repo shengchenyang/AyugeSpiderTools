@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, Protocol
 
+from ayugespidertools.common.typevars import _SENTINEL, sentinel
+
 __all__ = [
     "GenMysql",
     "GenOracle",
@@ -344,7 +346,7 @@ class GenOracle:
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
-        limit: bool | int = False,
+        limit: int | _SENTINEL = sentinel,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
         select_key = ", ".join(f'"{k}"' for k in key)
@@ -361,9 +363,9 @@ class GenOracle:
         if select_where:
             sql += f" where {select_where}"
         if order_by:
-            sql += f" order by {order_by}"
-        if limit:
-            sql += f" AND ROWNUM = {limit}"
+            sql += f' order by "{order_by}"'
+        if limit is not sentinel:
+            sql = f"select * from ({sql}) where ROWNUM <= {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod

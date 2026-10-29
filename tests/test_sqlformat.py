@@ -9,6 +9,7 @@ from ayugespidertools.common.sqlformat import (
     GenPostgresql,
     GenPostgresqlAsyncpg,
 )
+from ayugespidertools.common.typevars import sentinel
 
 
 def format_str(data: str) -> str:
@@ -69,10 +70,6 @@ def test_select_single_expression(generator, sql_template, expression):
         (
             GenPostgresqlAsyncpg,
             "SELECT id FROM articles WHERE age=$1 or title=$2 ORDER BY id DESC",
-        ),
-        (
-            GenOracle,
-            'select "id" from "articles" where "age"=:1 or "title"=:2 order by id DESC',
         ),
     ],
 )
@@ -335,14 +332,69 @@ def test_oracle_select_generate():
     sql, value = GenOracle.select_generate(
         db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
     )
-    assert sql == 'select "id" from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == (
+        'select * from (select "id" from "demo_eleven" where "age"=:1) '
+        "where ROWNUM <= 1"
+    )
     assert value == (18,)
 
     sql, value = GenOracle.select_generate(
         db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
     )
-    assert sql == 'select "id" from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == (
+        'select * from (select "id" from "demo_eleven" where "age"=:1) '
+        "where ROWNUM <= 1"
+    )
     assert value == (18,)
+
+
+@pytest.mark.parametrize(
+    ("rule", "where_sql", "expected_args"),
+    [
+        ({}, "", ()),
+        (
+            {"age": 18, "title": "标题"},
+            ' where "age"=:1 or "title"=:2',
+            (18, "标题"),
+        ),
+    ],
+)
+@pytest.mark.parametrize("order_by", [None, "id"])
+@pytest.mark.parametrize("limit", [sentinel, 0, 1, 10])
+def test_oracle_select_limit(rule, where_sql, expected_args, order_by, limit):
+    sql, args = GenOracle.select_generate(
+        db_table="articles",
+        key=["id", "title"],
+        rule=rule,
+        base="or",
+        order_by=order_by,
+        limit=limit,
+        vertical=False,
+    )
+    expected_query = f'select "id", "title" from "articles"{where_sql}'
+    if order_by:
+        expected_query += ' order by "id"'
+    if limit is not sentinel:
+        expected_sql = f"select * from ({expected_query}) where ROWNUM <= {limit}"
+    else:
+        expected_sql = expected_query
+    assert sql == expected_sql
+    assert args == expected_args
+
+
+@pytest.mark.parametrize("column", ["id", "VideoId", "视频ID"])
+def test_oracle_select_order_by_column(column):
+    sql, args = GenOracle.select_generate(
+        db_table="articles",
+        key=[column],
+        rule={"title": "标题"},
+        order_by=column,
+        vertical=False,
+    )
+    assert sql == (
+        f'select "{column}" from "articles" where "title"=:1 order by "{column}"'
+    )
+    assert args == ("标题",)
 
 
 def test_oracle_update_generate():
