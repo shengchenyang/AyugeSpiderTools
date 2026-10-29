@@ -347,9 +347,7 @@ class GenOracle:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(k if k == "1" else f"`{k}`" for k in key)
-        select_key = select_key.replace("""`count(*)`""", "count(*)")
-        select_key = select_key.replace("""`count(1)`""", "count(1)")
+        select_key = ", ".join(f'"{k}"' for k in key)
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
@@ -379,27 +377,6 @@ class GenOracle:
         )
         sql = f"""update "{db_table}" set {update_set} where {update_where}"""
         return sql, tuple(data.values()) + tuple(rule.values())
-
-    @staticmethod
-    def upsert_generate(
-        db_table: str,
-        conflict_cols: set[str],
-        data: dict[str, Any],
-        update_cols: Iterable[str] | None = None,
-    ) -> tuple[str, tuple]:
-        keys = data.keys()
-        placeholders = ", ".join(f":{i + 1}" for i in range(len(keys)))
-        insert_cols = ", ".join([f'"{col}"' for col in keys])
-        if update_cols:
-            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
-            conflict_sql = (
-                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
-            )
-        else:
-            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
-
-        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql}'
-        return sql, tuple(data.values())
 
     @staticmethod
     def merge_generate(

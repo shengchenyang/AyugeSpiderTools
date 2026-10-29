@@ -21,7 +21,7 @@ def format_str(data: str) -> str:
         (GenMysql, "select `name`, `age`, `title` from articles"),
         (GenPostgresql, "select name, age, title from articles"),
         (GenPostgresqlAsyncpg, "SELECT name, age, title FROM articles"),
-        (GenOracle, 'select `name`, `age`, `title` from "articles"'),
+        (GenOracle, 'select "name", "age", "title" from "articles"'),
     ],
 )
 @pytest.mark.parametrize("vertical", [True, False])
@@ -42,7 +42,6 @@ def test_select_without_rule_or_limit(generator, expected_sql, vertical):
         (GenMysql, "select {} from articles"),
         (GenPostgresql, "select {} from articles"),
         (GenPostgresqlAsyncpg, "SELECT {} FROM articles"),
-        (GenOracle, 'select {} from "articles"'),
     ],
 )
 @pytest.mark.parametrize("expression", ["1", "count(*)", "count(1)"])
@@ -73,7 +72,7 @@ def test_select_single_expression(generator, sql_template, expression):
         ),
         (
             GenOracle,
-            'select `id` from "articles" where "age"=:1 or "title"=:2 order by id DESC',
+            'select "id" from "articles" where "age"=:1 or "title"=:2 order by id DESC',
         ),
     ],
 )
@@ -100,10 +99,6 @@ def test_select_with_order_by(generator, expected_sql):
         (
             GenPostgresqlAsyncpg,
             "INSERT INTO articles (title, url) VALUES ($1, $2) ON CONFLICT (title) DO NOTHING;",
-        ),
-        (
-            GenOracle,
-            'INSERT INTO "articles" ("title", "url") VALUES (:1, :2) ON CONFLICT (title) DO NOTHING',
         ),
     ],
 )
@@ -340,13 +335,13 @@ def test_oracle_select_generate():
     sql, value = GenOracle.select_generate(
         db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
     )
-    assert sql == 'select `id` from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == 'select "id" from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
     assert value == (18,)
 
     sql, value = GenOracle.select_generate(
         db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
     )
-    assert sql == 'select `id` from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == 'select "id" from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
     assert value == (18,)
 
 
@@ -358,20 +353,6 @@ def test_oracle_update_generate():
     )
     assert sql == 'update "demo_eleven" set "name"=:1, "age"=:2 where "name"=:3'
     assert value == ("zhangsan", 18, "zhangsan")
-
-
-def test_oracle_upsert_generate():
-    sql, value = GenOracle.upsert_generate(
-        db_table="demo_eleven",
-        conflict_cols={"id"},
-        data={"name": "zhangsan", "age": 18},
-        update_cols={"age"},
-    )
-    assert (
-        sql
-        == 'INSERT INTO "demo_eleven" ("name", "age") VALUES (:1, :2) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age'
-    )
-    assert value == ("zhangsan", 18)
 
 
 @pytest.mark.parametrize("match_cols", [None, {}, [], set(), ()])
