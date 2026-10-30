@@ -138,44 +138,42 @@ class GenPostgresql:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, tuple]:
-        select_key = ", ".join(key)
-        select_key = select_key.replace('''"count(*)"''', "count(*)")
-        select_key = select_key.replace('''"count(1)"''', "count(1)")
+        select_key = ", ".join(f'"{k}"' for k in key)
 
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{column}{operator}%s"
+                f'"{column}"{operator}%s'
                 for column, operator in (k.split("|", 1) for k in rule)
             )
         else:
-            select_where = _base.join(f"{k}=%s" for k in rule)
+            select_where = _base.join(f'"{k}"=%s' for k in rule)
 
-        sql = f"select {select_key} from {db_table}"
+        sql = f'select {select_key} from "{db_table}"'
         if select_where:
             sql += f" where {select_where}"
         if order_by:
-            sql += f" order by {order_by}"
+            sql += f' order by "{order_by}"'
         if limit:
             sql += f" limit {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, tuple]:
-        keys = ", ".join(data)
+        keys = ", ".join(f'"{k}"' for k in data)
         values = ", ".join(["%s"] * len(data))
-        sql = f"""insert into {db_table} ({keys}) values ({values})"""
+        sql = f'insert into "{db_table}" ({keys}) values ({values})'
         return sql, tuple(data.values())
 
     @staticmethod
     def update_generate(
         db_table: str, data: dict, rule: dict[str, Any], base: SqlModeStr = "and"
     ) -> tuple[str, tuple]:
-        update_set = ", ".join(f"{k}=%s" for k in data)
+        update_set = ", ".join(f'"{k}"=%s' for k in data)
 
         _base = f" {base} "
-        update_where = _base.join(f"{k}=%s" for k in rule)
-        sql = f"""update {db_table} set {update_set} where {update_where}"""
+        update_where = _base.join(f'"{k}"=%s' for k in rule)
+        sql = f'update "{db_table}" set {update_set} where {update_where}'
         return sql, tuple(data.values()) + tuple(rule.values())
 
     @staticmethod
@@ -187,16 +185,17 @@ class GenPostgresql:
     ) -> tuple[str, tuple]:
         keys = data.keys()
         placeholders = ", ".join(["%s"] * len(keys))
-        insert_cols = ", ".join(keys)
+        insert_cols = ", ".join(f'"{col}"' for col in keys)
+        conflict_keys = ", ".join(f'"{col}"' for col in conflict_cols)
         if update_cols:
-            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
-            conflict_sql = (
-                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
+            update_set = ", ".join(
+                [f'"{col}" = EXCLUDED."{col}"' for col in update_cols]
             )
+            conflict_sql = f"ON CONFLICT ({conflict_keys}) DO UPDATE SET {update_set}"
         else:
-            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
+            conflict_sql = f"ON CONFLICT ({conflict_keys}) DO NOTHING"
 
-        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
+        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql};'
         return sql, tuple(data.values())
 
     @staticmethod
@@ -207,23 +206,23 @@ class GenPostgresql:
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
         keys = data.keys()
-        insert_cols = ", ".join(keys)
+        insert_cols = ", ".join(f'"{col}"' for col in keys)
         placeholders = ", ".join(["%s"] * len(keys))
         if not match_cols:
-            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
+            sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
             return sql, tuple(data.values())
 
         using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
-        on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
+        on_sql = " AND ".join([f't."{col}" = s."{col}"' for col in match_cols])
         if not update_cols:
             when_matched_sql = ""
         else:
-            update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
+            update_set = ", ".join([f'"{col}" = s."{col}"' for col in update_cols])
             when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
 
-        insert_vals = ", ".join([f"s.{col}" for col in keys])
+        insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
-        MERGE INTO {db_table} AS t
+        MERGE INTO "{db_table}" AS t
         USING {using_sql}
         ON {on_sql}
         {when_matched_sql}
@@ -243,43 +242,43 @@ class GenPostgresqlAsyncpg:
         limit: bool | int = False,
         vertical: bool = True,
     ) -> tuple[str, Any]:
-        select_key = ", ".join(key)
-        select_key = select_key.replace('''"count(*)"''', "count(*)")
-        select_key = select_key.replace('''"count(1)"''', "count(1)")
+        select_key = ", ".join(f'"{k}"' for k in key)
         _base = f" {base} "
         if vertical:
             select_where = _base.join(
-                f"{column}{operator}${i + 1}"
+                f'"{column}"{operator}${i + 1}'
                 for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
             )
         else:
-            select_where = _base.join(f"{k}=${i + 1}" for i, k in enumerate(rule))
+            select_where = _base.join(f'"{k}"=${i + 1}' for i, k in enumerate(rule))
 
-        sql = f"SELECT {select_key} FROM {db_table}"
+        sql = f'SELECT {select_key} FROM "{db_table}"'
         if select_where:
             sql += f" WHERE {select_where}"
         if order_by:
-            sql += f" ORDER BY {order_by}"
+            sql += f' ORDER BY "{order_by}"'
         if limit:
             sql += f" LIMIT {limit}"
         return sql, tuple(rule.values())
 
     @staticmethod
     def insert_generate(db_table: str, data: dict) -> tuple[str, Any]:
-        keys = ", ".join(data)
+        keys = ", ".join(f'"{k}"' for k in data)
         placeholders = ", ".join(f"${i + 1}" for i, _ in enumerate(data))
-        sql = f"INSERT INTO {db_table} ({keys}) VALUES ({placeholders})"
+        sql = f'INSERT INTO "{db_table}" ({keys}) VALUES ({placeholders})'
         return sql, data.values()
 
     @staticmethod
     def update_generate(
         db_table: str, data: dict, rule: dict[str, Any], base: SqlModeStr = "and"
     ) -> tuple[str, tuple]:
-        update_set = ", ".join(f"{k}=${i + 1}" for i, k in enumerate(data))
+        update_set = ", ".join(f'"{k}"=${i + 1}' for i, k in enumerate(data))
         offset = len(data)
         _base = f" {base} "
-        update_where = _base.join(f"{k}=${i + 1 + offset}" for i, k in enumerate(rule))
-        sql = f"UPDATE {db_table} SET {update_set} WHERE {update_where}"
+        update_where = _base.join(
+            f'"{k}"=${i + 1 + offset}' for i, k in enumerate(rule)
+        )
+        sql = f'UPDATE "{db_table}" SET {update_set} WHERE {update_where}'
         return sql, tuple(data.values()) + tuple(rule.values())
 
     @staticmethod
@@ -291,16 +290,17 @@ class GenPostgresqlAsyncpg:
     ) -> tuple[str, tuple]:
         keys = data.keys()
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
-        insert_cols = ", ".join(keys)
+        insert_cols = ", ".join(f'"{col}"' for col in keys)
+        conflict_keys = ", ".join(f'"{col}"' for col in conflict_cols)
         if update_cols:
-            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_cols])
-            conflict_sql = (
-                f"ON CONFLICT ({', '.join(conflict_cols)}) DO UPDATE SET {update_set}"
+            update_set = ", ".join(
+                [f'"{col}" = EXCLUDED."{col}"' for col in update_cols]
             )
+            conflict_sql = f"ON CONFLICT ({conflict_keys}) DO UPDATE SET {update_set}"
         else:
-            conflict_sql = f"ON CONFLICT ({', '.join(conflict_cols)}) DO NOTHING"
+            conflict_sql = f"ON CONFLICT ({conflict_keys}) DO NOTHING"
 
-        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
+        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql};'
         return sql, tuple(data.values())
 
     @staticmethod
@@ -311,23 +311,23 @@ class GenPostgresqlAsyncpg:
         update_cols: Iterable[str] | None = None,
     ) -> tuple[str, tuple]:
         keys = data.keys()
-        insert_cols = ", ".join(keys)
+        insert_cols = ", ".join(f'"{col}"' for col in keys)
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
         if not match_cols:
-            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
+            sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
             return sql, tuple(data.values())
 
         using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
-        on_sql = " AND ".join([f"t.{col} = s.{col}" for col in match_cols])
+        on_sql = " AND ".join([f't."{col}" = s."{col}"' for col in match_cols])
         if not update_cols:
             when_matched_sql = ""
         else:
-            update_set = ", ".join([f"{col} = s.{col}" for col in update_cols])
+            update_set = ", ".join([f'"{col}" = s."{col}"' for col in update_cols])
             when_matched_sql = f"WHEN MATCHED THEN UPDATE SET {update_set}"
 
-        insert_vals = ", ".join([f"s.{col}" for col in keys])
+        insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
-        MERGE INTO {db_table} AS t
+        MERGE INTO "{db_table}" AS t
         USING {using_sql}
         ON {on_sql}
         {when_matched_sql}
