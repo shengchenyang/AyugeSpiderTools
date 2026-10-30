@@ -42,7 +42,7 @@ def test_select_data(mysql_first_step, mysql_db_cursor):
     select_sql, select_value = GenMysql.select_generate(
         db_table=test_table,
         key=["id", "article_title"],
-        rule={"nick_name|=": "youcans_"},
+        rule={"nick_name": "youcans_"},
         limit=1,
     )
     mysql_db_cursor.execute(select_sql, select_value)
@@ -68,8 +68,8 @@ def test_insert_data(mysql_first_step, mysql_db_cursor):
         db_table=test_table,
         key=["id", "article_title"],
         rule={
-            "nick_name|=": "天罡gg",
-            "article_title|=": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
+            "nick_name": "天罡gg",
+            "article_title": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
         },
     )
 
@@ -91,7 +91,7 @@ def test_update_data(mysql_first_step, mysql_db_cursor):
     select_sql, select_value = GenMysql.select_generate(
         db_table=test_table,
         key=["id", "favor_count"],
-        rule={"id|=": "1"},
+        rule={"id": "1"},
     )
 
     mysql_db_cursor.execute(select_sql, select_value)
@@ -126,8 +126,8 @@ class TestMysqlOrm:
             db_table=test_table,
             key=["id", "article_title"],
             rule={
-                "nick_name|=": "天罡gg_ttt",
-                "article_title|=": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
+                "nick_name": "天罡gg_ttt",
+                "article_title": "基于SpringBoot+SpringCloud+Vue前后端分离项目实战 --开篇",
             },
         )
 
@@ -139,7 +139,7 @@ class TestMysqlOrm:
         select_sql, select_value = GenMysql.select_generate(
             db_table=test_table,
             key=["id", "article_title"],
-            rule={"nick_name|=": "youcans_"},
+            rule={"nick_name": "youcans_"},
             limit=1,
         )
         status, res = mysqlorm_conn.search_data(
@@ -160,7 +160,7 @@ class TestMysqlOrm:
         select_sql, select_value = GenMysql.select_generate(
             db_table=test_table,
             key=["id", "favor_count"],
-            rule={"id|=": "1"},
+            rule={"id": "1"},
         )
 
         mysql_db_cursor.execute(select_sql, select_value)

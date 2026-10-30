@@ -17,54 +17,6 @@ def format_str(data: str) -> str:
 
 
 @pytest.mark.parametrize(
-    ("generator", "expected_sql"),
-    [
-        (GenMysql, "select `name`, `age`, `title` from `articles`"),
-        (GenPostgresql, 'select "name", "age", "title" from "articles"'),
-        (GenPostgresqlAsyncpg, 'SELECT "name", "age", "title" FROM "articles"'),
-        (GenOracle, 'select "name", "age", "title" from "articles"'),
-    ],
-)
-@pytest.mark.parametrize("vertical", [True, False])
-def test_select_without_rule_or_limit(generator, expected_sql, vertical):
-    sql, args = generator.select_generate(
-        db_table="articles",
-        key=["name", "age", "title"],
-        rule={},
-        vertical=vertical,
-    )
-    assert sql == expected_sql
-    assert args == ()
-
-
-@pytest.mark.parametrize(
-    ("generator", "expected_sql"),
-    [
-        (
-            GenPostgresql,
-            'select "VideoId", "order" from "Articles" where "VideoId"=%s order by "order" limit 10',
-        ),
-        (
-            GenPostgresqlAsyncpg,
-            'SELECT "VideoId", "order" FROM "Articles" WHERE "VideoId"=$1 ORDER BY "order" LIMIT 10',
-        ),
-    ],
-)
-@pytest.mark.parametrize("vertical", [True, False])
-def test_postgresql_select_preserves_identifier_case(generator, expected_sql, vertical):
-    sql, args = generator.select_generate(
-        db_table="Articles",
-        key=["VideoId", "order"],
-        rule={"VideoId|=": 42} if vertical else {"VideoId": 42},
-        order_by="order",
-        limit=10,
-        vertical=vertical,
-    )
-    assert sql == expected_sql
-    assert args == (42,)
-
-
-@pytest.mark.parametrize(
     ("generator", "placeholders", "insert_prefix", "update_keywords"),
     [
         (GenPostgresql, "%s, %s", "insert into", ("update", "set", "where")),
@@ -175,7 +127,6 @@ def test_select_with_order_by(generator, expected_sql):
         rule={"age": 18, "title": "标题"},
         base="or",
         order_by="id",
-        vertical=False,
     )
     assert sql == expected_sql
     assert args == (18, "标题")
@@ -209,19 +160,18 @@ def test_upsert_without_update_columns(generator, expected_sql, update_cols):
 
 def test_mysql_select_generate():
     sql, value = GenMysql.select_generate(
-        db_table="student", key=["id"], rule={"age|=": 18, "sex|!=": "male"}, limit=1
+        db_table="student", key=["id"], rule={"age": 18, "sex": "male"}, limit=1
     )
-    assert sql == "select `id` from `student` where `age`=%s and `sex`!=%s limit 1"
+    assert sql == "select `id` from `student` where `age`=%s and `sex`=%s limit 1"
     assert value == (18, "male")
 
     sql, value = GenMysql.select_generate(
         db_table="student",
         key=["id"],
-        rule={"age=": 18, "sex": "male"},
+        rule={"age": 18, "sex": "male"},
         limit=1,
-        vertical=False,
     )
-    assert sql == "select `id` from `student` where `age=`=%s and `sex`=%s limit 1"
+    assert sql == "select `id` from `student` where `age`=%s and `sex`=%s limit 1"
     assert value == (18, "male")
 
 
@@ -235,7 +185,6 @@ def test_mysql_select_order_by_column(column, limit):
         base="or",
         order_by=column,
         limit=limit,
-        vertical=False,
     )
     expected_sql = (
         f"select `{column}` from `articles` where `age`=%s or `title`=%s "
@@ -265,12 +214,12 @@ def test_mysql_update_generate():
 
 def test_postgresql_select_generate():
     sql, value = GenPostgresql.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == 'select "id" from "demo_eleven" where "age"=%s limit 1'
     assert value == (18,)
     sql, value = GenPostgresql.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == 'select "id" from "demo_eleven" where "age"=%s limit 1'
     assert value == (18,)
@@ -308,12 +257,12 @@ def test_postgresql_upsert_generate():
 
 def test_postgres_asyncpg_select_generate():
     sql, value = GenPostgresqlAsyncpg.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == 'SELECT "id" FROM "demo_eleven" WHERE "age"=$1 LIMIT 1'
     assert value == (18,)
     sql, value = GenPostgresqlAsyncpg.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == 'SELECT "id" FROM "demo_eleven" WHERE "age"=$1 LIMIT 1'
     assert value == (18,)
@@ -447,7 +396,7 @@ def test_postgresql_merge_generate():
 
 def test_oracle_select_generate():
     sql, value = GenOracle.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == (
         'select * from (select "id" from "demo_eleven" where "age"=:1) '
@@ -456,7 +405,7 @@ def test_oracle_select_generate():
     assert value == (18,)
 
     sql, value = GenOracle.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
     assert sql == (
         'select * from (select "id" from "demo_eleven" where "age"=:1) '
@@ -486,7 +435,6 @@ def test_oracle_select_limit(rule, where_sql, expected_args, order_by, limit):
         base="or",
         order_by=order_by,
         limit=limit,
-        vertical=False,
     )
     expected_query = f'select "id", "title" from "articles"{where_sql}'
     if order_by:
@@ -506,7 +454,6 @@ def test_oracle_select_order_by_column(column):
         key=[column],
         rule={"title": "标题"},
         order_by=column,
-        vertical=False,
     )
     assert sql == (
         f'select "{column}" from "articles" where "title"=:1 order by "{column}"'

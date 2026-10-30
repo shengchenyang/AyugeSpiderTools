@@ -25,8 +25,7 @@ class GenSql(Protocol):
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
-        limit: bool | int = False,
-        vertical: bool = True,
+        limit: int | None = None,
     ): ...
 
     @staticmethod
@@ -48,8 +47,7 @@ class GenMysql:
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
-        limit: bool | int = False,
-        vertical: bool = True,
+        limit: int | None = None,
     ) -> tuple[str, tuple]:
         """根据一些参数来生成供 pymysql 之类的库中使用的 sql 查询语句
 
@@ -60,7 +58,6 @@ class GenMysql:
             base: 多查询条件
             order_by: 排序列名，不含 ASC/DESC，默认升序
             limit: limit
-            vertical: rule 的规则是否是 | 分隔
 
         Returns:
             1). sql: 生成的 sql 语句
@@ -69,13 +66,7 @@ class GenMysql:
         select_key = ", ".join(f"`{k}`" for k in key)
 
         _base = f" {base} "
-        if vertical:
-            select_where = _base.join(
-                f"`{column}`{operator}%s"
-                for column, operator in (k.split("|", 1) for k in rule)
-            )
-        else:
-            select_where = _base.join(f"`{k}`=%s" for k in rule)
+        select_where = _base.join(f"`{k}`=%s" for k in rule)
 
         sql = f"select {select_key} from `{db_table}`"
         if select_where:
@@ -135,21 +126,13 @@ class GenPostgresql:
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
-        limit: bool | int = False,
-        vertical: bool = True,
+        limit: int | None = None,
     ) -> tuple[str, tuple]:
         select_key = ", ".join(f'"{k}"' for k in key)
-
         _base = f" {base} "
-        if vertical:
-            select_where = _base.join(
-                f'"{column}"{operator}%s'
-                for column, operator in (k.split("|", 1) for k in rule)
-            )
-        else:
-            select_where = _base.join(f'"{k}"=%s' for k in rule)
-
-        sql = f'select {select_key} from "{db_table}"'
+        select_where = _base.join(f'"{k}"=%s' for k in rule)
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"select {select_key} from {db_table}"
         if select_where:
             sql += f" where {select_where}"
         if order_by:
@@ -162,7 +145,8 @@ class GenPostgresql:
     def insert_generate(db_table: str, data: dict) -> tuple[str, tuple]:
         keys = ", ".join(f'"{k}"' for k in data)
         values = ", ".join(["%s"] * len(data))
-        sql = f'insert into "{db_table}" ({keys}) values ({values})'
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"insert into {db_table} ({keys}) values ({values})"
         return sql, tuple(data.values())
 
     @staticmethod
@@ -173,7 +157,8 @@ class GenPostgresql:
 
         _base = f" {base} "
         update_where = _base.join(f'"{k}"=%s' for k in rule)
-        sql = f'update "{db_table}" set {update_set} where {update_where}'
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"update {db_table} set {update_set} where {update_where}"
         return sql, tuple(data.values()) + tuple(rule.values())
 
     @staticmethod
@@ -195,7 +180,8 @@ class GenPostgresql:
         else:
             conflict_sql = f"ON CONFLICT ({conflict_keys}) DO NOTHING"
 
-        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql};'
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
         return sql, tuple(data.values())
 
     @staticmethod
@@ -208,8 +194,9 @@ class GenPostgresql:
         keys = data.keys()
         insert_cols = ", ".join(f'"{col}"' for col in keys)
         placeholders = ", ".join(["%s"] * len(keys))
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
         if not match_cols:
-            sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
+            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
             return sql, tuple(data.values())
 
         using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
@@ -222,7 +209,7 @@ class GenPostgresql:
 
         insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
-        MERGE INTO "{db_table}" AS t
+        MERGE INTO {db_table} AS t
         USING {using_sql}
         ON {on_sql}
         {when_matched_sql}
@@ -239,20 +226,13 @@ class GenPostgresqlAsyncpg:
         rule: dict[str, Any],
         base: SqlModeStr = "and",
         order_by: str | None = None,
-        limit: bool | int = False,
-        vertical: bool = True,
+        limit: int | None = None,
     ) -> tuple[str, Any]:
         select_key = ", ".join(f'"{k}"' for k in key)
         _base = f" {base} "
-        if vertical:
-            select_where = _base.join(
-                f'"{column}"{operator}${i + 1}'
-                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
-            )
-        else:
-            select_where = _base.join(f'"{k}"=${i + 1}' for i, k in enumerate(rule))
-
-        sql = f'SELECT {select_key} FROM "{db_table}"'
+        select_where = _base.join(f'"{k}"=${i + 1}' for i, k in enumerate(rule))
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"SELECT {select_key} FROM {db_table}"
         if select_where:
             sql += f" WHERE {select_where}"
         if order_by:
@@ -265,8 +245,9 @@ class GenPostgresqlAsyncpg:
     def insert_generate(db_table: str, data: dict) -> tuple[str, Any]:
         keys = ", ".join(f'"{k}"' for k in data)
         placeholders = ", ".join(f"${i + 1}" for i, _ in enumerate(data))
-        sql = f'INSERT INTO "{db_table}" ({keys}) VALUES ({placeholders})'
-        return sql, data.values()
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"INSERT INTO {db_table} ({keys}) VALUES ({placeholders})"
+        return sql, tuple(data.values())
 
     @staticmethod
     def update_generate(
@@ -278,7 +259,8 @@ class GenPostgresqlAsyncpg:
         update_where = _base.join(
             f'"{k}"=${i + 1 + offset}' for i, k in enumerate(rule)
         )
-        sql = f'UPDATE "{db_table}" SET {update_set} WHERE {update_where}'
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"UPDATE {db_table} SET {update_set} WHERE {update_where}"
         return sql, tuple(data.values()) + tuple(rule.values())
 
     @staticmethod
@@ -300,7 +282,8 @@ class GenPostgresqlAsyncpg:
         else:
             conflict_sql = f"ON CONFLICT ({conflict_keys}) DO NOTHING"
 
-        sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) {conflict_sql};'
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
+        sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) {conflict_sql};"
         return sql, tuple(data.values())
 
     @staticmethod
@@ -313,8 +296,9 @@ class GenPostgresqlAsyncpg:
         keys = data.keys()
         insert_cols = ", ".join(f'"{col}"' for col in keys)
         placeholders = ", ".join(f"${i + 1}" for i in range(len(keys)))
+        db_table = ".".join(f'"{part}"' for part in db_table.split("."))
         if not match_cols:
-            sql = f'INSERT INTO "{db_table}" ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
+            sql = f"INSERT INTO {db_table} ({insert_cols}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;"
             return sql, tuple(data.values())
 
         using_sql = f"(VALUES ({placeholders})) AS s({insert_cols})"
@@ -327,7 +311,7 @@ class GenPostgresqlAsyncpg:
 
         insert_vals = ", ".join([f's."{col}"' for col in keys])
         sql = f"""
-        MERGE INTO "{db_table}" AS t
+        MERGE INTO {db_table} AS t
         USING {using_sql}
         ON {on_sql}
         {when_matched_sql}
@@ -345,17 +329,10 @@ class GenOracle:
         base: SqlModeStr = "and",
         order_by: str | None = None,
         limit: int | _SENTINEL = sentinel,
-        vertical: bool = True,
     ) -> tuple[str, tuple]:
         select_key = ", ".join(f'"{k}"' for k in key)
         _base = f" {base} "
-        if vertical:
-            select_where = _base.join(
-                f'"{column}"{operator}:{i + 1}'
-                for i, (column, operator) in enumerate(k.split("|", 1) for k in rule)
-            )
-        else:
-            select_where = _base.join(f'"{k}"=:{i + 1}' for i, k in enumerate(rule))
+        select_where = _base.join(f'"{k}"=:{i + 1}' for i, k in enumerate(rule))
 
         sql = f'select {select_key} from "{db_table}"'
         if select_where:
