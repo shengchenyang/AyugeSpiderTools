@@ -45,6 +45,7 @@ class AbstractClass(ABC):
             table_notes: 数据表注释
             note_dic: 当前表字段注释
         """
+        table = table.rsplit(".", 1)[-1]
         if f' of relation "{table}" does not exist' in err_msg:
             sql, possible_err = self.deal_1054_error(
                 err_msg=err_msg, table=table, note_dic=note_dic

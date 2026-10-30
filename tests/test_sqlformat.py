@@ -9,6 +9,7 @@ from ayugespidertools.common.sqlformat import (
     GenPostgresql,
     GenPostgresqlAsyncpg,
 )
+from ayugespidertools.common.typevars import sentinel
 
 
 def format_str(data: str) -> str:
@@ -16,64 +17,106 @@ def format_str(data: str) -> str:
 
 
 @pytest.mark.parametrize(
-    ("generator", "expected_sql"),
+    ("generator", "placeholders", "insert_prefix", "update_keywords"),
     [
-        (GenMysql, "select `name`, `age`, `title` from articles"),
-        (GenPostgresql, "select name, age, title from articles"),
-        (GenPostgresqlAsyncpg, "SELECT name, age, title FROM articles"),
-        (GenOracle, 'select `name`, `age`, `title` from "articles"'),
+        (GenPostgresql, "%s, %s", "insert into", ("update", "set", "where")),
+        (GenPostgresqlAsyncpg, "$1, $2", "INSERT INTO", ("UPDATE", "SET", "WHERE")),
     ],
 )
-@pytest.mark.parametrize("vertical", [True, False])
-def test_select_without_rule_or_limit(generator, expected_sql, vertical):
-    sql, args = generator.select_generate(
-        db_table="articles",
-        key=["name", "age", "title"],
-        rule={},
-        vertical=vertical,
+def test_postgresql_writes_preserve_identifier_case(
+    generator, placeholders, insert_prefix, update_keywords
+):
+    data = {"VideoId": 42, "order": "new"}
+    sql, args = generator.insert_generate(db_table="Articles", data=data)
+    assert sql == (
+        f'{insert_prefix} "Articles" ("VideoId", "order") '
+        f"{'values' if generator is GenPostgresql else 'VALUES'} ({placeholders})"
     )
+    assert tuple(args) == (42, "new")
+
+    sql, args = generator.update_generate(
+        db_table="Articles", data={"order": "new"}, rule={"VideoId": 42}
+    )
+    first, second = placeholders.split(", ")
+    update, set_keyword, where = update_keywords
+    assert sql == (
+        f'{update} "Articles" {set_keyword} "order"={first} {where} "VideoId"={second}'
+    )
+    assert args == ("new", 42)
+
+
+@pytest.mark.parametrize(
+    ("generator", "placeholders"),
+    [(GenPostgresql, "%s, %s"), (GenPostgresqlAsyncpg, "$1, $2")],
+)
+@pytest.mark.parametrize("update_cols", [None, {"order"}])
+def test_postgresql_upsert_preserves_identifier_case(
+    generator, placeholders, update_cols
+):
+    sql, args = generator.upsert_generate(
+        db_table="Articles",
+        conflict_cols={"VideoId"},
+        data={"VideoId": 42, "order": "new"},
+        update_cols=update_cols,
+    )
+    expected_sql = (
+        f'INSERT INTO "Articles" ("VideoId", "order") VALUES ({placeholders}) '
+        'ON CONFLICT ("VideoId") '
+    )
+    if update_cols:
+        expected_sql += 'DO UPDATE SET "order" = EXCLUDED."order";'
+    else:
+        expected_sql += "DO NOTHING;"
     assert sql == expected_sql
-    assert args == ()
+    assert args == (42, "new")
 
 
 @pytest.mark.parametrize(
-    ("generator", "sql_template"),
-    [
-        (GenMysql, "select {} from articles"),
-        (GenPostgresql, "select {} from articles"),
-        (GenPostgresqlAsyncpg, "SELECT {} FROM articles"),
-        (GenOracle, 'select {} from "articles"'),
-    ],
+    ("generator", "placeholders"),
+    [(GenPostgresql, "%s, %s"), (GenPostgresqlAsyncpg, "$1, $2")],
 )
-@pytest.mark.parametrize("expression", ["1", "count(*)", "count(1)"])
-def test_select_single_expression(generator, sql_template, expression):
-    sql, args = generator.select_generate(
-        db_table="articles",
-        key=[expression],
-        rule={},
+@pytest.mark.parametrize("match_cols", [None, {"VideoId"}])
+@pytest.mark.parametrize("update_cols", [None, {"order"}])
+def test_postgresql_merge_preserves_identifier_case(
+    generator, placeholders, match_cols, update_cols
+):
+    sql, args = generator.merge_generate(
+        db_table="Articles",
+        match_cols=match_cols,
+        data={"VideoId": 42, "order": "new"},
+        update_cols=update_cols,
     )
-    assert sql == sql_template.format(expression)
-    assert args == ()
+    if match_cols:
+        expected_sql = (
+            'MERGE INTO "Articles" AS t '
+            f'USING (VALUES ({placeholders})) AS s("VideoId", "order") '
+            'ON t."VideoId" = s."VideoId" '
+        )
+        if update_cols:
+            expected_sql += 'WHEN MATCHED THEN UPDATE SET "order" = s."order" '
+        expected_sql += (
+            'WHEN NOT MATCHED THEN INSERT ("VideoId", "order") '
+            'VALUES (s."VideoId", s."order")'
+        )
+    else:
+        expected_sql = (
+            f'INSERT INTO "Articles" ("VideoId", "order") VALUES ({placeholders}) '
+            "ON CONFLICT DO NOTHING;"
+        )
+    assert format_str(sql) == expected_sql
+    assert args == (42, "new")
 
 
 @pytest.mark.parametrize(
     ("generator", "expected_sql"),
     [
-        (
-            GenMysql,
-            "select `id` from articles where `age`=%s or `title`=%s order by id DESC",
-        ),
         (
             GenPostgresql,
-            "select id from articles where age=%s or title=%s order by id DESC",
+            'select "id" from "articles" where "age"=%s or "title"=%s order by "id"',
         ),
         (
             GenPostgresqlAsyncpg,
-            "SELECT id FROM articles WHERE age=$1 or title=$2 ORDER BY id DESC",
-        ),
-        (
-            GenOracle,
-            'select `id` from "articles" where "age"=:1 or "title"=:2 order by id DESC',
+            'SELECT "id" FROM "articles" WHERE "age"=$1 or "title"=$2 ORDER BY "id"',
         ),
     ],
 )
@@ -83,8 +126,7 @@ def test_select_with_order_by(generator, expected_sql):
         key=["id"],
         rule={"age": 18, "title": "标题"},
         base="or",
-        order_by="id DESC",
-        vertical=False,
+        order_by="id",
     )
     assert sql == expected_sql
     assert args == (18, "标题")
@@ -95,15 +137,11 @@ def test_select_with_order_by(generator, expected_sql):
     [
         (
             GenPostgresql,
-            "INSERT INTO articles (title, url) VALUES (%s, %s) ON CONFLICT (title) DO NOTHING;",
+            'INSERT INTO "articles" ("title", "url") VALUES (%s, %s) ON CONFLICT ("title") DO NOTHING;',
         ),
         (
             GenPostgresqlAsyncpg,
-            "INSERT INTO articles (title, url) VALUES ($1, $2) ON CONFLICT (title) DO NOTHING;",
-        ),
-        (
-            GenOracle,
-            'INSERT INTO "articles" ("title", "url") VALUES (:1, :2) ON CONFLICT (title) DO NOTHING',
+            'INSERT INTO "articles" ("title", "url") VALUES ($1, $2) ON CONFLICT ("title") DO NOTHING;',
         ),
     ],
 )
@@ -122,20 +160,40 @@ def test_upsert_without_update_columns(generator, expected_sql, update_cols):
 
 def test_mysql_select_generate():
     sql, value = GenMysql.select_generate(
-        db_table="student", key=["id"], rule={"age|=": 18, "sex|!=": "male"}, limit=1
+        db_table="student", key=["id"], rule={"age": 18, "sex": "male"}, limit=1
     )
-    assert sql == "select `id` from student where `age`=%s and `sex`!=%s limit 1"
+    assert sql == "select `id` from `student` where `age`=%s and `sex`=%s limit 1"
     assert value == (18, "male")
 
     sql, value = GenMysql.select_generate(
         db_table="student",
         key=["id"],
-        rule={"age=": 18, "sex": "male"},
+        rule={"age": 18, "sex": "male"},
         limit=1,
-        vertical=False,
     )
-    assert sql == "select `id` from student where `age=`=%s and `sex`=%s limit 1"
+    assert sql == "select `id` from `student` where `age`=%s and `sex`=%s limit 1"
     assert value == (18, "male")
+
+
+@pytest.mark.parametrize("column", ["id", "VideoId", "order", "视频ID"])
+@pytest.mark.parametrize("limit", [False, 10])
+def test_mysql_select_order_by_column(column, limit):
+    sql, args = GenMysql.select_generate(
+        db_table="articles",
+        key=[column],
+        rule={"age": 18, "title": "标题"},
+        base="or",
+        order_by=column,
+        limit=limit,
+    )
+    expected_sql = (
+        f"select `{column}` from `articles` where `age`=%s or `title`=%s "
+        f"order by `{column}`"
+    )
+    if limit:
+        expected_sql += " limit 10"
+    assert sql == expected_sql
+    assert args == (18, "标题")
 
 
 def test_mysql_insert_generate():
@@ -156,14 +214,14 @@ def test_mysql_update_generate():
 
 def test_postgresql_select_generate():
     sql, value = GenPostgresql.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == "select id from demo_eleven where age=%s limit 1"
+    assert sql == 'select "id" from "demo_eleven" where "age"=%s limit 1'
     assert value == (18,)
     sql, value = GenPostgresql.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == "select id from demo_eleven where age=%s limit 1"
+    assert sql == 'select "id" from "demo_eleven" where "age"=%s limit 1'
     assert value == (18,)
 
 
@@ -171,7 +229,7 @@ def test_postgresql_insert_generate():
     sql, value = GenPostgresql.insert_generate(
         db_table="demo_eleven", data={"name": "zhangsan", "age": 18}
     )
-    assert sql == "insert into demo_eleven (name, age) values (%s, %s)"
+    assert sql == 'insert into "demo_eleven" ("name", "age") values (%s, %s)'
     assert value == ("zhangsan", 18)
 
 
@@ -179,7 +237,7 @@ def test_postgresql_update_generate():
     sql, value = GenPostgresql.update_generate(
         db_table="demo_eleven", data={"score": 4}, rule={"name": "zhangsan"}
     )
-    assert sql == "update demo_eleven set score=%s where name=%s"
+    assert sql == 'update "demo_eleven" set "score"=%s where "name"=%s'
     assert value == (4, "zhangsan")
 
 
@@ -192,21 +250,21 @@ def test_postgresql_upsert_generate():
     )
     assert (
         sql
-        == "INSERT INTO demo_eleven (name, age) VALUES (%s, %s) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age;"
+        == 'INSERT INTO "demo_eleven" ("name", "age") VALUES (%s, %s) ON CONFLICT ("id") DO UPDATE SET "age" = EXCLUDED."age";'
     )
     assert value == ("zhangsan", 18)
 
 
 def test_postgres_asyncpg_select_generate():
     sql, value = GenPostgresqlAsyncpg.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == "SELECT id FROM demo_eleven WHERE age=$1 LIMIT 1"
+    assert sql == 'SELECT "id" FROM "demo_eleven" WHERE "age"=$1 LIMIT 1'
     assert value == (18,)
     sql, value = GenPostgresqlAsyncpg.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == "SELECT id FROM demo_eleven WHERE age=$1 LIMIT 1"
+    assert sql == 'SELECT "id" FROM "demo_eleven" WHERE "age"=$1 LIMIT 1'
     assert value == (18,)
 
 
@@ -214,7 +272,7 @@ def test_postgres_asyncpg_insert_generate():
     sql, value = GenPostgresqlAsyncpg.insert_generate(
         db_table="demo_eleven", data={"name": "zhangsan", "age": 18}
     )
-    assert sql == "INSERT INTO demo_eleven (name, age) VALUES ($1, $2)"
+    assert sql == 'INSERT INTO "demo_eleven" ("name", "age") VALUES ($1, $2)'
     assert list(value) == ["zhangsan", 18]
 
 
@@ -222,7 +280,7 @@ def test_postgres_asyncpg_update_generate():
     sql, value = GenPostgresqlAsyncpg.update_generate(
         db_table="demo_eleven", data={"score": 4}, rule={"name": "zhangsan"}
     )
-    assert sql == "UPDATE demo_eleven SET score=$1 WHERE name=$2"
+    assert sql == 'UPDATE "demo_eleven" SET "score"=$1 WHERE "name"=$2'
     assert value == (4, "zhangsan")
 
 
@@ -235,7 +293,7 @@ def test_postgres_asyncpg_upsert_generate():
     )
     assert (
         sql
-        == "INSERT INTO demo_eleven (name, age) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age;"
+        == 'INSERT INTO "demo_eleven" ("name", "age") VALUES ($1, $2) ON CONFLICT ("id") DO UPDATE SET "age" = EXCLUDED."age";'
     )
     assert value == ("zhangsan", 18)
 
@@ -248,12 +306,12 @@ def test_postgresql_psycopg_merge_generate():
         update_cols={"url"},
     )
     assert format_str(sql) == (
-        "MERGE INTO articles AS t "
-        "USING (VALUES (%s, %s, %s)) AS s(title, platform, url) "
-        "ON t.title = s.title AND t.platform = s.platform "
-        "WHEN MATCHED THEN UPDATE SET url = s.url "
-        "WHEN NOT MATCHED THEN INSERT (title, platform, url) "
-        "VALUES (s.title, s.platform, s.url)"
+        'MERGE INTO "articles" AS t '
+        'USING (VALUES (%s, %s, %s)) AS s("title", "platform", "url") '
+        'ON t."title" = s."title" AND t."platform" = s."platform" '
+        'WHEN MATCHED THEN UPDATE SET "url" = s."url" '
+        'WHEN NOT MATCHED THEN INSERT ("title", "platform", "url") '
+        'VALUES (s."title", s."platform", s."url")'
     )
     assert args == ("标题", "web", "https://example.com/'")
     assert args[2] not in sql
@@ -268,9 +326,9 @@ def test_postgresql_psycopg_merge_skips_matched_rows(update_cols):
         update_cols=update_cols,
     )
     assert format_str(sql) == (
-        "MERGE INTO articles AS t "
-        "USING (VALUES (%s, %s)) AS s(title, url) ON t.title = s.title "
-        "WHEN NOT MATCHED THEN INSERT (title, url) VALUES (s.title, s.url)"
+        'MERGE INTO "articles" AS t '
+        'USING (VALUES (%s, %s)) AS s("title", "url") ON t."title" = s."title" '
+        'WHEN NOT MATCHED THEN INSERT ("title", "url") VALUES (s."title", s."url")'
     )
     assert args == ("标题", "link")
 
@@ -284,7 +342,7 @@ def test_postgresql_psycopg_merge_without_rule_inserts(match_cols):
         update_cols={"url"},
     )
     assert sql == (
-        "INSERT INTO articles (title, url) VALUES (%s, %s) ON CONFLICT DO NOTHING;"
+        'INSERT INTO "articles" ("title", "url") VALUES (%s, %s) ON CONFLICT DO NOTHING;'
     )
     assert args == ("标题", "link")
 
@@ -299,7 +357,7 @@ def test_postgresql_asyncpg_merge_without_rule_inserts(match_cols, update_cols):
         update_cols=update_cols,
     )
     assert sql == (
-        "INSERT INTO articles (title, url) VALUES ($1, $2) ON CONFLICT DO NOTHING;"
+        'INSERT INTO "articles" ("title", "url") VALUES ($1, $2) ON CONFLICT DO NOTHING;'
     )
     assert args == ("标题", "https://example.com/'")
     assert args[1] not in sql
@@ -314,9 +372,9 @@ def test_postgresql_asyncpg_merge_skips_matched_rows(update_cols):
         update_cols=update_cols,
     )
     assert format_str(sql) == (
-        "MERGE INTO articles AS t "
-        "USING (VALUES ($1, $2)) AS s(title, url) ON t.title = s.title "
-        "WHEN NOT MATCHED THEN INSERT (title, url) VALUES (s.title, s.url)"
+        'MERGE INTO "articles" AS t '
+        'USING (VALUES ($1, $2)) AS s("title", "url") ON t."title" = s."title" '
+        'WHEN NOT MATCHED THEN INSERT ("title", "url") VALUES (s."title", s."url")'
     )
     assert args == ("标题", "link")
 
@@ -331,23 +389,76 @@ def test_postgresql_merge_generate():
     sql = format_str(data=sql)
     assert (
         sql
-        == "MERGE INTO demo_eleven AS t USING (VALUES ($1, $2)) AS s(octree_text, octree_href) ON t.octree_text = s.octree_text WHEN MATCHED THEN UPDATE SET octree_href = s.octree_href WHEN NOT MATCHED THEN INSERT (octree_text, octree_href) VALUES (s.octree_text, s.octree_href)"
+        == 'MERGE INTO "demo_eleven" AS t USING (VALUES ($1, $2)) AS s("octree_text", "octree_href") ON t."octree_text" = s."octree_text" WHEN MATCHED THEN UPDATE SET "octree_href" = s."octree_href" WHEN NOT MATCHED THEN INSERT ("octree_text", "octree_href") VALUES (s."octree_text", s."octree_href")'
     )
     assert value == ("zs", "new@mail.com")
 
 
 def test_oracle_select_generate():
     sql, value = GenOracle.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1, vertical=False
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == 'select `id` from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == (
+        'select * from (select "id" from "demo_eleven" where "age"=:1) '
+        "where ROWNUM <= 1"
+    )
     assert value == (18,)
 
     sql, value = GenOracle.select_generate(
-        db_table="demo_eleven", key=["id"], rule={"age|=": 18}, limit=1, vertical=True
+        db_table="demo_eleven", key=["id"], rule={"age": 18}, limit=1
     )
-    assert sql == 'select `id` from "demo_eleven" where "age"=:1 AND ROWNUM = 1'
+    assert sql == (
+        'select * from (select "id" from "demo_eleven" where "age"=:1) '
+        "where ROWNUM <= 1"
+    )
     assert value == (18,)
+
+
+@pytest.mark.parametrize(
+    ("rule", "where_sql", "expected_args"),
+    [
+        ({}, "", ()),
+        (
+            {"age": 18, "title": "标题"},
+            ' where "age"=:1 or "title"=:2',
+            (18, "标题"),
+        ),
+    ],
+)
+@pytest.mark.parametrize("order_by", [None, "id"])
+@pytest.mark.parametrize("limit", [sentinel, 0, 1, 10])
+def test_oracle_select_limit(rule, where_sql, expected_args, order_by, limit):
+    sql, args = GenOracle.select_generate(
+        db_table="articles",
+        key=["id", "title"],
+        rule=rule,
+        base="or",
+        order_by=order_by,
+        limit=limit,
+    )
+    expected_query = f'select "id", "title" from "articles"{where_sql}'
+    if order_by:
+        expected_query += ' order by "id"'
+    if limit is not sentinel:
+        expected_sql = f"select * from ({expected_query}) where ROWNUM <= {limit}"
+    else:
+        expected_sql = expected_query
+    assert sql == expected_sql
+    assert args == expected_args
+
+
+@pytest.mark.parametrize("column", ["id", "VideoId", "视频ID"])
+def test_oracle_select_order_by_column(column):
+    sql, args = GenOracle.select_generate(
+        db_table="articles",
+        key=[column],
+        rule={"title": "标题"},
+        order_by=column,
+    )
+    assert sql == (
+        f'select "{column}" from "articles" where "title"=:1 order by "{column}"'
+    )
+    assert args == ("标题",)
 
 
 def test_oracle_update_generate():
@@ -358,20 +469,6 @@ def test_oracle_update_generate():
     )
     assert sql == 'update "demo_eleven" set "name"=:1, "age"=:2 where "name"=:3'
     assert value == ("zhangsan", 18, "zhangsan")
-
-
-def test_oracle_upsert_generate():
-    sql, value = GenOracle.upsert_generate(
-        db_table="demo_eleven",
-        conflict_cols={"id"},
-        data={"name": "zhangsan", "age": 18},
-        update_cols={"age"},
-    )
-    assert (
-        sql
-        == 'INSERT INTO "demo_eleven" ("name", "age") VALUES (:1, :2) ON CONFLICT (id) DO UPDATE SET age = EXCLUDED.age'
-    )
-    assert value == ("zhangsan", 18)
 
 
 @pytest.mark.parametrize("match_cols", [None, {}, [], set(), ()])
