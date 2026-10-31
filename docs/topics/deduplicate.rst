@@ -8,23 +8,40 @@ Deduplicate
 于文件，基于 redis，基于入库前 item 唯一字段查询，基于 url 请求指纹等。这里提供一些简单常用的方法，具体\
 使用哪种方式请根据应用场景按需选择。
 
-唯一索引 & 项目配置
-=====================
+AyuItem
+=======
 
-一种数据去重的方式是在 ``yield item`` 后 ``pipeline`` 入库时根据库中数据来决定是否新增或更新等，比如\
-给数据库字段添加唯一索引，忽略重复插入的错误：
+本库实现的数据去重/更新的方式之一是通过 AyuItem 实现。可以很方便地通过 AyuItem 中的内置参数结合 mysql，\
+mongodb，postgresql 和 oracledb 的唯一索引即可达到入库时自动判断数据是否已存在，不存在就新增插入，存在时\
+也可自定义更新哪些字段或忽略它。而且是通过对应数据库的一条语句实现，减少像之前那样的先 select 再判断 insert，\
+update 或忽略跳过它而造成的 io 延迟。比如：mysql 通过 INSERT INTO ... ON DUPLICATE KEY UPDATE 实现，\
+mongodb 通过 $set 和 $setOnInsert 实现，postgresql 和 oracledb 是通过 MERGE INTO 实现。
 
-现在可以很方便地通过 AyuItem 中的内置参数结合 mysql，mongodb，postgresql 和 oracledb 的唯一索引即可\
-达到入库时自动判断数据是否已存在，不存在就新增插入，存在时也可自定更新哪些字段或忽略它。而且是通过对应数据库\
-的一条语句实现，减少像之前那样的先 select 再判断 insert， update 或忽略跳过它而造成的 io 延迟。比如：\
-mysql 通过 INSERT INTO ... ON DUPLICATE KEY UPDATE 实现，mongodb 通过 $set 和 $setOnInsert \
-实现，postgresql 是通过 INSERT INTO ... ON CONFLICT 实现，oracledb 是通过 MERGE INTO 实现。
+.. versionadded:: 3.13.0
 
 .. note::
 
-   在 AyugeSpiderTools 3.13.0 版本中内置了更简洁的去重及更新功能，可以通过设置 AyuItem 即可轻松达到\
-   之前先 select 然后再决定 insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。\
-   具体的使用场景和 mongodb，postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
+   在此版本中内置了更简洁的去重及更新功能，可以通过设置 AyuItem 即可轻松达到之前先 select 然后再决定 \
+   insert 还是 update 或什么也不做的复杂操作，且此方式实现方式更简洁且高效。具体的使用场景和 mongodb，\
+   postgresql 和 oracle 数据的示例请在 DemoSpider 中查看。
+
+.. versionchanged:: 3.18.0
+
+.. note::
+
+   在此版本之前，postgresql 是通过 INSERT INTO ... ON CONFLICT 实现数据的去重/更新的。目前可以使用和 \
+   oracledb 一样的方式来保持易用性和统一。若需要维持旧的实现方式，只要在你的项目中把对应的 AyuAsyncPostgresPipeline \
+   改为 AyuAsyncPostgresLegacyPipeline，把对应的 AyuFtyPostgresPipeline 改为 AyuFtyPostgresLegacyPipeline \
+   把对应的 AyuTwistedPostgresPipeline 改为 AyuTwistedPostgresLegacyPipeline，即可保持与之前运\
+   行效果一致的兼容效果。pg 数据库版本在 15 及以上可不用修改而无痛迁移。
+
+.. warning:: 注意：使用 AyuItem 的自带数据去重/更新注意事项
+
+   - Mysql 场景的实现基于 INSERT INTO ... ON CONFLICT 实现，所以一定要在 AyuItem 的 _update_rule \
+     中对应的字段设置为唯一索引（如果 _update_rule 里有多条规则，那么需要创建对应的联合唯一索引）。
+
+   - MongoDB，PostgreSQL 和 Oracle 同样推荐创建对应的唯一索引，来保证在数据量多时的效率，和防止并发场景\
+     下的数据竞争导致插入相同数据。
 
 Mysql
 -----
@@ -34,7 +51,8 @@ Mysql
 .. note::
 
    - 使用 AyuItem 内置的 mysql 更新规则时，需要在 .conf 配置中设置其 odku_enable 为 True 才能激活\
-     更新功能；
+     更新功能，而且 AyuItem 的 _update_rule 中的字段要设置为唯一索引才能生效（如果 _update_rule 是多\
+     个字段才能定位到需要去重/更新的数据，那么对应的表中字段也要创建联合的唯一索引）；
    - 再结合 .conf 中设置 insert_ignore 为 True，且不设置 _update_keys 参数时即可做到忽略更新内容，\
      达到只新增不更新已存在内容。这个请按需使用。
    - 当然，你也可以选择保持默认关闭 odku_enable 和关闭 insert_ignore 的配置，不使用 AyuItem 中的\
@@ -98,14 +116,6 @@ PostgreSQL
 
 对 PostgreSQL 的存储场景进行介绍：
 
-.. note::
-
-   postgresql 的使用和上面 mysql 和 mongodb 的一样，主要是多了一个 _conflict_cols 参数用于指定数\
-   据表中的唯一索引约束字段(在设置了唯一索引时，当然也非常推荐结合唯一索引使用)；为什么不使用 merge into \
-   接口就可以不用多一个自定义 _conflict_cols 字段了，不是更方便简约吗？是因为它只在 postgresql 15 版本\
-   及以上才支持，为了兼容性考虑。
-
-
 .. code-block:: python
 
    from ayugespidertools.items import AyuItem
@@ -117,7 +127,6 @@ PostgreSQL
        _table=_save_table,
        _update_rule={"octree_text": octree_text},
        _update_keys={"octree_href"},
-       _conflict_cols={"octree_text"},
    )
    self.slog.info(f"octree_item: {octree_item}")
    yield octree_item
