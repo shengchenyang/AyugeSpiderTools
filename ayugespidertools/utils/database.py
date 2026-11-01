@@ -409,6 +409,10 @@ class OracleAsyncPortal(metaclass=PortalSingletonMeta):
             service_name=db_conf.service_name,
             disable_oob=db_conf.disable_oob,
             mode=oracle_authentication_mode,
+            min=db_conf.min,
+            max=db_conf.max,
+            increment=db_conf.increment,
+            timeout=db_conf.timeout,
         )
 
     def connect(self) -> oracledb.AsyncConnectionPool:
