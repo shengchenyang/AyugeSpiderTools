@@ -215,6 +215,10 @@ class OracleHandler(ConfigHandler):
             "thick_lib_dir": oracle_section.get("thick_lib_dir", False),
             "disable_oob": oracle_section.get("disable_oob", False),
             "authentication_mode": oracle_section.get("authentication_mode", "DEFAULT"),
+            "min": oracle_section.get("pool_min", 10),
+            "max": oracle_section.get("pool_max", 20),
+            "increment": oracle_section.get("pool_increment", 2),
+            "timeout": oracle_section.get("pool_timeout", 60),
         }
 
 

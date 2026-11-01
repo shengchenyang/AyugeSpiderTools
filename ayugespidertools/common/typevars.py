@@ -149,6 +149,10 @@ class OracleConf(NamedTuple):
     thick_lib_dir: bool | str = False
     disable_oob: bool = False
     authentication_mode: OracleAuthenticationModesStr = "DEFAULT"
+    min: int | None = None
+    max: int | None = None
+    increment: int | None = None
+    timeout: int | None = None
 
 
 class AiohttpConf(NamedTuple):
