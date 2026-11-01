@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.17.1 (Preview: TBD)
+AyugeSpiderTools 3.18.1 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -20,6 +20,67 @@ AyugeSpiderTools 3.17.1 (Preview: TBD)
 安装预发布包。
 
 ... ...
+
+AyugeSpiderTools 3.18.0 (2026-10-31)
+====================================
+
+Deprecations
+------------
+
+- 移除对 python3.10 的支持。
+
+  (:commit:`fb78e012c7432197cf9864733e29cb4b9c21172a`)
+
+- postgresql 的 AyuItem 更新/去重实现方式由 INSERT INTO … ON CONFLICT 改为 MERGE INTO，保持和 oracle 一致，使其更易用；pg 数据库版本\
+  在 15 及以上的可无损升级，在 15 版本以下的可以把 AyuAsyncPostgresPipeline 改为 AyuAsyncPostgresLegacyPipeline，把 AyuFtyPostgresPipeline \
+  改为 AyuFtyPostgresLegacyPipeline，把 AyuTwistedPostgresPipeline 改为 AyuTwistedPostgresLegacyPipeline，即可保持与之前运行效果\
+  一致。
+
+  (:commit:`3378f8f313ff0be778a163563d0ddce2f95a2a81`)
+
+Bug fixes
+---------
+
+- 整理库中依赖的 GenSql 部分，统一数据库 sql 语句生成格式，若你有单独使用 ayugespidertools.common.sqlformat 部分的功能，请在测试兼容后再尝\
+  试升级，若没有单独引用则无需担心。
+
+  (:commit:`dafa048f7d8e3b9074100bee76af663834a02232`)
+
+New features
+------------
+
+- AyuItem 支持了大小写敏感功能，比如 pg 和 oracle 可以指定表及字段为大写或小写了，来兼容可能存在的 pg 或 \
+  oracle 表中的字段大小写问题。示例：
+
+  (:commit:`dafa048f7d8e3b9074100bee76af663834a02232`)
+
+.. code-block:: python
+
+   from ayugespidertools.items import AyuItem
+
+   # 以 pg 的 AyuItem 场景为例：
+   octree_text = "AyugeSpiderTools 一目了然"
+   item = AyuItem(
+       OCTREE_HREF="intro/overview.html",
+       OCTREE_TEXT=octree_text,
+       _update_keys={"OCTREE_HREF"},
+       _update_rule={
+           "OCTREE_TEXT": octree_text,
+       },
+       _table="public.ARTICLE_TABLE",
+   )
+
+- oracle 存储场景添加 AyuAsyncOraclePipeline 的连接池配置参数的可自定义功能。
+
+  (:commit:`ccf7637c492e4d3ef7cc2bb2562b12f9e47efb0b`)
+
+Improvements
+------------
+
+- pipelines 中关于数据库的配置问题优化为更清晰的报错。
+
+  (:commit:`488735953f458059b082850cb46ae69acf3b9e40`)
+
 
 AyugeSpiderTools 3.17.0 (2026-09-26)
 ====================================
