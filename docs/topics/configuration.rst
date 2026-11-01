@@ -23,7 +23,9 @@ VIT 下的 .conf 文件中独立管理。当然，你也可以在项目中自定
 Introduction
 ============
 
-.conf 文件配置格式使用 ini，具有易编写易解析易维护的优点，python 也有方便且成熟的自带库 `configparser`_ 支持。
+.conf 文件配置格式使用 ini，具有易编写易解析易维护的优点，python 也有方便且成熟的自带库 `configparser`_ \
+支持。startproject 生成的 .conf 的示例文件中，各 section 中的配置不是必须都要设置才行，你不需要的或\
+者只想使用项目中的默认设置而快速上手时，可只设置必须参数即可，不需要的设置可以保持注释状态或直接删除。
 
 [nacos]
 =======
@@ -253,6 +255,10 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
    "thick_lib_dir", "可选，默认 false", "oracledb 的 thick_mode 所需参数，按需配置。"
    "disable_oob", "可选，默认 false", "oracledb 的 thick_mode 所需参数，按需配置。"
    "authentication_mode", "可选，默认 DEFAULT", "oracledb 的 authentication_mode 所需参数，按需配置。"
+   "pool_min", "可选，默认 10", "连接池最少连接数。"
+   "pool_max", "可选，默认 20", "连接池最多连接数。"
+   "pool_increment", "可选，2", "连接不足时，每次尝试增加的连接数。"
+   "pool_timeout", "可选，60", "连接空闲时长，超过时连接可以被回收。"
 
 .. versionadded:: 3.16.0
 
@@ -260,6 +266,13 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 
    disable_oob 是一个默认 false 的布尔值，用于控制是否禁用 Oracle 的 Out-of-Band Break(OOB) 功能。该参数仅在 python-oracledb 的 \
    Thin 模式下生效。
+
+.. versionadded:: 3.18.0
+
+.. note::
+
+   pool_min，pool_max，pool_increment 和 pool_timeout 是在使用 AyuAsyncOraclePipeline 时可自定义连接池的配置，非必需参数，可按需\
+   设置。
 
 [kafka]
 =======
@@ -370,7 +383,8 @@ mongodb 链接的普通方式，[mongodb:uri] 和 [mongodb] 按需选择一种�
 
    - 一些 scrapy 第三方扩展需要在 settings.py 中设置一些配置，涉及到 host，密码等隐私配置，直接展示\
      在 settings.py 里是不可接受的，这里提供一种方法来解决；
-   - 注意：你可以在 .conf 中配置多个自定义部分来满足不同场景。
+   - 注意：你可以在 .conf 中配置多个自定义 section 部分来满足不同场景。即这里的 ``custom_section`` \
+     非固定名称，可自定义设置，也可设置多个自定义配置来方便区分管理。
 
 在 settings.py 或 spider 等脚本中赋值重要参数时，可以从 VIT_DIR 的 .conf 中获取自定义配置内容，来达\
 到隐藏隐私内容和保持配置内容统一存放的目的；比如在 .conf 中自定义配置以下内容：
