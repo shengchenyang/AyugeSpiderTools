@@ -281,14 +281,22 @@ scrapy.Item 等地方，可方便地自定义数据更新/去重规则；有统�
 
 - `scrapy`_
 
-赞助
-=======
+支持 & 贡献
+==============
 
-如果此项目对你有所帮助，可以选择打赏作者。
+.. list-table::
+   :align: center
+   :widths: 20 40 40
 
-.. image:: https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg
-   :alt: 微信赞赏码
-   :width: 280
+   * - **WeChat Pay**
+     - **Alipay / PayPal / Google Pay (Afdian)**
+     - **Issues & PRs**
+   * - .. image:: https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg
+          :width: 250px
+          :alt: Alipay / PayPal / Google Pay
+     - `点击查看赞助计划 <https://afdian.com/a/ayuge/plan>`_
+     - `Issues`_ · `PR`_
+
 
 .. _English: https://github.com/shengchenyang/AyugeSpiderTools/blob/master/README_en.rst
 .. _安装指南: https://ayugespidertools.readthedocs.io/en/latest/intro/install.html
@@ -297,3 +305,5 @@ scrapy.Item 等地方，可方便地自定义数据更新/去重规则；有统�
 .. _uv: https://docs.astral.sh/uv/
 .. _fontforge: https://github.com/fontforge/fontforge/releases
 .. _scrapy: https://github.com/scrapy/scrapy
+.. _Issues: https://github.com/shengchenyang/AyugeSpiderTools/issues
+.. _PR: https://ayugespidertools.readthedocs.io/en/latest/additional/contributing.html
