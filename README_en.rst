@@ -309,14 +309,21 @@ Thanks
 
 - `scrapy`_
 
-Sponsor
-=======
+Support & Contribute
+====================
 
-If this project is helpful to you, you can choose to reward the author.
+.. list-table::
+   :align: center
+   :widths: 20 40 40
 
-.. image:: https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg
-   :alt: WeChat Appreciation Code
-   :width: 280
+   * - **WeChat Pay**
+     - **Alipay / PayPal / Google Pay (Afdian)**
+     - **Issues & PRs**
+   * - .. image:: https://github.com/shengchenyang/AyugeSpiderTools/raw/master/artwork/ayugespidertools-donating.jpg
+          :width: 250px
+          :alt: Alipay / PayPal / Google Pay
+     - `View Sponsorship Plans <https://afdian.com/a/ayuge/plan>`_
+     - `Issues`_ · `PR`_
 
 .. _简体中文: https://github.com/shengchenyang/AyugeSpiderTools/blob/master/README.rst
 .. _Installation Guide: https://ayugespidertools.readthedocs.io/en/latest/intro/install.html
@@ -325,3 +332,5 @@ If this project is helpful to you, you can choose to reward the author.
 .. _uv: https://docs.astral.sh/uv/
 .. _fontforge: https://github.com/fontforge/fontforge/releases
 .. _scrapy: https://github.com/scrapy/scrapy
+.. _Issues: https://github.com/shengchenyang/AyugeSpiderTools/issues
+.. _PR: https://ayugespidertools.readthedocs.io/en/latest/additional/contributing.html
