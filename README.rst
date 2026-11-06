@@ -37,6 +37,18 @@
 
 **Demo Project**: https://github.com/shengchenyang/DemoSpider
 
+❤️赞助商
+===========
+
+**Proxy-Seller**
+
+   `Proxy-Seller`_ 提供住宅、移动、ISP 和数据中心代理，支持 HTTP(S) 和 SOCKS5，可按国家和城市选择出\
+   口 IP，可直接配合 Scrapy 的代理中间件使用。下单时使用优惠码 ``HOPLY15`` 可享折扣。
+
+链接：https://proxy-seller.com/?partner=E267408B50C74008
+
+长期优惠码：HOPLY15
+
 概述
 =======
 
@@ -307,3 +319,4 @@ scrapy.Item 等地方，可方便地自定义数据更新/去重规则；有统�
 .. _scrapy: https://github.com/scrapy/scrapy
 .. _Issues: https://github.com/shengchenyang/AyugeSpiderTools/issues
 .. _PR: https://ayugespidertools.readthedocs.io/en/latest/additional/contributing.html
+.. _Proxy-Seller: https://proxy-seller.com/?partner=E267408B50C74008
