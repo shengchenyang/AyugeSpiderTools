@@ -37,6 +37,19 @@ Documentation: https://ayugespidertools.readthedocs.io
 
 Demo Project: https://github.com/shengchenyang/DemoSpider
 
+❤️Sponsors
+==========
+
+**Proxy-Seller**
+
+   `Proxy-Seller`_ offers residential, mobile, ISP and datacenter proxies with HTTP(S) \
+   and SOCKS5 support and country and city targeting, and can be used with Scrapy proxy \
+   middleware. Use promo code ``HOPLY15`` at checkout for a discount.
+
+Link: https://proxy-seller.com/?partner=E267408B50C74008
+
+Promo Code: HOPLY15
+
 Overview
 ========
 
@@ -334,3 +347,4 @@ Support & Contribute
 .. _scrapy: https://github.com/scrapy/scrapy
 .. _Issues: https://github.com/shengchenyang/AyugeSpiderTools/issues
 .. _PR: https://ayugespidertools.readthedocs.io/en/latest/additional/contributing.html
+.. _Proxy-Seller: https://proxy-seller.com/?partner=E267408B50C74008
