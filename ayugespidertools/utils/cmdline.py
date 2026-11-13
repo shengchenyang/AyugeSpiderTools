@@ -5,15 +5,15 @@ import cProfile
 import inspect
 import os
 import sys
+import warnings
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, ParamSpec
 
 from scrapy.commands import BaseRunSpiderCommand, ScrapyCommand, ScrapyHelpFormatter
 from scrapy.crawler import AsyncCrawlerProcess, CrawlerProcess
-from scrapy.exceptions import UsageError
+from scrapy.exceptions import ScrapyDeprecationWarning, UsageError
 from scrapy.utils.misc import walk_modules_iter
 from scrapy.utils.project import get_project_settings, inside_project
-from scrapy.utils.python import garbage_collect
 from scrapy.utils.reactor import _asyncio_reactor_path
 
 from ayugespidertools import __version__
@@ -153,6 +153,21 @@ def _print_unknown_command(
     print('Use "ayuge" to see available commands')
 
 
+def _build_parser(
+    cmd: ScrapyCommand, cmdname: str, settings: Settings
+) -> ScrapyArgumentParser:
+    parser = ScrapyArgumentParser(
+        formatter_class=ScrapyHelpFormatter,
+        usage=f"ayuge {cmdname} {cmd.syntax()}",
+        conflict_handler="resolve",
+        description=cmd.long_desc(),
+    )
+    settings.setdict(cmd.default_settings, priority="command")
+    cmd.settings = settings
+    cmd.add_options(parser)
+    return parser
+
+
 def _run_print_help(
     parser: argparse.ArgumentParser,
     func: Callable[_P, None],
@@ -194,22 +209,20 @@ def execute(argv: list[str] | None = None, settings: Settings | None = None) -> 
         sys.exit(2)
 
     cmd = cmds[cmdname]
-    parser = ScrapyArgumentParser(
-        formatter_class=ScrapyHelpFormatter,
-        usage=f"ayuge {cmdname} {cmd.syntax()}",
-        conflict_handler="resolve",
-        description=cmd.long_desc(),
-    )
-    settings.setdict(cmd.default_settings, priority="command")
-    cmd.settings = settings
-    cmd.add_options(parser)
+    parser = _build_parser(cmd, cmdname, settings)
     opts, args = parser.parse_known_args(args=argv[1:])
     _run_print_help(parser, cmd.process_options, args, opts)
 
     if cmd.requires_crawler_process:
+        if force_crawler_process := settings.getbool("FORCE_CRAWLER_PROCESS"):
+            warnings.warn(
+                "The FORCE_CRAWLER_PROCESS setting is deprecated.",
+                ScrapyDeprecationWarning,
+                stacklevel=2,
+            )
         if (
             settings["TWISTED_REACTOR"] == _asyncio_reactor_path
-            and not settings.getbool("FORCE_CRAWLER_PROCESS")
+            and not force_crawler_process
         ) or not settings.getbool("TWISTED_REACTOR_ENABLED"):
             cmd.crawler_process = AsyncCrawlerProcess(settings)
         else:
@@ -236,10 +249,4 @@ def _run_command_profiled(
 
 
 if __name__ == "__main__":
-    try:
-        execute()
-    finally:
-        # Twisted prints errors in DebugInfo.__del__, but PyPy does not run gc.collect() on exit:
-        # http://doc.pypy.org/en/latest/cpython_differences.html
-        # ?highlight=gc.collect#differences-related-to-garbage-collection-strategies
-        garbage_collect()
+    execute()

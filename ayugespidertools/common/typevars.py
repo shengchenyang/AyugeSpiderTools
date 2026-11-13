@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import threading
+from collections.abc import Mapping
 from enum import Enum
 from typing import (
     TYPE_CHECKING,
@@ -67,7 +68,8 @@ class VerboseCookie(TypedDict):
     secure: NotRequired[bool]
 
 
-CookiesT = dict[str, str] | list[VerboseCookie]
+ScrapyCookiesT = dict[str, str] | list[VerboseCookie]
+ScrapyHeadersT = Mapping[str, Any] | None
 
 
 class PortalTag(str, Enum):

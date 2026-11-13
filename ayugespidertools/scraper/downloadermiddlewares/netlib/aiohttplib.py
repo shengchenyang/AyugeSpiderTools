@@ -80,7 +80,7 @@ class AiohttpDownloaderMiddleware:
         logger.debug(f"Retrying {request} (failed {retries} times): {reason}")
         retry_req = request.copy()
         retry_req.meta["retry_times"] = retries
-        retry_req.dont_filter = True
+        retry_req.meta["skip_dupefilter_once"] = True
         # 优先级逐级降低，以防堆积
         retry_req.priority = request.priority + self.priority_adjust
 

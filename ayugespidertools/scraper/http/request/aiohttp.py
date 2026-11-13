@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import warnings
-from typing import TYPE_CHECKING, Any, AnyStr
+from typing import TYPE_CHECKING, Any, AnyStr, Self, cast
 
 from scrapy import Request
 
@@ -26,7 +26,11 @@ if TYPE_CHECKING:
     from scrapy.http import Response
     from twisted.python.failure import Failure
 
-    from ayugespidertools.common.typevars import CookiesT, StrOrURL
+    from ayugespidertools.common.typevars import (
+        ScrapyCookiesT,
+        ScrapyHeadersT,
+        StrOrURL,
+    )
 
     CallbackT = Callable[Concatenate[Response, ...], Any]
 
@@ -39,7 +43,7 @@ class AiohttpRequest(Request):
         method: str = "GET",
         headers: Mapping[AnyStr, Any] | Iterable[tuple[AnyStr, Any]] | None = None,
         body: _SENTINEL = sentinel,
-        cookies: CookiesT | None = None,
+        cookies: ScrapyCookiesT | None = None,
         meta: dict[str, Any] | None = None,
         encoding: str = "utf-8",
         priority: int = 0,
@@ -47,6 +51,7 @@ class AiohttpRequest(Request):
         errback: Callable[[Failure], Any] | None = None,
         flags: list[str] | None = None,
         cb_kwargs: dict[str, Any] | None = None,
+        parent_id: int | None = None,
         params: Mapping[str, str] | None = None,
         data: Any = None,
         json: Any = None,
@@ -127,7 +132,7 @@ class AiohttpRequest(Request):
             url=url,
             callback=callback,
             method=method,
-            headers=headers,
+            headers=cast("ScrapyHeadersT", headers),
             cookies=cookies,
             meta=meta,
             encoding=encoding,
@@ -136,9 +141,10 @@ class AiohttpRequest(Request):
             errback=errback,
             flags=flags,
             cb_kwargs=cb_kwargs,
+            parent_id=parent_id,
         )
 
-    def copy(self) -> AiohttpRequest:
+    def copy(self) -> Self:
         aiohttp_args = copy.deepcopy(self.meta.get("aiohttp", {}).get("args", {}))
         meta = copy.deepcopy(self.meta)
         meta.pop("aiohttp", None)
@@ -152,5 +158,6 @@ class AiohttpRequest(Request):
             errback=self.errback,
             flags=self.flags,
             cb_kwargs=self.cb_kwargs,
+            parent_id=self.id,
             **aiohttp_args,
         )

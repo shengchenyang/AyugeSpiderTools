@@ -7,12 +7,13 @@
 支持的 Python 版本
 ===================
 
-AyugeSpiderTools 需要 Python 3.10+。
+AyugeSpiderTools 需要 Python 3.11+。
 
 .. warning::
 
    - 在 AyugeSpiderTools 3.10.1 之后的版本不再支持 python 3.8。
    - 在 AyugeSpiderTools 3.14.0 之后的版本不再支持 python 3.9。
+   - 在 AyugeSpiderTools 3.18.0 之后的版本不再支持 python 3.10。
 
 安装 AyugeSpiderTools
 =======================
