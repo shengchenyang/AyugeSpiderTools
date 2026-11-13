@@ -16,9 +16,9 @@ from ayugespidertools.extras.ext import AppConfManageMixin
 __all__ = ["Tools"]
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from scrapy.http import Response
-    from scrapy.http.headers import Headers
-    from scrapy.utils.datatypes import CaseInsensitiveDict
 
     from ayugespidertools.common.typevars import Str_Lstr
 
@@ -221,31 +221,17 @@ class Tools(AppConfManageMixin):
         return None
 
     @staticmethod
-    def first_not_none(data_lst: list[Any]) -> Any:
-        """获取列表中第一个不为 None 的值
+    def first_not_none(data_lst: Iterable[Any]) -> Any:
+        """Get the first non-None value in an iterable.
 
         Args:
-            data_lst: 数据列表
+            data_lst: Iterable data.
 
         Returns:
-            1). 第一个不为 None 的值
+            1). The first non-None value, or None if no such value exists.
         """
         _res = [x for x in data_lst if x is not None]
         return _res[0] if _res else None
-
-    @staticmethod
-    def get_dict_form_scrapy_req_headers(
-        scrapy_headers: Headers,
-    ) -> CaseInsensitiveDict:
-        """根据 scrapy request 中的 headers 信息转化为正常的 dict 格式
-
-        Args:
-            scrapy_headers: scrapy 的 request headers 内容
-
-        Returns:
-            1). 转化 dict 后的 headers 内容
-        """
-        return scrapy_headers.to_unicode_dict()
 
     @staticmethod
     def get_data_urls_by_img(mediatype: str, data: bytes | str) -> str:

@@ -8,7 +8,6 @@ from scrapy.http.request import NO_CALLBACK
 from scrapy.utils.python import to_bytes
 
 from ayugespidertools.common.multiplexing import ReuseOperation
-from ayugespidertools.common.utils import Tools
 from ayugespidertools.config import logger
 from ayugespidertools.exceptions import NotConfigured
 from ayugespidertools.extras.oss import AliOssBase
@@ -32,10 +31,7 @@ if TYPE_CHECKING:
 async def files_download_by_scrapy(spider: AyuSpider, url: str) -> tuple[Response, str]:
     request = scrapy.Request(url, callback=NO_CALLBACK)
     response = await spider.crawler.engine.download_async(request)
-    headers_dict = Tools.get_dict_form_scrapy_req_headers(
-        scrapy_headers=response.headers
-    )
-    content_type = headers_dict.get("Content-Type")
+    content_type = response.headers.get(b"Content-Type", b"").decode()
     file_format = content_type.split("/")[-1].replace("jpeg", "jpg")
     file_guid = hashlib.sha1(to_bytes(url)).hexdigest()  # noqa: S324
     filename = f"{file_guid}.{file_format}"

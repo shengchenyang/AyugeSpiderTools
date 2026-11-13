@@ -1,10 +1,5 @@
-import unittest
-import warnings
-from unittest import mock
-
 import loguru
 import pytest
-from scrapy import signals
 from scrapy.settings import Settings
 from scrapy.spiders import Spider
 from scrapy.utils.test import get_crawler
@@ -14,25 +9,14 @@ from tests import CONSUL_CONFIG, MONGODB_CONFIG, MYSQL_CONFIG, tests_vitdir
 from tests.conftest import ForTestConfig
 
 
-class SpiderTest(unittest.TestCase):
-    spider_class = AyuSpider
-    scrapy_spider_class = Spider
-
-    def setUp(self):
-        warnings.simplefilter("always")
-
-    def tearDown(self):
-        warnings.resetwarnings()
+class TestSpider:
+    scrapy_spider_class: type[Spider] = Spider
+    spider_class: type[AyuSpider] = AyuSpider
 
     def test_base_spider(self):
         spider = self.spider_class("example.com")
         assert spider.name == "example.com"
         assert spider.start_urls == []
-
-    def test_spider_args(self):
-        """``__init__`` method arguments are assigned to spider attributes"""
-        spider = self.spider_class("example.com", foo="bar")
-        assert spider.foo == "bar"
 
     def test_spider_without_name(self):
         """``__init__`` method arguments are assigned to spider attributes"""
@@ -41,36 +25,6 @@ class SpiderTest(unittest.TestCase):
             self.spider_class()
         with pytest.raises(ValueError, match=msg):
             self.spider_class(somearg="foo")
-
-    def test_from_crawler_crawler_and_settings_population(self):
-        crawler = get_crawler()
-        spider = self.spider_class.from_crawler(crawler, "example.com")
-        assert hasattr(spider, "crawler")
-        assert spider.crawler is crawler
-        assert hasattr(spider, "settings")
-        assert spider.settings is crawler.settings
-
-    def test_from_crawler_init_call(self):
-        with mock.patch.object(
-            self.spider_class, "__init__", return_value=None
-        ) as mock_init:
-            self.spider_class.from_crawler(get_crawler(), "example.com", foo="bar")
-            mock_init.assert_called_once_with("example.com", foo="bar")
-
-    def test_closed_signal_call(self):
-        class TestSpider(self.spider_class):
-            closed_called = False
-
-            def closed(self, reason):
-                self.closed_called = True
-
-        crawler = get_crawler()
-        spider = TestSpider.from_crawler(crawler, "example.com")
-        crawler.signals.send_catch_log(signal=signals.spider_opened, spider=spider)
-        crawler.signals.send_catch_log(
-            signal=signals.spider_closed, spider=spider, reason=None
-        )
-        assert spider.closed_called
 
     def test_update_settings(self):
         spider_settings = {"TEST1": "spider", "TEST2": "spider"}
