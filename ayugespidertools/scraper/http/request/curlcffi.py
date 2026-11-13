@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import warnings
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from scrapy import Request
 
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Mapping
+    from collections.abc import Callable
     from io import BytesIO
     from typing import Concatenate, Literal
 
@@ -31,11 +31,13 @@ if TYPE_CHECKING:
     from scrapy.http import Response
     from twisted.python.failure import Failure
 
-    from ayugespidertools.common.typevars import CookiesT, StrOrURL
+    from ayugespidertools.common.typevars import (
+        ScrapyCookiesT,
+        ScrapyHeadersT,
+        StrOrURL,
+    )
 
     CallbackT = Callable[Concatenate[Response, ...], Any]
-    ScrapyHeaders = Mapping[str, Any] | Iterable[tuple[str, Any]] | None
-    ScrapyCookies = CookiesT | None
 
 
 class CurlCffiRequest(Request):
@@ -54,6 +56,7 @@ class CurlCffiRequest(Request):
         errback: Callable[[Failure], Any] | None = None,
         flags: list[str] | None = None,
         cb_kwargs: dict[str, Any] | None = None,
+        parent_id: int | None = None,
         params: dict | list | tuple | None = None,
         data: dict[str, str] | list[tuple] | str | BytesIO | bytes | None = None,
         json: dict | list | None = None,
@@ -140,8 +143,8 @@ class CurlCffiRequest(Request):
             url=url,
             callback=callback,
             method=method,
-            headers=cast("ScrapyHeaders", headers),
-            cookies=cast("ScrapyCookies", cookies),
+            headers=cast("ScrapyHeadersT", headers),
+            cookies=cast("ScrapyCookiesT", cookies),
             meta=meta,
             encoding=encoding,
             priority=priority,
@@ -149,9 +152,10 @@ class CurlCffiRequest(Request):
             errback=errback,
             flags=flags,
             cb_kwargs=cb_kwargs,
+            parent_id=parent_id,
         )
 
-    def copy(self) -> CurlCffiRequest:
+    def copy(self) -> Self:
         curl_cffi_args = copy.deepcopy(self.meta.get("curl_cffi", {}).get("args", {}))
         meta = copy.deepcopy(self.meta)
         meta.pop("curl_cffi", None)
@@ -165,5 +169,6 @@ class CurlCffiRequest(Request):
             errback=self.errback,
             flags=self.flags,
             cb_kwargs=self.cb_kwargs,
+            parent_id=self.id,
             **curl_cffi_args,
         )

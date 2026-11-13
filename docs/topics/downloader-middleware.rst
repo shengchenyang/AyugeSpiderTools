@@ -102,7 +102,7 @@ downloader-middleware
 .. code-block:: python
 
    custom_settings = {
-       "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+       # "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
        "DOWNLOADER_MIDDLEWARES": {
            # 将 scrapy Request 替换为 aiohttp 方式
            "ayugespidertools.middlewares.AiohttpDownloaderMiddleware": 543,
@@ -124,7 +124,7 @@ downloader-middleware
 
 .. note::
 
-   - TWISTED_REACTOR 的配置在本库的 settings 中就默认打开的，这里配置是为了演示，不用再次配置的；
+   - Scrapy 2.20.0 默认使用 AsyncioSelectorReactor，无需额外配置 TWISTED_REACTOR；
    - 这里的 scrapy DOWNLOAD_TIMEOUT 同样也是 aiohttp 请求的超时设置参数；
    - AIOHTTP_CONFIG 为 aiohttp 的全局配置，是构建 aiohttp.ClientSession 的 connector 时所需的\
      参数；
