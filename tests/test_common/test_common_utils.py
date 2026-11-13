@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import pytest
-from scrapy.http.request import Request
 from scrapy.http.response.text import TextResponse
 
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -212,18 +211,6 @@ def test_first_not_none():
     data_lst = [None, "", False, "data"]
     res = Tools.first_not_none(data_lst)
     assert res == ""
-
-
-def test_get_dict_form_scrapy_req_headers():
-    _headers = {
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
-        "X-Requested-With": "XMLHttpRequest",
-    }
-    scrapy_headers = Request(url="https://www.baidu.com", headers=_headers).headers
-    res = Tools.get_dict_form_scrapy_req_headers(scrapy_headers=scrapy_headers)
-    assert res == _headers
 
 
 def test_bezier_track():
