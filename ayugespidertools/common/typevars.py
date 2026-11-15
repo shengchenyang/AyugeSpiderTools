@@ -18,8 +18,13 @@ from yarl import URL
 
 if TYPE_CHECKING:
     import asyncio
+    from socket import AddressFamily
     from ssl import SSLContext
 
+    from aiohttp.abc import AbstractResolver
+    from aiohttp.client_reqrep import Fingerprint
+    from aiohttp.connector import SocketFactoryType
+    from aiohttp.helpers import _SENTINEL as AiohttpSentinel
     from loguru import Logger
     from scrapy.utils.log import SpiderLoggerAdapter
 
@@ -58,6 +63,7 @@ SecurityProtocolStr = Literal["PLAINTEXT", "SSL", "SASL_PLAINTEXT", "SASL_SSL"]
 SaslMechanismStr = Literal[
     "PLAIN", "GSSAPI", "OAUTHBEARER", "SCRAM-SHA-256", "SCRAM-SHA-512"
 ]
+ScrapyHeadersT = Mapping[str, Any] | None
 
 
 class VerboseCookie(TypedDict):
@@ -69,7 +75,6 @@ class VerboseCookie(TypedDict):
 
 
 ScrapyCookiesT = dict[str, str] | list[VerboseCookie]
-ScrapyHeadersT = Mapping[str, Any] | None
 
 
 class PortalTag(str, Enum):
@@ -163,12 +168,13 @@ class AiohttpConf(NamedTuple):
     fingerprint: bytes | None = None
     use_dns_cache: bool | None = None
     ttl_dns_cache: int | None = None
-    family: int | None = None
+    dns_cache_max_size: int | None = None
+    family: AddressFamily | None = None
     ssl_context: SSLContext | None = None
-    ssl: bool | None = None
+    ssl: bool | Fingerprint | SSLContext | None = None
     local_addr: tuple[str, int] | None = None
-    resolver: str | None = None
-    keepalive_timeout: float | object | None = None
+    resolver: AbstractResolver | None = None
+    keepalive_timeout: float | AiohttpSentinel | None = None
     force_close: bool | None = None
     limit: int | None = None
     limit_per_host: int | None = None
@@ -177,11 +183,13 @@ class AiohttpConf(NamedTuple):
     timeout_ceil_threshold: float | None = None
     happy_eyeballs_delay: float | None = None
     interleave: int | None = None
+    socket_factory: SocketFactoryType | None = None
+    ssl_shutdown_timeout: AiohttpSentinel | None | float = None
 
     # 这些是一些全局中需要的配置，其它的参数都在 ClientSession.request 中赋值
-    sleep: int | None = None
+    sleep: float | None = None
     retry_times: int | None = None
-    timeout: int | None = None
+    timeout: float | None = None
 
 
 class AlterItemTable(NamedTuple):

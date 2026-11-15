@@ -6,19 +6,16 @@ __all__ = [
 
 
 class Param:
-    """用于存储项目中需要的参数变量设置"""
+    """Project constants"""
 
     retry_num = 3
     retry_time_min = 200
     retry_time_max = 1000
-
     aiohttp_retry_times_default = 3
 
-    # 部署运行的平台为 win 或 linux
     IS_WINDOWS = platform.system().lower() == "windows"
     IS_LINUX = platform.system().lower() == "linux"
 
-    # aiohttp 配置示例
     aiohttp_conf_example = {
         "timeout": 5,
         "proxy": "127.0.0.1:80",
@@ -27,7 +24,7 @@ class Param:
     }
 
     charset_collate_map = {
-        # utf8mb4_unicode_ci 也是经常使用的
+        # utf8mb4_unicode_ci is also frequently used
         "utf8mb4": "utf8mb4_general_ci",
         "utf8": "utf8_general_ci",
         "gbk": "gbk_chinese_ci",

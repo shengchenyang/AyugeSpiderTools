@@ -41,6 +41,8 @@ if TYPE_CHECKING:
 
 
 class CurlCffiRequest(Request):
+    __slots__ = ()
+
     def __init__(
         self,
         url: StrOrURL,
