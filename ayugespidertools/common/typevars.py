@@ -193,11 +193,11 @@ class AiohttpConf(NamedTuple):
 
 
 class AlterItemTable(NamedTuple):
-    """用于描述 AlterItem 中的 table 字段
+    """Describe the table field in AlterItem.
 
     Attributes:
         name: table name
-        notes: table name 的注释
+        notes: comments on table name
     """
 
     name: str
