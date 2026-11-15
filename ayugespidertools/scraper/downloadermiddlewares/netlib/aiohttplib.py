@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import aiohttp
 from scrapy import signals
@@ -19,10 +19,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from typing import Self
+    from typing import Self, TypeAlias
 
     from itemadapter import ItemAdapter
-    from scrapy import Request
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.statscollectors import StatsCollector
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     from ayugespidertools.scraper.http.request.aiohttp import AiohttpRequest
     from ayugespidertools.spiders import AyuSpider
 
-    AyuRequest = AiohttpRequest | Request
+    AyuRequest: TypeAlias = AiohttpRequest
 
 
 AIOHTTP_REQUEST_ERROR_STATUS = 599
@@ -103,6 +102,7 @@ class AiohttpDownloaderMiddleware:
                 fingerprint=_aiohttp_cfg.get("fingerprint"),
                 use_dns_cache=_aiohttp_cfg.get("use_dns_cache"),
                 ttl_dns_cache=_aiohttp_cfg.get("ttl_dns_cache"),
+                dns_cache_max_size=_aiohttp_cfg.get("dns_cache_max_size"),
                 family=_aiohttp_cfg.get("family"),
                 ssl_context=_aiohttp_cfg.get("ssl_context"),
                 ssl=_aiohttp_cfg.get("ssl"),
@@ -117,6 +117,8 @@ class AiohttpDownloaderMiddleware:
                 timeout_ceil_threshold=_aiohttp_cfg.get("timeout_ceil_threshold"),
                 happy_eyeballs_delay=_aiohttp_cfg.get("happy_eyeballs_delay"),
                 interleave=_aiohttp_cfg.get("interleave"),
+                socket_factory=_aiohttp_cfg.get("socket_factory"),
+                ssl_shutdown_timeout=_aiohttp_cfg.get("ssl_shutdown_timeout"),
                 # 设置一些自定义的全局参数
                 timeout=settings.get("DOWNLOAD_TIMEOUT"),
                 sleep=_aiohttp_cfg.get("sleep"),
@@ -155,7 +157,7 @@ class AiohttpDownloaderMiddleware:
         return headers
 
     async def _request_by_aiohttp(
-        self, aio_request_args: ItemAdapter | dict
+        self, aio_request_args: ItemAdapter | dict[str, Any]
     ) -> tuple[int, str, Headers, bytes]:
         """使用 aiohttp 来请求
 
@@ -186,9 +188,9 @@ class AiohttpDownloaderMiddleware:
         self, request: AyuRequest
     ) -> AyuRequest | Response | None:
         spider = cast("AyuSpider", self.crawler.spider)
-        aiohttp_options = request.meta.get("aiohttp", {})
-        self.aiohttp_args = aiohttp_options.setdefault("args", {})
-        aiohttp_req_args = ReuseOperation.filter_none_value(data=self.aiohttp_args)
+        aiohttp_req_args = ReuseOperation.filter_none_value(
+            data=getattr(request, "_ayuge_aiohttp_args", {})
+        )
 
         try:
             (

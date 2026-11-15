@@ -78,6 +78,7 @@ Default:
        "fingerprint": None,
        "use_dns_cache": None,
        "ttl_dns_cache": None,
+       "dns_cache_max_size": None,
        "family": None,
        "ssl_context": None,
        "ssl": None,
@@ -90,14 +91,15 @@ Default:
        "enable_cleanup_closed": None,
        "loop": None,
        "timeout_ceil_threshold": None,
+       "socket_factory": None,
+       "ssl_shutdown_timeout": None,
        # 设置一些自定义的全局参数
        "sleep": None,
        "retry_times": None,
    }
 
-这是使用 ``aiohttp`` 的 ``yield AiohttpRequest`` 来代替 scrapy 的 ``yield Request`` 和 \
-``yield FormRequest`` 来发送请求的功能；其中的全局配置默配置全为 ``None``，代表如果不配置其值或配置\
-为 None 会使用 ``aiohttp request`` 的默认值，默认值示例如下：
+这是使用 ``aiohttp`` 的 ``yield AiohttpRequest`` 来代替 Scrapy 请求来发送请求的功能；其中的全局配置\
+默认全为 ``None``，代表如果不配置其值或配置为 None 会使用 ``aiohttp request`` 的默认值，默认值示例如下：
 
 .. code:: bash
 
@@ -106,7 +108,8 @@ Default:
    fingerprint: Optional[bytes] = None,
    use_dns_cache: bool = True,
    ttl_dns_cache: Optional[int] = 10,
-   family: int = 0,
+   dns_cache_max_size: int = 1000,
+   family: socket.AddressFamily = socket.AddressFamily.AF_UNSPEC,
    ssl_context: Optional[SSLContext] = None,
    ssl: Union[bool, Fingerprint, SSLContext] = True,
    local_addr: Optional[Tuple[str, int]] = None,
@@ -118,6 +121,10 @@ Default:
    enable_cleanup_closed: bool = False,
    loop: Optional[asyncio.AbstractEventLoop] = None,
    timeout_ceil_threshold: float = 5,
+   happy_eyeballs_delay: Optional[float] = 0.25,
+   interleave: Optional[int] = None,
+   socket_factory: Optional[SocketFactoryType] = None,
+   ssl_shutdown_timeout: Union[_SENTINEL, None, float] = sentinel,
 
 使用 aiohttp 来发送请求时，这个 ``AIOHTTP_CONFIG`` 及其子项不是必须参数，按需设置即可。现可使用统一\
 的 ``yield AiohttpRequest`` 方式，且与 aiohttp 一样的请求参数来更方便地开发。
