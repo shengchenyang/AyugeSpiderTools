@@ -40,11 +40,19 @@ Demo Project: https://github.com/shengchenyang/DemoSpider
 ❤️Sponsors
 ==========
 
-**Proxy-Seller**
+.. container::
 
-   `Proxy-Seller`_ offers residential, mobile, ISP and datacenter proxies with HTTP(S) \
-   and SOCKS5 support and country and city targeting, and can be used with Scrapy proxy \
-   middleware. Use promo code ``HOPLY15`` at checkout for a discount.
+   |proxy-seller|
+
+   .. |proxy-seller| image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/proxy-seller.png
+      :target: https://proxy-seller.com/?partner=E267408B50C74008
+      :alt: proxy-seller
+      :width: 150px
+
+   .. pull-quote::
+      `Proxy-Seller`_ offers residential, mobile, ISP and datacenter proxies with HTTP(S) \
+      and SOCKS5 support and country and city targeting, and can be used with Scrapy proxy \
+      middleware. Use promo code ``HOPLY15`` at checkout for a discount.
 
 Link: https://proxy-seller.com/?partner=E267408B50C74008
 

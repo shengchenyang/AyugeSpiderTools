@@ -40,10 +40,18 @@
 ❤️赞助商
 ===========
 
-**Proxy-Seller**
+.. container::
 
-   `Proxy-Seller`_ 提供住宅、移动、ISP 和数据中心代理，支持 HTTP(S) 和 SOCKS5，可按国家和城市选择出\
-   口 IP，可直接配合 Scrapy 的代理中间件使用。下单时使用优惠码 ``HOPLY15`` 可享折扣。
+   |proxy-seller|
+
+   .. |proxy-seller| image:: https://raw.githubusercontent.com/shengchenyang/AyugeSpiderTools/master/artwork/proxy-seller.png
+      :target: https://proxy-seller.com/?partner=E267408B50C74008
+      :alt: proxy-seller
+      :width: 150px
+
+   .. pull-quote::
+      `Proxy-Seller`_ 提供住宅、移动、ISP 和数据中心代理，支持 HTTP(S) 和 SOCKS5，可按国家和城市选择\
+      出口 IP，可直接配合 Scrapy 的代理中间件使用。下单时使用优惠码 ``HOPLY15`` 可享折扣。
 
 链接：https://proxy-seller.com/?partner=E267408B50C74008
 
