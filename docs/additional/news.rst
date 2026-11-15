@@ -4,7 +4,7 @@
 Release notes
 =============
 
-AyugeSpiderTools 3.18.1 (Preview: TBD)
+AyugeSpiderTools 3.19.0 (Preview: TBD)
 ======================================
 
 此部分用于展示下一版本更新预览。
@@ -18,6 +18,20 @@ AyugeSpiderTools 3.18.1 (Preview: TBD)
 
 当然也可以直接 ``pip install git+https://github.com/shengchenyang/AyugeSpiderTools.git`` 来\
 安装预发布包。
+
+New features
+------------
+
+- 更新 scrapy 依赖为 2.20.0。
+
+  (:commit:`19c348cf6e7fb68d8ed543b0b5a0a97aa1d840ec`)
+
+Improvements
+------------
+
+- 优化使用 aiohttp 请求时参数传递方式，不再通过 meta 保存而是 request 属性，避免污染用户侧的 meta 数据。
+
+  (:commit:`389e4917458558e3bef63e4bab96ec37c7c52832`)
 
 ... ...
 
