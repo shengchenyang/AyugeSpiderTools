@@ -22,15 +22,15 @@ _MISSING = object()
 
 
 class ScrapyItem(Item):
-    """scrapy item 的标准方式"""
+    """Standard way of scrapy items."""
 
 
 class DataItem(NamedTuple):
-    """用于描述 item 中字段
+    """Represent a field in an item.
 
     Attributes:
-        key_value: 参数值
-        notes: 对参数的注释
+        key_value: the parameter value
+        notes: a description of the parameter
     """
 
     key_value: Any
@@ -45,23 +45,24 @@ class AyuItem(MutableMapping[str, Any]):
         >>> item = AyuItem(
         ...     _table="ta",
         ... )
-        >>> # 获取字段
+        >>> # Get a field value
         >>> item["_table"]
         'ta'
-        >>> # 添加 / 修改字段，不存在则创建，存在则修改
+        >>> # Add or modify a field. Create the key-value pair if the key does not exist;
+        >>> # otherwise, update the existing value.
         >>> item["_table"] = "tab"
         >>> item["title"] = "tit"
-        >>> # 也可通过 add_field 添加字段，但不能重复添加相同字段
+        >>> # Fields can also be added using add_field, but duplicate keys are not allowed.
         >>> item.add_field("num", 10)
         >>> [ item["_table"], item["title"], item["num"] ]
         ['tab', 'tit', 10]
-        >>> # 转换为 dict
+        >>> # Convert to a dictionary
         >>> item.asdict() == {'_table': 'tab', '_conflict_cols': {'id'}, 'title': 'tit', 'num': 10}
         True
-        >>> # 转换为 scrapy item
+        >>> # Convert to a Scrapy item
         >>> item.asitem().__class__.__name__ == "ScrapyItem"
         True
-        >>> # 删除字段
+        >>> # Delete fields
         >>> item.pop("num")
         10
         >>> del item["title"]
@@ -91,13 +92,16 @@ class AyuItem(MutableMapping[str, Any]):
         _conflict_cols: set[str] | None = None,
         **kwargs: Any,
     ) -> None:
-        """初始化 AyuItem 实例
+        """Initialize an AyuItem instance.
 
         Args:
-            _table: 数据库表名。
-            _update_rule: 去重更新规则，用于 mongo mysql postgresql oracle 等入库前的去重更新判断条件。
-            _update_keys: 去重更新规则 _update_rule 匹配时，需要更新的字段，若不设置则忽略。
-            _conflict_cols: 唯一索引冲突列，用于 postgresql 中的参数设置，默认为 {"id"}
+            _table: The target database table name.
+            _update_rule: The criteria used to identify existing records before
+                inserting data. Supported by MongoDB, MySQL, PostgreSQL, and Oracle.
+            _update_keys: The fields to update when an existing record matches
+                the _update_rule. If omitted, no fields are updated.
+            _conflict_cols: The columns used for conflict detection in PostgreSQL
+                ON CONFLICT clauses. Defaults to {"id"}.
         """
         object.__setattr__(self, "_data", kwargs)
         if _conflict_cols is None:

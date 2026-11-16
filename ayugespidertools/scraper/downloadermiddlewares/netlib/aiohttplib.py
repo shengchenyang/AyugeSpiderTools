@@ -50,7 +50,7 @@ class AiohttpDownloaderMiddleware:
     def _retry(
         self, request: AyuRequest, reason: str | int | Exception, spider: AyuSpider
     ) -> AyuRequest | None:
-        """重试请求
+        """Retry request.
 
         Args:
             request: retry request
@@ -58,7 +58,7 @@ class AiohttpDownloaderMiddleware:
             spider: AyuSpider
 
         Returns:
-            1). AyuRequest | None: 重试的 request 对象
+            AyuRequest | None: the request object that was retried.
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -80,7 +80,6 @@ class AiohttpDownloaderMiddleware:
         retry_req = request.copy()
         retry_req.meta["retry_times"] = retries
         retry_req.meta["skip_dupefilter_once"] = True
-        # 优先级逐级降低，以防堆积
         retry_req.priority = request.priority + self.priority_adjust
 
         if isinstance(reason, Exception):
@@ -93,11 +92,10 @@ class AiohttpDownloaderMiddleware:
     async def spider_opened(self, spider: AyuSpider) -> None:
         self.slog = spider.slog
         settings = spider.crawler.settings
-        # 自定义 aiohttp 全局配置信息，优先级小于 aiohttp_meta 中的配置
+        # custom global aiohttp configuration
         if _aiohttp_cfg := settings.get("AIOHTTP_CONFIG", {}):
-            # 这里的配置信息如果在 aiohttp_meta 中重复设置，则会更新当前请求的参数
             self.aiohttp_cfg = AiohttpConf(
-                # 设置 aiohttp.TCPConnector 中的配置
+                # configure aiohttp.TCPConnector options
                 verify_ssl=_aiohttp_cfg.get("verify_ssl"),
                 fingerprint=_aiohttp_cfg.get("fingerprint"),
                 use_dns_cache=_aiohttp_cfg.get("use_dns_cache"),
@@ -119,7 +117,7 @@ class AiohttpDownloaderMiddleware:
                 interleave=_aiohttp_cfg.get("interleave"),
                 socket_factory=_aiohttp_cfg.get("socket_factory"),
                 ssl_shutdown_timeout=_aiohttp_cfg.get("ssl_shutdown_timeout"),
-                # 设置一些自定义的全局参数
+                # set some custom global parameters
                 timeout=settings.get("DOWNLOAD_TIMEOUT"),
                 sleep=_aiohttp_cfg.get("sleep"),
                 retry_times=_aiohttp_cfg.get(
@@ -133,7 +131,7 @@ class AiohttpDownloaderMiddleware:
             )
             aiohttp_tcp_conn_args = ReuseOperation.filter_none_value(aiohttp_tcp_conn)
             _connector = aiohttp.TCPConnector(**aiohttp_tcp_conn_args)
-            # 超时设置, 若同时配置 AiohttpRequestArgs 的 timeout 参数会更新此值
+            # default timeout, overridden by AiohttpRequest.timeout when provided.
             _timeout = aiohttp.ClientTimeout(total=self.aiohttp_cfg.timeout)
             self.session = aiohttp.ClientSession(connector=_connector, timeout=_timeout)
             self.priority_adjust = settings.getint("RETRY_PRIORITY_ADJUST")
@@ -159,17 +157,6 @@ class AiohttpDownloaderMiddleware:
     async def _request_by_aiohttp(
         self, aio_request_args: ItemAdapter | dict[str, Any]
     ) -> tuple[int, str, Headers, bytes]:
-        """使用 aiohttp 来请求
-
-        Args:
-            aio_request_args: aiohttp 请求参数
-
-        Returns:
-            1). response_status: 响应状态码
-            2). response_url: 响应 URL
-            3). response_headers: 响应头
-            4). response_body: 响应内容
-        """
         async with self.session.request(**aio_request_args) as response:
             response_status = response.status
             response_url = str(response.url)
@@ -200,7 +187,7 @@ class AiohttpDownloaderMiddleware:
                 response_body,
             ) = await self._request_by_aiohttp(aio_request_args=aiohttp_req_args)
         except Exception as e:
-            self.slog.error(f"url: {request.url} aiohttp 请求失败，Error: {e}")
+            self.slog.error(f"url: {request.url} aiohttp request failed，Error: {e}")
             response_status = self._response_status_from_error(e)
 
             if _sleep := self.aiohttp_cfg.sleep:

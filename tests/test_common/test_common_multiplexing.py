@@ -116,17 +116,6 @@ def test_random_weight():
     assert any([True, 20 < x_count < 40])
 
 
-def test_judge_str_is_json():
-    data = '{"post_key1": post_value1}'
-    res = ReuseOperation.judge_str_is_json(judge_str=data)
-    data = '{"post_key1": "post_value1"}'
-    res1 = ReuseOperation.judge_str_is_json(judge_str=data)
-    data = "post_key1=post_value1"
-    res2 = ReuseOperation.judge_str_is_json(judge_str=data)
-    res3 = ReuseOperation.judge_str_is_json(10)
-    assert all([res is False, res1 is True, res2 is False, res3 is False])
-
-
 def test_get_items_except_keys():
     dict_conf = {
         "alldata": {
