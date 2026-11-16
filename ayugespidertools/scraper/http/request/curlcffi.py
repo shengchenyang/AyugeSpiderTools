@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import warnings
 from typing import TYPE_CHECKING, Any, Self, cast
 
@@ -20,6 +19,7 @@ if TYPE_CHECKING:
 
     from curl_cffi import CurlMime
     from curl_cffi.const import CurlFollow, CurlHttpVersion
+    from curl_cffi.fingerprints import Fingerprint
     from curl_cffi.requests import (
         BrowserTypeLiteral,
         CookieTypes,
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     )
     from curl_cffi.requests.impersonate import ExtraFingerprints, ExtraFpDict
     from curl_cffi.requests.session import HttpMethod, HttpVersionLiteral
+    from curl_cffi.requests.streams import RequestContent
     from scrapy.http import Response
     from twisted.python.failure import Failure
 
@@ -41,7 +42,7 @@ if TYPE_CHECKING:
 
 
 class CurlCffiRequest(Request):
-    __slots__ = ()
+    __slots__ = ("_ayuge_curlcffi_args",)
 
     def __init__(
         self,
@@ -61,8 +62,9 @@ class CurlCffiRequest(Request):
         parent_id: int | None = None,
         params: dict | list | tuple | None = None,
         data: dict[str, str] | list[tuple] | str | BytesIO | bytes | None = None,
-        json: dict | list | None = None,
-        files: dict | None = None,
+        content: RequestContent | None = None,
+        json: dict[str, Any] | list[Any] | None = None,
+        files: dict[str, Any] | None = None,
         auth: tuple[str, str] | None = None,
         timeout: float | tuple[float, float] | object | None = None,
         allow_redirects: bool | CurlFollow | str | None = None,
@@ -73,8 +75,8 @@ class CurlCffiRequest(Request):
         verify: bool | None = None,
         referer: str | None = None,
         accept_encoding: str | None = "gzip, deflate, br",
-        content_callback: Callable[[bytes], None] | None = None,
-        impersonate: BrowserTypeLiteral | None = None,
+        content_callback: Callable[..., Any] | None = None,
+        impersonate: BrowserTypeLiteral | Fingerprint | None = None,
         ja3: str | None = None,
         akamai: str | None = None,
         perk: str | None = None,
@@ -84,11 +86,13 @@ class CurlCffiRequest(Request):
         quote: str | Literal[False] = "",
         http_version: CurlHttpVersion | HttpVersionLiteral | None = None,
         interface: str | None = None,
+        doh_url: str | None = None,
         cert: str | tuple[str, str] | None = None,
         stream: bool | None = None,
         max_recv_speed: int = 0,
         multipart: CurlMime | None = None,
         discard_cookies: bool = False,
+        **kwargs: Any,
     ) -> None:
         if body is not sentinel:
             warnings.warn(
@@ -136,10 +140,9 @@ class CurlCffiRequest(Request):
             "multipart": multipart,
             "discard_cookies": discard_cookies,
         }
-
-        meta = copy.deepcopy(meta) or {}
-        curl_cffi_meta = meta.setdefault("curl_cffi", {})
-        curl_cffi_meta["args"] = curl_cffi_req_args
+        if kwargs:
+            curl_cffi_req_args.update(kwargs)
+        self._ayuge_curlcffi_args = curl_cffi_req_args
 
         super().__init__(
             url=url,
@@ -158,13 +161,9 @@ class CurlCffiRequest(Request):
         )
 
     def copy(self) -> Self:
-        curl_cffi_args = copy.deepcopy(self.meta.get("curl_cffi", {}).get("args", {}))
-        meta = copy.deepcopy(self.meta)
-        meta.pop("curl_cffi", None)
-
         return self.__class__(
             callback=self.callback,
-            meta=meta,
+            meta=self.meta,
             encoding=self.encoding,
             priority=self.priority,
             dont_filter=self.dont_filter,
@@ -172,5 +171,5 @@ class CurlCffiRequest(Request):
             flags=self.flags,
             cb_kwargs=self.cb_kwargs,
             parent_id=self.id,
-            **curl_cffi_args,
+            **self._ayuge_curlcffi_args,
         )

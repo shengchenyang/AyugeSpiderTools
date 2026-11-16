@@ -23,9 +23,9 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
-    from typing import Self
+    from typing import Self, TypeAlias
 
-    from scrapy import Request
+    from curl_cffi.requests.cache import CacheSpec
     from scrapy.crawler import Crawler
     from scrapy.http import Response
     from scrapy.statscollectors import StatsCollector
@@ -34,8 +34,7 @@ if TYPE_CHECKING:
     from ayugespidertools.scraper.http.request.curlcffi import CurlCffiRequest
     from ayugespidertools.spiders import AyuSpider
 
-    AyuRequest = CurlCffiRequest | Request
-
+    AyuRequest: TypeAlias = CurlCffiRequest
 
 CURL_CFFI_REQUEST_ERROR_STATUS = 599
 CURL_CFFI_LOCAL_CONFIG_KEYS = {"sleep", "retry_times"}
@@ -68,14 +67,16 @@ class CurlCffiConf(NamedTuple):
     default_headers: bool | None = None
     default_encoding: Any = None
     curl_options: dict[Any, Any] | None = None
-    curl_infos: list[object] | None = None
+    curl_infos: list | None = None
     http_version: Any = None
     debug: bool | None = None
     interface: str | None = None
+    doh_url: str | None = None
     cert: str | tuple[str, str] | None = None
     response_class: type[curl_requests.Response] | None = None
     discard_cookies: bool | None = None
     raise_for_status: bool | None = None
+    cache: CacheSpec | None = None
     sleep: int | float | None = None
     retry_times: int | None = None
 
@@ -93,7 +94,7 @@ class CurlCffiDownloaderMiddleware:
     def _retry(
         self, request: AyuRequest, reason: str | int | Exception, spider: AyuSpider
     ) -> AyuRequest | None:
-        """重试请求
+        """Retry request.
 
         Args:
             request: retry request
@@ -101,7 +102,7 @@ class CurlCffiDownloaderMiddleware:
             spider: AyuSpider
 
         Returns:
-            1). AyuRequest | None: 重试的 request 对象
+            AyuRequest | None: the request object that was retried.
         """
         retries = request.meta.get("retry_times", 0) + 1
         stats = spider.crawler.stats
@@ -123,7 +124,7 @@ class CurlCffiDownloaderMiddleware:
         retry_req = request.copy()
         retry_req.meta["retry_times"] = retries
         retry_req.meta["skip_dupefilter_once"] = True
-        # 优先级逐级降低，以防堆积
+        # decrease priority progressively to prevent requests from piling up
         retry_req.priority = request.priority + self.priority_adjust
 
         if isinstance(reason, Exception):
@@ -136,7 +137,7 @@ class CurlCffiDownloaderMiddleware:
     async def spider_opened(self, spider: AyuSpider) -> None:
         self.slog = spider.slog
         settings = spider.crawler.settings
-        # 自定义 curl_cffi 全局配置信息，优先级小于 curl_cffi_meta 中的配置
+        # custom global curl_cffi configuration
         _curl_cffi_cfg = settings.getdict("CURL_CFFI_CONFIG", {})
         retry_times = _curl_cffi_cfg.get("retry_times")
         self.curl_cffi_cfg = CurlCffiConf(
@@ -169,10 +170,12 @@ class CurlCffiDownloaderMiddleware:
             http_version=_curl_cffi_cfg.get("http_version"),
             debug=_curl_cffi_cfg.get("debug"),
             interface=_curl_cffi_cfg.get("interface"),
+            doh_url=_curl_cffi_cfg.get("doh_url"),
             cert=_curl_cffi_cfg.get("cert"),
             response_class=_curl_cffi_cfg.get("response_class"),
             discard_cookies=_curl_cffi_cfg.get("discard_cookies"),
             raise_for_status=_curl_cffi_cfg.get("raise_for_status"),
+            cache=_curl_cffi_cfg.get("cache"),
             sleep=_curl_cffi_cfg.get("sleep"),
             retry_times=(
                 Param.aiohttp_retry_times_default
@@ -198,9 +201,8 @@ class CurlCffiDownloaderMiddleware:
         return s
 
     async def _request_by_curl_cffi(
-        self, curl_cffi_request_args: dict
+        self, curl_cffi_request_args: dict[str, Any]
     ) -> curl_requests.Response:
-        """使用 curl_cffi 来请求"""
         return await self.session.request(**curl_cffi_request_args)
 
     @staticmethod
@@ -224,20 +226,17 @@ class CurlCffiDownloaderMiddleware:
     async def process_request(
         self, request: AyuRequest
     ) -> AyuRequest | Response | None:
-        curl_cffi_options = request.meta.get("curl_cffi")
-        if curl_cffi_options is None:
-            return None
-
         spider = cast("AyuSpider", self.crawler.spider)
-        self.curl_cffi_args = curl_cffi_options.setdefault("args", {})
-        curl_cffi_req_args = ReuseOperation.filter_none_value(data=self.curl_cffi_args)
+        curl_cffi_req_args = ReuseOperation.filter_none_value(
+            data=getattr(request, "_ayuge_curlcffi_args", {})
+        )
 
         try:
             response = await self._request_by_curl_cffi(
                 curl_cffi_request_args=curl_cffi_req_args
             )
         except Exception as e:
-            self.slog.error(f"url: {request.url} curl_cffi 请求失败，Error: {e}")
+            self.slog.error(f"url: {request.url} curl_cffi request failed，Error: {e}")
             response_status = self._response_status_from_error(e)
 
             if _sleep := self.curl_cffi_cfg.sleep:

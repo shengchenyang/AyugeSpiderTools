@@ -84,6 +84,7 @@ class AiohttpRequest(Request):
         max_headers: int | None = None,
         middlewares: Sequence[ClientMiddlewareType] | None = None,
         upload_tracker: UploadTracker | None = None,
+        **kwargs: Any,
     ) -> None:
         if body is not sentinel:
             warnings.warn(
@@ -127,6 +128,8 @@ class AiohttpRequest(Request):
             "middlewares": middlewares,
             "upload_tracker": upload_tracker,
         }
+        if kwargs:
+            aiohttp_req_args.update(kwargs)
         self._ayuge_aiohttp_args = aiohttp_req_args
 
         if isinstance(url, URL):

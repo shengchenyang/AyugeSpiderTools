@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import configparser
-import json
 import random
 from typing import TYPE_CHECKING, Any
 
@@ -36,18 +35,17 @@ if TYPE_CHECKING:
 
 
 class ReuseOperation:
-    """存放常用的复用方法"""
-
     @staticmethod
     def fetch_local_conf(vit_dir: str | Path, inner_settings: dict) -> dict:
-        """通过本地 VIT 中的 .conf 获取所需配置，并将其添加到 inner_settings
+        """Obtain the required configuration from the .conf file in your local
+        VIT and add it to inner_settings.
 
         Args:
-            vit_dir: 配置文件所在的目录
-            inner_settings: inner_settings 配置
+            vit_dir: path to the local VIT directory
+            inner_settings: internal settings
 
         Returns:
-            inner_settings: 本库所需的配置
+            inner_settings: the settings required by this library.
         """
         cfg = configparser.ConfigParser()
         cfg.read(f"{vit_dir}/.conf", encoding="utf-8")
@@ -55,15 +53,6 @@ class ReuseOperation:
 
     @staticmethod
     def item_to_dict(item: AyuItem | dict) -> dict:
-        """将 item 转换为 dict 类型；
-        将 spider 中的 yield 的 item 转换为 dict 类型，方便后续处理
-
-        Args:
-            item: spider 中的 yield 的 item
-
-        Returns:
-            1). dict 类型的 item
-        """
         if isinstance(item, dict):
             return item
         if isinstance(item, AyuItem):
@@ -82,14 +71,6 @@ class ReuseOperation:
 
     @classmethod
     def reshape_item(cls, item_dict: dict[str, Any]) -> AlterItem:
-        """重新整合 item
-
-        Args:
-            item_dict: dict 类型的 item
-
-        Returns:
-            1). 整合后的 item
-        """
         insert_data = cls.get_items_except_keys(
             data=item_dict, keys=AyuItem._except_keys
         )
@@ -132,36 +113,36 @@ class ReuseOperation:
 
     @staticmethod
     def is_namedtuple_instance(x: Any) -> bool:
-        """判断 x 是否为 namedtuple 类型
+        """Check whether x is a namedtuple instance.
 
         Args:
-            x: 需要判断的参数
+            x: the object to check
 
         Returns:
-            1). 是否符合 namedtuple 类型
+            whether x is a namedtuple instance.
         """
         return isinstance(x, tuple) and hasattr(x, "_fields")
 
     @staticmethod
     def random_weight(weight_data: list):
-        """带权重的随机取值，即在带权重的列表数据中根据权重随机取一个值
+        """Randomly select an item from a weighted list based on its weight.
 
         Args:
-            weight_data: 带权重的列表信息，示例：
+            weight_data: a list of weighted items. For example:
                 [{'username': 'xxxx', 'password': '******', 'weight': 8}, ...]
 
         Returns:
-            ret: 返回当前权重列表 account_arr 中的一个值
+            an item randomly selected from the weighted list.
         """
         total = sum(item["weight"] for item in weight_data)
-        # 在 0 与权重和之间获取一个随机数
+        # generate a random number between 0 and the total weight.
         ra = random.uniform(0, total)  # noqa: S311
         curr_sum = 0
         ret = None
         for data in weight_data:
-            # 在遍历中，累加当前权重值
+            # accumulate the weights while iterating.
             curr_sum += data["weight"]
-            # 当随机数 <= 当前权重和时，返回权重 key
+            # return the item when the random number falls within the cumulative weight.
             if ra <= curr_sum:
                 ret = data
                 break
@@ -169,14 +150,14 @@ class ReuseOperation:
 
     @staticmethod
     def is_dict_meet_min_limit(data: dict, keys: Iterable[str]) -> bool:
-        """判断 data 是否包含 keys 中所有的 key
+        """Check whether data contains all the specified keys.
 
         Args:
-            data: 需要判断的参数
-            keys: data 中需要包含的 key 值
+            data: the dictionary to check
+            keys: the keys that must be present in the dictionary
 
         Returns:
-            1). 是否满足 key 值限制
+            whether the dictionary contains all the specified keys.
         """
         if any([not data, not isinstance(data, dict)]):
             return False
@@ -185,14 +166,15 @@ class ReuseOperation:
 
     @classmethod
     def get_items_by_keys(cls, data: dict, keys: Iterable[str] | None) -> dict:
-        """获取 data 中的含有 keys 的 key 的字段
+        """Extract the specified key-value pairs from data.
 
         Args:
-            data: 需要处理的参数
-            keys: 需要取的 key 值列表
+            data: the dictionary to process
+            keys: the keys to extract from the dictionary
 
         Returns:
-            1). 取值后的 dict，或不满足请求的 False 值
+            a dictionary containing the matching key-value pairs, or an empty
+            dictionary if no keys are specified.
         """
         if not keys:
             return {}
@@ -200,14 +182,14 @@ class ReuseOperation:
 
     @staticmethod
     def get_items_except_keys(data: dict[str, Any], keys: Iterable[str] | None) -> dict:
-        """获取 data 中的不含有 keys 的 key 的字段
+        """Exclude the specified keys from data.
 
         Args:
-            data: 需要处理的参数
-            keys: 需要排除的 key 值列表
+            data: the dictionary to process
+            keys: the keys to exclude from the dictionary
 
         Returns:
-            1). data 排除 keys 中的键值后的值
+            a dictionary containing the remaining key-value pairs after exclusion.
         """
         if not keys:
             return data
@@ -215,23 +197,27 @@ class ReuseOperation:
 
     @staticmethod
     def filter_none_value(data: dict[str, Any]) -> dict:
-        """过滤掉 dict 中值为 None 的数据
+        """Filter out key-value pairs with None values from a dictionary.
 
         Args:
-            data: 需要处理的参数
+            data: the dictionary to process
 
         Returns:
-            1). data 过滤掉 dict 中值为 None 的数据
+            a dictionary containing only key-value pairs with non-None values.
         """
         return {k: v for k, v in data.items() if v is not None}
 
     @staticmethod
     def create_database(db_conf: MysqlConf | PostgreSQLConf) -> None:
-        """创建数据库：由于这是在连接数据库，报数据库不存在错误时的场景，则需要
-        新建(不指定数据库)连接创建好所需数据库即可
+        """Create the database if it does not exist.
+
+        When a database connection fails because the specified database does not
+        exist, establish a connection without specifying a database and create
+        the required database.
 
         Args:
-            db_conf: 数据库连接配置，目前支持 mysql 和 postgresql
+            db_conf: database connection configuration. currently supports MySQL
+            and PostgreSQL.
         """
         if isinstance(db_conf, MysqlConf):
             with pymysql.connect(
@@ -262,19 +248,12 @@ class ReuseOperation:
         else:
             raise TypeError(f"Invalid db_conf type: {type(db_conf)}")
         logger.info(
-            f"创建数据库 {db_conf.database} 成功，其 charset 类型是：{db_conf.charset}!"
+            f"Database {db_conf.database} created successfully with charset：{db_conf.charset}!"
         )
 
     @classmethod
     def dict_keys_to_lower(cls, deal_dict: dict) -> dict:
-        """将 dict 中 str 类型的 key 值变成小写
-
-        Args:
-            deal_dict: 需要处理的 dict
-
-        Returns:
-            1). 处理后的 dict 值
-        """
+        """Convert all string keys in a dictionary to lowercase recursively."""
         key_to_lower_dict = {}
         for key, value in deal_dict.items():
             if isinstance(value, dict):
@@ -290,14 +269,7 @@ class ReuseOperation:
 
     @classmethod
     def dict_keys_to_upper(cls, deal_dict: dict) -> dict:
-        """将 dict 中 str 类型的 key 值变成大写
-
-        Args:
-            deal_dict: 需要处理的 dict
-
-        Returns:
-            1). 处理后的 dict 值
-        """
+        """Convert all string keys in a dictionary to uppercase."""
         key_to_upper_dict = {}
         for key, value in deal_dict.items():
             if isinstance(value, dict):
@@ -313,48 +285,20 @@ class ReuseOperation:
 
     @classmethod
     def get_remote_option(cls, settings: BaseSettings) -> dict:
-        """获取项目中 consul 或 nacos 的链接配置
-
-        Args:
-            settings: scrapy 的 settings 信息
-
-        Returns:
-            1). 满足最少要求的远程配置
-        """
         remote_conf = settings.get("REMOTE_CONFIG", {})
         return cls.get_items_by_keys(
             data=remote_conf, keys={"token", "url", "format", "remote_type"}
         )
 
     @staticmethod
-    def judge_str_is_json(judge_str: str) -> bool:
-        """判断字符串是否为 json 格式
-
-        Args:
-            judge_str: 需要判断的字符串
-
-        Returns:
-            1). 是否为 json 格式
-        """
-        if not isinstance(judge_str, str):
-            return False
-
-        try:
-            json.loads(judge_str)
-        except Exception:
-            return False
-        else:
-            return True
-
-    @staticmethod
     def get_ck_dict_from_headers(headers_ck_str: str) -> dict:
-        """从 headers 中的 ck str 格式转化为 dict 格式
+        """Convert a cookie string from request headers into a dictionary.
 
         Args:
-            headers_ck_str: request headers ck 的 str 格式
+            headers_ck_str: the cookie string from request headers
 
         Returns:
-            1). 转化 dict 格式后的 ck
+            a dictionary containing the parsed cookies.
         """
         return {
             x.split("=", 1)[0].strip(): x.split("=", 1)[1].strip()
@@ -363,13 +307,13 @@ class ReuseOperation:
 
     @staticmethod
     def get_req_dict_from_scrapy(req_body_data_str: str) -> dict:
-        """将 scrapy 请求中的 body 对象转为 dict 格式
+        """Convert a Scrapy request body string into a dictionary.
 
         Args:
-            req_body_data_str: scrapy 中的 body 参数
+            req_body_data_str: the request body string from Scrapy
 
         Returns:
-            1). 转化 dict 格式后的 body
+            a dictionary containing the parsed request body parameters.
         """
         return {
             x.split("=", 1)[0]: x.split("=", 1)[1] for x in req_body_data_str.split("&")
@@ -377,17 +321,17 @@ class ReuseOperation:
 
     @classmethod
     def get_array_depth(cls, array: list) -> int:
-        """获取 array 的最大层级，深度
+        """Get the maximum nesting depth of an array.
 
         Args:
-            array: 数组
+            array: the array to measure
 
         Returns:
-            1). 最大层级，深度
+            the maximum nesting depth.
         """
 
         """1 + max(map(depthCount,x)) if x and isinstance(x,list) else 0"""
-        # 先判断是否为数组类型的元素
+        # check whether the element is a sequence or set
         judge_array = isinstance(
             array,
             frozenset | list | set | tuple,
