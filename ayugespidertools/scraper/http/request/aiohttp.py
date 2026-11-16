@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Self, cast
 
 from scrapy import Request
 
+from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.typevars import _SENTINEL, URL, sentinel
 from ayugespidertools.exceptions import AyugeSpiderToolsDeprecationWarning
 
@@ -130,6 +131,7 @@ class AiohttpRequest(Request):
         }
         if kwargs:
             aiohttp_req_args.update(kwargs)
+        aiohttp_req_args = ReuseOperation.filter_none_value(aiohttp_req_args)
         self._ayuge_aiohttp_args = aiohttp_req_args
 
         if isinstance(url, URL):

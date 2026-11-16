@@ -12,6 +12,7 @@ class Param:
     retry_time_min = 200
     retry_time_max = 1000
     aiohttp_retry_times_default = 3
+    curlcffi_retry_times_default = 3
 
     IS_WINDOWS = platform.system().lower() == "windows"
     IS_LINUX = platform.system().lower() == "linux"

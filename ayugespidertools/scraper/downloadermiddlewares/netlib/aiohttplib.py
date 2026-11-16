@@ -175,9 +175,7 @@ class AiohttpDownloaderMiddleware:
         self, request: AyuRequest
     ) -> AyuRequest | Response | None:
         spider = cast("AyuSpider", self.crawler.spider)
-        aiohttp_req_args = ReuseOperation.filter_none_value(
-            data=getattr(request, "_ayuge_aiohttp_args", {})
-        )
+        aiohttp_req_args = getattr(request, "_ayuge_aiohttp_args", {})
 
         try:
             (
