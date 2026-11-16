@@ -178,7 +178,7 @@ class CurlCffiDownloaderMiddleware:
             cache=_curl_cffi_cfg.get("cache"),
             sleep=_curl_cffi_cfg.get("sleep"),
             retry_times=(
-                Param.aiohttp_retry_times_default
+                Param.curlcffi_retry_times_default
                 if retry_times is None
                 else retry_times
             ),
@@ -227,9 +227,7 @@ class CurlCffiDownloaderMiddleware:
         self, request: AyuRequest
     ) -> AyuRequest | Response | None:
         spider = cast("AyuSpider", self.crawler.spider)
-        curl_cffi_req_args = ReuseOperation.filter_none_value(
-            data=getattr(request, "_ayuge_curlcffi_args", {})
-        )
+        curl_cffi_req_args = getattr(request, "_ayuge_curlcffi_args", {})
 
         try:
             response = await self._request_by_curl_cffi(
