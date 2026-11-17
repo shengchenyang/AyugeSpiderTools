@@ -22,7 +22,7 @@ class $classname(AyuSpider):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://myip.ipip.net") as additional_response:
                 additional_data = await additional_response.text()
-                self.slog.debug(f"start 响应内容: {additional_data}")
+                self.slog.debug(f"Response body in start: {additional_data}")
                 yield Request(
                     url="https://myip.ipip.net",
                     callback=self.parse,
@@ -30,4 +30,4 @@ class $classname(AyuSpider):
                 )
 
     async def parse(self, response: Response, **kwargs: Any) -> Any:
-        self.slog.debug(f"parse 响应内容: {response.text}")
+        self.slog.debug(f"Response body in parse: {response.text}")

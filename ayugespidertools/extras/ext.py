@@ -17,29 +17,12 @@ __all__ = ["AppConfManageMixin", "EncryptMixin"]
 class EncryptMixin:
     @staticmethod
     def mm3_hash128_encode(encode_data: str) -> str:
-        """MurmurHash3 非加密哈希之 hash128
-
-        Args:
-            encode_data: 需要 mmh3 hash128 的参数
-
-        Returns:
-            1). mmh3 hash128 后的结果
-        """
         o = mmh3.hash128(encode_data)
         hash128_encoded = hex(((o & 0xFFFFFFFFFFFFFFFF) << 64) + (o >> 64))
         return hash128_encoded[2:]
 
     @staticmethod
     def rsa_encrypt(rsa_public_key: str, encode_data: str) -> str:
-        """rsa encode example
-
-        Args:
-            rsa_public_key: rsa publickey
-            encode_data: rsa encode data
-
-        Returns:
-            1). rsa encrypted result
-        """
         public_key = f"""-----BEGIN PUBLIC KEY-----
             {rsa_public_key}
             -----END PUBLIC KEY-----"""

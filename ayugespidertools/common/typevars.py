@@ -163,7 +163,7 @@ class OracleConf(NamedTuple):
 
 
 class AiohttpConf(NamedTuple):
-    # 这些是对应 aiohttp.TCPConnector 中的配置
+    # Options passed to aiohttp.TCPConnector.
     verify_ssl: bool | None = None
     fingerprint: bytes | None = None
     use_dns_cache: bool | None = None
@@ -186,7 +186,7 @@ class AiohttpConf(NamedTuple):
     socket_factory: SocketFactoryType | None = None
     ssl_shutdown_timeout: AiohttpSentinel | None | float = None
 
-    # 这些是一些全局中需要的配置，其它的参数都在 ClientSession.request 中赋值
+    # Shared request settings; pass other options directly to ClientSession.request.
     sleep: float | None = None
     retry_times: int | None = None
     timeout: float | None = None

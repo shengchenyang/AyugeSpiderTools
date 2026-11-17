@@ -25,14 +25,14 @@ class KafkaProducerClient:
         self.producer = KafkaPortal(db_conf=kafka_conf).connect()
 
     def sendmsg(self, topic: str, value: dict, key: str | None = None) -> None:
-        """发送数据
+        """Send a message to Kafka and wait up to ten seconds for acknowledgement.
 
         Args:
-            topic: kafka topic
+            topic: Destination Kafka topic.
             value: message value. Must be type bytes, or be serializable to
                 bytes via configured value_serializer. If value is None, key is
                 required and message acts as a 'delete'.
-            key: kafka key
+            key: Optional message key passed to the configured key serializer.
         """
         # Asynchronous by default
         future = (
@@ -48,22 +48,24 @@ class KafkaProducerClient:
         # Block for 'synchronous' sends
         try:
             _ = future.get(timeout=10)
-            # 暂不需要日志记录成功后 _ 的 partition 和 offset，故注释掉
+            # Partition and offset metadata are not currently logged.
             # Successful result returns assigned partition and offset
             # partition = record_metadata.partition
             # offset = record_metadata.offset
-            # logger.info(f"save success, partition: {partition}, offset: {offset}")
+            # logger.info(f"Kafka message delivered, partition: {partition}, offset: {offset}")
         except KafkaError:
-            # Decide what to do if produce request failed...
-            logger.error(f"save error, topic: {topic}, value: {value}, key: {key}")
+            # Log the message context when delivery fails.
+            logger.error(
+                f"Failed to deliver Kafka message, topic: {topic}, value: {value}, key: {key}"
+            )
 
     def on_send_success(self, *args, **kwargs):
-        """发送成功回调函数，暂不做任何处理或提示"""
+        """Handle a successful send without additional logging."""
         return
 
     def on_send_error(self, excp: BaseException) -> None:
-        """发送失败回调函数，只日志记录"""
-        logger.error(f"send error: {excp}")
+        """Log a Kafka message delivery failure."""
+        logger.error(f"Kafka message delivery failed: {excp}")
 
     def close_producer(self):
         if self.producer:

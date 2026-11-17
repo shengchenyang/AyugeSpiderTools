@@ -12,8 +12,8 @@ try:
     import numpy as np
 except ImportError:
     raise NotConfigured(
-        "missing opencv-python(cv2) or numpy library, please install it. "
-        "install command: pip install ayugespidertools[all]"
+        "The opencv-python (cv2) and numpy packages are required. "
+        "Install them with: pip install ayugespidertools[all]"
     )
 
 __all__ = ["BezierTrajectory", "CvnpilKit"]
@@ -25,49 +25,36 @@ if TYPE_CHECKING:
 class CvnpilKit:
     @staticmethod
     def get_array_dimension(array: frozenset | list | set | tuple) -> int:
-        """获取 array 的维度
-
-        Args:
-            array: 数组
-
-        Returns:
-            1). 层级数
-        """
-        # 其实直接返回 len(array) 即可
         return len(np.array(array).shape)
 
     @staticmethod
     def read_image_data(
         img: bytes | str, flags: int = cv2.IMREAD_COLOR
     ) -> np.ndarray | None:
-        """
-        用 opencv 读取图片数据
+        """Load image data from a file path or encoded image bytes using OpenCV.
+
         Args:
-            img: 图片参数，类型需要是路径 str 或 bytes 数据
-            flags: 应用颜色通道类型
+            img: Image file path or encoded image bytes.
+            flags: OpenCV read flags for file paths. Byte input is decoded with
+                IMREAD_ANYCOLOR regardless of this argument.
 
         Returns:
-            img_cv: opencv 读取背景图片的数据
+            The decoded image array, or None if OpenCV cannot decode the image.
         """
-        assert type(img) in [str, bytes], "img 参数需要是路径或 bytes 数据"
+        assert type(img) in [str, bytes], (
+            "img must be a file path (str) or encoded image bytes"
+        )
         if isinstance(img, bytes):
             img_buf = np.frombuffer(img, np.uint8)
             img_cv = cv2.imdecode(img_buf, cv2.IMREAD_ANYCOLOR)
         else:
-            # 读取图片，读进来直接是 BGR 格式数据格式在 0~255
+            # Load the image using the requested flags; color mode defaults to BGR.
             img_cv = cv2.imread(img, flags)
         return img_cv
 
     @staticmethod
     def clear_white(img):
-        """清除图片的空白区域，这里主要清除滑块的空白
-
-        Args:
-            img: 待处理的图片
-
-        Returns:
-            1). 清除图片空白区域的图片
-        """
+        """Crop blank areas around the slider."""
         rows, cols, channel = img.shape
         min_x = 255
         min_y = 255
@@ -89,38 +76,30 @@ class CvnpilKit:
 
     @staticmethod
     def image_edge_detection(img):
-        """图像边缘检测处理，识别图片边缘
-
-        Args:
-            img: 需要处理的图片，用于边缘检测使用
-
-        Returns:
-            1). 处理后的图片
-        """
+        """Detect image edges with the Canny algorithm."""
         return cv2.Canny(img, 100, 200)
 
     @staticmethod
     def _template_match(bg: MatLike, slider: MatLike, out: str | None = None) -> int:
-        """模板匹配找出滑块缺口的距离
+        """Find the slider gap in the background using normalized template matching.
 
         Args:
-            bg: 背景图片
-            slider: 缺口(滑块)图片
-            out: 展示图片的存储全路径，会将绘制的图片保存至此
+            bg: Background image array.
+            slider: Slider template image array.
+            out: Optional output path for the background with the match outlined.
 
         Returns:
-            tl[0]: 滑块缺口的距离
+            The horizontal coordinate of the best match.
         """
         res = cv2.matchTemplate(bg, slider, cv2.TM_CCOEFF_NORMED)
-        # 寻找最优匹配(一维数组当作向量,用 Mat 定义) 中最小值和最大值的位置
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        # 左上角点的坐标
+        # Top-left corner of the best match.
         tl = max_loc
 
         if out:
-            # 绘制方框
+            # Draw a rectangle around the matched region.
             th, tw = slider.shape[:2]
-            # 右下角点的坐标
+            # Bottom-right corner of the matched region.
             br = (tl[0] + tw, tl[1] + th)
             cv2.rectangle(bg, tl, br, (0, 0, 255), 2)
             cv2.imwrite(out, bg)
@@ -130,15 +109,15 @@ class CvnpilKit:
     def discern_gap(
         cls, bg: str | bytes, slider: str | bytes, out: str | None = None
     ) -> int:
-        """识别滑块缺口方法
+        """Locate a slider gap after cropping the slider and extracting image edges.
 
         Args:
-            bg: 带缺口的背景图，可以是全路径图片，也可以是图片的 bytes 数据
-            slider: 滑块图，可以是全路径图片，也可以是图片的 bytes 数据
-            out: 绘制图展示的存储地址，参数格式为图片的全路径
+            bg: Background image file path or encoded image bytes.
+            slider: Slider image file path or encoded image bytes.
+            out: Optional output path for the annotated match image.
 
         Returns:
-            1): 滑块缺口横坐标
+            The horizontal coordinate of the matched gap.
         """
         slider_cv = CvnpilKit.read_image_data(slider)
         bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
@@ -154,47 +133,49 @@ class CvnpilKit:
     def identify_gap(
         cls, bg: bytes | str, slider: bytes | str, out: str | None = None
     ) -> int:
-        """通过背景图片和缺口图片识别出滑块距离
+        """Locate a slider gap by matching the background and slider edge maps.
 
         Args:
-            bg: 背景图片，可以是图片的全路径，也可以是图片的 bytes 内容
-            slider: 缺口（滑块）图片，可以是图片的全路径，也可以是图片的 bytes 内容
-            out: 输出图片路径，示例：doc/test.jpg；此参数如果为空，则不输出标记后的图片
+            bg: Background image file path or encoded image bytes.
+            slider: Slider image file path or encoded image bytes.
+            out: Optional output path for the annotated match image.
+                No image is saved when this argument is omitted.
 
         Returns:
-            tl[0]: 滑块缺口距离
+            The horizontal coordinate of the matched gap.
         """
-        # 读取图片数据
+        # Decode the background and slider images.
         bg_cv = cls.read_image_data(bg)
         slider_cv = cls.read_image_data(slider, cv2.IMREAD_GRAYSCALE)
-        # 识别图片边缘
+        # Extract edge maps.
         bg_edge = cv2.Canny(bg_cv, 100, 200)
         slider_edge = cv2.Canny(slider_cv, 100, 200)
-        # 转换图片格式
+        # Convert the edge maps to three-channel images.
         bg_img = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)
         slider_img = cv2.cvtColor(slider_edge, cv2.COLOR_GRAY2RGB)
         return cls._template_match(bg_img, slider_img, out)
 
     @staticmethod
     def match_gap(bg: str | bytes, slider: str | bytes) -> int | None:
-        """滑块坐标定位方法
+        """Locate a slider template by iteratively adjusting the match threshold.
 
         Args:
-            bg: 1) 带缺口的背景图，全路径; 2) 或者是背景图的 bytes 数据
-            slider: 1） 滑块图，全路径; 2）或者是滑块图的 bytes 数据
+            bg: Background image file path or encoded image bytes.
+            slider: Slider image file path or encoded image bytes.
 
         Returns:
-            loc[1][0]: 滑块位置坐标
+            The first horizontal coordinate meeting the final threshold,
+            or None if the threshold becomes negative.
         """
         bg_cv = CvnpilKit.read_image_data(bg, cv2.IMREAD_GRAYSCALE)
         slider_cv = CvnpilKit.read_image_data(slider, cv2.IMREAD_GRAYSCALE)
 
         run = 1
-        # 这里的返回值根据不同版本的 open-cv 其返回结果会有不同的个数
+        # The number of values returned here may vary across OpenCV versions.
         # w, h, z = slider_cv.shape[::-1]
-        # 在背景图里面查找滑块图的位置
+        # Find the slider template in the background image.
         res = cv2.matchTemplate(bg_cv, slider_cv, cv2.TM_CCOEFF_NORMED)
-        # 使用二分法查找阈值的精确值
+        # Use binary search to determine the precise matching threshold.
         lft: float = 0.0
         rgt: float = 1.0
         loc: tuple[np.ndarray[Any, np.dtype[np.signedinteger[Any]]], ...] = ()
@@ -202,15 +183,15 @@ class CvnpilKit:
             run += 1
             threshold = (rgt + lft) / 2
             if threshold < 0:
-                # 逻辑走到这里，则说明出错了，并未找出目标位置
+                # This indicates an error: the target location was not found.
                 return None
 
-            # 匹配程度大于百分之 threshold 的坐标 x, y
+            # Get the x and y coordinates where the matching score exceeds the threshold.
             loc = np.where(res >= threshold)
             if len(loc[1]) > 1:
                 rgt += (rgt - lft) / 2
             elif len(loc[1]) == 1:
-                # 找到目标区域起点 x 坐标为：loc[1][0]
+                # The x-coordinate of the target region's starting point is loc[1][0].
                 break
             elif len(loc[1]) < 1:
                 rgt -= (rgt - lft) / 2
@@ -218,13 +199,13 @@ class CvnpilKit:
 
     @staticmethod
     def get_normal_track(space):
-        """通用的根据滑块距离获取轨迹数组方法
+        """Generate a track array based on the slider distance.
 
         Args:
-            space: 滑块缺口距离
+            space: The distance to the slider gap.
 
         Returns:
-            tracks_list: 生成的轨迹数组
+            The generated track array.
         """
         x = [0, 0]
         y = [0, 0, 0]
@@ -261,7 +242,7 @@ class CvnpilKit:
 
 
 class BezierTrajectory:
-    """贝塞尔曲线轨迹生成器
+    """Generate trajectories along Bezier curves.
 
     Examples:
         >>> bt = BezierTrajectory()
@@ -270,7 +251,7 @@ class BezierTrajectory:
     """
 
     def _generate_control_points(self, track: list):
-        """计算贝塞尔曲线的控制点"""
+        """Calculate the control points of a Bézier curve."""
         track_len = len(track)
 
         def calculate_bezier_point(x):
@@ -323,17 +304,20 @@ class BezierTrajectory:
         return normal_numbers
 
     def simulation(self, start, end, order=1, deviation=0, bias=0.5):
-        """模拟贝塞尔曲线的绘制过程
+        """Build a Bezier curve from endpoints and generated intermediate control points.
 
         Args:
-            start: 开始点的坐标
-            end: 结束点的坐标
-            order: 几阶贝塞尔曲线，越大越复杂
-            deviation: 轨迹上下波动的范围
-            bias: 波动范围的分布位置
+            start: Starting point coordinates.
+            end: Ending point coordinates.
+            order: Degree of the Bezier curve.
+            deviation: Vertical displacement of intermediate control points
+                from the line connecting the endpoints.
+            bias: Position from which intermediate control-point intervals begin,
+                expressed as a fraction of the horizontal span.
 
         Returns:
-            1). 返回一个字典 equation 对应该曲线的方程，P 对应贝塞尔曲线的影响点
+            A dictionary with equation (a callable mapping x to y) and P
+            (the endpoints and intermediate control points).
         """
         start = np.array(start)
         end = np.array(end)
@@ -377,21 +361,26 @@ class BezierTrajectory:
         shake_num=0,
         yhh=10,
     ) -> dict:
-        """生成轨迹数组
+        """Sample a Bezier trajectory with optional oscillation around the endpoint.
 
         Args:
-            start: 开始点的坐标
-            end: 结束点的坐标
-            num: 返回的数组的轨迹点的数量
-            order: 几阶贝塞尔曲线，越大越复杂
-            deviation: 轨迹上下波动的范围
-            bias: 波动范围的分布位置
-            mode: 0 表示均速滑动，1 表示先慢后快，2 表示先快后慢，3 表示先慢中间快后慢
-            shake_num: 在终点来回摆动的次数
-            yhh: 在终点来回摆动的范围
+            start: Starting point coordinates.
+            end: Ending point coordinates.
+            num: Requested number of trajectory points.
+            order: Degree of the Bezier curve.
+            deviation: Vertical displacement of intermediate control points.
+            bias: Starting fraction for intermediate control-point intervals.
+            mode: Horizontal sampling mode:
+                0 for linear spacing;
+                1 for reversed quadratic weights;
+                2 for endpoint-based quadratic weights;
+                3 for Bezier-based weights.
+            shake_num: Number of oscillation segments around the endpoint.
+            yhh: Initial horizontal amplitude of the endpoint oscillation.
 
         Returns:
-            1). 返回一个字典 trackArray 对应轨迹数组，P 对应贝塞尔曲线的影响点
+            A dictionary with trackArray (the sampled trajectory points) and P
+            (the endpoints and intermediate control points).
         """
         s: list = []
         fun = self.simulation(start, end, order, deviation, bias)

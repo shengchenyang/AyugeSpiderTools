@@ -26,7 +26,7 @@ class PostgresContext(NamedTuple):
 
 
 class AbstractClass(ABC):
-    """用于处理 postgresql 异常的模板方法类"""
+    """Template method base class for recovering from PostgreSQL pipeline errors."""
 
     def template_method(
         self,
@@ -36,14 +36,14 @@ class AbstractClass(ABC):
         table_notes: str,
         note_dic: dict[str, str],
     ) -> None:
-        """模板方法，用于处理 postgresql 存储场景的异常
+        """Handle exceptions encountered during PostgreSQL storage operations.
 
         Args:
-            err_msg: pipeline 存储时报错内容
-            context: postgresql conn context
-            table: 数据表
-            table_notes: 数据表注释
-            note_dic: 当前表字段注释
+            err_msg: Error message raised while storing an item.
+            context: PostgreSQL cursor and optional connection.
+            table: Destination table name.
+            table_notes: Database table comment.
+            note_dic: Mapping of column names to database column comments.
         """
         table = table.rsplit(".", 1)[-1]
         if f' of relation "{table}" does not exist' in err_msg:
@@ -58,28 +58,24 @@ class AbstractClass(ABC):
             COMMENT ON TABLE {table} IS {table_notes!r};
             COMMENT ON COLUMN {table}.id IS 'id';
             """
-            self._exec_sql(context=context, sql=sql, possible_err="创建表失败")
+            self._exec_sql(
+                context=context,
+                sql=sql,
+                possible_err="Failed to create the PostgreSQL table",
+            )
 
         elif "value too long for type" in err_msg:
-            raise Exception(f"postgres 有字段超出长度限制：{err_msg}")
+            raise Exception(
+                f"A PostgreSQL column value exceeds its length limit: {err_msg}"
+            )
 
         else:
-            raise Exception(f"POSTGRES OTHER ERROR: {err_msg}")
+            raise Exception(f"Unhandled PostgreSQL error: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict[str, str]
     ) -> tuple[str, str]:
-        """解决 column "xxx" of relation "x" does not exist
-
-        Args:
-            err_msg: 报错内容
-            table: 数据表名
-            note_dic: 当前表字段的注释
-
-        Returns:
-            1). sql: 用于添加字段的 sql 语句
-            2). 执行此 sql 可能会报错的信息
-        """
+        """Example error message: column "xxx" of relation "x" does not exist"""
         colum_pattern = re.compile(r'column "(.*?)" of relation ".*?" does not exist')
         text = re.findall(colum_pattern, err_msg)
         colum = text[0]
@@ -89,18 +85,17 @@ class AbstractClass(ABC):
             f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {colum} VARCHAR(255) DEFAULT '';"
             f"COMMENT ON COLUMN {table}.{colum} IS {notes!r}"
         )
-        return sql, f"添加字段 {colum} 已存在"
+        return sql, f"Failed to add column {colum}; the column may already exist"
 
     @abstractmethod
     def _exec_sql(
         self, context: PostgresContext, sql: str, possible_err: str | None = None
     ) -> None:
-        """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
         raise NotImplementedError("Subclasses must implement the '_exec_sql' method")
 
 
 class Synchronize(AbstractClass):
-    """pipeline 同步执行 sql 的场景"""
+    """Execute PostgreSQL recovery SQL synchronously."""
 
     def _exec_sql(
         self, context: PostgresContext, sql: str, possible_err: str | None = None
@@ -111,14 +106,14 @@ class Synchronize(AbstractClass):
             context.conn.commit()
         except Exception as e:
             logger.warning(
-                f"synchronize postgres exec sql err: {e!s}\n"
-                f"possible_err: {possible_err}"
+                f"Synchronous PostgreSQL recovery SQL execution failed: {e!s}\n"
+                f"Recovery context: {possible_err}"
             )
             context.conn.rollback()
 
 
 class TwistedAsynchronous(AbstractClass):
-    """pipeline twisted 异步执行 sql 的场景"""
+    """Execute PostgreSQL recovery SQL in a Twisted pipeline transaction."""
 
     def _exec_sql(
         self, context: PostgresContext, sql: str, possible_err: str | None = None
@@ -128,7 +123,8 @@ class TwistedAsynchronous(AbstractClass):
             context.cursor.execute("COMMIT")
         except Exception as e:
             logger.warning(
-                f"twisted postgres exec sql err: {e!s}\npossible_err ->: {possible_err}"
+                f"Twisted PostgreSQL recovery SQL execution failed: {e!s}\n"
+                f"Recovery context: {possible_err}"
             )
             context.cursor.execute("ROLLBACK")
 

@@ -12,32 +12,24 @@ __all__ = [
 
 
 class Encrypt(EncryptMixin):
-    """普通加密方法"""
-
     @staticmethod
     def md5(encrypt_data: str) -> str:
-        """md5 处理方法
-
-        Args:
-            encrypt_data: 需要 md5 处理的参数
-
-        Returns:
-            1). md5 处理后的参数
-        """
         hl = hashlib.md5()  # noqa: S324
         hl.update(encrypt_data.encode(encoding="utf-8"))
         return hl.hexdigest()
 
     @staticmethod
     def base64_encode(encode_data: bytes | str, url_safe: bool = False) -> str:
-        """base64 编码
+        """Base64 encode.
 
         Args:
-            encode_data: 需要 base64 编码的参数
-            url_safe: 标准的 Base64 编码后可能出现字符 + 和 /，在 url 中就不能直接作为参数。是否要处理此情况
+            encode_data: The data to be Base64-encoded.
+            url_safe: Whether to use URL-safe Base64 encoding. Standard Base64
+                may contain the characters '+' and '/', which cannot be used
+                directly in URL parameters.
 
         Returns:
-            1). base64 编码后的结果
+            The Base64-encoded result.
         """
         if not isinstance(encode_data, bytes):
             encode_data = bytes(encode_data, encoding="utf-8")
@@ -47,14 +39,16 @@ class Encrypt(EncryptMixin):
 
     @staticmethod
     def base64_decode(decode_data: str, url_safe: bool = False) -> str:
-        """base64 解码
+        """Base64 decode.
 
         Args:
-            decode_data: 需要 base64 解码的参数
-            url_safe: 标准的 Base64 编码后可能出现字符 + 和 /，在 url 中就不能直接作为参数。是否要处理此情况
+            decode_data: The data to be Base64-decoded.
+            url_safe: Whether to use URL-safe Base64 decoding. Standard Base64
+                may contain the characters '+' and '/', which cannot be used
+                directly in URL parameters.
 
         Returns:
-            1). base64 解码后的结果
+            The decoded result as a string.
         """
         if url_safe:
             return str(base64.urlsafe_b64decode(decode_data), encoding="utf-8")
@@ -62,14 +56,16 @@ class Encrypt(EncryptMixin):
 
     @staticmethod
     def uni_to_chr(uni: str) -> str:
-        """将 Unicode 码位表示的字符串转换正常的字符，用于获取字体映射时使用
+        """Convert a Unicode code point string into its corresponding character.
+
+        Used for retrieving font mappings.
 
         Args:
-            uni: 需要转换的 unicode 字符串，
-                如：006A，但它可能是非标准的，可能需要去掉前面的 0x 或 uni。
+            uni: The Unicode code point to convert, such as "006A".
+                Non-standard prefixes such as "0x" or "uni" may need to be removed.
 
         Returns:
-            1). 转换后的字符
+            The converted character.
         """
         _uni = re.sub(r"^(0x|U\+|uni)", "", uni)
         unicode_value = int(_uni, 16)

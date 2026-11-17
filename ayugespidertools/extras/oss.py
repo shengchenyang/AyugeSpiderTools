@@ -39,13 +39,13 @@ class AliOssBase:
         """create OSS client
 
         Args:
-            access_key: your access key id
-            access_secret: your access key secret
-            endpoint: The endpoint corresponding to the location of the bucket
-            region: The region corresponding to the location of the endpoint, see the link:
+            access_key: Alibaba Cloud access key ID.
+            access_secret: Alibaba Cloud access key secret.
+            endpoint: OSS service endpoint for the bucket.
+            region: OSS region. If empty, derive it from the endpoint. See:
                 https://www.alibabacloud.com/help/zh/oss/user-guide/regions-and-endpoints
-            bucket: bucket name
-            doc: The OSS folder directory to be operated on，such as: file/img
+            bucket: Destination bucket name.
+            doc: The OSS folder directory to be operated on，such as: file/img.
         """
         self.endpoint = endpoint.rstrip("/")
         self.doc = doc
@@ -75,8 +75,8 @@ class AliOssBase:
         """Upload a single file
 
         Args:
-            put_bytes: The file to be uploaded (bytes content)
-            file: upload file name
+            put_bytes: File contents as bytes.
+            file: upload file name.
         """
         assert isinstance(put_bytes, bytes), "put_bytes needs to be in bytes format"
 
@@ -96,7 +96,7 @@ class AliOssBase:
             file: current file
 
         Returns:
-            1). full link to the current file
+            The full object URL.
         """
         ep = self.endpoint.replace("https://", "", 1).replace("http://", "", 1)
         oss_file_path = f"{self.doc}/{file}" if self.doc else file

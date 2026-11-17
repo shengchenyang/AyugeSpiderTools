@@ -234,7 +234,7 @@ class CurlCffiDownloaderMiddleware:
                 curl_cffi_request_args=curl_cffi_req_args
             )
         except Exception as e:
-            self.slog.error(f"url: {request.url} curl_cffi request failed，Error: {e}")
+            self.slog.error(f"curl_cffi request failed for URL {request.url}: {e}")
             response_status = self._response_status_from_error(e)
 
             if _sleep := self.curl_cffi_cfg.sleep:

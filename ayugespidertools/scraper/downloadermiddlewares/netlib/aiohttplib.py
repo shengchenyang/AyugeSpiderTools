@@ -185,7 +185,7 @@ class AiohttpDownloaderMiddleware:
                 response_body,
             ) = await self._request_by_aiohttp(aio_request_args=aiohttp_req_args)
         except Exception as e:
-            self.slog.error(f"url: {request.url} aiohttp request failed，Error: {e}")
+            self.slog.error(f"aiohttp request failed for URL {request.url}: {e}")
             response_status = self._response_status_from_error(e)
 
             if _sleep := self.aiohttp_cfg.sleep:

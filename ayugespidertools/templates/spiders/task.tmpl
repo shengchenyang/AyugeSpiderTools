@@ -16,10 +16,11 @@ class $classname(AyuRabbitMQSpider):
     name = "$name"
 
     async def start_requests_from_mq(self, task_info: dict) -> AsyncIterator[Any]:
-        # 从任务 mq 中取出具体信息，这里以获取 example_param 为例
-        example_param = task_info.get("example_param")
-        self.slog.info(f"取出的信息: {example_param}")
-        # 这里一般是根据 task_info 中的各种参数来构造采集请求，这里不再演示，请自行按需求实现
+        # Retrieve task details from the message queue. Here, 'task_id' is used as an example.
+        task_id = task_info.get("task_id")
+        self.slog.info(f"Task parameter task_id: {task_id}")
+        # Normally, you would build crawl requests based on the parameters in task_info.
+        # The implementation is omitted here; adapt it to your specific requirements.
         yield Request(
             url="data:,",
             callback=self.parse_first,
@@ -27,9 +28,8 @@ class $classname(AyuRabbitMQSpider):
         )
 
     async def parse_first(self, response: Response) -> Any:
-        # 这里具体是推送结果到 mq 结果队列，还是保存到不同数据库 pipeline 中请自行选择；
-        # 也可以结合使用。
+        # Here, you can choose to publish the results to a message queue,
+        # store them through a database pipeline, or use both approaches.
+        # The implementation is left to you.
         random_int = random.randint(0, 100)
-        # 这里你可以结合各种数据库 pipeline 实现数据存储，也可结合 mq pipeline 或 RabbitMQAsyncPortal
-        # 实现任务消费和分发的功能，具体请根据场景自行选择，不再演示。
         self.slog.info(random_int)

@@ -16,8 +16,6 @@ if TYPE_CHECKING:
 
 
 class ProxyDownloaderMiddleware:
-    """Example of proxy middleware"""
-
     proxy: str
     crawler: Crawler
 
@@ -37,7 +35,5 @@ class ProxyDownloaderMiddleware:
         request.meta["proxy"] = self.proxy
 
     def spider_opened(self, spider: AyuSpider) -> None:
-        spider.slog.info(
-            f"代理中间件: ProxyDownloaderMiddleware 已开启，生效脚本为: {spider.name}"
-        )
+        spider.slog.info(f"ProxyDownloaderMiddleware enabled for spider {spider.name}")
         self.proxy = spider.proxy_conf.proxy

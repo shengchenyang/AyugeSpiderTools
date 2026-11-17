@@ -52,7 +52,7 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
     def db_create(self, cursor: Any) -> None: ...
 
     def db_create_err(self, failure: Failure) -> None:
-        self.slog.error(f"创建数据表失败: {failure}")
+        self.slog.error(f"Failed to create the Oracle table: {failure}")
 
     def process_item(self, item: Any) -> Any:
         item_dict = ReuseOperation.item_to_dict(item)
@@ -76,4 +76,6 @@ class AyuTwistedOraclePipeline(OraclePipeEnhanceMixin):
         cursor.execute(sql, args)
 
     def handle_error(self, failure: Failure, item: Any) -> None:
-        self.slog.error(f"插入数据失败:{failure}, item: {item}")
+        self.slog.error(
+            f"Failed to insert the item into Oracle: {failure}, item: {item}"
+        )

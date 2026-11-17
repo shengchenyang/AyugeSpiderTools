@@ -46,7 +46,10 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         self.pool_db_conf = self.crawler.settings.get("POOL_DB_CONFIG", None)
         self.slog = spider.slog
         if not self.pool_db_conf:
-            spider.slog.warning("未配置 POOL_DB_CONFIG 参数，将使用其默认参数")
+            spider.slog.warning(
+                "POOL_DB_CONFIG is not configured; "
+                "using the default connection pool settings"
+            )
             self.pool_db_conf = {
                 "maxconnections": 5,
                 "maxcached": 0,
@@ -56,7 +59,6 @@ class AyuTurboMysqlPipeline(AyuMysqlPipeline):
         self.mysql_conf = spider.mysql_conf
         self._connect(spider.mysql_conf).close()
 
-        # 添加 PooledDB 的配置
         self.conn = PooledDB(
             creator=pymysql,
             user=self.mysql_conf.user,

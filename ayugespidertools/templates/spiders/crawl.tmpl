@@ -20,7 +20,7 @@ class $classname(AyuCrawlSpider):
     rules = (Rule(LinkExtractor(allow=r"Items/"), callback="parse_item", follow=True),)
 
     def parse_item(self, response):
-        self.slog.info("请查看 DemoSpider 中的 demo_crawl 示例")
+        self.slog.info("See the demo_crawl example in DemoSpider")
         # yield AyuItem(
         #     url=response.url,
         #     _table="_demo_crawl",
