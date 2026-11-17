@@ -19,15 +19,13 @@ if TYPE_CHECKING:
 
 
 class MongoDBEngineClass(metaclass=DatabaseSingletonMeta):
-    """mongodb 连接单例模式：同一个 engine_url 只能存在一个 conn 实例"""
+    """Reuse a single MongoDB engine wrapper for each engine_url."""
 
     def __init__(self, engine_url, *args, **kwargs):
         self.engine = MongoDbBase.connects(uri=engine_url)
 
 
 class MongoDbBase:
-    """mongodb 数据库的相关操作"""
-
     @staticmethod
     def connects(
         user: str | None = None,
@@ -39,18 +37,23 @@ class MongoDbBase:
         database: str | None = None,
         uri: str | None = None,
     ) -> tuple[MongoClient, Database]:
-        """初始化 mongo 连接句柄
-        可传入 user, password, host 等参数的形式，也可只传入 uri 的方式
+        """Create a MongoDB client and select a database.
+
+        Supply either a URI or individual connection parameters.
 
         Args:
-            user: 用户名
-            password: 用户对应的密码
-            host: mongoDB 链接需要的 host
-            port: mongoDB 链接需要的端口
-            authsource: mongoDB 身份验证需要的数据库名称
-            authMechanism: mongoDB 身份验证机制
-            database: mongoDB 链接需要的数据库
-            uri: mongoDB uri，需要包含 database 参数， demo: 'mongodb://host/my_database'
+            user: Authentication username.
+            password: Authentication password.
+            host: MongoDB server hostname.
+            port: MongoDB server port.
+            authsource: Database used for authentication.
+            authMechanism: MongoDB authentication mechanism.
+            database: Database to select when no URI is supplied.
+            uri: MongoDB URI containing a default database, for example:
+                "mongodb://host/my_database". Overrides individual parameters.
+
+        Returns:
+            The MongoClient instance and selected database.
         """
         if uri is not None:
             conn: MongoClient = MongoClient(uri)
@@ -85,19 +88,19 @@ class MongoDbBase:
     def upload(
         cls, db, file_name, _id, content_type, collection, file_data
     ) -> tuple[int | None, str | None]:
-        """上传文件
+        """Upload a file to GridFS unless a file with the same name already exists.
 
         Args:
-            db: 目标库对应连接
-            file_name: 上传至 mongoDB 的 GridFS 存储桶里的文件名
-            _id: 唯一 id，雪花 id，用来标识此上传任务和图片的唯一
-            content_type: 上传文件的类型，示例：image/jpeg
-            collection: 存储至 GridFS 存储桶名称
-            file_data: 文件的 bytes 内容
+            db: Destination MongoDB database.
+            file_name: Filename stored in the GridFS bucket.
+            _id: Identifier recorded as targetId in the file metadata.
+            content_type: File MIME type, such as "image/jpeg".
+            collection: GridFS bucket name.
+            file_data: File contents as bytes.
 
         Returns:
-            gridfs_id: 上传至 GridFS 上的文件 ID 标识
-            image_id: 上传至 GridFS 上的文件 MD5 标识
+            The GridFS file ID and a download path containing the ID and MD5 value,
+            or (None, None) if an existing file cannot be retrieved.
         """
         metadata = {
             "_contentType": content_type,
@@ -107,7 +110,7 @@ class MongoDbBase:
         }
 
         gridfs_col = GridFS(db, collection)
-        # 当存储桶中不存在此文件，才需要上传
+        # Upload only if the bucket does not contain this filename.
         if not gridfs_col.exists(filename=file_name):
             gridfs_id = gridfs_col.put(
                 data=file_data,
@@ -119,7 +122,7 @@ class MongoDbBase:
             image_id = f"/file/find/{gridfs_id!s}/{md5}"
             return gridfs_id, image_id
 
-        # 否则，只需返回文件的 id 等标识即可
+        # Reuse the existing file ID and download path.
         if res := gridfs_col.find_one({"filename": file_name}):
             return res._id, f"/file/find/{res._id!s}/{res.md5}"
         return None, None

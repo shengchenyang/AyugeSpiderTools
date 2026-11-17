@@ -248,7 +248,7 @@ class ReuseOperation:
         else:
             raise TypeError(f"Invalid db_conf type: {type(db_conf)}")
         logger.info(
-            f"Database {db_conf.database} created successfully with charset：{db_conf.charset}!"
+            f"Database {db_conf.database} created successfully with character encoding {db_conf.charset}"
         )
 
     @classmethod

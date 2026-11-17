@@ -23,8 +23,6 @@ if TYPE_CHECKING:
 
 
 class RandomRequestUaMiddleware:
-    """随机请求头中间件"""
-
     crawler: Crawler
 
     def __init__(self):
@@ -47,7 +45,6 @@ class RandomRequestUaMiddleware:
         return s
 
     def spider_opened(self, spider: AyuSpider) -> None:
-        # 带权重的 ua 列表
         ua_arr = [
             {"explorer": "safari", "weight": 50},
             {"explorer": "edge", "weight": 9},
@@ -56,9 +53,7 @@ class RandomRequestUaMiddleware:
         ]
         self.explorer_types = [x["explorer"] for x in ua_arr]
         self.explorer_weights = [x["weight"] for x in ua_arr]
-        spider.slog.info(
-            f"随机请求头中间件 RandomRequestUaMiddleware 已开启，生效脚本为: {spider.name}"
-        )
+        spider.slog.info(f"RandomRequestUaMiddleware enabled for spider {spider.name}")
 
     def process_request(self, request: Request) -> None:
         request.headers.setdefault(b"User-Agent", self.get_random_ua_by_weight())

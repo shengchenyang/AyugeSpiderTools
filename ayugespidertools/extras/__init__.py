@@ -1,1 +1,1 @@
-# 这里用于放入 extras 内容，以防非核心依赖过多。
+# Keep optional features here to limit dependencies required by the core package.

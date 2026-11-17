@@ -39,15 +39,12 @@ class $classname(AyuSpider):
             octree_text = curr_li.xpath("a/text()").get()
             octree_href = curr_li.xpath("a/@href").get()
 
-            # AyuItem 内置的更新功能文档: https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
+            # Documentation for AyuItem update support:
+            # https://ayugespidertools.readthedocs.io/en/latest/topics/deduplicate.html
             yield AyuItem(
                 octree_text=octree_text,
                 octree_href=octree_href,
                 _table="demo_eight",
-                # 这里的更新新增逻辑会在各自的 pipeline 中生效且互不影响，当然你也可以一同设置 postgresql,
-                # oracle 的 pipeline，它们会互不影响且一同生效。
                 _update_rule={"octree_text": octree_text},
                 _update_keys={"octree_href"},
-                # postgresql 存储场景才需要配置此参数。
-                _conflict_cols={"octree_href"},
             )

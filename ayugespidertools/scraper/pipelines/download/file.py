@@ -32,10 +32,13 @@ class FilesDownloadPipeline:
 
     def open_spider(self) -> None:
         _file_path = self.crawler.settings.get("FILES_STORE", None)
-        assert _file_path is not None, "未配置 FILES_STORE 存储路径参数！"
+        assert _file_path is not None, "`FILES_STORE` storage path is not configured"
 
         if not Path.exists(_file_path):
-            logger.warning(f"FILES_STORE: {_file_path} 路径不存在，自动创建所需路径！")
+            logger.warning(
+                f"FILES_STORE directory {_file_path} does not exist; "
+                "creating it automatically!"
+            )
             Path(_file_path).mkdir(parents=True)
         self.file_path = _file_path
 
@@ -58,7 +61,7 @@ class FilesDownloadPipeline:
                     item[f"{key}_local"] = filename
                 else:
                     item[f"{key}_local"] = DataItem(
-                        key_value=filename, notes=f"{key} 文件存储路径"
+                        key_value=filename, notes=f"Local filename for {key}"
                     )
 
     async def process_item(self, item: Any) -> Any:

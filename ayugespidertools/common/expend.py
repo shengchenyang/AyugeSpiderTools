@@ -23,19 +23,15 @@ if TYPE_CHECKING:
 
 
 class MysqlPipeEnhanceMixin:
-    """扩展 mysql pipelines 的功能"""
-
     @staticmethod
     def _connect(mysql_conf: MysqlConf) -> PymysqlConnection:
-        """链接数据库操作：
-            1.如果链接正常，则返回链接句柄；
-            2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
+        """Connect to MySQL, creating the database if it does not exist.
 
         Args:
-            mysql_conf: pymysql 链接所需的参数
+            mysql_conf: MySQL connection configure.
 
         Returns:
-            1). mysql 链接句柄
+            A PyMySQL connection.
         """
         try:
             conn = MysqlPortal(db_conf=mysql_conf, tag=PortalTag.LIBRARY).connect()
@@ -43,11 +39,12 @@ class MysqlPipeEnhanceMixin:
             # (1049, "Unknown database 'xxx'")
             if "1049" in str(e):
                 logger.warning(
-                    f"目标数据库：{mysql_conf.database} 不存在，尝试创建中..."
+                    f"MySQL database {mysql_conf.database} does not exist; "
+                    "attempting to create it ..."
                 )
                 ReuseOperation.create_database(db_conf=mysql_conf)
             else:
-                logger.error(f"connect to mysql failed: {e}")
+                logger.error(f"Failed to connect to MySQL: {e}")
         else:
             return conn
         return MysqlPortal(db_conf=mysql_conf, tag=PortalTag.LIBRARY).connect()
@@ -60,18 +57,18 @@ class MysqlPipeEnhanceMixin:
         insert_prefix: InsertPrefixStr = "INSERT",
         duplicate: dict[str, Any] | None = None,
     ) -> tuple[str, tuple]:
-        """根据处理后的 item 生成 mysql 插入语句
+        """Build a parameterized MySQL INSERT statement for an item.
 
         Args:
-            table: 数据库表名
-            item: 处理后的 item
-            odku_enable: 是否开启 ON DUPLICATE KEY UPDATE
-            insert_prefix: INSERT 语句前缀设置: INSERT IGNORE or INSERT
-            duplicate: 需要更新的数据
+            table: Destination table name.
+            item: Processed item containing column names and values.
+            odku_enable: Whether to allow an ON DUPLICATE KEY UPDATE clause.
+            insert_prefix: INSERT statement prefix, either "INSERT" or "INSERT IGNORE".
+            duplicate: Columns and values to update on a duplicate key. An update
+                clause is added only when odku_enable and duplicate are both truthy.
 
         Returns:
-            1). sql 插入语句
-            2). sql 语句执行和格式化需要的 value
+            The SQL statement and a tuple of bound parameter values.
         """
         keys = f"""`{"`, `".join(item.keys())}`"""
         values = ", ".join(["%s"] * len(item))
@@ -90,14 +87,14 @@ class MysqlPipeEnhanceMixin:
 
     @staticmethod
     def _get_log_by_spider(spider, crawl_time):
-        """获取 spider 的运行日志情况
+        """Summarize a spider run using Scrapy statistics.
 
         Args:
-            spider: scrapy spider
-            crawl_time: 爬取时间
+            spider: Scrapy spider with MySQL configuration.
+            crawl_time: Crawl date recorded with the statistics.
 
         Returns:
-            log_info: 日志信息
+            A dictionary of run statistics and diagnostic error descriptions.
         """
         mysql_conf = spider.mysql_conf
         text: dict[str, Any] = {}
@@ -120,24 +117,28 @@ class MysqlPipeEnhanceMixin:
                     status_code = k.split("/")[-1] if len(k.split("/")) > 0 else ""
                     if status_code.startswith("4"):
                         if status_code == "429":
-                            error_reason += f"{status_code}错误：代理超过使用频率限制"
-                        else:
                             error_reason += (
-                                f"{status_code}错误：网页失效/无此网页/网站拒绝访问"
+                                f"HTTP {status_code}: request rate limit exceeded; "
                             )
+                        else:
+                            error_reason += f"HTTP {status_code}: client error; the resource may be unavailable or access denied; "
                     elif status_code.startswith("5"):
-                        error_reason += f"{status_code}错误：网站服务器处理出错"
+                        error_reason += f"HTTP {status_code}: server error; "
                     elif status_code != "":
-                        error_reason += f"{status_code}:待人工排查原因"
+                        error_reason += (
+                            f"HTTP {status_code}: manual investigation required; "
+                        )
                 elif "exception_type_count" in k:
                     error_name = k.split("/")[-1]
                     if "Timeout" in error_name:
-                        error_reason += f"{error_name}:网站响应超时错误 "
+                        error_reason += f"{error_name}: response timed out; "
                     elif "ConnectionDone" in error_name:
-                        error_reason += f"{error_name}:网站与脚本连接断开 "
+                        error_reason += f"{error_name}: connection closed; "
                     else:
                         # "ResponseNeverReceived" or "ResponseFailed"
-                        error_reason += f"{error_name}:网站无响应 "
+                        error_reason += (
+                            f"{error_name}: request failed without a usable response; "
+                        )
                 text[key] = v
 
         log_info = {
@@ -158,9 +159,11 @@ class MysqlPipeEnhanceMixin:
             "crawl_time": crawl_time,
         }
 
-        # 错误原因
         if text.get("log_count_ERROR", 0):
-            log_info["log_count_ERROR"] = error_reason or "请人工排查错误原因！"
+            log_info["log_count_ERROR"] = (
+                error_reason
+                or "Manual investigation required to determine the cause of the errors"
+            )
 
         else:
             log_info["log_count_ERROR"] = ""
@@ -168,19 +171,15 @@ class MysqlPipeEnhanceMixin:
 
 
 class PostgreSQLPipeEnhanceMixin:
-    """扩展 postgresql pipelines 的功能"""
-
     @staticmethod
     def _connect(postgres_conf: PostgreSQLConf) -> PsycopgConnection:
-        """链接数据库操作：
-            1.如果链接正常，则返回链接句柄；
-            2.如果目标数据库不存在，则创建数据库后再返回链接句柄。
+        """Connect to PostgreSQL and attempt database creation on matching connection errors.
 
         Args:
-            postgres_conf: postgresql 链接所需的参数
+            postgres_conf: PostgreSQL connection configure.
 
         Returns:
-            1). postgresql 链接句柄
+            A psycopg connection.
         """
         try:
             conn = PostgreSQLPortal(
@@ -190,11 +189,12 @@ class PostgreSQLPipeEnhanceMixin:
             # err: connection to server at "x.x.x.x", port x failed: FATAL:  database "x" does not exist
             if "failed" in str(e).lower():
                 logger.warning(
-                    f"目标数据库：{postgres_conf.database} 不存在，尝试创建中..."
+                    f"PostgreSQL database {postgres_conf.database} does not exist; "
+                    "attempting to create it ..."
                 )
                 ReuseOperation.create_database(db_conf=postgres_conf)
             else:
-                logger.error(f"connect to postgresql failed: {e}")
+                logger.error(f"Failed to connect to PostgreSQL: {e}")
         else:
             return conn
         return PostgreSQLPortal(db_conf=postgres_conf, tag=PortalTag.LIBRARY).connect()
@@ -203,15 +203,16 @@ class PostgreSQLPipeEnhanceMixin:
     def _get_sql_by_item(
         table: str, item: dict[str, Any], is_psycopg: bool = False
     ) -> str:
-        """根据处理后的 item 生成 postgresql 插入语句
+        """Build a parameterized PostgreSQL INSERT statement for an item.
 
         Args:
-            table: 数据库表名
-            item: 处理后的 item
-            is_psycopg: 是否是 psycopg 还是 asyncpg
+            table: Destination table name.
+            item: Processed item containing column names and values.
+            is_psycopg: Use psycopg placeholders when True; otherwise use asyncpg
+                placeholders and append ON CONFLICT DO NOTHING.
 
         Returns:
-            1). sql 插入语句
+            The SQL INSERT statement.
         """
         if is_psycopg:
             keys = f"""{", ".join(item.keys())}"""
@@ -223,30 +224,28 @@ class PostgreSQLPipeEnhanceMixin:
 
 
 class OraclePipeEnhanceMixin:
-    """扩展 oracle pipelines 的功能"""
-
     @staticmethod
     def _connect(oracle_conf: OracleConf) -> OracleConnection:
-        """链接数据库返回链接句柄
+        """Open an Oracle database connection.
 
         Args:
-            oracle_conf: oracle 链接所需的参数
+            oracle_conf: Oracle connection configure.
 
         Returns:
-            1). oracle 链接句柄
+            An Oracle connection.
         """
         return OraclePortal(db_conf=oracle_conf, tag=PortalTag.LIBRARY).connect()
 
     @staticmethod
     def _get_sql_by_item(table: str, item: dict[str, Any]) -> str:
-        """根据处理后的 item 生成 oracle 插入语句
+        """Build an Oracle INSERT statement with named bind parameters.
 
         Args:
-            table: 数据库表名
-            item: 处理后的 item
+            table: Destination table name.
+            item: Processed item containing column names and values.
 
         Returns:
-            1). sql 插入语句
+            The SQL INSERT statement.
         """
         keys = f""":{", :".join(item.keys())}"""
         table_keys = ", ".join(f'"{key}"' for key in item)

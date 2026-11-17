@@ -51,7 +51,6 @@ class Product(ABC, Generic[SpiderConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> SpiderConf | None:
-        """获取各个工具链接配置信息"""
         raise NotImplementedError(
             "Subclasses must implement the 'get_conn_conf' method"
         )
@@ -69,12 +68,12 @@ class MysqlConfProduct(Product[MysqlConf]):
     def get_conn_conf(
         self, settings: Settings, remote_option: dict
     ) -> MysqlConf | None:
-        # 1). 优先从远程配置中取值
+        # 1. Retrieve the configuration from the remote source first.
         if settings.get("APP_CONF_MANAGE", False):
             remote_conf = Tools.fetch_remote_conf(conf_name="mysql", **remote_option)
             return MysqlConf(**remote_conf) if remote_conf else None
 
-        # 2). 从本地参数中取值
+        # 2. Otherwise, Retrieve the configuration from local settings.
         local_conf = settings.get("MYSQL_CONFIG")
         return MysqlConf(**local_conf) if local_conf else None
 

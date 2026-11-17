@@ -66,12 +66,13 @@ class AyuSpider(Spider):
 
     @property
     def slog(self) -> slogT:
-        """本库的日志管理模块，使用 loguru 来管理日志
-        Note:
-            本配置可与 Scrapy 的 Spider.logger 同时管理，根据场景可以自行配置。
+        """Return the logger selected by the LOGURU_ENABLED setting.
+
+        Use loguru when enabled; otherwise use Scrapy's Spider.logger.
+        Scrapy's logger remains available independently of this property.
         """
         loguru_enabled = self.crawler.settings.get("LOGURU_ENABLED", True)
-        assert isinstance(loguru_enabled, bool), "loguru_enabled 参数格式需要为 bool"
+        assert isinstance(loguru_enabled, bool), "LOGURU_ENABLED must be a bool"
 
         return logger if loguru_enabled else super().logger
 
@@ -83,15 +84,20 @@ class AyuSpider(Spider):
         }
 
         if not (vit_dir := settings.get("VIT_DIR", None)):
-            logger.warning("settings 中未配置 VIT_DIR，将从默认配置中获取！")
+            logger.warning(
+                "VIT_DIR is not configured; deriving the default path from BOT_NAME!"
+            )
             if module_spec := importlib.util.find_spec(settings["BOT_NAME"]):
                 submodule_paths = module_spec.submodule_search_locations
-                assert submodule_paths, "project path is None or empty"
-                assert len(submodule_paths) == 1, "please change your project name"
+                assert submodule_paths, "Project path is None or empty"
+                assert len(submodule_paths) == 1, (
+                    "The project package must have exactly one submodule search location;"
+                    "please change your project name"
+                )
                 vit_dir = Path(*submodule_paths) / "VIT"
                 _normal_settings["VIT_DIR"] = vit_dir
             else:
-                raise NotConfigured("you must define the VIT_DIR parameter")
+                raise NotConfigured("You must define the VIT_DIR parameter")
 
         inner_settings = ReuseOperation.fetch_local_conf(
             vit_dir=vit_dir, inner_settings=_normal_settings
@@ -110,7 +116,7 @@ class AyuSpider(Spider):
             )
 
         remote_option = ReuseOperation.get_remote_option(settings=crawler.settings)
-        # 将本地 .conf 或远程（consul, nacos）中对应的配置信息，赋值给 spider 对象
+        # Attach connection settings from the local .conf file or remote Consul/Nacos configuration.
         if mysql_conf := get_spider_conf(
             MysqlConfCreator(), crawler.settings, remote_option
         ):

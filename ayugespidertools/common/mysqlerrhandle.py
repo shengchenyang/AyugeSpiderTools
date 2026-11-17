@@ -29,7 +29,7 @@ class MysqlContext(NamedTuple):
 
 
 class AbstractClass(ABC):
-    """用于处理 mysql 异常的模板方法类"""
+    """Template method base class for recovering from MySQL pipeline errors."""
 
     def _create_table(
         self,
@@ -40,15 +40,15 @@ class AbstractClass(ABC):
         collate: str,
         table_notes: str = "",
     ) -> None:
-        """创建数据库表
+        """Create a MySQL table with an auto-incrementing primary key.
 
         Args:
-            context: mysql connect context
-            table_name: 创建表的名称
-            engine: 创建表的 engine
-            charset: charset
-            collate: collate
-            table_notes: 创建表的注释
+            context: MySQL cursor and optional connection.
+            table_name: Name of the table to create.
+            engine: MySQL storage engine.
+            charset: Table character set.
+            collate: Table collation.
+            table_notes: Database table comment.
         """
         sql = (
             f"CREATE TABLE IF NOT EXISTS `{table_name}` (`id` int(32) NOT NULL"
@@ -58,23 +58,26 @@ class AbstractClass(ABC):
 
         try:
             context.cursor.execute(sql)
-            logger.info(f"创建数据表 {table_notes}: {table_name} 成功！")
+            logger.info(
+                f"Created MySQL table {table_name} ({table_notes}) successfully"
+            )
         except Exception as e:
-            logger.error(f"创建表 {table_name} 失败，err：{e}")
+            logger.error(f"Failed to create MySQL table {table_name}: {e}")
 
     def _get_column_type(
         self, context: MysqlContext, database: str, table: str, column: str
     ) -> str | None:
-        """获取数据字段存储类型
+        """Look up a column type in the MySQL information schema.
 
         Args:
-            context: mysql connect context
-            database: 数据库名
-            table: 数据表名
-            column: 字段名称
+            context: MySQL cursor and optional connection.
+            database: Database name.
+            table: Table name.
+            column: Column name.
 
         Returns:
-            column_type: 字段存储类型
+            The column type, an empty string for an unexpected row count,
+            or None if the query fails.
         """
         sql = (
             f"select COLUMN_TYPE from information_schema.columns where table_schema = {database!r}"
@@ -85,14 +88,14 @@ class AbstractClass(ABC):
             context.cursor.execute(sql)
             lines = context.cursor.fetchall()
             if isinstance(lines, list):
-                # 此处 AyuMysqlPipeline 返回的结构示例为：[{'COLUMN_TYPE': 'varchar(190)'}]
+                # AyuMysqlPipeline uses a dictionary cursor, e.g. [{'COLUMN_TYPE': 'varchar(190)'}]
                 column_type = lines[0]["COLUMN_TYPE"] if len(lines) == 1 else ""
             else:
-                # 此处 AyuTwistedMysqlPipeline 返回的结构示例为：(('varchar(10)',),)
+                # AyuTwistedMysqlPipeline uses a tuple cursor, e.g. (('varchar(10)',),)
                 column_type = lines[0][0] if len(lines) == 1 else ""
 
         except Exception as e:
-            logger.error(f"未获取到当前字段的存储类型，err: {e}")
+            logger.error(f"Failed to retrieve the column type: {e}")
         return column_type
 
     def template_method(
@@ -104,15 +107,15 @@ class AbstractClass(ABC):
         table_notes: str,
         note_dic: dict[str, str],
     ) -> None:
-        """模板方法，用于处理 mysql 存储场景的异常
+        """Handle exceptions encountered during MySQL storage operations.
 
         Args:
-            err_msg: pipeline 存储时报错内容
-            context: mysql conn context
-            mysql_conf: spider mysql_conf
-            table: 数据表
-            table_notes: 数据表注释
-            note_dic: 当前表字段注释
+            err_msg: Error message raised while storing an item.
+            context: MySQL connection.
+            mysql_conf: Spider mysql connection configure.
+            table: Destination table name.
+            table_notes: Database table comment.
+            note_dic: Mapping of column names to database column comments.
         """
         if "1054" in err_msg:
             sql, possible_err = self.deal_1054_error(
@@ -151,21 +154,14 @@ class AbstractClass(ABC):
             self._exec_sql(context=context, sql=sql, possible_err=possible_err)
 
         else:
-            raise Exception(f"MYSQL OTHER ERROR: {err_msg}")
+            raise Exception(f"Unhandled MySQL error: {err_msg}")
 
     def deal_1054_error(
         self, err_msg: str, table: str, note_dic: dict[str, str]
     ) -> tuple[str, str]:
-        """解决 1054, u"Unknown column 'xx' in 'field list'"
+        """Handle MySQL error 1054.
 
-        Args:
-            err_msg: 报错内容
-            table: 数据表名
-            note_dic: 当前表字段的注释
-
-        Returns:
-            1). sql: 用于添加字段的 sql 语句
-            2). 执行此 sql 可能会报错的信息
+        Example error message: u"Unknown column 'xx' in 'field list'"
         """
         colum_pattern = re.compile(r"Unknown column '(.*?)' in 'field list'")
         text = re.findall(colum_pattern, err_msg)
@@ -173,7 +169,7 @@ class AbstractClass(ABC):
         notes = note_dic[colum]
 
         sql = f"ALTER TABLE `{table}` ADD COLUMN `{colum}` VARCHAR(255) NULL DEFAULT '' COMMENT {notes!r};"
-        return sql, f"添加字段 {colum} 已存在"
+        return sql, f"Failed to add column {colum}; the column may already exist"
 
     def deal_1406_error(
         self,
@@ -183,18 +179,9 @@ class AbstractClass(ABC):
         table: str,
         note_dic: dict[str, str],
     ) -> tuple[str, str]:
-        """解决 1406, u"Data too long for 'xx' at ..."
+        """Handle MySQL error 1406.
 
-        Args:
-            err_msg: 报错内容
-            context: mysql connect context
-            database: 数据库名
-            table: 数据表名
-            note_dic: 当前表字段的注释
-
-        Returns:
-            1). sql: 修改字段类型的 sql
-            2). 执行此 sql 可能会报错的信息
+        Example error message: u"Data too long for 'xx' at ..."
         """
         if "Data too long for" in err_msg:
             colum_pattern = re.compile(r"Data too long for column '(.*?)' at")
@@ -209,8 +196,8 @@ class AbstractClass(ABC):
                 f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
                 f" {change_colum_type} NULL DEFAULT NULL COMMENT {notes!r};"
             )
-            return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
-        raise Exception(f"未解决 Data too long 的问题，err: {err_msg}")
+            return sql, f"Failed to change column {colum} to {change_colum_type}"
+        raise Exception(f"Unable to recover from the data-too-long error: {err_msg}")
 
     def deal_1265_error(
         self,
@@ -220,18 +207,9 @@ class AbstractClass(ABC):
         table: str,
         note_dic: dict[str, str],
     ) -> tuple[str, str]:
-        """解决 1265, u"Data truncated for column 'xx' at ..."
+        """Handle MySQL error 1265.
 
-        Args:
-            err_msg: 报错内容
-            context: mysql connect context
-            database: 数据库名
-            table: 数据表名
-            note_dic: 当前表字段的注释
-
-        Returns:
-            1). sql: 修改字段类型的 sql
-            2). 执行此 sql 可能会报错的信息
+        Example error message: u"Data truncated for column 'xx' at ..."
         """
         if "Data truncated for column" in err_msg:
             colum_pattern = re.compile(r"Data truncated for column '(.*?)' at")
@@ -246,19 +224,18 @@ class AbstractClass(ABC):
                 f"ALTER TABLE `{table}` CHANGE COLUMN `{colum}` `{colum}`"
                 f" {change_colum_type} NULL DEFAULT NULL COMMENT {notes!r};"
             )
-            return sql, f"更新 {colum} 字段类型为 {change_colum_type} 时失败"
-        raise Exception(f"未解决 Data truncated 问题，err: {err_msg}")
+            return sql, f"Failed to change column {colum} to {change_colum_type}"
+        raise Exception(f"Failed to resolve the Data truncated issue. Error: {err_msg}")
 
     @abstractmethod
     def _exec_sql(
         self, context: MysqlContext, sql: str, possible_err: str | None = None
     ) -> None:
-        """子类要实现执行 sql 的不同方法，使得可以正常适配不同的 pipelines 场景"""
         raise NotImplementedError("Subclasses must implement the '_exec_sql' method")
 
 
 class Synchronize(AbstractClass):
-    """pipeline 同步执行 sql 的场景"""
+    """Execute MySQL recovery SQL synchronously."""
 
     def _exec_sql(
         self, context: MysqlContext, sql: str, possible_err: str | None = None
@@ -267,13 +244,13 @@ class Synchronize(AbstractClass):
             context.cursor.execute(sql)
         except Exception as e:
             logger.warning(
-                f"synchronize mysql exec sql err: {e!s}\n"
-                f"possible_err ->: {possible_err}"
+                f"Synchronous MySQL recovery SQL execution failed: {e!s}\n"
+                f"Recovery context: {possible_err}"
             )
 
 
 class TwistedAsynchronous(AbstractClass):
-    """pipeline twisted 异步执行 sql 的场景"""
+    """Execute MySQL recovery SQL in a Twisted pipeline transaction."""
 
     def _exec_sql(
         self, context: MysqlContext, sql: str, possible_err: str | None = None
@@ -282,7 +259,8 @@ class TwistedAsynchronous(AbstractClass):
             context.cursor.execute(sql)
         except Exception as e:
             logger.warning(
-                f"twisted mysql exec sql err: {e!s}\npossible_err: {possible_err}"
+                f"Twisted MySQL recovery SQL execution failed: {e!s}\n"
+                f"Recovery context: {possible_err}"
             )
 
 

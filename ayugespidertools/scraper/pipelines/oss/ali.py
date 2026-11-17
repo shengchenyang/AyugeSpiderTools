@@ -58,7 +58,7 @@ class AyuAsyncOssPipeline:
             )
         self.oss_conf = spider.oss_conf
         if not self.oss_conf.region:
-            logger.warning("not configure oss region")
+            logger.warning("The OSS `region` is not configured")
         oss_conf_dict = self.oss_conf._asdict()
         self.oss_bucket = AliOssBase(**oss_conf_dict)
         self.full_link_enable = self.oss_conf.full_link_enable
@@ -77,7 +77,7 @@ class AyuAsyncOssPipeline:
             item[f"{self.oss_conf.oss_fields_prefix}{key}"] = filename
         else:
             item[f"{self.oss_conf.oss_fields_prefix}{key}"] = DataItem(
-                key_value=filename, notes=f"{key} 对应的 oss 存储字段"
+                key_value=filename, notes=f"OSS object reference for {key}"
             )
 
     async def _upload_file(

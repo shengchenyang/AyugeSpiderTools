@@ -10,7 +10,7 @@ from ayugespidertools.common.multiplexing import ReuseOperation
 from ayugespidertools.common.mysqlerrhandle import Synchronize, deal_mysql_err
 from ayugespidertools.exceptions import NotConfigured
 
-# 将 pymysql 中 Data truncated for column 警告类型置为 Error，其他警告忽略
+# Promote PyMySQL data-truncation warnings to errors.
 warnings.filterwarnings(
     "error", category=pymysql.Warning, message=".*Data truncated for column.*"
 )

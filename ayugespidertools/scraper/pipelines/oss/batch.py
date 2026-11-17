@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class AyuAsyncOssBatchPipeline(AyuAsyncOssPipeline):
-    """适用于 oss 上传时，对应的文件资源字段为列表类型的场景"""
+    """Upload files to OSS from URL fields containing a list of URLs."""
 
     oss_bucket: AliOssBase
     oss_conf: OssConf

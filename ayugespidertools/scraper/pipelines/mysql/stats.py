@@ -45,12 +45,13 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     def table_collection_statistics(
         self, spider_name: str, database: str, crawl_time: datetime.date
     ) -> None:
-        """统计数据库入库数据，获取当前数据库中所有包含 crawl_time 字段的数据表的简要信息
+        """Collect database insertion statistics for all tables containing a
+        `crawl_time` column in the current database.
 
         Args:
-            spider_name: 爬虫脚本名称
-            database: 数据库，保存程序采集记录保存的数据库
-            crawl_time: 采集时间，程序运行时间
+            spider_name: The name of the spider script.
+            database:  The database where the collection records are stored.
+            crawl_time:  The program execution date.
         """
         sql = f"""
         select concat(
@@ -79,11 +80,11 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     def insert_table_statistics(
         self, data: dict, table: str = "table_collection_statistics"
     ) -> None:
-        """插入统计数据到表中
+        """Insert collection statistics into a database table.
 
         Args:
-            data: 需要统计的入库信息
-            table: 存储表的名称
+            data: Table-level crawl statistics to insert.
+            table: Destination statistics table name.
         """
         create_table_sql = f"""
         CREATE TABLE IF NOT EXISTS `{table}` (
@@ -108,34 +109,33 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
     def insert_script_statistics(
         self, data: dict, table: str = "script_collection_statistics"
     ) -> None:
-        """存储运行脚本的统计信息
+        """Store spider-run statistics, creating the statistics table if needed.
 
         Args:
-            data: 需要插入的 log 信息
-            table: 存储表的名称
+            data: Run statistics and diagnostic information to insert.
+            table: Destination statistics table name.
         """
-        self.cursor.execute(
-            f"""
-                CREATE TABLE IF NOT EXISTS `{table}` (
-                    `id` int(11) NOT NULL AUTO_INCREMENT,
-                    `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
-                    `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',
-                    `uid` varchar(255) NOT NULL DEFAULT '-' COMMENT 'uid',
-                    `request_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '请求次数统计',
-                    `received_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '接收次数统计',
-                    `item_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集数据量',
-                    `info_count` varchar(255) NOT NULL DEFAULT '-' COMMENT 'info 数据统计',
-                    `warning_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '警告数据统计',
-                    `error_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '错误数据统计',
-                    `start_time` datetime NOT NULL COMMENT '开始时间',
-                    `finish_time` datetime NOT NULL COMMENT '结束时间',
-                    `spend_minutes` varchar(255) NOT NULL DEFAULT '-' COMMENT '花费时间',
-                    `crawl_time` datetime NOT NULL COMMENT '程序运行/数据采集时间',
-                    `log_count_ERROR` varchar(255) DEFAULT NULL COMMENT '错误原因',
-                    PRIMARY KEY (`id`) USING BTREE
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目运行脚本统计信息表';
-                """
-        )
+        script_statistics_sql = f"""
+        CREATE TABLE IF NOT EXISTS `{table}` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `database` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集程序和记录信息存储的数据库名',
+            `spider_name` varchar(255) NOT NULL DEFAULT '-' COMMENT '脚本名称',
+            `uid` varchar(255) NOT NULL DEFAULT '-' COMMENT 'uid',
+            `request_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '请求次数统计',
+            `received_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '接收次数统计',
+            `item_counts` varchar(255) NOT NULL DEFAULT '-' COMMENT '采集数据量',
+            `info_count` varchar(255) NOT NULL DEFAULT '-' COMMENT 'info 数据统计',
+            `warning_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '警告数据统计',
+            `error_count` varchar(255) NOT NULL DEFAULT '-' COMMENT '错误数据统计',
+            `start_time` datetime NOT NULL COMMENT '开始时间',
+            `finish_time` datetime NOT NULL COMMENT '结束时间',
+            `spend_minutes` varchar(255) NOT NULL DEFAULT '-' COMMENT '花费时间',
+            `crawl_time` datetime NOT NULL COMMENT '程序运行/数据采集时间',
+            `log_count_ERROR` varchar(255) DEFAULT NULL COMMENT '错误原因',
+            PRIMARY KEY (`id`) USING BTREE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='项目运行脚本统计信息表';
+        """
+        self.cursor.execute(script_statistics_sql)
 
         sql, args = self._get_sql_by_item(
             table=table,
@@ -145,24 +145,25 @@ class AyuStatisticsMysqlPipeline(MysqlPipeEnhanceMixin):
         self._log_record(sql=sql, data=args)
 
     def _log_record(self, sql: str, data: tuple[Any]) -> None:
-        """执行日志记录的 sql 语句
+        """Execute and commit a statistics INSERT statement.
+
+        Roll back and log a warning if execution fails.
 
         Args:
-            sql: sql 语句
-            data: sql 语句中的参数
+            sql: SQL statement to execute.
+            data: Parameter values to bind to the statement.
         """
         try:
             self.cursor.execute(sql, data)
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            self.slog.warning(f"日志记录存储错误: {e}")
+            self.slog.warning(f"Failed to store crawl statistics: {e}")
 
     def close_spider(self) -> None:
         spider = cast("AyuSpider", self.crawler.spider)
         log_info = self._get_log_by_spider(spider=spider, crawl_time=self.crawl_time)
 
-        # 运行脚本统计信息
         self.insert_script_statistics(log_info)
         self.table_collection_statistics(
             spider_name=spider.name,

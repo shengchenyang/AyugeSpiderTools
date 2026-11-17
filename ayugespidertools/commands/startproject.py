@@ -8,9 +8,10 @@ import ayugespidertools
 
 class AyuCommand(Command):
     def run(self, args: list[str], opts: argparse.Namespace) -> None:
-        # 若想自定义 TEMPLATES_TO_RENDER 的文件模版，需重写父类的 run 方法，示例请查看提交历史
+        # To customize the file templates in TEMPLATES_TO_RENDER, override the
+        # parent class's run method. See the commit history for an example.
         super().run(args, opts)
-        # 添加本库的文字提示内容
+        # Add text hints to this library
         print(
             "Or you can start your first spider with ayuge:\n"
             "    ayuge genspider example example.com"
