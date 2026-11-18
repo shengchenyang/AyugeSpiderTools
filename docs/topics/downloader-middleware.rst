@@ -127,7 +127,7 @@ downloader-middleware
    - Scrapy 2.20.0 默认使用 AsyncioSelectorReactor，无需额外配置 TWISTED_REACTOR；
    - 这里的 scrapy DOWNLOAD_TIMEOUT 同样也是 aiohttp 请求的超时设置参数；
    - AIOHTTP_CONFIG 为 aiohttp 的全局配置，是构建 aiohttp.ClientSession 的 connector 时所需的\
-     参数；
+     参数，适合配置一些全局自定义参数，但不是非必需配置请按需设置；
 
 AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的参数):
 
@@ -196,5 +196,123 @@ AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的
 
 由于改成通过 yield AiohttpRequest 的统一接口发送请求，且此方法参数与 aiohttp 的请求参数一致，极大地\
 减少用户使用成本和避免维护地狱。
+
+4. 发送请求方式改为 curl_cffi
+==============================
+
+4.1. 使用方法
+-----------------
+
+激活 DOWNLOADER_MIDDLEWARES 中的对应配置。
+
+.. code-block:: python
+
+   custom_settings = {
+       # "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+       "DOWNLOADER_MIDDLEWARES": {
+           # 将 scrapy Request 替换为 curl_cffi 方式
+           "ayugespidertools.middlewares.CurlCffiDownloaderMiddleware": 543,
+       },
+       # curl_cffi.requests.AsyncSession 的配置项，非必需项，按需配置
+       "CURL_CFFI_CONFIG": {
+           "allow_redirects": False,
+       },
+   }
+
+.. note::
+
+   - Scrapy 2.20.0 默认使用 AsyncioSelectorReactor，无需额外配置 TWISTED_REACTOR；
+   - CURL_CFFI_CONFIG 为 curl_cffi 的全局配置，是构建 curl_cffi.requests.AsyncSession 时所需的\
+     参数，适合配置一些全局自定义参数，但不是非必需配置请按需设置；
+
+CURL_CFFI_CONFIG 可配置的参数如下(其实就是 curl_cffi.requests.AsyncSession 中的参数):
+
+.. code-block:: python
+
+   CURL_CFFI_CONFIG = {
+       "loop": None,
+       "async_curl": None,
+       "max_clients": None,
+       "headers": None,
+       "cookies": None,
+       "auth": None,
+       "proxies": None,
+       "proxy": None,
+       "proxy_auth": None,
+       "base_url": None,
+       "params": None,
+       "verify": None,
+       "timeout": None,
+       "trust_env": None,
+       "allow_redirects": None,
+       "max_redirects": None,
+       "retry": None,
+       "impersonate": None,
+       "ja3": None,
+       "akamai": None,
+       "perk": None,
+       "extra_fp": None,
+       "default_headers": None,
+       "default_encoding": None,
+       "curl_options": None,
+       "curl_infos": None,
+       "http_version": None,
+       "debug": None,
+       "interface": None,
+       "doh_url": None,
+       "cert": None,
+       "response_class": None,
+       "discard_cookies": None,
+       "raise_for_status": None,
+       "cache": None,
+       # 设置一些自定义的全局参数
+       "sleep": None,
+       "retry_times": None,
+   }
+
+在 spider 中使用的示例如下：
+
+.. code-block:: python
+
+   from typing import TYPE_CHECKING, Any
+
+   from ayugespidertools.request import CurlCffiRequest
+   from ayugespidertools.spiders import AyuSpider
+
+   if TYPE_CHECKING:
+       from collections.abc import AsyncIterator
+
+       from scrapy.http.response import Response
+
+
+   class DemoCurlCffiSpider(AyuSpider):
+       name = "demo_curl_cffi"
+       allowed_domains = ["browserleaks.com"]
+       start_urls = ["https://tls.browserleaks.com/json"]
+       custom_settings = {
+           # "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+           "DOWNLOADER_MIDDLEWARES": {
+               # 将 scrapy Request 替换为 curl_cffi 方式
+               "ayugespidertools.middlewares.CurlCffiDownloaderMiddleware": 543,
+           },
+           # curl_cffi.requests.AsyncSession 的配置项，非必需项，按需配置
+           "CURL_CFFI_CONFIG": {
+               "allow_redirects": False,
+           },
+       }
+
+       async def start(self) -> AsyncIterator[Any]:
+           for idx in range(5):
+               # 这里的参数与 curl_cffi 中的一致，可以按需设置
+               yield CurlCffiRequest(
+                   url="https://tls.browserleaks.com/json",
+                   callback=self.parse_first,
+                   cb_kwargs={"request_idx": idx},
+                   impersonate="chrome124",
+                   dont_filter=True,
+               )
+
+       async def parse_first(self, response: Response, request_idx: int) -> Any:
+           self.slog.info(f"{request_idx} ja3_hash: {response.json()['ja3_hash']}")
 
 .. _custom_section: https://ayugespidertools.readthedocs.io/en/latest/topics/configuration.html#custom-section
