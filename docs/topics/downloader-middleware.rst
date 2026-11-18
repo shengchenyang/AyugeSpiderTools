@@ -118,14 +118,8 @@ downloader-middleware
        },
        # aiohttp.TCPConnector 的配置项，非必需项，按需配置
        "AIOHTTP_CONFIG": {
-           "sleep": 1,
-           # 同时连接的总数
-           "limit": 100,
-           # 同时连接到一台主机的数量
-           "limit_per_host": 0,
            "retry_times": 3,
            "verify_ssl": False,
-           "allow_redirects": False,
        },
        # aiohttp 的超时时间也用这个配置
        "DOWNLOAD_TIMEOUT": 25,
@@ -160,6 +154,10 @@ AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的
        "enable_cleanup_closed": None,
        "loop": None,
        "timeout_ceil_threshold": None,
+       "happy_eyeballs_delay": None,
+       "interleave": None,
+       "socket_factory": None,
+       "ssl_shutdown_timeout": None,
        # 设置一些自定义的全局参数
        "sleep": None,
        "retry_times": None,
