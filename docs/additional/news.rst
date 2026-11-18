@@ -33,6 +33,10 @@ Improvements
 
   (:commit:`389e4917458558e3bef63e4bab96ec37c7c52832`)
 
+- 优化使用 curl_cffi 请求时参数传递方式，不再通过 meta 保存而是 request 属性，避免污染用户侧的 meta 数据。
+
+  (:commit:`0a024b2909e3c8797972626d2122cc3807690815`)
+
 ... ...
 
 AyugeSpiderTools 3.18.0 (2026-10-31)
