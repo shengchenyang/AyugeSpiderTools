@@ -87,7 +87,16 @@ downloader-middleware
 ^^^^^^^^^^^^^^^^^^^
 
 除了自带的通用代理中间件、自定义配置解析的代理中间件，你也可以通过使用 aiohttp 发送请求时设置代理参数。\
-具体示例请查看 :ref:`downloader-middleware <topics-downloader-middleware-aiohttp>` 的部分文档。
+具体示例请查看 :ref:`downloader-middleware aiohttp <topics-downloader-middleware-aiohttp>` 的部分文档。
+
+2.4. curl_cffi 的代理方式
+--------------------------
+
+2.4.1. 使用方法
+^^^^^^^^^^^^^^^^^^^
+
+当然，你也可以通过使用 curl_cffi 发送请求时设置代理参数。\
+具体示例请查看 :ref:`downloader-middleware curl_cffi <topics-downloader-middleware-curl-cffi>` 的部分文档。
 
 .. _topics-downloader-middleware-aiohttp:
 
@@ -196,6 +205,8 @@ AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的
 
 由于改成通过 yield AiohttpRequest 的统一接口发送请求，且此方法参数与 aiohttp 的请求参数一致，极大地\
 减少用户使用成本和避免维护地狱。
+
+.. _topics-downloader-middleware-curl-cffi:
 
 4. 发送请求方式改为 curl_cffi
 ==============================
