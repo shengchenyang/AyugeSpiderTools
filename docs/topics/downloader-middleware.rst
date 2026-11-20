@@ -130,7 +130,7 @@ downloader-middleware
    - Scrapy 2.20.0 默认使用 AsyncioSelectorReactor，无需额外配置 TWISTED_REACTOR；
    - 这里的 scrapy DOWNLOAD_TIMEOUT 同样也是 aiohttp 请求的超时设置参数；
    - AIOHTTP_CONFIG 为 aiohttp 的全局配置，是构建 aiohttp.ClientSession 的 connector 时所需的\
-     参数，适合配置一些全局自定义参数，但不是非必需配置请按需设置；
+     参数，适合配置一些全局自定义参数，但不是必需配置请按需设置；
 
 AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的参数):
 
@@ -232,7 +232,7 @@ AIOHTTP_CONFIG 可配置的参数如下(其实就是 aiohttp.TCPConnector 中的
 
    - Scrapy 2.20.0 默认使用 AsyncioSelectorReactor，无需额外配置 TWISTED_REACTOR；
    - CURL_CFFI_CONFIG 为 curl_cffi 的全局配置，是构建 curl_cffi.requests.AsyncSession 时所需的\
-     参数，适合配置一些全局自定义参数，但不是非必需配置请按需设置；
+     参数，适合配置一些全局自定义参数，但不是必需配置请按需设置；
 
 CURL_CFFI_CONFIG 可配置的参数如下(其实就是 curl_cffi.requests.AsyncSession 中的参数):
 
