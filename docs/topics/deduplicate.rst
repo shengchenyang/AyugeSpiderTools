@@ -177,12 +177,13 @@ Mysql 场景下除了使用 insert_ignore 或 odku_enable 的配置外，可以�
 
 
    async def test_example():
-       conn = MysqlAsyncPortal(db_conf=MysqlConf(...))
-       pool = await conn.connect()
+       portal_conn = MysqlAsyncPortal(db_conf=MysqlConf(...))
+       pool = await portal_conn.connect()
        async with pool.acquire() as conn:
            async with conn.cursor() as cursor:
-               await cursor.execute("SELECT 42;")
-       await conn.close()
+               await cursor.execute("这里填查询语句")
+               row = await cursor.fetchone()
+       await portal_conn.close()
 
 当然，也可以使用普通的方式来查询：
 
@@ -195,7 +196,8 @@ Mysql 场景下除了使用 insert_ignore 或 odku_enable 的配置外，可以�
    def test_example():
        conn = MysqlPortal(db_conf=MysqlConf(...)).connect()
        cursor = conn.cursor()
-       cursor.execute("SELECT 42;")
+       cursor.execute("这里填查询语句")
+       row = cursor.fetchone()
        conn.close()
 
 MongoDB
@@ -242,7 +244,7 @@ PostgreSQL 场景下的 asyncio 的数据库链接操作示例：
        pool = await PostgreSQLAsyncPortal(db_conf=PostgreSQLConf(...)).connect()
 
        async with pool.acquire() as conn:
-           await conn.fetchrow("SELECT 42;")
+           await conn.fetchrow("这里填查询语句")
        await pool.close()
 
 .. warning::
@@ -261,7 +263,7 @@ PostgreSQL 场景下的 asyncio 的数据库链接操作示例：
 
        async with pool.connection() as conn:
            async with conn.cursor() as cursor:
-               await cursor.execute("SELECT 42;")
+               await cursor.execute("这里填查询语句")
        await pool.close()
 
 当然，也可以使用普通的方式来查询：
@@ -275,7 +277,7 @@ PostgreSQL 场景下的 asyncio 的数据库链接操作示例：
    def test_example():
        conn = PostgreSQLPortal(db_conf=PostgreSQLConf(...)).connect()
        cursor = conn.cursor()
-       cursor.execute("SELECT 42;")
+       cursor.execute("这里填查询语句")
        conn.close()
 
 Oracle
@@ -290,17 +292,15 @@ Oracle 场景下的 asyncio 的数据库链接操作示例:
 
 
    async def test_example():
-       _sql = 'SELECT * from "_article_info_list"'
        pool = OracleAsyncPortal(db_conf=OracleConf(...)).connect()
-       async with pool.acquire() as conn:
-           with conn.cursor() as cursor:
-               await cursor.execute(_sql)
-               exists = await cursor.fetchone()
-       await conn.close()
+       # async with pool.acquire() as conn:
+       #     with conn.cursor() as cursor:
+       #         await cursor.execute("这里填查询语句")
+       #         exists = await cursor.fetchone()
+       # await conn.close()
 
-       # 但是更推荐直接使用 conn 操作即可，更简洁，可自行挑选喜欢的方式
        async with pool.acquire() as conn:
-           exists = await connection.fetchone(_sql)
+           exists = await conn.fetchone(_sql)
        await conn.close()
 
 当然，也可以使用普通的方式来查询：
@@ -314,7 +314,7 @@ Oracle 场景下的 asyncio 的数据库链接操作示例:
    def test_example():
        conn = OraclePortal(db_conf=OracleConf(...)).connect()
        cursor = conn.cursor()
-       cursor.execute("SELECT 42;")
+       cursor.execute("这里填查询语句")
        conn.close()
 
 Redis
