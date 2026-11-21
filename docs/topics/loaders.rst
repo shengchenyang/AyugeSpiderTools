@@ -111,7 +111,7 @@ ItemLoader 中。收集完所有数据后， `ItemLoader.load_item()`_ 调用该
 然后就可以 :ref:`使用项目加载器填充项目 <topics-loaders-fill-item-by-itemloaders>`  中的代码了
 
 本库主推便捷，不太推荐使用以上代码自定义增加 Item 字段来适配 Item Loaders 的特性，除非某些场景下使用 \
-Item Loaders 能够极大方便开发时，才推荐使用下。
+Item Loaders 能够极大地方便开发时，才推荐使用。
 
 .. _Item Loaders: https://docs.scrapy.org/en/latest/topics/loaders.html
 .. _add_xpath(): https://docs.scrapy.org/en/latest/topics/loaders.html#scrapy.loader.ItemLoader.add_xpath

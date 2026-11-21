@@ -55,13 +55,13 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 1.2.1. 介绍
 ^^^^^^^^^^^^^^^^
 
-结合 ``twisted``  实现 Mysql 存储场景下的异步操作。同样不用手动创建数据库表及字段。比较推荐此方式方式，\
+结合 ``twisted`` 实现 Mysql 存储场景下的异步操作。同样不用手动创建数据库表及字段。比较推荐此方式，\
 比较成熟。
 
 1.2.2. 相关示例
 ^^^^^^^^^^^^^^^^^^^
 
-可在 DemoSpdider 项目中的 ``demo_five`` 中查看。
+可在 DemoSpider 项目中的 ``demo_five`` 中查看。
 
 1.3. AyuAsyncMysqlPipeline
 ------------------------------
@@ -74,7 +74,7 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 1.3.2. 相关示例
 ^^^^^^^^^^^^^^^^^^^
 
-可在 DemoSpdider 项目中的 ``demo_aiomysql`` 中查看示例。
+可在 DemoSpider 项目中的 ``demo_aiomysql`` 中查看示例。
 
 2. MongoDB 存储
 ==================
@@ -91,16 +91,16 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 
 结合 ``twisted``  实现 ``mongodb`` 存储场景下的异步操作。
 
-可在 DemoSpdider 项目中的 ``demo_six`` 中查看示例。
+可在 DemoSpider 项目中的 ``demo_six`` 中查看示例。
 
 2.3. AyuAsyncMongoPipeline
 --------------------------------
 
 结合 ``motor`` 实现的 ``async`` 的异步存储功能。
 
-可在 DemoSpdider 项目中的 ``demo_mongo_async`` 中查看示例。
+可在 DemoSpider 项目中的 ``demo_mongo_async`` 中查看示例。
 
-3. PostgreSql 存储
+3. PostgreSQL 存储
 =====================
 
 就不再分别介绍了，命名规则一致，可通过对应的 ``AyuFtyPostgresPipeline``，``AyuTwistedPostgresPipeline``，\
@@ -123,7 +123,7 @@ table 字段，表注释，也会自动处理常见（字段编码，``Data too 
 同样地，具有的 pipelines 有 ``AyuFtyESPipeline`` 和 ``AyuAsyncESPipeline``，没有结合 ``twisted`` \
 实现的异步方式。
 
-可在 DemoSpdider 项目中的 ``demo_es`` 和 ``demo_es_async`` 中查看示例。
+可在 DemoSpider 项目中的 ``demo_es`` 和 ``demo_es_async`` 中查看示例。
 
 6. 消息推送服务
 =================
