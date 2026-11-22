@@ -89,6 +89,7 @@ lint = [
 ]
 docs = [
     "sphinx-rtd-theme==3.0.2",
+    "sphinx-design==0.6.1",
     "myst-parser==3.0.0",
     "sphinx-markdown-tables==0.0.17",
     "sphinx-hoverxref==1.4.2",
