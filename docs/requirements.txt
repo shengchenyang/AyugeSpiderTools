@@ -1,5 +1,6 @@
 sphinx==7.4.7
 sphinx-rtd-theme==3.0.2
+sphinx-design==0.6.1
 sphinx-autobuild==2024.10.3
 sphinx_markdown_tables==0.0.17
 sphinx-hoverxref==1.4.2

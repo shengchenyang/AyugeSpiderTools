@@ -41,6 +41,7 @@ Getting help
 
    intro/overview
    intro/install
+   intro/guide
    intro/tutorial
    intro/examples
 
@@ -49,6 +50,9 @@ Getting help
 
 :doc:`intro/install`
     在您的设备上安装 AyugeSpiderTools。
+
+:doc:`intro/guide`
+    按步骤创建项目、配置 MongoDB 并运行第一个 Spider。
 
 :doc:`intro/tutorial`
     编写您的第一个 AyugeSpiderTools 项目。

@@ -30,6 +30,7 @@ except (ImportError, AttributeError):
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "sphinx_design",
     "myst_parser",
     "sphinx_markdown_tables",
     "hoverxref.extension",
@@ -64,8 +65,6 @@ html_context = {
 }
 
 html_theme = "sphinx_rtd_theme"
-
-html_static_path: list = []
 
 source_suffix = [".rst", ".md"]
 
