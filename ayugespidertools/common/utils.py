@@ -6,7 +6,7 @@ import urllib.request
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from ayugespidertools.common.encryption import Encrypt
 from ayugespidertools.common.multiplexing import ReuseOperation
@@ -54,23 +54,38 @@ class Tools(AppConfManageMixin):
         Returns:
             The configuration text, with Consul Base64 values decoded as needed.
         """
-        headers = (
-            {"X-Consul-Token": token}
-            if all([remote_type == "consul", token is not None])
-            else {}
-        )
-        req = urllib.request.Request(url=url, headers=headers)  # noqa: S310
-        r = urllib.request.urlopen(req)  # noqa: S310
-        data = r.read().decode(errors="ignore")
+        handlers = {
+            "consul": Tools._get_consul_kvs,
+            "nacos": Tools._get_nacos_kvs,
+        }
+        try:
+            handler = handlers[remote_type]
+        except KeyError:
+            raise ValueError(
+                f"Unsupported configuration provider: {remote_type}"
+            ) from None
+        return handler(url, token)
 
-        url_params = urlparse(url).query
-        if remote_type == "consul":
-            if "raw" in url_params:
-                return data
+    @staticmethod
+    def _get_consul_kvs(url: str, token: str | None = None) -> str:
+        headers = {"X-Consul-Token": token} if token is not None else {}
+        data = Tools._read_remote_kvs(url, headers)
+        url_params = parse_qs(urlparse(url).query, keep_blank_values=True)
+        if "raw" in url_params:
+            return data
 
-            json_data = json.loads(data)
-            return Encrypt.base64_decode(decode_data=json_data[0]["Value"])
-        return data
+        json_data = json.loads(data)
+        return Encrypt.base64_decode(decode_data=json_data[0]["Value"])
+
+    @staticmethod
+    def _get_nacos_kvs(url: str, token: str | None = None) -> str:
+        return Tools._read_remote_kvs(url)
+
+    @staticmethod
+    def _read_remote_kvs(url: str, headers: dict[str, str] | None = None) -> str:
+        req = urllib.request.Request(url=url, headers=headers or {})  # noqa: S310
+        with urllib.request.urlopen(req) as response:  # noqa: S310
+            return response.read().decode(errors="ignore")
 
     @classmethod
     def fetch_remote_conf(
