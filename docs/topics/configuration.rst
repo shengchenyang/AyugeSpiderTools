@@ -39,6 +39,15 @@ Introduction
    "url", "_", "nacos 服务对应的链接，若有鉴权参数请在 url 中构建。"
    "format", "参数可选 json, xml, yaml", "nacos url 配置中对应的格式解析方法，支持 json，
    xml，yaml 解析。请优先使用 json 和 xml 来解析，yaml 解析需要安装 ayugespidertools[all] 依赖。"
+   "token", "可选，默认空", "用于配置 nacos v3 版本 accessToken 参数。"
+
+.. versionadded:: 3.19.0
+
+.. note::
+
+   之前版本中是不需要一个独立的 token 参数来单独保存 nacos accessToken 的，因为 nacos 的 v1 和 v2 \
+   版本中 accessToken 都是在 url 中构建的，现在 v3 版本也需要 token 参数来管理了，是向后兼容的，不影\
+   响之前 v1 和 v2 的方式。
 
 [consul]
 ========
