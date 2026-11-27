@@ -58,12 +58,9 @@ class Tools(AppConfManageMixin):
             "consul": Tools._get_consul_kvs,
             "nacos": Tools._get_nacos_kvs,
         }
-        try:
-            handler = handlers[remote_type]
-        except KeyError:
-            raise ValueError(
-                f"Unsupported configuration provider: {remote_type}"
-            ) from None
+        handler = handlers.get(remote_type)
+        if handler is None:
+            raise ValueError(f"Unsupported configuration provider: {remote_type}")
         return handler(url, token)
 
     @staticmethod
@@ -79,6 +76,16 @@ class Tools(AppConfManageMixin):
 
     @staticmethod
     def _get_nacos_kvs(url: str, token: str | None = None) -> str:
+        path = urlparse(url).path
+        if "/v1" in path:
+            return Tools._read_remote_kvs(url)
+        if "/v2" in path:
+            resp = Tools._read_remote_kvs(url)
+            return json.loads(resp).get("data", "")
+        if "/v3" in path:
+            headers = {"accessToken": token} if token is not None else {}
+            resp = Tools._read_remote_kvs(url, headers)
+            return json.loads(resp).get("data", {}).get("content", "")
         return Tools._read_remote_kvs(url)
 
     @staticmethod
