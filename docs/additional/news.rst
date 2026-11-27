@@ -26,6 +26,10 @@ New features
 
   (:commit:`19c348cf6e7fb68d8ed543b0b5a0a97aa1d840ec`)
 
+- 适配 v1,v2, v3 所有版本的 Nacos 的获取配置方法。
+
+  (:commit:`3a6fde18c2267e3290bb373a49c5a0903fb07e45`)
+
 Improvements
 ------------
 
